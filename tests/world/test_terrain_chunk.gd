@@ -51,7 +51,7 @@ func test_apply_uploads_mesh_with_material() -> void:
 	var mesh := (chunk.get_node("%Mesh") as MeshInstance3D).mesh as ArrayMesh
 	var res := _settings.resolution_for_lod(0)
 	assert_int(mesh.get_surface_count()).is_equal(1)
-	assert_int(mesh.surface_get_array_len(0)).is_equal(res * res)
+	assert_int(mesh.surface_get_array_len(0)).is_equal(res * res + 4 * (res - 1))  # + skirt
 	assert_object(mesh.surface_get_material(0)).is_same(_material)
 	var aabb := mesh.get_aabb()
 	assert_float(aabb.size.x).is_equal_approx(_settings.chunk_size, 1e-3)

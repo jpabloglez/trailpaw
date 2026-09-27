@@ -8,6 +8,7 @@ func _settings(load_radius: int = 2, unload_radius: int = 3) -> StreamingSetting
 	s.unload_radius = unload_radius
 	s.build_budget_ms = 2.0
 	s.max_tasks_in_flight = 4
+	s.lod0_radius = 1.5
 	return s
 
 
@@ -60,3 +61,28 @@ func test_load_order_is_nearest_first_with_view_tiebreak() -> void:
 		assert_float(d).is_greater_equal(last_distance - 1.0)  # bias never jumps a ring
 		last_distance = maxf(last_distance, d)
 	assert_int(coords.find(Vector2i(1, 0))).is_less(coords.find(Vector2i(-1, 0)))
+
+
+func test_lod0_radius_must_cover_diagonals() -> void:
+	var s := _settings()
+	s.lod0_radius = 1.0
+	assert_bool(s.is_valid()).is_false()
+
+
+func test_lod_by_distance_with_hysteresis() -> void:
+	var s := _settings(4, 5)
+	assert_int(StreamingPlan.lod_for(0.0, -1, s)).is_equal(0)
+	assert_int(StreamingPlan.lod_for(sqrt(2.0), -1, s)).is_equal(0)  # diagonal neighbour
+	assert_int(StreamingPlan.lod_for(2.0, -1, s)).is_equal(StreamingPlan.FAR_LOD)
+	assert_int(StreamingPlan.lod_for(2.0, 0, s)).is_equal(0)  # already detailed: keep
+	assert_int(StreamingPlan.lod_for(2.6, 0, s)).is_equal(StreamingPlan.FAR_LOD)
+	assert_int(StreamingPlan.lod_for(1.0, StreamingPlan.FAR_LOD, s)).is_equal(0)
+
+
+func test_desired_set_assigns_lod0_to_the_3x3_block() -> void:
+	var desired := StreamingPlan.desired_chunks(Vector2i.ZERO, _settings(4, 5))
+	for dz in range(-1, 2):
+		for dx in range(-1, 2):
+			assert_int(desired[Vector2i(dx, dz)]).is_equal(0)
+	assert_int(desired[Vector2i(2, 0)]).is_equal(StreamingPlan.FAR_LOD)
+	assert_int(desired[Vector2i(4, 0)]).is_equal(StreamingPlan.FAR_LOD)

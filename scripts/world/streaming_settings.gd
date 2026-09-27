@@ -5,10 +5,16 @@ extends Resource
 ## coordinates. Defaults are neutral: values come from
 ## [code]data/world/streaming_settings.tres[/code].
 
+## Smallest LOD 0 radius that covers diagonal neighbours (sqrt(2) ≈ 1.41).
+const MIN_LOD0_RADIUS: float = 1.5
+
 ## Chunks within this distance of the target's chunk are loaded.
 @export_range(1, 16) var load_radius: int = 0
 ## Loaded chunks are only dropped beyond this distance (hysteresis; > load_radius).
 @export_range(1, 20) var unload_radius: int = 0
+## Chunks within this distance use LOD 0 (full detail + collision). Keep it >= 1.5 so
+## the 3×3 block around the target, diagonals included, always has collision.
+@export_range(0.0, 16.0, 0.5, "suffix:chunks") var lod0_radius: float = 0.0
 ## Main-thread time per frame for turning finished chunk data into nodes. At least one
 ## chunk is built per frame when any is ready.
 @export_range(0.1, 16.0, 0.1, "suffix:ms") var build_budget_ms: float = 0.0
@@ -23,6 +29,10 @@ func get_validation_errors() -> PackedStringArray:
 		errors.append("load_radius must be >= 1")
 	if unload_radius <= load_radius:
 		errors.append("unload_radius must be > load_radius")
+	if lod0_radius < MIN_LOD0_RADIUS:
+		errors.append(
+			"lod0_radius must be >= %.1f (diagonal neighbours need collision)" % MIN_LOD0_RADIUS
+		)
 	if build_budget_ms <= 0.0:
 		errors.append("build_budget_ms must be > 0")
 	if max_tasks_in_flight < 1:

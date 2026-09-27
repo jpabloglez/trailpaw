@@ -17,6 +17,7 @@ func before_test() -> void:
 	_settings.unload_radius = 3
 	_settings.build_budget_ms = 8.0
 	_settings.max_tasks_in_flight = 4
+	_settings.lod0_radius = 1.5
 	_target = auto_free(Node3D.new())
 	add_child(_target)
 	_streamer = _make_streamer(_settings)
@@ -130,3 +131,39 @@ func test_freeing_mid_load_waits_for_tasks() -> void:
 	await get_tree().process_frame
 	# Reaching here without engine errors means every task was waited on.
 	assert_bool(true).is_true()
+
+
+func test_loaded_lods_match_the_plan_and_only_lod0_collides() -> void:
+	await _until_idle()
+	var desired := StreamingPlan.desired_chunks(Vector2i.ZERO, _settings)
+	for coord: Vector2i in desired:
+		var chunk := _streamer.get_chunk(coord)
+		assert_int(chunk.lod).is_equal(desired[coord])
+		assert_bool(chunk.has_collision()).is_equal(chunk.lod == 0)
+
+
+func test_no_chunk_disappears_while_walking_across_chunks() -> void:
+	await _until_idle()
+	var step := _chunk_size / 20.0
+	var path_frames := 0
+	# Walk 3 chunks along +X and 1 diagonally; check every frame.
+	while _target.position.x < 3.5 * _chunk_size:
+		var before := _streamer.loaded_coords()
+		_target.position += Vector3(step, 0.0, step * 0.3)
+		await get_tree().process_frame
+		path_frames += 1
+		(
+			assert_bool(_streamer.is_ready_at(_target.position))
+			. override_failure_message("no collision under target at frame %d" % path_frames)
+			. is_true()
+		)
+		var center := StreamingPlan.chunk_at(_target.position.x, _target.position.z, _chunk_size)
+		for coord: Vector2i in before:
+			if not StreamingPlan.should_unload(coord, center, _settings):
+				assert_bool(_streamer.is_loaded(coord)).is_true()
+	await _until_idle()
+	var center := StreamingPlan.chunk_at(_target.position.x, _target.position.z, _chunk_size)
+	var desired := StreamingPlan.desired_chunks(center, _settings)
+	for coord: Vector2i in desired:
+		if desired[coord] == 0:
+			assert_int(_streamer.get_chunk(coord).lod).is_equal(0)

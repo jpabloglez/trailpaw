@@ -87,7 +87,11 @@ generation. Revisit if the design moves to a finite, hand-crafted map.
    - Create `ArrayMesh`, `MeshInstance3D`, `StaticBody3D` + collision.
    - Create one `MultiMeshInstance3D` per vegetation type per chunk.
    - Register interactables (water, food sources) with their `Area3D`s.
-3. LOD: distant chunks use a lower vertex resolution; vegetation fades out via
+3. LOD: distant chunks use a lower vertex resolution (LOD0 65² at 1 m with collision within
+   `lod0_radius` = 1.5 chunks — the 3×3 block incl. diagonals; LOD1 17² at 4 m beyond, with
+   1 chunk of hysteresis). Every chunk has a vertical **skirt** (`skirt_depth`) that hides
+   LOD T-junction cracks; chunks changing LOD are rebuilt in place (never missing a frame).
+   Vegetation fades out via
    `visibility_range_end` and shader dithering.
 
 Scene-tree mutations happen only on the main thread; worker threads produce plain data.
