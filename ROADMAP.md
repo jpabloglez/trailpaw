@@ -71,7 +71,7 @@ Milestones: **M1 "Walk the world"** (end of Phase 3), **M2 "A day in the life"**
 - [x] Seam-free edges (shared border vertices, consistent normals).
 - [x] Two LOD resolutions for far chunks.
 - [x] `FloatingOrigin` rebase with absolute-position tracking in `GameState`.
-- [ ] `debug/terrain_sandbox.tscn` with a free-fly camera and chunk-border gizmos.
+- [x] `debug/terrain_sandbox.tscn` with a free-fly camera and chunk-border gizmos.
 
 **Tests:** same seed → identical chunk hash; neighbour chunk edges match; streamer loads
 exactly the expected set for a given position; rebase preserves absolute position.

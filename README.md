@@ -64,6 +64,12 @@ from the Godot project manager).
 # click to capture the mouse and orbit, wheel to zoom, Esc to release, F3 debug overlay
 godot --path . res://scenes/debug/movement_sandbox.tscn
 
+# Terrain sandbox (Phase 2): streamed terrain around the animal; F4 free-fly camera
+# (WASD + mouse, Shift boost, wheel = speed), F3 overlay + chunk borders
+godot --path . res://scenes/debug/terrain_sandbox.tscn
+# 10 km streaming probe (report + exit code; see docs/notes/terrain-streaming-perf.md)
+godot --headless --path . res://scenes/debug/terrain_sandbox.tscn -- --auto-travel=10000
+
 # Lint and format (GDScript)
 .venv/bin/gdlint scripts/ tests/
 .venv/bin/gdformat --check scripts/ tests/

@@ -248,7 +248,7 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
 | Unit | NeedsModel, BiomeResolver, noise determinism, chunk math, save migration | gdUnit4 |
 | Scene | Player spawns and moves on flat ground, interactor picks targets, streamer loads ring | gdUnit4 scene runner |
 | Determinism | Same seed → identical chunk hash | gdUnit4 |
-| Performance | `tools/perf_probe` scene logs frame times on a scripted flight path | Godot + Python report |
+| Performance | Terrain streaming probe: `terrain_sandbox.tscn -- --auto-travel=<m>` (spikes, holes, frame percentiles; results in `docs/notes/terrain-streaming-perf.md`); full `tools/perf_probe` in Phase 11 | Godot (+ Python report later) |
 | Manual | Game feel, camera, visuals | Checklist in each ROADMAP phase |
 
 ## 12. Architecture Decision Records

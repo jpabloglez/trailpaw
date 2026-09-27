@@ -15,6 +15,13 @@ extends Node3D
 ## building for at most [member StreamingSettings.build_budget_ms] (at least one chunk).
 ## No per-frame allocations in the steady state.
 
+## Emitted at most once per frame when the loaded set, a chunk's LOD or chunk positions
+## changed (after building or unloading, and after a floating-origin rebase).
+signal chunks_changed
+
+## Group of nodes providing [code]get_debug_lines()[/code] for the F3 overlay.
+const DEBUG_LINES_GROUP: StringName = &"debug_lines"
+
 ## Terrain shape and chunk geometry.
 @export var terrain: TerrainSettings
 ## Radii, budget and concurrency.
@@ -26,7 +33,7 @@ extends Node3D
 ## Material applied to every chunk surface.
 @export var material: Material
 
-var _world_seed: int = 0
+var _changed: bool = false
 var _center: Vector2i = Vector2i.ZERO
 var _has_center: bool = false
 var _desired: Dictionary[Vector2i, int] = {}
@@ -37,6 +44,7 @@ var _ready_jobs: Array[ChunkJob] = []
 var _pool: Array[TerrainChunk] = []
 var _last_build_ms: float = 0.0
 var _max_build_ms: float = 0.0
+var _max_chunk_ms: float = 0.0
 var _last_frame_built: int = 0
 var _total_built: int = 0
 
@@ -53,7 +61,7 @@ func _ready() -> void:
 		push_error("WorldStreamer %s: %s" % [get_path(), ", ".join(problems)])
 		set_process(false)
 		return
-	_world_seed = GameState.world_seed
+	add_to_group(DEBUG_LINES_GROUP)
 	EventBus.origin_shifted.connect(_on_origin_shifted)
 
 
@@ -66,6 +74,9 @@ func _process(_delta: float) -> void:
 	_collect_finished()
 	_build_ready()
 	_submit_tasks()
+	if _changed:
+		_changed = false
+		chunks_changed.emit()
 
 
 func _exit_tree() -> void:
@@ -113,9 +124,26 @@ func stats() -> Dictionary:
 		"pooled": _pool.size(),
 		"last_build_ms": _last_build_ms,
 		"max_build_ms": _max_build_ms,
+		"max_chunk_ms": _max_chunk_ms,
 		"last_frame_built": _last_frame_built,
 		"total_built": _total_built,
 	}
+
+
+## Lines for the F3 debug overlay.
+func get_debug_lines() -> PackedStringArray:
+	return PackedStringArray(
+		[
+			(
+				"chunks %d loaded  %d queued  %d generating"
+				% [_loaded.size(), _queue.size(), _in_flight.size()]
+			),
+			(
+				"build %.2f ms last  %.2f ms max  (budget %.1f)"
+				% [_last_build_ms, _max_build_ms, streaming.build_budget_ms]
+			),
+		]
+	)
 
 
 ## Local position of the corner of chunk [param coord].
@@ -137,6 +165,7 @@ func _on_origin_shifted(_offset: Vector3) -> void:
 	# Re-derive every chunk position from its exact integer coordinate (no drift).
 	for coord: Vector2i in _loaded:
 		_loaded[coord].position = chunk_origin(coord)
+	_changed = true
 
 
 func _replan(center: Vector2i) -> void:
@@ -176,13 +205,16 @@ func _build_ready() -> void:
 		if _desired.get(job.coord, -1) != job.lod or _has_lod(job.coord, job.lod):
 			continue  # stale: the target moved on (or the LOD changed) while generating
 		# A chunk changing LOD is rebuilt in place, so it never disappears for a frame.
+		var chunk_start := Time.get_ticks_usec()
 		var chunk: TerrainChunk = _loaded.get(job.coord)
 		if chunk == null:
 			chunk = _acquire()
 		chunk.position = chunk_origin(job.coord)
 		chunk.apply(job.data, material)
+		_max_chunk_ms = maxf(_max_chunk_ms, float(Time.get_ticks_usec() - chunk_start) / 1000.0)
 		_loaded[job.coord] = chunk
 		built += 1
+		_changed = true
 	_last_frame_built = built
 	if built > 0:
 		_last_build_ms = float(Time.get_ticks_usec() - start) / 1000.0
@@ -195,7 +227,7 @@ func _submit_tasks() -> void:
 		var coord: Vector2i = _queue.pop_front()
 		if not _desired.has(coord) or _has_lod(coord, _desired[coord]):
 			continue
-		var job := ChunkJob.new(coord, _desired[coord], terrain.duplicate(), _world_seed)
+		var job := ChunkJob.new(coord, _desired[coord], terrain.duplicate(), GameState.world_seed)
 		job.task_id = WorkerThreadPool.add_task(job.run, false, "terrain chunk")
 		_in_flight.append(job)
 
@@ -228,6 +260,7 @@ func _release(coord: Vector2i) -> void:
 	_loaded.erase(coord)
 	chunk.reset()
 	_pool.append(chunk)
+	_changed = true
 
 
 func _view_direction() -> Vector2:

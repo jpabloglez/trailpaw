@@ -17,6 +17,7 @@ var coord: Vector2i = Vector2i.ZERO
 ## LOD of the data currently applied, or -1 when empty.
 var lod: int = -1
 
+var _border := PackedVector3Array()
 var _mesh := ArrayMesh.new()
 var _arrays: Array = []
 var _heightmap := HeightMapShape3D.new()
@@ -36,6 +37,7 @@ func _ready() -> void:
 func apply(data: ChunkData, material: Material) -> void:
 	coord = data.coord
 	lod = data.lod
+	_border = data.border
 	_arrays[Mesh.ARRAY_VERTEX] = data.vertices
 	_arrays[Mesh.ARRAY_NORMAL] = data.normals
 	_arrays[Mesh.ARRAY_TEX_UV] = data.uvs
@@ -54,6 +56,11 @@ func apply(data: ChunkData, material: Material) -> void:
 		_collision.position = Vector3(size * 0.5, 0.0, size * 0.5)
 		_collision.disabled = false
 	visible = true
+
+
+## Closed outline of the chunk's surface border in local space (for debug gizmos).
+func border_outline() -> PackedVector3Array:
+	return _border
 
 
 ## Whether this chunk currently has active collision.

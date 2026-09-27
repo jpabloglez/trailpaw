@@ -1,0 +1,68 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/debug/terrain_sandbox.gd" id="1_q6pur"]
+[ext_resource type="Script" path="res://scripts/world/world_streamer.gd" id="2_o3dhc"]
+[ext_resource type="Resource" path="res://data/world/terrain_settings.tres" id="3_u18in"]
+[ext_resource type="Resource" path="res://data/world/streaming_settings.tres" id="4_nu80k"]
+[ext_resource type="PackedScene" path="res://scenes/world/terrain_chunk.tscn" id="5_t448s"]
+[ext_resource type="Material" path="res://data/world/terrain_placeholder_material.tres" id="6_elxu1"]
+[ext_resource type="PackedScene" path="res://scenes/player/animal.tscn" id="7_u3weh"]
+[ext_resource type="PackedScene" path="res://scenes/player/camera_rig.tscn" id="8_ql1ge"]
+[ext_resource type="Script" path="res://scripts/debug/free_fly_camera.gd" id="9_gsmrj"]
+[ext_resource type="Resource" path="res://data/debug/free_fly_camera.tres" id="10_fpa07"]
+[ext_resource type="Script" path="res://scripts/debug/chunk_border_gizmo.gd" id="11_63snc"]
+[ext_resource type="PackedScene" path="res://scenes/ui/debug_overlay.tscn" id="12_h55wb"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_k7oal"]
+
+[sub_resource type="Sky" id="Sky_qqnsy"]
+sky_material = SubResource("ProceduralSkyMaterial_k7oal")
+
+[sub_resource type="Environment" id="Environment_atku0"]
+background_mode = 2
+sky = SubResource("Sky_qqnsy")
+ambient_light_source = 3
+tonemap_mode = 2
+fog_enabled = true
+fog_density = 0.008
+fog_sky_affect = 0.4
+
+[node name="TerrainSandbox" type="Node3D" unique_id=2936388 node_paths=PackedStringArray("streamer", "animal", "camera_rig", "free_fly")]
+script = ExtResource("1_q6pur")
+streamer = NodePath("WorldStreamer")
+animal = NodePath("Animal")
+camera_rig = NodePath("CameraRig")
+free_fly = NodePath("FreeFlyCamera")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=663329616]
+environment = SubResource("Environment_atku0")
+
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=1456101742]
+transform = Transform3D(0.8660254, 0.38302222, -0.32139382, 0, 0.64278764, 0.76604444, 0.5, -0.66341394, 0.5566704, 0, 0, 0)
+shadow_enabled = true
+directional_shadow_max_distance = 120.0
+
+[node name="WorldStreamer" type="Node3D" parent="." unique_id=1159292779 node_paths=PackedStringArray("target")]
+script = ExtResource("2_o3dhc")
+terrain = ExtResource("3_u18in")
+streaming = ExtResource("4_nu80k")
+target = NodePath("../Animal")
+chunk_scene = ExtResource("5_t448s")
+material = ExtResource("6_elxu1")
+
+[node name="Animal" parent="." unique_id=858224225 instance=ExtResource("7_u3weh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 30, 32)
+
+[node name="CameraRig" parent="." unique_id=1364750976 node_paths=PackedStringArray("target") instance=ExtResource("8_ql1ge")]
+target = NodePath("../Animal")
+
+[node name="FreeFlyCamera" type="Camera3D" parent="." unique_id=1228331704]
+far = 2000.0
+script = ExtResource("9_gsmrj")
+settings = ExtResource("10_fpa07")
+
+[node name="ChunkBorderGizmo" type="MeshInstance3D" parent="." unique_id=1465677942 node_paths=PackedStringArray("streamer")]
+script = ExtResource("11_63snc")
+streamer = NodePath("../WorldStreamer")
+
+[node name="DebugOverlay" parent="." unique_id=650706242 instance=ExtResource("12_h55wb")]
