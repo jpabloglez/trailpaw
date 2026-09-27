@@ -52,7 +52,7 @@ Milestones: **M1 "Walk the world"** (end of Phase 3), **M2 "A day in the life"**
 - [x] `Animal` scene: `CharacterBody3D` + box/capsule placeholder with a visible "nose".
 - [x] `MovementComponent`: camera-relative input, acceleration, arc turning, walk/trot/run, jump, gravity, slope limit.
 - [x] `StateMachine` component (generic, reusable by fauna later) with Idle/Locomotion/Jump/Fall.
-- [ ] `CameraRig`: SpringArm3D, mouse orbit with captured cursor, zoom, collision, auto-recentre.
+- [x] `CameraRig`: SpringArm3D, mouse orbit with captured cursor, zoom, collision, auto-recentre.
 - [x] Tunables in `data/species/placeholder.tres` (`AnimalSpecies` resource).
 - [ ] Debug overlay (F3): FPS, speed, state, position.
 

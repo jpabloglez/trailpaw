@@ -1,0 +1,21 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/player/camera_rig.gd" id="1_lih4b"]
+[ext_resource type="Resource" path="res://data/camera/default_camera_rig.tres" id="2_3e48g"]
+
+[node name="CameraRig" type="Node3D" unique_id=1364750976]
+script = ExtResource("1_lih4b")
+settings = ExtResource("2_3e48g")
+
+[node name="Yaw" type="Node3D" parent="." unique_id=1443315513]
+unique_name_in_owner = true
+
+[node name="Pitch" type="Node3D" parent="Yaw" unique_id=146932761]
+unique_name_in_owner = true
+
+[node name="SpringArm3D" type="SpringArm3D" parent="Yaw/Pitch" unique_id=76081759]
+unique_name_in_owner = true
+
+[node name="Camera3D" type="Camera3D" parent="Yaw/Pitch/SpringArm3D" unique_id=2109649588]
+unique_name_in_owner = true
+fov = 70.0

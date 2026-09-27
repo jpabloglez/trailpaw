@@ -128,6 +128,15 @@ Swapping species = swapping a `.tres`; no code changes.
 `SpringArm3D` third-person rig with mouse orbit, collision, zoom (wheel), slight lag and
 auto-recentre behind the animal while moving. Sensitivity and invert-Y in Settings.
 
+- Scene `scenes/player/camera_rig.tscn`: `CameraRig` (top-level) → `%Yaw` → `%Pitch` →
+  `%SpringArm3D` (mask `world`, sphere probe) → `%Camera3D`. Tunables in
+  `data/camera/default_camera_rig.tres` (`CameraRigSettings`); sensitivity/invert-Y move to
+  `Settings` in Phase 10.
+- **Physics interpolation is enabled project-wide.** The rig itself opts out and follows the
+  target's `get_global_transform_interpolated()` in `_process`, so the view is smooth on
+  high-refresh displays while gameplay stays at a 60 Hz physics tick.
+- Cursor: captured on left click, released with `pause` (Esc).
+
 ### 4.4 Animation
 `AnimationTree` with a state machine; locomotion via `BlendSpace1D` (speed) and additive
 head-look. Procedural foot placement using Godot's `SkeletonModifier3D`-based IK is a
