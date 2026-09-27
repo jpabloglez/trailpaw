@@ -14,6 +14,14 @@ config/name="Trailpaw"
 config/description="A cozy open-world nature game."
 config/features=PackedStringArray("4.7", "Forward Plus")
 
+[autoload]
+
+EventBus="*res://scripts/autoload/event_bus.gd"
+GameState="*res://scripts/autoload/game_state.gd"
+Settings="*res://scripts/autoload/settings.gd"
+SaveSystem="*res://scripts/autoload/save_system.gd"
+FloatingOrigin="*res://scripts/autoload/floating_origin.gd"
+
 [display]
 
 window/size/viewport_width=1920
