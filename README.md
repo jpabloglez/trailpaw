@@ -60,6 +60,10 @@ from the Godot project manager).
 ## Everyday commands
 
 ```bash
+# Play the movement sandbox (Phase 1): WASD move, Shift run, Space jump,
+# click to capture the mouse and orbit, wheel to zoom, Esc to release, F3 debug overlay
+godot --path . res://scenes/debug/movement_sandbox.tscn
+
 # Lint and format (GDScript)
 .venv/bin/gdlint scripts/ tests/
 .venv/bin/gdformat --check scripts/ tests/
