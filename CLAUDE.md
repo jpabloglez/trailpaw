@@ -35,8 +35,10 @@ godot --headless --path . --import
 godot --path .
 godot --path . res://scenes/debug/terrain_sandbox.tscn
 
-# Tests (verify flags against the installed gdUnit4 version)
-./addons/gdUnit4/runtest.sh -a res://tests
+# Tests (gdUnit4 v6.2.1; GODOT_BIN must point to the real binary, not a wrapper)
+GODOT_BIN=$(readlink -f "$(command -v godot)") \
+  ./addons/gdUnit4/runtest.sh --headless --ignoreHeadlessMode -a res://tests
+# exit 0 = pass, 100 = failures, 101 = warnings; reports in reports/ (gitignored)
 
 # Lint and format check
 gdlint scripts/ tests/
