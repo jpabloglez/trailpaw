@@ -13,6 +13,7 @@ const KEY_ACTIONS: Dictionary = {
 	&"sniff": KEY_Q,
 	&"rest": KEY_R,
 	&"pause": KEY_ESCAPE,
+	&"toggle_debug_overlay": KEY_F3,
 }
 
 ## Expected default mouse-button bindings.
