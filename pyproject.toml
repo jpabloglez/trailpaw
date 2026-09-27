@@ -1,0 +1,17 @@
+# Tool configuration only; tools/ is not an installable package.
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+include = ["tools/**/*.py"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "D", "ANN"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.pytest.ini_options]
+testpaths = ["tools/tests"]
+pythonpath = ["."]
+addopts = "-ra"

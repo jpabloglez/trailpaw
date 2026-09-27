@@ -32,7 +32,7 @@ Milestones: **M1 "Walk the world"** (end of Phase 3), **M2 "A day in the life"**
 - [x] Create folder layout from `CLAUDE.md` §3 with `.gitkeep` files.
 - [x] Git + Git LFS (`.gitattributes`), `.gitignore` for `.godot/`, `*.import` cache, exports.
 - [x] Install gdUnit4 in `addons/`; one smoke test passes headless.
-- [ ] `pip install gdtoolkit ruff pytest`; add `gdlintrc`, `requirements-dev.txt`.
+- [x] `pip install gdtoolkit ruff pytest`; add `gdlintrc`, `requirements-dev.txt`.
 - [x] Autoload stubs: `EventBus`, `GameState`, `Settings`, `SaveSystem`, `FloatingOrigin`.
 - [x] Define full `InputMap` from ARCHITECTURE §4.5.
 - [ ] GitHub Actions: lint → headless import → tests.
