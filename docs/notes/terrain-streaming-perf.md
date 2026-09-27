@@ -39,11 +39,15 @@ on the target GPU (GTX 1050). Not the shipping configuration (native Windows, Fo
   `ArrayMesh` per apply (16), `ARRAY_FLAG_COMPRESS_ATTRIBUTES` halving upload size (23).
   Spikes do not scale with data size → a fixed per-buffer-creation stall in this driver stack.
 
-## Next steps
+## Native Windows (2026-09-27)
 
-1. Run the GPU probe on **native Windows with Forward+** (the real target) before closing
-   Phase 2's exit criterion.
-2. If spikes remain there: update existing GPU buffers in place
-   (`RenderingServer.mesh_surface_update_vertex_region`) for same-LOD reuse. Godot 4.7 has no
-   public helper to build surface bytes, so this needs a hand-written encoder for Godot's
-   vertex format — keep it behind a golden test.
+The user ran the sandbox and GPU probe on **native Windows with Forward+** and reported
+everything fine — the upload stalls seen under WSL2 did not appear. Phase 2's exit criterion
+is considered met. (Exact native numbers were not recorded; add them here on the next run.)
+
+## If spikes ever reappear
+
+- Update existing GPU buffers in place
+  (`RenderingServer.mesh_surface_update_vertex_region`) for same-LOD reuse. Godot 4.7 has no
+  public helper to build surface bytes, so this needs a hand-written encoder for Godot's
+  vertex format — keep it behind a golden test.
