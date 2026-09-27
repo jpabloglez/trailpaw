@@ -8,7 +8,8 @@ extends RefCounted
 ## exact same absolute coordinates on their shared border. Normals use central differences
 ## over a one-sample apron around the chunk, so border normals match too.
 ## [br][br]
-## Budget (worker thread): ~(resolution + 2)² height samples plus one pass to build arrays;
+## Budget (worker thread): ~(resolution + 2)² height samples plus one pass to build arrays
+## (plus a 4·(res-1) vertex skirt);
 ## measured LOD0 65×65 ≈ 6.3 ms, LOD1 17×17 ≈ 0.5 ms (GDScript). Never touches the scene tree.
 
 
@@ -28,6 +29,7 @@ static func generate(
 	data.resolution = res
 	data.step = step
 	_build_surface(data, heights)
+	_build_skirt(data, settings.skirt_depth)
 	if lod == 0:
 		data.collision_heights = _interior(heights, res)
 	return data
@@ -80,6 +82,51 @@ static func _build_surface(data: ChunkData, heights: PackedFloat32Array) -> void
 			else:
 				_put_quad(data.indices, k, v10, v11, v01, v00)
 			k += 6
+
+
+## Grid indices of the chunk border as a closed loop (+X, +Z, -X, -Z edges), 4·(res-1).
+static func border_loop(res: int) -> PackedInt32Array:
+	var loop := PackedInt32Array()
+	loop.resize(4 * (res - 1))
+	var k := 0
+	for i in res - 1:  # z = 0 edge, towards +X
+		loop[k] = i
+		k += 1
+	for j in res - 1:  # x = max edge, towards +Z
+		loop[k] = j * res + (res - 1)
+		k += 1
+	for i in range(res - 1, 0, -1):  # z = max edge, towards -X
+		loop[k] = (res - 1) * res + i
+		k += 1
+	for j in range(res - 1, 0, -1):  # x = 0 edge, towards -Z
+		loop[k] = j * res
+		k += 1
+	return loop
+
+
+## Appends a vertical skirt hanging [param depth] below the border, facing outwards.
+## Skirt vertices come after the res² surface vertices, so grid indexing is unchanged.
+static func _build_skirt(data: ChunkData, depth: float) -> void:
+	var loop := border_loop(data.resolution)
+	var n := loop.size()
+	var first := data.vertices.size()
+	data.vertices.resize(first + n)
+	data.normals.resize(first + n)
+	data.uvs.resize(first + n)
+	for k in n:
+		var top := loop[k]
+		data.vertices[first + k] = data.vertices[top] - Vector3(0.0, depth, 0.0)
+		data.normals[first + k] = data.normals[top]
+		data.uvs[first + k] = data.uvs[top]
+	var base := data.indices.size()
+	data.indices.resize(base + n * 6)
+	for k in n:
+		var a := loop[k]
+		var b := loop[(k + 1) % n]
+		var a_low := first + k
+		var b_low := first + (k + 1) % n
+		# Clockwise seen from outside the chunk.
+		_put_quad(data.indices, base + k * 6, a, a_low, b_low, b)
 
 
 ## Writes two clockwise triangles for the quad a-b-c-d (a→b→c, a→c→d).

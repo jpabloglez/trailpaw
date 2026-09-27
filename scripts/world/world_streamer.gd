@@ -3,7 +3,8 @@ extends Node3D
 ## Streams [TerrainChunk]s around a target: generates [ChunkData] on worker threads and
 ## turns finished data into nodes on the main thread within a per-frame time budget.
 ##
-## Loads every chunk within [member StreamingSettings.load_radius] of the target's chunk,
+## Loads every chunk within [member StreamingSettings.load_radius] of the target's chunk
+## (LOD 0 with collision near the target, coarse LOD further out),
 ## nearest first (ties go to chunks in the view direction), and only drops chunks beyond
 ## [member StreamingSettings.unload_radius], so moving back and forth near a border never
 ## thrashes. Chunk nodes are pooled. Results for chunks that are no longer wanted are
@@ -138,13 +139,16 @@ func _chunk_for_local(local_position: Vector3) -> Vector2i:
 func _replan(center: Vector2i) -> void:
 	_center = center
 	_has_center = true
-	_desired = StreamingPlan.desired_chunks(center, streaming)
 	for coord: Vector2i in _loaded.keys():
 		if StreamingPlan.should_unload(coord, center, streaming):
 			_release(coord)
+	var current_lods: Dictionary[Vector2i, int] = {}
+	for coord: Vector2i in _loaded:
+		current_lods[coord] = _loaded[coord].lod
+	_desired = StreamingPlan.desired_chunks(center, streaming, current_lods)
 	_queue.clear()
 	for coord: Vector2i in _desired:
-		if not _loaded.has(coord) and not _is_in_flight(coord):
+		if not _has_lod(coord, _desired[coord]) and not _is_in_flight(coord, _desired[coord]):
 			_queue.append(coord)
 	StreamingPlan.sort_by_priority(_queue, center, _view_direction())
 
@@ -166,9 +170,12 @@ func _build_ready() -> void:
 		if built > 0 and float(Time.get_ticks_usec() - start) >= budget_us:
 			break
 		var job: ChunkJob = _ready_jobs.pop_front()
-		if not _desired.has(job.coord) or _loaded.has(job.coord):
-			continue  # stale: the target moved on while it was generating
-		var chunk := _acquire()
+		if _desired.get(job.coord, -1) != job.lod or _has_lod(job.coord, job.lod):
+			continue  # stale: the target moved on (or the LOD changed) while generating
+		# A chunk changing LOD is rebuilt in place, so it never disappears for a frame.
+		var chunk: TerrainChunk = _loaded.get(job.coord)
+		if chunk == null:
+			chunk = _acquire()
 		chunk.position = chunk_origin(job.coord)
 		chunk.apply(job.data, material)
 		_loaded[job.coord] = chunk
@@ -183,19 +190,24 @@ func _build_ready() -> void:
 func _submit_tasks() -> void:
 	while _in_flight.size() < streaming.max_tasks_in_flight and not _queue.is_empty():
 		var coord: Vector2i = _queue.pop_front()
-		if _loaded.has(coord) or not _desired.has(coord):
+		if not _desired.has(coord) or _has_lod(coord, _desired[coord]):
 			continue
 		var job := ChunkJob.new(coord, _desired[coord], terrain.duplicate(), _world_seed)
 		job.task_id = WorkerThreadPool.add_task(job.run, false, "terrain chunk")
 		_in_flight.append(job)
 
 
-func _is_in_flight(coord: Vector2i) -> bool:
+func _has_lod(coord: Vector2i, lod: int) -> bool:
+	var chunk: TerrainChunk = _loaded.get(coord)
+	return chunk != null and chunk.lod == lod
+
+
+func _is_in_flight(coord: Vector2i, lod: int) -> bool:
 	for job in _in_flight:
-		if job.coord == coord:
+		if job.coord == coord and job.lod == lod:
 			return true
 	for job in _ready_jobs:
-		if job.coord == coord:
+		if job.coord == coord and job.lod == lod:
 			return true
 	return false
 

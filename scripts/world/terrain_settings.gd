@@ -18,6 +18,9 @@ const MAX_OCTAVES: int = 8
 ## Vertices per chunk side for each LOD level (index = LOD). [code]resolution - 1[/code] must
 ## divide evenly so coarser grids share vertex positions with finer ones.
 @export var lod_resolutions: PackedInt32Array = PackedInt32Array()
+## Depth of the vertical skirt around every chunk; hides cracks between chunks of
+## different LOD (T-junctions) without neighbours knowing about each other.
+@export_range(0.0, 20.0, 0.1, "suffix:m") var skirt_depth: float = 0.0
 
 @export_group("Height")
 ## Height offset added to every sample.
@@ -53,6 +56,8 @@ func get_validation_errors() -> PackedStringArray:
 	var errors := PackedStringArray()
 	if chunk_size <= 0.0:
 		errors.append("chunk_size must be > 0")
+	if skirt_depth <= 0.0:
+		errors.append("skirt_depth must be > 0")
 	if lod_resolutions.is_empty():
 		errors.append("lod_resolutions must list at least one LOD")
 	if not lod_resolutions.is_empty() and not is_equal_approx(step_for_lod(0), COLLISION_STEP):

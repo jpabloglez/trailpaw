@@ -6,5 +6,6 @@
 script = ExtResource("1_3cfbc")
 load_radius = 4
 unload_radius = 5
+lod0_radius = 1.5
 build_budget_ms = 2.0
 max_tasks_in_flight = 4
