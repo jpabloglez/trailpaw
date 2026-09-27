@@ -24,6 +24,7 @@ var _heightmap := HeightMapShape3D.new()
 
 @onready var _mesh_instance: MeshInstance3D = %Mesh
 @onready var _collision: CollisionShape3D = %Collision
+@onready var _water: MeshInstance3D = %Water
 
 
 func _ready() -> void:
@@ -57,12 +58,23 @@ func apply(data: ChunkData, material: Material) -> void:
 		# HeightMapShape3D is centred on its origin.
 		_collision.position = Vector3(size * 0.5, 0.0, size * 0.5)
 		_collision.disabled = false
+	# Water: one shared 1×1 plane per chunk, scaled to the chunk (no per-chunk mesh).
+	_water.visible = data.has_water()
+	if _water.visible:
+		var side := data.step * float(data.resolution - 1)
+		_water.position = Vector3(side * 0.5, data.water_level, side * 0.5)
+		_water.scale = Vector3(side, 1.0, side)
 	visible = true
 
 
 ## Closed outline of the chunk's surface border in local space (for debug gizmos).
 func border_outline() -> PackedVector3Array:
 	return _border
+
+
+## Whether this chunk currently shows a water plane.
+func has_water() -> bool:
+	return _water.visible
 
 
 ## Whether this chunk currently has active collision.
@@ -74,4 +86,5 @@ func has_collision() -> bool:
 func reset() -> void:
 	visible = false
 	_collision.disabled = true
+	_water.visible = false
 	lod = -1

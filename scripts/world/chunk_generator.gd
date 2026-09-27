@@ -37,6 +37,9 @@ static func generate_with(
 	data.step = step
 	var heights := sample_apron(sampler, coord, res, step, data)
 	_build_surface(data, heights)
+	data.water_level = settings.sea_level
+	for v in data.vertices.size():
+		data.min_height = minf(data.min_height, data.vertices[v].y)
 	_build_skirt(data, settings.skirt_depth)
 	if lod == 0:
 		data.collision_heights = _interior(heights, res)

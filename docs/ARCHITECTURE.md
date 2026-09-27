@@ -129,6 +129,11 @@ Scene-tree mutations happen only on the main thread; worker threads produce plai
   rebase (verified pixel-identical across a rebase). Distance fog comes from the
   Environment; the debug sandbox uses depth fog closing (90→200 m) before the streaming
   edge (~210 m) with `fog_sky_affect = 1` so the edge never shows.
+- Water v1: `TerrainSettings.sea_level` (−6 m). A chunk whose ground dips below it shows a
+  translucent plane (`shaders/water.gdshader`, ripples in absolute coordinates, no depth
+  texture so Forward+ and Compatibility match) — one shared 1×1 `PlaneMesh` scaled to the
+  chunk. Coverage (seed 12345): river valley ≈ 42 %, forest 2 %, hills 1 %, meadow 0 %.
+  No swimming/drinking yet (Phases 5 and 7): the animal walks along the bed.
 - Distance is computed in **absolute world coordinates** (tracked by `FloatingOrigin`),
   never from the rebased local position.
 

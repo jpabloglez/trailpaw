@@ -9,6 +9,7 @@ chunk_size = 64.0
 lod_resolutions = PackedInt32Array(65, 17)
 skirt_depth = 2.0
 biomes = ExtResource("1_2mfl4")
+sea_level = -6.0
 continental_frequency = 0.0015
 continental_amplitude = 18.0
 continental_octaves = 3

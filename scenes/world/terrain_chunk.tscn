@@ -1,6 +1,10 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/world/terrain_chunk.gd" id="1_nby65"]
+[ext_resource type="Material" path="res://data/world/water_material.tres" id="2_wxdmj"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_laytl"]
+size = Vector2(1, 1)
 
 [node name="TerrainChunk" type="Node3D" unique_id=1442656002]
 script = ExtResource("1_nby65")
@@ -15,3 +19,10 @@ collision_mask = 0
 [node name="Collision" type="CollisionShape3D" parent="Body" unique_id=1897161100]
 unique_name_in_owner = true
 disabled = true
+
+[node name="Water" type="MeshInstance3D" parent="." unique_id=802513433]
+unique_name_in_owner = true
+visible = false
+material_override = ExtResource("2_wxdmj")
+cast_shadow = 0
+mesh = SubResource("PlaneMesh_laytl")

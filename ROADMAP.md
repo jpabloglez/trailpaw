@@ -86,7 +86,7 @@ exactly the expected set for a given position; rebase preserves absolute positio
 - [x] `BiomeResolver.weights_at()` using distance bands + boundary noise + blend width.
 - [x] Biome-dependent height parameters and ground vertex colours.
 - [x] Terrain shader: blends ground palettes by weight, slope-based rock tint, distance fog.
-- [ ] Rivers/lakes v1: water plane at sea level in low areas (river valley biome raises frequency).
+- [x] Rivers/lakes v1: water plane at sea level in low areas (river valley biome raises frequency).
 - [ ] `EventBus.biome_entered` + HUD toast with biome name.
 
 **Tests:** weights sum to 1; bands appear in configured order along any direction; transitions are continuous.
