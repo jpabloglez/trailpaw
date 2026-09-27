@@ -53,7 +53,7 @@ Milestones: **M1 "Walk the world"** (end of Phase 3), **M2 "A day in the life"**
 - [ ] `MovementComponent`: camera-relative input, acceleration, arc turning, walk/trot/run, jump, gravity, slope limit.
 - [ ] `StateMachine` component (generic, reusable by fauna later) with Idle/Locomotion/Jump/Fall.
 - [ ] `CameraRig`: SpringArm3D, mouse orbit with captured cursor, zoom, collision, auto-recentre.
-- [ ] Tunables in `data/species/placeholder.tres` (`AnimalSpecies` resource).
+- [x] Tunables in `data/species/placeholder.tres` (`AnimalSpecies` resource).
 - [ ] Debug overlay (F3): FPS, speed, state, position.
 
 **Tests:** state transitions; speed never exceeds species max; movement is camera-relative.

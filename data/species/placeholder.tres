@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="AnimalSpecies" format=3]
+
+[ext_resource type="Script" path="res://scripts/player/animal_species.gd" id="1_esaoj"]
+
+[resource]
+script = ExtResource("1_esaoj")
+display_name = "Placeholder"
+walk_speed = 1.5
+trot_speed = 4.0
+run_speed = 7.5
+acceleration = 12.0
+deceleration = 16.0
+turn_rate_slow = 6.0
+turn_rate_fast = 2.5
+turn_slowdown = 0.6
+jump_height = 1.0
+air_control = 0.3
+max_slope_degrees = 45.0
