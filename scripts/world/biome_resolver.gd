@@ -15,12 +15,19 @@ extends RefCounted
 const NOISE_SALT: int = 0xB10E
 
 var _biomes: Array[BiomeDefinition] = []
+var _offsets := PackedFloat32Array()
+var _continental := PackedFloat32Array()
+var _detail := PackedFloat32Array()
+var _ridged := PackedFloat32Array()
+var _color_a := PackedColorArray()
+var _color_b := PackedColorArray()
 var _starts := PackedFloat64Array()
 var _sequence_length: float = 0.0
 var _cycle: bool = false
 var _half_blend: float = 0.0
 var _noise_amplitude: float = 0.0
 var _spawn: Vector2 = Vector2.ZERO
+var _noise_slope: float = 0.0
 var _noise: FastNoiseLite
 var _scratch := BiomeBlend.new()
 
@@ -30,11 +37,22 @@ func _init(table: BiomeTable, world_seed: int) -> void:
 	_cycle = table.cycle
 	_half_blend = table.blend_width * 0.5
 	_noise_amplitude = table.boundary_noise_amplitude
+	_noise_slope = (
+		table.boundary_noise_amplitude
+		* table.boundary_noise_frequency
+		* BiomeTable.NOISE_GRADIENT_FACTOR
+	)
 	_spawn = table.spawn
 	var start := 0.0
 	for biome in _biomes:
 		_starts.append(start)
 		start += biome.band_width
+		_offsets.append(biome.height_offset)
+		_continental.append(biome.continental_scale)
+		_detail.append(biome.detail_scale)
+		_ridged.append(biome.ridged_scale)
+		_color_a.append(biome.ground_color_a)
+		_color_b.append(biome.ground_color_b)
 	_sequence_length = start
 	_noise = FastNoiseLite.new()
 	_noise.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
@@ -63,13 +81,32 @@ func blend_into(x: float, z: float, out: BiomeBlend) -> void:
 	elif _has_band_after(k) and d > end - _half_blend:
 		neighbour = k + 1
 		neighbour_weight = smoothstep(end - _half_blend, end + _half_blend, d)
-	var own := _band(k)
+	var own := _slot(k)
 	if neighbour < 0 or neighbour_weight <= 0.0:
-		_fill(out, own, null, 0.0)
+		_fill(out, own, -1, 0.0)
 	elif neighbour_weight > 0.5:
-		_fill(out, _band(neighbour), own, 1.0 - neighbour_weight)
+		_fill(out, _slot(neighbour), own, 1.0 - neighbour_weight)
 	else:
-		_fill(out, own, _band(neighbour), neighbour_weight)
+		_fill(out, own, _slot(neighbour), neighbour_weight)
+
+
+## If every point within [param radius] of absolute ([param x], [param z]) lies inside a
+## single band, away from any cross-fade, fills [param out] with that band's values and
+## returns [code]true[/code]; the blend is then exactly constant over the area. Uses a
+## rigorous bound: the noisy distance changes by at most 1 + A·f·[constant
+## BiomeTable.NOISE_GRADIENT_FACTOR] per metre.
+func uniform_blend(x: float, z: float, radius: float, out: BiomeBlend) -> bool:
+	var d := effective_distance(x, z)
+	var reach := radius * (1.0 + _noise_slope)
+	var k := band_index(d)
+	var start := band_start(k)
+	var end := start + _band(k).band_width
+	var pure_from := start + _half_blend if k > 0 else -INF
+	var pure_to := end - _half_blend if _has_band_after(k) else INF
+	if d - reach <= pure_from or d + reach >= pure_to:
+		return false
+	_fill(out, _slot(k), -1, 0.0)
+	return true
 
 
 ## Biome weights at absolute ([param x], [param z]), keyed by biome id. Sums to 1.
@@ -122,30 +159,44 @@ func biome_of_band(k: int) -> BiomeDefinition:
 
 
 func _band(k: int) -> BiomeDefinition:
-	return _biomes[k % _biomes.size()] if _cycle else _biomes[mini(k, _biomes.size() - 1)]
+	return _biomes[_slot(k)]
+
+
+## Index into the biome list for global band [param k].
+func _slot(k: int) -> int:
+	return k % _biomes.size() if _cycle else mini(k, _biomes.size() - 1)
 
 
 func _has_band_after(k: int) -> bool:
 	return _cycle or k < _biomes.size() - 1
 
 
-func _fill(
-	out: BiomeBlend, primary: BiomeDefinition, secondary: BiomeDefinition, weight: float
-) -> void:
-	out.primary = primary
-	out.secondary = secondary
+func _fill(out: BiomeBlend, primary: int, secondary: int, weight: float) -> void:
+	out.primary = _biomes[primary]
+	out.secondary = _biomes[secondary] if secondary >= 0 else null
 	out.secondary_weight = weight
-	if secondary == null:
-		out.height_offset = primary.height_offset
-		out.continental_scale = primary.continental_scale
-		out.detail_scale = primary.detail_scale
-		out.ridged_scale = primary.ridged_scale
-		out.color_a = primary.ground_color_a
-		out.color_b = primary.ground_color_b
+	if secondary < 0:
+		out.height_offset = _offsets[primary]
+		out.continental_scale = _continental[primary]
+		out.detail_scale = _detail[primary]
+		out.ridged_scale = _ridged[primary]
+		out.color_a = _color_a[primary]
+		out.color_b = _color_b[primary]
 		return
-	out.height_offset = lerpf(primary.height_offset, secondary.height_offset, weight)
-	out.continental_scale = lerpf(primary.continental_scale, secondary.continental_scale, weight)
-	out.detail_scale = lerpf(primary.detail_scale, secondary.detail_scale, weight)
-	out.ridged_scale = lerpf(primary.ridged_scale, secondary.ridged_scale, weight)
-	out.color_a = primary.ground_color_a.lerp(secondary.ground_color_a, weight)
-	out.color_b = primary.ground_color_b.lerp(secondary.ground_color_b, weight)
+	out.height_offset = lerpf(_offsets[primary], _offsets[secondary], weight)
+	out.continental_scale = lerpf(_continental[primary], _continental[secondary], weight)
+	out.detail_scale = lerpf(_detail[primary], _detail[secondary], weight)
+	out.ridged_scale = lerpf(_ridged[primary], _ridged[secondary], weight)
+	out.color_a = _color_a[primary].lerp(_color_a[secondary], weight)
+	out.color_b = _color_b[primary].lerp(_color_b[secondary], weight)
+
+
+## Largest |height offset| + per-layer scale among all biomes (for height bounds).
+func max_modifiers() -> Vector4:
+	var bound := Vector4.ZERO
+	for i in _biomes.size():
+		bound.x = maxf(bound.x, absf(_offsets[i]))
+		bound.y = maxf(bound.y, _continental[i])
+		bound.z = maxf(bound.z, _detail[i])
+		bound.w = maxf(bound.w, _ridged[i])
+	return bound

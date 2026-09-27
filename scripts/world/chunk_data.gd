@@ -20,6 +20,11 @@ var vertices := PackedVector3Array()
 var normals := PackedVector3Array()
 ## Per-vertex UVs in [0, 1] across the chunk.
 var uvs := PackedVector2Array()
+## Per-vertex ground palette colour A (biome-blended).
+var colors := PackedColorArray()
+## Per-vertex ground palette colour B as RGBA8 bytes (4 per vertex), uploaded as
+## [constant Mesh.ARRAY_CUSTOM0] for the terrain shader.
+var custom0 := PackedByteArray()
 ## Triangle indices (clockwise = front-facing in Godot).
 var indices := PackedInt32Array()
 ## Closed outline of the chunk surface border (local positions), for debug gizmos.
@@ -42,6 +47,8 @@ func content_hash() -> String:
 	ctx.update(vertices.to_byte_array())
 	ctx.update(normals.to_byte_array())
 	ctx.update(uvs.to_byte_array())
+	ctx.update(colors.to_byte_array())
+	ctx.update(custom0)
 	ctx.update(indices.to_byte_array())
 	ctx.update(collision_heights.to_byte_array())
 	return ctx.finish().hex_encode()

@@ -22,6 +22,11 @@ const MAX_OCTAVES: int = 8
 ## different LOD (T-junctions) without neighbours knowing about each other.
 @export_range(0.0, 20.0, 0.1, "suffix:m") var skirt_depth: float = 0.0
 
+@export_group("Biomes")
+## Biome bands that reshape and colour the terrain. Without a table the terrain is the
+## plain layered noise (useful for tests).
+@export var biomes: BiomeTable
+
 @export_group("Height")
 ## Height offset added to every sample.
 @export_range(-100.0, 100.0, 0.1, "suffix:m") var base_height: float = 0.0
@@ -70,6 +75,9 @@ func get_validation_errors() -> PackedStringArray:
 			errors.append("lod_resolutions[%d] must be >= 2" % i)
 		elif i > 0 and (lod_resolutions[0] - 1) % (res - 1) != 0:
 			errors.append("lod_resolutions[%d] - 1 must divide lod_resolutions[0] - 1" % i)
+	if biomes != null:
+		for problem: String in biomes.get_validation_errors():
+			errors.append("biomes: " + problem)
 	for layer: String in ["continental", "detail", "ridged"]:
 		if float(get(layer + "_frequency")) <= 0.0:
 			errors.append("%s_frequency must be > 0" % layer)

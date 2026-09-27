@@ -74,29 +74,64 @@ func test_terrain_is_varied() -> void:
 	assert_float(hi - lo).is_greater(5.0)
 
 
-func test_terrain_is_walkable_for_the_placeholder_species() -> void:
-	# Cozy terrain: nearly everything must be below the animal's slope limit.
-	var sampler := HeightSampler.new(_settings, SEED)
-	var limit := tan(deg_to_rad((load(SPECIES_PATH) as AnimalSpecies).max_slope_degrees))
-	var steep := 0
-	var total := 0
-	for i in 60:
-		for j in 60:
-			var x := -1500.0 + i * 50.0
-			var z := -1500.0 + j * 50.0
-			var dx := (sampler.height_at(x + 1.0, z) - sampler.height_at(x - 1.0, z)) * 0.5
-			var dz := (sampler.height_at(x, z + 1.0) - sampler.height_at(x, z - 1.0)) * 0.5
-			if Vector2(dx, dz).length() > limit:
-				steep += 1
-			total += 1
-	assert_float(float(steep) / total).is_less(0.02)
-
-
 ## Golden values: fail loudly if an engine upgrade or code change alters the world a
-## given seed produces (that would silently break saves). Update deliberately, with an ADR.
+## given seed produces (that would silently break saves). Update deliberately, with an ADR
+## (last change: ADR-005, biome-blended terrain).
 func test_golden_heights_for_reference_seed() -> void:
 	var sampler := HeightSampler.new(_settings, SEED)
 	assert_int(HeightSampler.layer_seed(SEED, HeightSampler.LAYER_SALT[0])).is_equal(1883851918)
-	assert_float(sampler.height_at(0.0, 0.0)).is_equal_approx(7.000001, 1e-4)
-	assert_float(sampler.height_at(1234.5, -678.25)).is_equal_approx(3.564025, 1e-4)
-	assert_float(sampler.height_at(-9000.0, 4200.0)).is_equal_approx(13.689618, 1e-4)
+	assert_float(sampler.height_at(0.0, 0.0)).is_equal_approx(4.4, 1e-4)
+	assert_float(sampler.height_at(1234.5, -678.25)).is_equal_approx(5.594238, 1e-4)
+	assert_float(sampler.height_at(-9000.0, 4200.0)).is_equal_approx(10.088988, 1e-4)
+
+
+func test_terrain_is_walkable_in_every_biome() -> void:
+	var sampler := HeightSampler.new(_settings, SEED)
+	var resolver := sampler.resolver()
+	var limit := tan(deg_to_rad((load(SPECIES_PATH) as AnimalSpecies).max_slope_degrees))
+	for b in _settings.biomes.biomes.size():
+		var steep := 0
+		var total := 0
+		for a in 24:
+			for r in 12:
+				var p := (
+					Vector2.from_angle(a * TAU / 24.0) * (resolver.band_start(b) + 260.0 + r * 25.0)
+				)
+				var dx := (
+					(sampler.height_at(p.x + 1.0, p.y) - sampler.height_at(p.x - 1.0, p.y)) * 0.5
+				)
+				var dz := (
+					(sampler.height_at(p.x, p.y + 1.0) - sampler.height_at(p.x, p.y - 1.0)) * 0.5
+				)
+				if Vector2(dx, dz).length() > limit:
+					steep += 1
+				total += 1
+		assert_float(float(steep) / total).is_less(0.02)
+
+
+func test_biome_shapes_the_terrain_valley_low_hills_high() -> void:
+	var sampler := HeightSampler.new(_settings, SEED)
+	var resolver := sampler.resolver()
+	var means := {}
+	for b in _settings.biomes.biomes.size():
+		var sum := 0.0
+		var n := 0
+		for a in 36:
+			for r in 10:
+				var p := (
+					Vector2.from_angle(a * TAU / 36.0) * (resolver.band_start(b) + 250.0 + r * 30.0)
+				)
+				if resolver.dominant_at(p.x, p.y) == _settings.biomes.biomes[b]:
+					sum += sampler.height_at(p.x, p.y)
+					n += 1
+		means[_settings.biomes.biomes[b].id] = sum / n
+	assert_float(means[&"river_valley"]).is_less(means[&"meadow"])
+	assert_float(means[&"meadow"]).is_less(means[&"hills"])
+
+
+func test_plain_noise_without_biome_table() -> void:
+	var plain := _settings.duplicate() as TerrainSettings
+	plain.biomes = null
+	var sampler := HeightSampler.new(plain, SEED)
+	assert_object(sampler.resolver()).is_null()
+	assert_float(absf(sampler.height_at(10.0, 20.0))).is_less_equal(sampler.max_deviation())

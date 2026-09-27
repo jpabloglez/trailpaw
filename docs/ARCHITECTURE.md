@@ -115,6 +115,11 @@ Scene-tree mutations happen only on the main thread; worker threads produce plai
   (meadow → forest → river valley → hills → alpine…), then a low-frequency noise
   perturbs the boundary so transitions look organic. Weights are blended across a
   transition width to avoid hard seams.
+- Terrain: height modifiers (offset, per-layer scales) and the two ground colours are blended
+  per vertex from the biome weights (`HeightSampler.sample`, ADR-005). Colour A goes in
+  `COLOR`, colour B in `CUSTOM0` (RGBA8). Chunks wholly inside one band use a bit-identical
+  constant-blend fast path. Each `ChunkJob` builds its sampler on the main thread so worker
+  threads never read the shared biome resources.
 - Distance is computed in **absolute world coordinates** (tracked by `FloatingOrigin`),
   never from the rebased local position.
 
@@ -269,5 +274,6 @@ Stored in `docs/adr/NNN-title.md`. Initial set:
 - [ADR-002](adr/002-gdscript-first.md) GDScript first, GDExtension (C++) only after profiling.
 - [ADR-003](adr/003-no-death-soft-consequences.md) No death mechanic; soft consequences for critical needs.
 - [ADR-004](adr/004-floating-origin.md) Floating origin instead of a double-precision engine build.
+- [ADR-005](adr/005-biome-blended-terrain.md) Biome-blended terrain height function.
 
 New ADRs start from [`000-template.md`](adr/000-template.md).

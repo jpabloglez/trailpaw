@@ -8,26 +8,34 @@ extends RefCounted
 ## exact same absolute coordinates on their shared border. Normals use central differences
 ## over a one-sample apron around the chunk, so border normals match too.
 ## [br][br]
-## Budget (worker thread): ~(resolution + 2)² height samples plus one pass to build arrays
+## Budget (worker thread): ~(resolution + 2)² height + biome samples plus one pass to build
+## arrays
 ## (plus a 4·(res-1) vertex skirt);
-## measured LOD0 65×65 ≈ 6.3 ms, LOD1 17×17 ≈ 0.5 ms (GDScript). Never touches the scene tree.
+## measured LOD0 65×65 ≈ 15.6 ms avg (≈ 63 % of chunks take the uniform-band fast path), LOD1
+## ≈ 1.1 ms (GDScript, ADR-005). Never touches the scene tree.
 
 
 ## Generates the chunk at [param coord] for [param lod]. Collision heights are only
-## produced for LOD 0.
+## produced for LOD 0. Convenience wrapper that builds its own [HeightSampler].
 static func generate(
 	coord: Vector2i, lod: int, settings: TerrainSettings, world_seed: int
 ) -> ChunkData:
-	var sampler := HeightSampler.new(settings, world_seed)
+	return generate_with(coord, lod, settings, HeightSampler.new(settings, world_seed))
+
+
+## Generates the chunk with a caller-owned [param sampler] (built on the main thread so
+## worker tasks never read shared resources).
+static func generate_with(
+	coord: Vector2i, lod: int, settings: TerrainSettings, sampler: HeightSampler
+) -> ChunkData:
 	var res := settings.resolution_for_lod(lod)
 	var step := settings.step_for_lod(lod)
-	var heights := sample_apron(sampler, coord, res, step)
-
 	var data := ChunkData.new()
 	data.coord = coord
 	data.lod = lod
 	data.resolution = res
 	data.step = step
+	var heights := sample_apron(sampler, coord, res, step, data)
 	_build_surface(data, heights)
 	_build_skirt(data, settings.skirt_depth)
 	if lod == 0:
@@ -35,19 +43,56 @@ static func generate(
 	return data
 
 
-## Heights on a (res + 2)² grid: the chunk's res² vertices plus a one-sample apron.
+## Heights on a (res + 2)² grid: the chunk's res² vertices plus a one-sample apron. When
+## [param data] is given, also fills its per-vertex biome colours for the interior.
 static func sample_apron(
-	sampler: HeightSampler, coord: Vector2i, res: int, step: float
+	sampler: HeightSampler, coord: Vector2i, res: int, step: float, data: ChunkData = null
 ) -> PackedFloat32Array:
 	var side := res + 2
 	var heights := PackedFloat32Array()
 	heights.resize(side * side)
+	if data != null:
+		data.colors.resize(res * res)
+		data.custom0.resize(res * res * 4)
+	var blend := BiomeBlend.new()
 	var base_x := coord.x * (res - 1) - 1
 	var base_z := coord.y * (res - 1) - 1
+	# Most chunks lie wholly inside one band: resolve the biome once instead of per sample.
+	var span := float(side - 1) * step
+	var centre_x := float(base_x) * step + span * 0.5
+	var centre_z := float(base_z) * step + span * 0.5
+	var resolver := sampler.resolver()
+	var uniform := (
+		resolver != null
+		and resolver.uniform_blend(centre_x, centre_z, span * 0.5 * sqrt(2.0), blend)
+	)
+	if uniform:
+		# Hoist the constant modifiers; colours are the same for every vertex.
+		var offset := blend.height_offset
+		var cs := blend.continental_scale
+		var ds := blend.detail_scale
+		var rs := blend.ridged_scale
+		for j in side:
+			var z := float(base_z + j) * step
+			for i in side:
+				heights[j * side + i] = sampler.sample_with_modifiers(
+					float(base_x + i) * step, z, offset, cs, ds, rs
+				)
+		if data != null:
+			data.colors.fill(blend.color_a)
+			for v in res * res:
+				_put_rgba8(data.custom0, v, blend.color_b)
+		return heights
 	for j in side:
 		var z := float(base_z + j) * step
+		var interior_row := j >= 1 and j <= res
 		for i in side:
-			heights[j * side + i] = sampler.height_at(float(base_x + i) * step, z)
+			var x := float(base_x + i) * step
+			heights[j * side + i] = sampler.sample(x, z, blend)
+			if data != null and interior_row and i >= 1 and i <= res:
+				var v := (j - 1) * res + (i - 1)
+				data.colors[v] = blend.color_a
+				_put_rgba8(data.custom0, v, blend.color_b)
 	return heights
 
 
@@ -113,6 +158,9 @@ static func _build_skirt(data: ChunkData, depth: float) -> void:
 	data.vertices.resize(first + n)
 	data.normals.resize(first + n)
 	data.uvs.resize(first + n)
+	if not data.colors.is_empty():
+		data.colors.resize(first + n)
+		data.custom0.resize((first + n) * 4)
 	data.border.resize(n)
 	for k in n:
 		var top := loop[k]
@@ -120,6 +168,10 @@ static func _build_skirt(data: ChunkData, depth: float) -> void:
 		data.vertices[first + k] = data.vertices[top] - Vector3(0.0, depth, 0.0)
 		data.normals[first + k] = data.normals[top]
 		data.uvs[first + k] = data.uvs[top]
+		if not data.colors.is_empty():
+			data.colors[first + k] = data.colors[top]
+			for c in 4:
+				data.custom0[(first + k) * 4 + c] = data.custom0[top * 4 + c]
 	var base := data.indices.size()
 	data.indices.resize(base + n * 6)
 	for k in n:
@@ -149,3 +201,11 @@ static func _interior(heights: PackedFloat32Array, res: int) -> PackedFloat32Arr
 		for i in res:
 			out[j * res + i] = heights[(j + 1) * side + (i + 1)]
 	return out
+
+
+static func _put_rgba8(bytes: PackedByteArray, vertex: int, color: Color) -> void:
+	var o := vertex * 4
+	bytes[o] = color.r8
+	bytes[o + 1] = color.g8
+	bytes[o + 2] = color.b8
+	bytes[o + 3] = color.a8
