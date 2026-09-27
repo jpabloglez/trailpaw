@@ -129,11 +129,18 @@ Phase 11 polish item.
 | `interact` | E / left click on highlighted target |
 | `sniff` (highlight nearby resources) | Q |
 | `rest` | R (hold) |
-| `camera_orbit` | Mouse move (captured) |
-| `camera_zoom` | Mouse wheel |
+| `camera_zoom_in` / `camera_zoom_out` | Mouse wheel up / down |
 | `pause` | Esc |
+| *camera orbit* | Mouse move (captured) — not an action, see below |
 
-All actions defined in `project.godot` `InputMap` and remappable at runtime.
+All actions are defined in `project.godot` `InputMap` and remappable at runtime. Keys are
+bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZERTY).
+
+- Camera orbit reads `InputEventMouseMotion` directly in `CameraRig`; `InputMap` cannot
+  bind mouse motion to an action.
+- Zoom is split into two actions because a wheel event has no analogue axis.
+- "Hold" behaviour (`sprint`, `rest`) is gameplay logic on top of the action, not part of
+  the `InputMap`.
 
 ## 5. Needs system
 
