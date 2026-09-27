@@ -70,7 +70,7 @@ Milestones: **M1 "Walk the world"** (end of Phase 3), **M2 "A day in the life"**
 - [x] `WorldStreamer`: load/unload ring with hysteresis, nearest-first queue, main-thread budget (N chunks/frame).
 - [x] Seam-free edges (shared border vertices, consistent normals).
 - [x] Two LOD resolutions for far chunks.
-- [ ] `FloatingOrigin` rebase with absolute-position tracking in `GameState`.
+- [x] `FloatingOrigin` rebase with absolute-position tracking in `GameState`.
 - [ ] `debug/terrain_sandbox.tscn` with a free-fly camera and chunk-border gizmos.
 
 **Tests:** same seed → identical chunk hash; neighbour chunk edges match; streamer loads

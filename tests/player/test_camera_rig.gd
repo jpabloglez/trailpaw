@@ -143,3 +143,23 @@ func test_no_recentre_when_target_is_still() -> void:
 	for i in 300:
 		rig._process(1.0 / 60.0)
 	assert_float(rig.yaw()).is_equal(0.0)
+
+
+func test_rebase_does_not_trigger_auto_recentre() -> void:
+	FloatingOrigin.reset()
+	FloatingOrigin.configure(64.0, 100.0)
+	var target := _make_target(Vector3(300.0, 0.0, 0.0))
+	target.add_to_group(FloatingOrigin.SHIFTABLE_GROUP)
+	var rig := _make_rig(target)
+	target.rotation.y = 1.5
+	FloatingOrigin.track(target)
+	for i in int((_settings.recentre_delay + 0.5) * 60.0):
+		rig._process(1.0 / 60.0)  # still target: no recentre, look timer expires
+	FloatingOrigin.rebase_now()
+	rig._process(1.0 / 60.0)
+	assert_float(rig.yaw()).is_equal(0.0)
+	assert_vector(rig.global_position - target.global_position).is_equal_approx(
+		Vector3(0.0, _settings.pivot_height, 0.0), Vector3.ONE * 0.05
+	)
+	FloatingOrigin.reset()
+	GameState.chunk_size = 0.0

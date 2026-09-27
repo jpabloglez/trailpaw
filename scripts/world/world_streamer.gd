@@ -26,10 +26,6 @@ extends Node3D
 ## Material applied to every chunk surface.
 @export var material: Material
 
-## Chunk-grid offset of the floating origin (local position 0 lies at the corner of this
-## chunk). Wired to [code]GameState[/code] in a later task; zero until then.
-var origin_chunk: Vector2i = Vector2i.ZERO
-
 var _world_seed: int = 0
 var _center: Vector2i = Vector2i.ZERO
 var _has_center: bool = false
@@ -58,6 +54,7 @@ func _ready() -> void:
 		set_process(false)
 		return
 	_world_seed = GameState.world_seed
+	EventBus.origin_shifted.connect(_on_origin_shifted)
 
 
 func _process(_delta: float) -> void:
@@ -123,7 +120,7 @@ func stats() -> Dictionary:
 
 ## Local position of the corner of chunk [param coord].
 func chunk_origin(coord: Vector2i) -> Vector3:
-	var local := coord - origin_chunk
+	var local := coord - GameState.origin_chunk
 	return Vector3(local.x, 0.0, local.y) * terrain.chunk_size
 
 
@@ -133,7 +130,13 @@ func _target_chunk() -> Vector2i:
 
 func _chunk_for_local(local_position: Vector3) -> Vector2i:
 	var local := StreamingPlan.chunk_at(local_position.x, local_position.z, terrain.chunk_size)
-	return local + origin_chunk
+	return local + GameState.origin_chunk
+
+
+func _on_origin_shifted(_offset: Vector3) -> void:
+	# Re-derive every chunk position from its exact integer coordinate (no drift).
+	for coord: Vector2i in _loaded:
+		_loaded[coord].position = chunk_origin(coord)
 
 
 func _replan(center: Vector2i) -> void:

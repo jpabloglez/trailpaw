@@ -21,6 +21,9 @@ const MIN_LOD0_RADIUS: float = 1.5
 ## Maximum chunk generation tasks running on worker threads at once.
 @export_range(1, 32) var max_tasks_in_flight: int = 0
 
+## Horizontal distance from the local origin that triggers a floating-origin rebase.
+@export_range(100.0, 20000.0, 50.0, "suffix:m") var rebase_distance: float = 0.0
+
 
 ## Returns human-readable problems with the tunables; empty when valid.
 func get_validation_errors() -> PackedStringArray:
@@ -35,6 +38,8 @@ func get_validation_errors() -> PackedStringArray:
 		)
 	if build_budget_ms <= 0.0:
 		errors.append("build_budget_ms must be > 0")
+	if rebase_distance <= 0.0:
+		errors.append("rebase_distance must be > 0")
 	if max_tasks_in_flight < 1:
 		errors.append("max_tasks_in_flight must be >= 1")
 	return errors

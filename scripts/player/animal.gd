@@ -14,6 +14,7 @@ const PLAYER_GROUP: StringName = &"player"
 
 func _ready() -> void:
 	add_to_group(PLAYER_GROUP)
+	add_to_group(FloatingOrigin.SHIFTABLE_GROUP)
 
 
 ## Snapshot for debug tools: speed (m/s), gait, state, position and grounded flag.
