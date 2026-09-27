@@ -3,7 +3,7 @@ extends GdUnitTestSuite
 
 const CHUNK_SCENE: String = "res://scenes/world/terrain_chunk.tscn"
 const SETTINGS_PATH: String = "res://data/world/terrain_settings.tres"
-const MATERIAL_PATH: String = "res://data/world/terrain_placeholder_material.tres"
+const MATERIAL_PATH: String = "res://data/world/terrain_material.tres"
 const SEED: int = 12345
 
 var _settings: TerrainSettings

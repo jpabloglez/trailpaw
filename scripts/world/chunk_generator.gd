@@ -53,7 +53,7 @@ static func sample_apron(
 	heights.resize(side * side)
 	if data != null:
 		data.colors.resize(res * res)
-		data.custom0.resize(res * res * 4)
+		data.uv2.resize(res * res)
 	var blend := BiomeBlend.new()
 	var base_x := coord.x * (res - 1) - 1
 	var base_z := coord.y * (res - 1) - 1
@@ -79,9 +79,8 @@ static func sample_apron(
 					float(base_x + i) * step, z, offset, cs, ds, rs
 				)
 		if data != null:
-			data.colors.fill(blend.color_a)
-			for v in res * res:
-				_put_rgba8(data.custom0, v, blend.color_b)
+			data.colors.fill(_pack_a(blend))
+			data.uv2.fill(_pack_b(blend))
 		return heights
 	for j in side:
 		var z := float(base_z + j) * step
@@ -91,8 +90,8 @@ static func sample_apron(
 			heights[j * side + i] = sampler.sample(x, z, blend)
 			if data != null and interior_row and i >= 1 and i <= res:
 				var v := (j - 1) * res + (i - 1)
-				data.colors[v] = blend.color_a
-				_put_rgba8(data.custom0, v, blend.color_b)
+				data.colors[v] = _pack_a(blend)
+				data.uv2[v] = _pack_b(blend)
 	return heights
 
 
@@ -160,7 +159,7 @@ static func _build_skirt(data: ChunkData, depth: float) -> void:
 	data.uvs.resize(first + n)
 	if not data.colors.is_empty():
 		data.colors.resize(first + n)
-		data.custom0.resize((first + n) * 4)
+		data.uv2.resize(first + n)
 	data.border.resize(n)
 	for k in n:
 		var top := loop[k]
@@ -170,8 +169,7 @@ static func _build_skirt(data: ChunkData, depth: float) -> void:
 		data.uvs[first + k] = data.uvs[top]
 		if not data.colors.is_empty():
 			data.colors[first + k] = data.colors[top]
-			for c in 4:
-				data.custom0[(first + k) * 4 + c] = data.custom0[top * 4 + c]
+			data.uv2[first + k] = data.uv2[top]
 	var base := data.indices.size()
 	data.indices.resize(base + n * 6)
 	for k in n:
@@ -203,9 +201,11 @@ static func _interior(heights: PackedFloat32Array, res: int) -> PackedFloat32Arr
 	return out
 
 
-static func _put_rgba8(bytes: PackedByteArray, vertex: int, color: Color) -> void:
-	var o := vertex * 4
-	bytes[o] = color.r8
-	bytes[o + 1] = color.g8
-	bytes[o + 2] = color.b8
-	bytes[o + 3] = color.a8
+## Vertex colour: rgb = palette colour A, alpha = palette colour B's blue channel.
+static func _pack_a(blend: BiomeBlend) -> Color:
+	return Color(blend.color_a.r, blend.color_a.g, blend.color_a.b, blend.color_b.b)
+
+
+## UV2: palette colour B's red and green channels.
+static func _pack_b(blend: BiomeBlend) -> Vector2:
+	return Vector2(blend.color_b.r, blend.color_b.g)

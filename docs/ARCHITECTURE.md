@@ -117,9 +117,18 @@ Scene-tree mutations happen only on the main thread; worker threads produce plai
   transition width to avoid hard seams.
 - Terrain: height modifiers (offset, per-layer scales) and the two ground colours are blended
   per vertex from the biome weights (`HeightSampler.sample`, ADR-005). Colour A goes in
-  `COLOR`, colour B in `CUSTOM0` (RGBA8). Chunks wholly inside one band use a bit-identical
+  `COLOR.rgb`, colour B in `(UV2.xy, COLOR.a)` — standard attributes, because the
+  Compatibility renderer misreads custom (`CUSTOM0`) attributes. Chunks wholly inside one band use a bit-identical
   constant-blend fast path. Each `ChunkJob` builds its sampler on the main thread so worker
   threads never read the shared biome resources.
+- Shading: `shaders/terrain.gdshader` (`data/world/terrain_material.tres`, all tunables set
+  in the material) mixes palette A↔B with a seamless world-space noise pattern, adds fine
+  brightness detail and tints slopes between 28° and 40° with rock (at/under the 45° walk
+  limit, so unwalkable ground reads as rock). Patterns use absolute coordinates through the
+  `world_origin_offset` global shader uniform, which `FloatingOrigin` updates on every
+  rebase (verified pixel-identical across a rebase). Distance fog comes from the
+  Environment; the debug sandbox uses depth fog closing (90→200 m) before the streaming
+  edge (~210 m) with `fog_sky_affect = 1` so the edge never shows.
 - Distance is computed in **absolute world coordinates** (tracked by `FloatingOrigin`),
   never from the rebased local position.
 

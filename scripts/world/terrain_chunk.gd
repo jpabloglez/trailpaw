@@ -12,9 +12,6 @@ extends Node3D
 ## upload ≈ 0.33 ms steady (first upload ≈ 4 ms: one-off material warm-up), height map
 ## ≈ 0.04 ms. No per-call allocations besides what the engine does internally.
 
-## Surface format flag: CUSTOM0 carries palette colour B as RGBA8.
-const CUSTOM0_FORMAT: int = Mesh.ARRAY_CUSTOM_RGBA8_UNORM << Mesh.ARRAY_FORMAT_CUSTOM0_SHIFT
-
 ## Grid coordinate of the data currently applied (absolute).
 var coord: Vector2i = Vector2i.ZERO
 ## LOD of the data currently applied, or -1 when empty.
@@ -45,10 +42,10 @@ func apply(data: ChunkData, material: Material) -> void:
 	_arrays[Mesh.ARRAY_NORMAL] = data.normals
 	_arrays[Mesh.ARRAY_TEX_UV] = data.uvs
 	_arrays[Mesh.ARRAY_COLOR] = data.colors if not data.colors.is_empty() else null
-	_arrays[Mesh.ARRAY_CUSTOM0] = data.custom0 if not data.custom0.is_empty() else null
+	_arrays[Mesh.ARRAY_TEX_UV2] = data.uv2 if not data.uv2.is_empty() else null
 	_arrays[Mesh.ARRAY_INDEX] = data.indices
 	_mesh.clear_surfaces()
-	_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, _arrays, [], {}, CUSTOM0_FORMAT)
+	_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, _arrays)
 	_mesh.surface_set_material(0, material)
 	if data.collision_heights.is_empty():
 		_collision.disabled = true

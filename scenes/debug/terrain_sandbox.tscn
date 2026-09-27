@@ -5,7 +5,7 @@
 [ext_resource type="Resource" path="res://data/world/terrain_settings.tres" id="3_u18in"]
 [ext_resource type="Resource" path="res://data/world/streaming_settings.tres" id="4_nu80k"]
 [ext_resource type="PackedScene" path="res://scenes/world/terrain_chunk.tscn" id="5_t448s"]
-[ext_resource type="Material" path="res://data/world/terrain_placeholder_material.tres" id="6_elxu1"]
+[ext_resource type="Material" path="res://data/world/terrain_material.tres" id="6_elxu1"]
 [ext_resource type="PackedScene" path="res://scenes/player/animal.tscn" id="7_u3weh"]
 [ext_resource type="PackedScene" path="res://scenes/player/camera_rig.tscn" id="8_ql1ge"]
 [ext_resource type="Script" path="res://scripts/debug/free_fly_camera.gd" id="9_gsmrj"]
@@ -24,8 +24,12 @@ sky = SubResource("Sky_qqnsy")
 ambient_light_source = 3
 tonemap_mode = 2
 fog_enabled = true
-fog_density = 0.008
-fog_sky_affect = 0.4
+fog_mode = 1
+fog_density = 1.0
+fog_sky_affect = 1.0
+fog_depth_curve = 1.6
+fog_depth_begin = 90.0
+fog_depth_end = 200.0
 
 [node name="TerrainSandbox" type="Node3D" unique_id=2936388 node_paths=PackedStringArray("streamer", "animal", "camera_rig", "free_fly")]
 script = ExtResource("1_q6pur")

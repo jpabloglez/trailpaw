@@ -31,14 +31,16 @@ func _f32(value: float) -> float:
 func test_vertex_colours_cover_surface_and_skirt() -> void:
 	var data := _gen(Vector2i(4, -2), 0)
 	assert_int(data.colors.size()).is_equal(data.vertices.size())
-	assert_int(data.custom0.size()).is_equal(data.vertices.size() * 4)
+	assert_int(data.uv2.size()).is_equal(data.vertices.size())
 
 
 func test_spawn_chunk_uses_the_meadow_palette() -> void:
 	var meadow := _settings.biomes.biomes[0]
 	var data := _gen(Vector2i(0, 0), 0)
-	assert_object(data.colors[0]).is_equal(meadow.ground_color_a)
-	assert_int(data.custom0[0]).is_equal(meadow.ground_color_b.r8)
+	var a := meadow.ground_color_a
+	var b := meadow.ground_color_b
+	assert_object(data.colors[0]).is_equal(Color(a.r, a.g, a.b, b.b))
+	assert_object(data.uv2[0]).is_equal(Vector2(b.r, b.g))
 
 
 func test_colours_match_across_chunk_borders() -> void:

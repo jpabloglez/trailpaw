@@ -117,6 +117,13 @@ toggle_free_fly={
 common/physics_ticks_per_second=60
 common/physics_interpolation=true
 
+[shader_globals]
+
+world_origin_offset={
+"type": "vec3",
+"value": Vector3(0, 0, 0)
+}
+
 [rendering]
 
 renderer/rendering_method="forward_plus"
