@@ -213,7 +213,9 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
 ## 12. Architecture Decision Records
 
 Stored in `docs/adr/NNN-title.md`. Initial set:
-- ADR-001 Custom procedural chunked terrain instead of a terrain plugin.
-- ADR-002 GDScript first, GDExtension (C++) only after profiling.
-- ADR-003 No death mechanic; soft consequences for critical needs.
-- ADR-004 Floating origin instead of a double-precision engine build.
+- [ADR-001](adr/001-custom-chunked-terrain.md) Custom procedural chunked terrain instead of a terrain plugin.
+- [ADR-002](adr/002-gdscript-first.md) GDScript first, GDExtension (C++) only after profiling.
+- [ADR-003](adr/003-no-death-soft-consequences.md) No death mechanic; soft consequences for critical needs.
+- [ADR-004](adr/004-floating-origin.md) Floating origin instead of a double-precision engine build.
+
+New ADRs start from [`000-template.md`](adr/000-template.md).
