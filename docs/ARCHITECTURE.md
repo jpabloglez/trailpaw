@@ -57,6 +57,11 @@ singleton. Access them by their autoload name (`EventBus.some_signal`).
 - `Vector2i` chunk coordinates; the streamer keeps a ring of radius `R_LOAD` (e.g. 4)
   loaded around the player and unloads beyond `R_UNLOAD` (hysteresis avoids thrashing).
 - Load order: nearest first, prioritised by camera direction.
+- Implementation: `WorldStreamer` (node) + `StreamingPlan` (pure decisions) +
+  `data/world/streaming_settings.tres` (load 4 / unload 5 chunks, 2 ms build budget, 4
+  worker tasks). Each `ChunkJob` owns a settings copy; the main thread reads its result only
+  after `WorkerThreadPool.wait_for_task_completion`. Stale results are discarded, chunk
+  nodes are pooled, and `_exit_tree` waits for every pending task.
 
 ### 3.2 Terrain choice (ADR-001)
 **Decision:** custom procedural chunked terrain (`ArrayMesh` built from a height function)

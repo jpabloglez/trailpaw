@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="StreamingSettings" format=3]
+
+[ext_resource type="Script" path="res://scripts/world/streaming_settings.gd" id="1_3cfbc"]
+
+[resource]
+script = ExtResource("1_3cfbc")
+load_radius = 4
+unload_radius = 5
+build_budget_ms = 2.0
+max_tasks_in_flight = 4
