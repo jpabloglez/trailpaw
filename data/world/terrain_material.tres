@@ -1,0 +1,24 @@
+[gd_resource type="ShaderMaterial" format=3]
+
+[ext_resource type="Shader" path="res://shaders/terrain.gdshader" id="1_60n0l"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_b0x05"]
+frequency = 0.012
+fractal_octaves = 4
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_nm2j4"]
+noise = SubResource("FastNoiseLite_b0x05")
+seamless = true
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_60n0l")
+shader_parameter/pattern_noise = SubResource("NoiseTexture2D_nm2j4")
+shader_parameter/macro_scale = 0.01
+shader_parameter/macro_contrast = 0.18
+shader_parameter/detail_scale = 0.21
+shader_parameter/detail_strength = 0.08
+shader_parameter/rock_color = Color(0.47, 0.44, 0.4, 1)
+shader_parameter/rock_start_degrees = 28.0
+shader_parameter/rock_full_degrees = 40.0
+shader_parameter/roughness_value = 0.95
