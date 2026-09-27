@@ -113,6 +113,12 @@ Swapping species = swapping a `.tres`; no code changes.
 - **Ground alignment:** raycasts at front and rear feet → body pitch/roll follows terrain
   normal with smoothing and clamping.
 - States (`StateMachine` component): Idle, Locomotion, Jump, Fall, Swim, Interact, Rest.
+- **Intent-based control:** `MovementComponent` never reads `Input`. A controller writes
+  its intent (`move_input`, `sprint`, `request_jump()`): `PlayerInput` for the player,
+  the AI for fauna (Phase 8). The maths lives in the pure `LocomotionModel` (unit-tested).
+- **Gaits in Phase 1:** full input = trot, `sprint` = run; walk is the band below the
+  walk/trot midpoint (starting, stopping, analogue input later). Velocity always follows
+  the heading, and the heading turns at a speed-dependent rate, so turns are arcs.
 
 ### 4.3 Camera
 `SpringArm3D` third-person rig with mouse orbit, collision, zoom (wheel), slight lag and
