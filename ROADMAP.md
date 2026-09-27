@@ -50,7 +50,7 @@ Milestones: **M1 "Walk the world"** (end of Phase 3), **M2 "A day in the life"**
 
 - [ ] `debug/movement_sandbox.tscn`: flat plane, ramps, steps, obstacles.
 - [ ] `Animal` scene: `CharacterBody3D` + box/capsule placeholder with a visible "nose".
-- [ ] `MovementComponent`: camera-relative input, acceleration, arc turning, walk/trot/run, jump, gravity, slope limit.
+- [x] `MovementComponent`: camera-relative input, acceleration, arc turning, walk/trot/run, jump, gravity, slope limit.
 - [ ] `StateMachine` component (generic, reusable by fauna later) with Idle/Locomotion/Jump/Fall.
 - [ ] `CameraRig`: SpringArm3D, mouse orbit with captured cursor, zoom, collision, auto-recentre.
 - [x] Tunables in `data/species/placeholder.tres` (`AnimalSpecies` resource).
