@@ -3,11 +3,15 @@ extends CanvasLayer
 ## F3 debug overlay: FPS plus the player's speed, gait, state and position.
 ##
 ## Finds the player through the [constant Animal.PLAYER_GROUP] group (no node paths) and
-## reads [method Animal.get_debug_info]. Hidden by default.
+## reads [method Animal.get_debug_info]; other systems add lines through
+## [constant LINES_GROUP]. Hidden by default; toggling emits
+## [code]EventBus.debug_overlay_toggled[/code].
 ## [br][br]
 ## Budget: refreshes at [constant REFRESH_HZ] Hz, not every frame, so the string building
 ## (the only allocation) happens ten times per second at most; nothing runs while hidden.
 
+## Group of nodes that add lines via [code]get_debug_lines() -> PackedStringArray[/code].
+const LINES_GROUP: StringName = &"debug_lines"
 ## Text refreshes per second while visible.
 const REFRESH_HZ: float = 10.0
 
@@ -38,13 +42,18 @@ func _process(delta: float) -> void:
 ## Shows or hides the overlay; refreshes immediately when shown.
 func toggle() -> void:
 	visible = not visible
+	EventBus.debug_overlay_toggled.emit(visible)
 	if visible:
 		refresh()
 
 
 ## Rebuilds the overlay text from the current FPS and player info.
 func refresh() -> void:
-	_label.text = format_info(Engine.get_frames_per_second(), _player_info())
+	var text := format_info(Engine.get_frames_per_second(), _player_info())
+	for provider: Node in get_tree().get_nodes_in_group(LINES_GROUP):
+		if provider.has_method(&"get_debug_lines"):
+			text += "\n" + "\n".join(provider.get_debug_lines())
+	_label.text = text
 
 
 ## Current overlay text (for tests and tools).

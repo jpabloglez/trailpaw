@@ -113,8 +113,10 @@ static func _build_skirt(data: ChunkData, depth: float) -> void:
 	data.vertices.resize(first + n)
 	data.normals.resize(first + n)
 	data.uvs.resize(first + n)
+	data.border.resize(n)
 	for k in n:
 		var top := loop[k]
+		data.border[k] = data.vertices[top]
 		data.vertices[first + k] = data.vertices[top] - Vector3(0.0, depth, 0.0)
 		data.normals[first + k] = data.normals[top]
 		data.uvs[first + k] = data.uvs[top]

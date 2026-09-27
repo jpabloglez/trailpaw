@@ -63,3 +63,29 @@ func test_reads_player_through_group() -> void:
 	_overlay.toggle()
 	assert_str(_overlay.text()).contains("state ")
 	assert_str(_overlay.text()).not_contains("no player")
+
+
+## Provider used by the extra-lines test.
+class LinesProvider:
+	extends Node
+
+	func get_debug_lines() -> PackedStringArray:
+		return PackedStringArray(["extra one", "extra two"])
+
+
+func test_includes_lines_from_providers() -> void:
+	var provider: Node = auto_free(LinesProvider.new())
+	provider.add_to_group(DebugOverlay.LINES_GROUP)
+	add_child(provider)
+	_overlay.toggle()
+	assert_str(_overlay.text()).contains("extra one\nextra two")
+
+
+func test_toggle_emits_event_bus_signal() -> void:
+	var received: Array[bool] = []
+	var listener := func(shown: bool) -> void: received.append(shown)
+	EventBus.debug_overlay_toggled.connect(listener)
+	_overlay.toggle()
+	_overlay.toggle()
+	EventBus.debug_overlay_toggled.disconnect(listener)
+	assert_array(received).contains_exactly([true, false])

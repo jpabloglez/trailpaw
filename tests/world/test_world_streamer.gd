@@ -190,3 +190,12 @@ func test_rebase_keeps_chunks_at_their_absolute_positions_without_reloading() ->
 	assert_bool(_streamer.is_ready_at(_target.position)).is_true()
 	FloatingOrigin.reset()
 	GameState.chunk_size = 0.0
+
+
+func test_emits_chunks_changed_and_debug_lines() -> void:
+	var monitor := monitor_signals(_streamer)
+	await _until_idle()
+	await assert_signal(monitor).is_emitted("chunks_changed")
+	var lines := _streamer.get_debug_lines()
+	assert_str(lines[0]).contains("%d loaded" % _streamer.loaded_coords().size())
+	assert_float(_streamer.stats()["max_chunk_ms"]).is_greater(0.0)

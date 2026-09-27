@@ -22,6 +22,8 @@ var normals := PackedVector3Array()
 var uvs := PackedVector2Array()
 ## Triangle indices (clockwise = front-facing in Godot).
 var indices := PackedInt32Array()
+## Closed outline of the chunk surface border (local positions), for debug gizmos.
+var border := PackedVector3Array()
 ## Heights for a [HeightMapShape3D] ([code]resolution²[/code], row-major). Empty when the
 ## chunk gets no collision.
 var collision_heights := PackedFloat32Array()
