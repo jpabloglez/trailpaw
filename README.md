@@ -95,6 +95,7 @@ official release, checked against its SHA512 and cached.
 
 ## Licence
 
-To be decided. Third-party components keep their own licences:
+The project's source code and original content are released under the [MIT Licence](LICENSE).
+Third-party components keep their own licences:
 - gdUnit4 (MIT): `addons/gdUnit4/LICENSE`
-- assets: see `assets/CREDITS.md`
+- assets: see [`assets/CREDITS.md`](assets/CREDITS.md)
