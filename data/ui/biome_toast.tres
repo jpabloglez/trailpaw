@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="BiomeToastSettings" format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/biome_toast_settings.gd" id="1_v77ji"]
+
+[resource]
+script = ExtResource("1_v77ji")
+fade_in = 0.6
+hold = 2.5
+fade_out = 1.2

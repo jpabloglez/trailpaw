@@ -16,3 +16,7 @@ signal origin_shifted(offset: Vector3)
 ## The F3 debug overlay was shown or hidden. Debug visualisers (chunk borders, ...) follow it.
 @warning_ignore("unused_signal")
 signal debug_overlay_toggled(overlay_visible: bool)
+
+## The player entered a new biome (dominant with weight >= the tracker's threshold).
+@warning_ignore("unused_signal")
+signal biome_entered(biome_id: StringName, display_name: String)

@@ -28,6 +28,8 @@ const SPAWN_CLEARANCE: float = 0.5
 @export var camera_rig: CameraRig
 ## Debug fly camera.
 @export var free_fly: FreeFlyCamera
+## Announces biome changes for whichever node has focus.
+@export var biome_tracker: BiomeTracker
 
 var _animal_frozen: bool = true
 var _sampler: HeightSampler
@@ -101,6 +103,8 @@ func _use_free_fly(enabled: bool) -> void:
 	var focus: Node3D = free_fly if enabled else animal
 	streamer.target = focus
 	FloatingOrigin.track(focus)
+	if biome_tracker != null:
+		biome_tracker.target = focus
 
 
 func _freeze_animal(frozen: bool) -> void:
@@ -135,8 +139,14 @@ func _start_probe(distance: float, speed: float) -> void:
 		"build_ms_max": 0.0,
 		"process_ms_sum": 0.0,
 		"physics_ms_sum": 0.0,
+		"biomes": [],
 	}
 	EventBus.origin_shifted.connect(func(_offset: Vector3) -> void: _probe["rebases"] += 1)
+	EventBus.biome_entered.connect(
+		func(id: StringName, _name: String) -> void:
+			if not _probe.is_empty() and _probe["started"]:
+				(_probe["biomes"] as Array).append(id)
+	)
 	_probe_frame_ms.clear()
 	print("[probe] %.0f m along +X at %.1f m/s (seed %d)" % [distance, speed, world_seed])
 
@@ -174,7 +184,13 @@ func _finish_probe(absolute: Vector3) -> void:
 	free_fly.stop_autopilot()
 	var frames := _probe_frame_ms.duplicate()
 	frames.sort()
-	var ok: bool = _probe["spikes"] == 0 and _probe["holes"] == 0 and _probe["collision_gaps"] == 0
+	var order_ok := _biome_order_ok(_probe["biomes"])
+	var ok: bool = (
+		_probe["spikes"] == 0
+		and _probe["holes"] == 0
+		and _probe["collision_gaps"] == 0
+		and order_ok
+	)
 	var lines := PackedStringArray(
 		[
 			(
@@ -220,6 +236,13 @@ func _finish_probe(absolute: Vector3) -> void:
 				]
 			),
 			"[probe] most chunks built in one spike frame: %d" % _probe.get("spike_chunks", 0),
+			(
+				"[probe] biomes entered (%s order): %s"
+				% [
+					"cyclic" if order_ok else "WRONG",
+					" → ".join(PackedStringArray(_probe["biomes"]))
+				]
+			),
 			"[probe] RESULT %s" % ("PASS" if ok else "FAIL"),
 		]
 	)
@@ -239,3 +262,19 @@ static func _user_arg_float(prefix: String, fallback: float) -> float:
 		if arg.begins_with(prefix):
 			return arg.trim_prefix(prefix).to_float()
 	return fallback
+
+
+## Whether [param entered] follows the biome table's cyclic order (each step goes to the next
+## band). Always true without a biome table.
+func _biome_order_ok(entered: Array) -> bool:
+	var table := streamer.terrain.biomes
+	if table == null or entered.size() < 2:
+		return true
+	var ids: Array[StringName] = []
+	for biome in table.biomes:
+		ids.append(biome.id)
+	for i in range(1, entered.size()):
+		var expected := ids[(ids.find(entered[i - 1]) + 1) % ids.size()]
+		if entered[i] != expected:
+			return false
+	return true
