@@ -46,6 +46,10 @@ Autoloads: EventBus · GameState · Settings · SaveSystem · FloatingOrigin
 | `SaveSystem` | Serialises/deserialises a `SaveData` resource to `user://saves/`. Versioned schema. |
 | `FloatingOrigin` | Re-centres the world when the player exceeds a threshold distance from the origin. |
 
+Autoload scripts live in `scripts/autoload/` and are the one exception to the "every script
+declares `class_name`" rule: a `class_name` equal to the autoload name would hide the
+singleton. Access them by their autoload name (`EventBus.some_signal`).
+
 ## 3. World generation and streaming
 
 ### 3.1 Coordinates and chunks
