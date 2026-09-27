@@ -154,6 +154,7 @@ Phase 11 polish item.
 | `rest` | R (hold) |
 | `camera_zoom_in` / `camera_zoom_out` | Mouse wheel up / down |
 | `pause` | Esc |
+| `toggle_debug_overlay` (debug) | F3 |
 | *camera orbit* | Mouse move (captured) — not an action, see below |
 
 All actions are defined in `project.godot` `InputMap` and remappable at runtime. Keys are

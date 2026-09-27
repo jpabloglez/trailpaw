@@ -52,3 +52,9 @@ func test_level_geometry_is_on_world_layer_only() -> void:
 	assert_int(bodies.size()).is_greater(10)
 	for body: Node in bodies:
 		assert_int((body as StaticBody3D).collision_layer).is_equal(WORLD_LAYER_BIT)
+
+
+func test_has_hidden_debug_overlay() -> void:
+	var overlay := _sandbox.get_node("DebugOverlay") as DebugOverlay
+	assert_object(overlay).is_not_null()
+	assert_bool(overlay.visible).is_false()
