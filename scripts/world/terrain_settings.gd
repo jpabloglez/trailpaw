@@ -27,6 +27,11 @@ const MAX_OCTAVES: int = 8
 ## plain layered noise (useful for tests).
 @export var biomes: BiomeTable
 
+@export_group("Water")
+## Absolute height of the water surface. Chunks with ground below it get a water plane
+## (lakes and channels, mostly in the river valley).
+@export_range(-100.0, 100.0, 0.1, "suffix:m") var sea_level: float = 0.0
+
 @export_group("Height")
 ## Height offset added to every sample.
 @export_range(-100.0, 100.0, 0.1, "suffix:m") var base_height: float = 0.0

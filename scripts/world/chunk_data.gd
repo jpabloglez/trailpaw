@@ -27,11 +27,20 @@ var colors := PackedColorArray()
 var uv2 := PackedVector2Array()
 ## Triangle indices (clockwise = front-facing in Godot).
 var indices := PackedInt32Array()
+## Lowest surface height in the chunk (m, absolute).
+var min_height: float = INF
+## Water surface height copied from the settings (m, absolute).
+var water_level: float = 0.0
 ## Closed outline of the chunk surface border (local positions), for debug gizmos.
 var border := PackedVector3Array()
 ## Heights for a [HeightMapShape3D] ([code]resolution²[/code], row-major). Empty when the
 ## chunk gets no collision.
 var collision_heights := PackedFloat32Array()
+
+
+## Whether any ground in this chunk lies below the water surface.
+func has_water() -> bool:
+	return min_height < water_level
 
 
 ## Number of vertices of the surface grid (excluding any skirt).
