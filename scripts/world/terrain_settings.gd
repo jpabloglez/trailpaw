@@ -10,6 +10,14 @@ extends Resource
 ## Maximum fractal octaves allowed per layer (keeps per-sample cost bounded).
 const MAX_OCTAVES: int = 8
 
+@export_group("Chunks")
+## Side length of a square terrain chunk.
+@export_range(8.0, 512.0, 1.0, "suffix:m") var chunk_size: float = 0.0
+## Vertices per chunk side for each LOD level (index = LOD). [code]resolution - 1[/code] must
+## divide evenly so coarser grids share vertex positions with finer ones.
+@export var lod_resolutions: PackedInt32Array = PackedInt32Array()
+
+@export_group("Height")
 ## Height offset added to every sample.
 @export_range(-100.0, 100.0, 0.1, "suffix:m") var base_height: float = 0.0
 
@@ -41,6 +49,16 @@ const MAX_OCTAVES: int = 8
 ## Returns human-readable problems with the tunables; empty when valid.
 func get_validation_errors() -> PackedStringArray:
 	var errors := PackedStringArray()
+	if chunk_size <= 0.0:
+		errors.append("chunk_size must be > 0")
+	if lod_resolutions.is_empty():
+		errors.append("lod_resolutions must list at least one LOD")
+	for i in lod_resolutions.size():
+		var res := lod_resolutions[i]
+		if res < 2:
+			errors.append("lod_resolutions[%d] must be >= 2" % i)
+		elif i > 0 and (lod_resolutions[0] - 1) % (res - 1) != 0:
+			errors.append("lod_resolutions[%d] - 1 must divide lod_resolutions[0] - 1" % i)
 	for layer: String in ["continental", "detail", "ridged"]:
 		if float(get(layer + "_frequency")) <= 0.0:
 			errors.append("%s_frequency must be > 0" % layer)
@@ -55,3 +73,13 @@ func get_validation_errors() -> PackedStringArray:
 ## Returns [code]true[/code] when [method get_validation_errors] finds no problems.
 func is_valid() -> bool:
 	return get_validation_errors().is_empty()
+
+
+## Vertices per side for [param lod].
+func resolution_for_lod(lod: int) -> int:
+	return lod_resolutions[lod]
+
+
+## Distance between neighbouring vertices at [param lod].
+func step_for_lod(lod: int) -> float:
+	return chunk_size / float(lod_resolutions[lod] - 1)
