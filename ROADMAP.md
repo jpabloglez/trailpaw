@@ -35,7 +35,7 @@ Milestones: **M1 "Walk the world"** (end of Phase 3), **M2 "A day in the life"**
 - [x] `pip install gdtoolkit ruff pytest`; add `gdlintrc`, `requirements-dev.txt`.
 - [x] Autoload stubs: `EventBus`, `GameState`, `Settings`, `SaveSystem`, `FloatingOrigin`.
 - [x] Define full `InputMap` from ARCHITECTURE §4.5.
-- [ ] GitHub Actions: lint → headless import → tests.
+- [x] GitHub Actions: lint → headless import → tests.
 - [ ] `docs/adr/` with ADR-001…004 as short records.
 - [ ] Optional: `.claude/commands/` with custom commands (`/phase-status`, `/check` running lint + tests).
 
