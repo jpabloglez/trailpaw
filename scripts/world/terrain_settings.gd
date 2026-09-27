@@ -7,6 +7,8 @@ extends Resource
 ## high ground. Defaults are deliberately neutral: values come from
 ## [code]data/world/terrain_settings.tres[/code] (see [method get_validation_errors]).
 
+## LOD 0 grid spacing required for collision: [HeightMapShape3D] samples are 1 m apart.
+const COLLISION_STEP: float = 1.0
 ## Maximum fractal octaves allowed per layer (keeps per-sample cost bounded).
 const MAX_OCTAVES: int = 8
 
@@ -53,6 +55,10 @@ func get_validation_errors() -> PackedStringArray:
 		errors.append("chunk_size must be > 0")
 	if lod_resolutions.is_empty():
 		errors.append("lod_resolutions must list at least one LOD")
+	if not lod_resolutions.is_empty() and not is_equal_approx(step_for_lod(0), COLLISION_STEP):
+		errors.append(
+			"LOD 0 vertex spacing must be %.1f m (HeightMapShape3D spacing)" % COLLISION_STEP
+		)
 	for i in lod_resolutions.size():
 		var res := lod_resolutions[i]
 		if res < 2:
