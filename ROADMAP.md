@@ -36,7 +36,7 @@ Milestones: **M1 "Walk the world"** (end of Phase 3), **M2 "A day in the life"**
 - [x] Autoload stubs: `EventBus`, `GameState`, `Settings`, `SaveSystem`, `FloatingOrigin`.
 - [x] Define full `InputMap` from ARCHITECTURE §4.5.
 - [x] GitHub Actions: lint → headless import → tests.
-- [ ] `docs/adr/` with ADR-001…004 as short records.
+- [x] `docs/adr/` with ADR-001…004 as short records.
 - [ ] Optional: `.claude/commands/` with custom commands (`/phase-status`, `/check` running lint + tests).
 
 **Exit criteria:** fresh clone → `--import` clean → tests and lint green locally and in CI.
