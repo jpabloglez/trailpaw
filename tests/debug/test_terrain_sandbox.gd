@@ -74,3 +74,13 @@ func test_overlay_shows_streaming_and_world_lines() -> void:
 	assert_str(overlay.text()).contains("build ")
 	assert_str(overlay.text()).contains("origin chunk")
 	assert_str(overlay.text()).contains("mode animal")
+
+
+func test_biome_tracker_follows_focus_and_toast_is_present() -> void:
+	var tracker := _sandbox.get_node("BiomeTracker") as BiomeTracker
+	assert_object(tracker.terrain).is_same(_sandbox.streamer.terrain)
+	assert_object(tracker.target).is_same(_sandbox.animal)
+	_sandbox.toggle_free_fly()
+	assert_object(tracker.target).is_same(_sandbox.free_fly)
+	assert_object(_sandbox.get_node("BiomeToast")).is_instanceof(BiomeToast)
+	GameState.current_biome = &""

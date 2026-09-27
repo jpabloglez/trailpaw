@@ -134,6 +134,11 @@ Scene-tree mutations happen only on the main thread; worker threads produce plai
   texture so Forward+ and Compatibility match) — one shared 1×1 `PlaneMesh` scaled to the
   chunk. Coverage (seed 12345): river valley ≈ 42 %, forest 2 %, hills 1 %, meadow 0 %.
   No swimming/drinking yet (Phases 5 and 7): the animal walks along the bed.
+- Events: `BiomeTracker` samples the focus node's absolute position at 4 Hz and announces a
+  new biome only once its weight reaches 0.6 (hysteresis; the first sample announces the
+  start biome): it sets `GameState.current_biome` and emits
+  `EventBus.biome_entered(biome_id, display_name)`. `BiomeToast` (HUD) shows the name with
+  fade in / hold / fade out from `data/ui/biome_toast.tres`.
 - Distance is computed in **absolute world coordinates** (tracked by `FloatingOrigin`),
   never from the rebased local position.
 

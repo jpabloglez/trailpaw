@@ -16,6 +16,9 @@ var origin_chunk: Vector2i = Vector2i.ZERO
 ## [code]FloatingOrigin.configure()[/code].
 var chunk_size: float = 0.0
 
+## Biome the player is currently in (as last announced by the biome tracker).
+var current_biome: StringName = &""
+
 
 ## World-space offset of the local origin (m).
 func origin_offset() -> Vector3:

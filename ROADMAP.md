@@ -87,7 +87,7 @@ exactly the expected set for a given position; rebase preserves absolute positio
 - [x] Biome-dependent height parameters and ground vertex colours.
 - [x] Terrain shader: blends ground palettes by weight, slope-based rock tint, distance fog.
 - [x] Rivers/lakes v1: water plane at sea level in low areas (river valley biome raises frequency).
-- [ ] `EventBus.biome_entered` + HUD toast with biome name.
+- [x] `EventBus.biome_entered` + HUD toast with biome name.
 
 **Tests:** weights sum to 1; bands appear in configured order along any direction; transitions are continuous.
 **Exit (M1):** walking outwards visibly changes landscape in a smooth, pleasing way.

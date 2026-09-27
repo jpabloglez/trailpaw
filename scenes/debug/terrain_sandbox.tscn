@@ -13,6 +13,9 @@
 [ext_resource type="Script" path="res://scripts/debug/chunk_border_gizmo.gd" id="11_63snc"]
 [ext_resource type="PackedScene" path="res://scenes/ui/debug_overlay.tscn" id="12_h55wb"]
 
+[ext_resource type="Script" path="res://scripts/world/biome_tracker.gd" id="20_btrk"]
+[ext_resource type="PackedScene" path="res://scenes/ui/biome_toast.tscn" id="21_btst"]
+
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_k7oal"]
 
 [sub_resource type="Sky" id="Sky_qqnsy"]
@@ -31,12 +34,13 @@ fog_depth_curve = 1.6
 fog_depth_begin = 90.0
 fog_depth_end = 200.0
 
-[node name="TerrainSandbox" type="Node3D" unique_id=2936388 node_paths=PackedStringArray("streamer", "animal", "camera_rig", "free_fly")]
+[node name="TerrainSandbox" type="Node3D" unique_id=2936388 node_paths=PackedStringArray("streamer", "animal", "camera_rig", "free_fly", "biome_tracker")]
 script = ExtResource("1_q6pur")
 streamer = NodePath("WorldStreamer")
 animal = NodePath("Animal")
 camera_rig = NodePath("CameraRig")
 free_fly = NodePath("FreeFlyCamera")
+biome_tracker = NodePath("BiomeTracker")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=663329616]
 environment = SubResource("Environment_atku0")
@@ -70,3 +74,10 @@ script = ExtResource("11_63snc")
 streamer = NodePath("../WorldStreamer")
 
 [node name="DebugOverlay" parent="." unique_id=650706242 instance=ExtResource("12_h55wb")]
+
+[node name="BiomeTracker" type="Node" parent="." node_paths=PackedStringArray("target")]
+script = ExtResource("20_btrk")
+terrain = ExtResource("3_u18in")
+target = NodePath("../Animal")
+
+[node name="BiomeToast" parent="." instance=ExtResource("21_btst")]
