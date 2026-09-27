@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="TerrainSettings" format=3]
+
+[ext_resource type="Script" path="res://scripts/world/terrain_settings.gd" id="1_amsa7"]
+
+[resource]
+script = ExtResource("1_amsa7")
+continental_frequency = 0.0015
+continental_amplitude = 18.0
+continental_octaves = 3
+detail_frequency = 0.02
+detail_amplitude = 1.2
+detail_octaves = 3
+ridged_frequency = 0.004
+ridged_amplitude = 14.0
+ridged_octaves = 4

@@ -67,7 +67,10 @@ generation. Revisit if the design moves to a finite, hand-crafted map.
 
 ### 3.3 Generation pipeline (per chunk)
 1. **Worker thread** (`WorkerThreadPool.add_task`):
-   - Sample heights with layered `FastNoiseLite` (continental + detail + ridged for mountains).
+   - Sample heights with layered `FastNoiseLite` (continental + detail + ridged for mountains)
+     via `HeightSampler` (tunables in `data/world/terrain_settings.tres`). Each task builds its
+     own sampler from a settings copy; layer seeds use an explicit integer mix of the world
+     seed, and a golden-value test pins the output so upgrades cannot silently change worlds.
    - Resolve biome weights per vertex (see 3.4) → vertex colours / splat weights.
    - Build `PackedVector3Array` vertices, normals, UVs, indices.
    - Build `HeightMapShape3D` data for collision.

@@ -64,7 +64,7 @@ Milestones: **M1 "Walk the world"** (end of Phase 3), **M2 "A day in the life"**
 
 ## Phase 2 — Procedural terrain chunks
 
-- [ ] `HeightSampler` (pure class): layered `FastNoiseLite`, seeded, deterministic.
+- [x] `HeightSampler` (pure class): layered `FastNoiseLite`, seeded, deterministic.
 - [ ] `ChunkGenerator`: builds mesh arrays + collision data off the main thread.
 - [ ] `TerrainChunk` scene: MeshInstance3D + StaticBody3D + HeightMapShape3D.
 - [ ] `WorldStreamer`: load/unload ring with hysteresis, nearest-first queue, main-thread budget (N chunks/frame).
