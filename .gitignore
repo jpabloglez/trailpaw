@@ -1,0 +1,23 @@
+# Godot 4 cache and editor state (per-asset *.import sidecar files ARE committed)
+.godot/
+
+# Build and export output
+/export/
+/build/
+
+# gdUnit4 run artifacts
+/reports/
+addons/gdUnit4/GdUnitRunner.cfg
+
+# Python tooling
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.tmp
+*~
