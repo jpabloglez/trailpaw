@@ -12,5 +12,5 @@ script = ExtResource("6_0wvnb")
 biomes = Array[ExtResource("1_iuphu")]([ExtResource("2_37edx"), ExtResource("3_bcnfc"), ExtResource("4_7iaqi"), ExtResource("5_htlee")])
 cycle = true
 blend_width = 150.0
-boundary_noise_amplitude = 120.0
-boundary_noise_frequency = 0.002
+boundary_noise_amplitude = 110.0
+boundary_noise_frequency = 0.0013

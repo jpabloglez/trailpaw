@@ -4,6 +4,14 @@ extends Resource
 ## the sequence repeats forever (meadow → forest → river valley → hills → meadow …), so the
 ## endless world keeps changing. Lives at [code]data/biomes/biome_table.tres[/code].
 
+## Upper bound of the boundary noise gradient relative to its frequency (measured ≈ 4.6 for
+## FastNoiseLite simplex-smooth; rounded up for margin).
+const NOISE_GRADIENT_FACTOR: float = 5.0
+## Largest allowed [code]amplitude × frequency[/code] of the boundary noise. With
+## [constant NOISE_GRADIENT_FACTOR] this keeps the noisy distance rising by at least
+## 0.25 m per metre along every outward ray, so bands always appear in order.
+const MAX_NOISE_SLOPE: float = 0.15
+
 ## Biomes in band order, starting at the spawn point.
 @export var biomes: Array[BiomeDefinition] = []
 ## Repeat the sequence after the last band; otherwise the last band extends forever.
@@ -42,6 +50,10 @@ func get_validation_errors() -> PackedStringArray:
 		errors.append("boundary_noise_amplitude must be >= 0")
 	if boundary_noise_amplitude > 0.0 and boundary_noise_frequency <= 0.0:
 		errors.append("boundary_noise_frequency must be > 0 when the amplitude is > 0")
+	if boundary_noise_amplitude * boundary_noise_frequency > MAX_NOISE_SLOPE:
+		errors.append(
+			"boundary noise too steep: amplitude × frequency must be <= %.2f" % MAX_NOISE_SLOPE
+		)
 	return errors
 
 

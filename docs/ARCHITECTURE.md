@@ -100,10 +100,17 @@ Scene-tree mutations happen only on the main thread; worker threads produce plai
 - Data: `BiomeDefinition` (`data/biomes/{meadow,forest,river_valley,hills}.tres`: id, display
   name, band width, height offset/scales, two-colour ground palette) ordered by `BiomeTable`
   (`data/biomes/biome_table.tres`): 800 m bands that **repeat in a cycle**, 150 m blend,
-  ±120 m boundary noise, measured from the spawn point.
+  ±110 m boundary noise, measured from the spawn point.
 - `BiomeDefinition` (Resource): name, height params, ground palette, vegetation table,
   fauna table, ambient audio, temperature, water frequency.
-- `BiomeResolver.weights_at(world_pos) -> Dictionary[StringName, float]`:
+- `BiomeResolver` (pure, seeded, one per worker task): noisy distance
+  `d' = |pos − spawn| + noise(pos) · amplitude`; the band containing `d'` cross-fades with
+  its neighbour over `blend_width` (smoothstep), so weights sum to exactly 1, at most two
+  biomes mix and transitions are continuous. `amplitude × frequency ≤ 0.15` (validated;
+  measured noise gradient ≤ 4.6× frequency) keeps `d'` increasing along every outward ray,
+  so bands always appear in order. `blend_into()` fills a reused `BiomeBlend` (no
+  allocation) for generation; `weights_at()` / `dominant_at()` for gameplay and tests.
+- Original sketch — `BiomeResolver.weights_at(world_pos) -> Dictionary[StringName, float]`:
   `progress = distance_from_spawn / BIOME_SPAN` selects the dominant biome band
   (meadow → forest → river valley → hills → alpine…), then a low-frequency noise
   perturbs the boundary so transitions look organic. Weights are blended across a
