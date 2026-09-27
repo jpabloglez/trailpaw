@@ -65,10 +65,10 @@ Milestones: **M1 "Walk the world"** (end of Phase 3), **M2 "A day in the life"**
 ## Phase 2 — Procedural terrain chunks
 
 - [x] `HeightSampler` (pure class): layered `FastNoiseLite`, seeded, deterministic.
-- [ ] `ChunkGenerator`: builds mesh arrays + collision data off the main thread.
+- [x] `ChunkGenerator`: builds mesh arrays + collision data off the main thread.
 - [ ] `TerrainChunk` scene: MeshInstance3D + StaticBody3D + HeightMapShape3D.
 - [ ] `WorldStreamer`: load/unload ring with hysteresis, nearest-first queue, main-thread budget (N chunks/frame).
-- [ ] Seam-free edges (shared border vertices, consistent normals).
+- [x] Seam-free edges (shared border vertices, consistent normals).
 - [ ] Two LOD resolutions for far chunks.
 - [ ] `FloatingOrigin` rebase with absolute-position tracking in `GameState`.
 - [ ] `debug/terrain_sandbox.tscn` with a free-fly camera and chunk-border gizmos.

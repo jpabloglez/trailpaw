@@ -72,7 +72,10 @@ generation. Revisit if the design moves to a finite, hand-crafted map.
      own sampler from a settings copy; layer seeds use an explicit integer mix of the world
      seed, and a golden-value test pins the output so upgrades cannot silently change worlds.
    - Resolve biome weights per vertex (see 3.4) → vertex colours / splat weights.
-   - Build `PackedVector3Array` vertices, normals, UVs, indices.
+   - Build `PackedVector3Array` vertices, normals, UVs, indices (`ChunkGenerator` → `ChunkData`).
+     **Seam-free:** samples use the integer global grid index
+     (`coord * (resolution - 1) + i`) times the step, so neighbours evaluate identical
+     coordinates on shared borders; normals use central differences over a one-sample apron.
    - Build `HeightMapShape3D` data for collision.
    - Scatter vegetation/props with a seeded RNG (Poisson-disk or jittered grid) → transform lists.
 2. **Main thread** (budgeted, a few chunks per frame):

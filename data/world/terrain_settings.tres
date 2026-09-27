@@ -4,6 +4,8 @@
 
 [resource]
 script = ExtResource("1_amsa7")
+chunk_size = 64.0
+lod_resolutions = PackedInt32Array(65, 17)
 continental_frequency = 0.0015
 continental_amplitude = 18.0
 continental_octaves = 3
