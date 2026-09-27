@@ -1,5 +1,6 @@
 [gd_resource type="Resource" script_class="TerrainSettings" format=3]
 
+[ext_resource type="Resource" path="res://data/biomes/biome_table.tres" id="1_2mfl4"]
 [ext_resource type="Script" path="res://scripts/world/terrain_settings.gd" id="1_amsa7"]
 
 [resource]
@@ -7,6 +8,7 @@ script = ExtResource("1_amsa7")
 chunk_size = 64.0
 lod_resolutions = PackedInt32Array(65, 17)
 skirt_depth = 2.0
+biomes = ExtResource("1_2mfl4")
 continental_frequency = 0.0015
 continental_amplitude = 18.0
 continental_octaves = 3

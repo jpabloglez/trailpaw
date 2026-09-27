@@ -2,7 +2,9 @@ class_name ChunkJob
 extends RefCounted
 ## One chunk generation task for [WorkerThreadPool]. The worker writes [member data]; the
 ## main thread reads it only after [method WorkerThreadPool.wait_for_task_completion],
-## which is the synchronisation point. The job owns its [TerrainSettings] copy.
+## which is the synchronisation point. The job owns its [TerrainSettings] copy and a
+## [HeightSampler] built on the main thread, so the worker never reads shared resources
+## (biome [code].tres[/code] files are shared by all jobs).
 
 ## Chunk to generate.
 var coord: Vector2i
@@ -14,7 +16,7 @@ var data: ChunkData
 var task_id: int = -1
 
 var _settings: TerrainSettings
-var _world_seed: int
+var _sampler: HeightSampler
 
 
 func _init(
@@ -23,9 +25,9 @@ func _init(
 	coord = chunk_coord
 	lod = chunk_lod
 	_settings = settings
-	_world_seed = world_seed
+	_sampler = HeightSampler.new(settings, world_seed)
 
 
 ## Worker-thread entry point.
 func run() -> void:
-	data = ChunkGenerator.generate(coord, lod, _settings, _world_seed)
+	data = ChunkGenerator.generate_with(coord, lod, _settings, _sampler)
