@@ -1,0 +1,17 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/world/terrain_chunk.gd" id="1_nby65"]
+
+[node name="TerrainChunk" type="Node3D" unique_id=1442656002]
+script = ExtResource("1_nby65")
+
+[node name="Mesh" type="MeshInstance3D" parent="." unique_id=97153013]
+unique_name_in_owner = true
+
+[node name="Body" type="StaticBody3D" parent="." unique_id=1356129891]
+unique_name_in_owner = true
+collision_mask = 0
+
+[node name="Collision" type="CollisionShape3D" parent="Body" unique_id=1897161100]
+unique_name_in_owner = true
+disabled = true
