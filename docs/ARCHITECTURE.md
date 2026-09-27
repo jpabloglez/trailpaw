@@ -109,10 +109,16 @@ Scene-tree mutations happen only on the main thread; worker threads produce plai
 
 ### 3.5 Floating origin
 32-bit floats lose precision several kilometres from the origin (jittery animation and
-physics). When the player is further than `REBASE_DISTANCE` (e.g. 2 km) from the local
-origin, `FloatingOrigin` shifts every root node by the offset and accumulates it in
-`GameState.world_offset: Vector3` (stored in doubles via two floats or `Vector3i` chunk offset).
-This avoids needing a custom double-precision engine build.
+physics). When the tracked target is further than `rebase_distance` (2 km, in
+`streaming_settings.tres`) from the local origin, `FloatingOrigin` shifts the world back by a
+**whole number of chunks**:
+- every node in the `origin_shiftable` group (player, camera rig, debug camera) gets
+  `global_position -= offset` and `reset_physics_interpolation()` (no interpolated streak);
+- `GameState.origin_chunk: Vector2i` advances by the same chunks — an exact integer, so
+  `GameState.absolute_position(local)` = local + `origin_chunk * chunk_size` never drifts;
+- `EventBus.origin_shifted(offset)` fires: `WorldStreamer` re-derives every chunk position from
+  its integer coordinate and `CameraRig` corrects its cached follow goal.
+Y is never shifted. This avoids needing a custom double-precision engine build (ADR-004).
 
 ## 4. Player (quadruped animal)
 

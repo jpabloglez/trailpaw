@@ -34,6 +34,8 @@ func _ready() -> void:
 		set_process(false)
 		return
 	top_level = true
+	add_to_group(FloatingOrigin.SHIFTABLE_GROUP)
+	EventBus.origin_shifted.connect(_on_origin_shifted)
 	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	var probe := SphereShape3D.new()
 	probe.radius = settings.collision_margin
@@ -135,6 +137,12 @@ static func recentre_yaw(current_yaw: float, target_yaw: float, rate: float, del
 ## Frame-rate independent exponential smoothing weight for [method lerp].
 static func smoothing_weight(rate: float, delta: float) -> float:
 	return 1.0 - exp(-rate * delta)
+
+
+func _on_origin_shifted(offset: Vector3) -> void:
+	# The rig itself is shifted by FloatingOrigin; keep the cached goal consistent so the
+	# jump is not mistaken for target movement (which would trigger auto-recentre).
+	_previous_goal -= offset
 
 
 func _goal_position() -> Vector3:

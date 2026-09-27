@@ -9,6 +9,7 @@ func _settings(load_radius: int = 2, unload_radius: int = 3) -> StreamingSetting
 	s.build_budget_ms = 2.0
 	s.max_tasks_in_flight = 4
 	s.lod0_radius = 1.5
+	s.rebase_distance = 2000.0
 	return s
 
 

@@ -18,6 +18,7 @@ func before_test() -> void:
 	_settings.build_budget_ms = 8.0
 	_settings.max_tasks_in_flight = 4
 	_settings.lod0_radius = 1.5
+	_settings.rebase_distance = 2000.0
 	_target = auto_free(Node3D.new())
 	add_child(_target)
 	_streamer = _make_streamer(_settings)
@@ -167,3 +168,25 @@ func test_no_chunk_disappears_while_walking_across_chunks() -> void:
 	for coord: Vector2i in desired:
 		if desired[coord] == 0:
 			assert_int(_streamer.get_chunk(coord).lod).is_equal(0)
+
+
+func test_rebase_keeps_chunks_at_their_absolute_positions_without_reloading() -> void:
+	FloatingOrigin.reset()
+	FloatingOrigin.configure(_chunk_size, 0.0)  # manual rebases only
+	FloatingOrigin.track(_target)
+	_target.add_to_group(FloatingOrigin.SHIFTABLE_GROUP)
+	_move_to_chunk(Vector2i(3, -2))
+	await _until_idle()
+	var coords := _sorted(_streamer.loaded_coords())
+	var built: int = _streamer.stats()["total_built"]
+	FloatingOrigin.rebase_now()
+	await get_tree().process_frame
+	assert_object(GameState.origin_chunk).is_equal(Vector2i(4, -2))
+	assert_array(_sorted(_streamer.loaded_coords())).is_equal(coords)
+	assert_int(_streamer.stats()["total_built"]).is_equal(built)
+	for coord: Vector2i in _streamer.loaded_coords():
+		var absolute: Vector3 = GameState.absolute_position(_streamer.get_chunk(coord).position)
+		assert_vector(absolute).is_equal(Vector3(coord.x, 0.0, coord.y) * _chunk_size)
+	assert_bool(_streamer.is_ready_at(_target.position)).is_true()
+	FloatingOrigin.reset()
+	GameState.chunk_size = 0.0
