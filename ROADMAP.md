@@ -27,10 +27,10 @@ Milestones: **M1 "Walk the world"** (end of Phase 3), **M2 "A day in the life"**
 
 ## Phase 0 — Project setup and tooling
 
-- [ ] Install pinned Godot 4.x stable; write version to `.godot-version`.
+- [x] Install pinned Godot 4.x stable; write version to `.godot-version`.
 - [ ] Create project with Forward+ renderer; set physics tick 60 Hz, window 1920×1080, stretch mode `canvas_items`.
 - [ ] Create folder layout from `CLAUDE.md` §3 with `.gitkeep` files.
-- [ ] Git + Git LFS (`.gitattributes`), `.gitignore` for `.godot/`, `*.import` cache, exports.
+- [x] Git + Git LFS (`.gitattributes`), `.gitignore` for `.godot/`, `*.import` cache, exports.
 - [ ] Install gdUnit4 in `addons/`; one smoke test passes headless.
 - [ ] `pip install gdtoolkit ruff pytest`; add `gdlintrc`, `requirements-dev.txt`.
 - [ ] Autoload stubs: `EventBus`, `GameState`, `Settings`, `SaveSystem`, `FloatingOrigin`.
