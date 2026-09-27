@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="CameraRigSettings" format=3]
+
+[ext_resource type="Script" path="res://scripts/player/camera_rig_settings.gd" id="1_d5fbo"]
+
+[resource]
+script = ExtResource("1_d5fbo")
+mouse_sensitivity = 0.003
+pitch_min_degrees = -70.0
+pitch_max_degrees = 20.0
+default_pitch_degrees = -18.0
+zoom_min = 2.0
+zoom_max = 9.0
+zoom_step = 0.5
+zoom_default = 4.5
+zoom_smoothing = 10.0
+pivot_height = 0.9
+follow_smoothing = 12.0
+collision_margin = 0.2
+recentre_delay = 1.5
+recentre_speed = 1.5
+recentre_min_speed = 0.5
