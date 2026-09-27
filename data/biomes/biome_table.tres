@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="BiomeTable" format=3]
+
+[ext_resource type="Script" path="res://scripts/world/biome_definition.gd" id="1_iuphu"]
+[ext_resource type="Resource" path="res://data/biomes/meadow.tres" id="2_37edx"]
+[ext_resource type="Resource" path="res://data/biomes/forest.tres" id="3_bcnfc"]
+[ext_resource type="Resource" path="res://data/biomes/river_valley.tres" id="4_7iaqi"]
+[ext_resource type="Resource" path="res://data/biomes/hills.tres" id="5_htlee"]
+[ext_resource type="Script" path="res://scripts/world/biome_table.gd" id="6_0wvnb"]
+
+[resource]
+script = ExtResource("6_0wvnb")
+biomes = Array[ExtResource("1_iuphu")]([ExtResource("2_37edx"), ExtResource("3_bcnfc"), ExtResource("4_7iaqi"), ExtResource("5_htlee")])
+cycle = true
+blend_width = 150.0
+boundary_noise_amplitude = 120.0
+boundary_noise_frequency = 0.002

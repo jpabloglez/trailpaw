@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="BiomeDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/world/biome_definition.gd" id="1_muwrv"]
+
+[resource]
+script = ExtResource("1_muwrv")
+id = &"hills"
+display_name = "Hills"
+band_width = 800.0
+height_offset = 6.0
+continental_scale = 1.4
+detail_scale = 1.0
+ridged_scale = 2.2
+ground_color_a = Color(0.56, 0.62, 0.37, 1)
+ground_color_b = Color(0.62, 0.56, 0.43, 1)
