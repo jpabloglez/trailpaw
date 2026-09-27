@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="BiomeDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/world/biome_definition.gd" id="1_fpjyh"]
+
+[resource]
+script = ExtResource("1_fpjyh")
+id = &"meadow"
+display_name = "Meadow"
+band_width = 800.0
+height_offset = 3.0
+continental_scale = 0.6
+detail_scale = 0.8
+ridged_scale = 0.2
+ground_color_a = Color(0.52, 0.68, 0.34, 1)
+ground_color_b = Color(0.72, 0.73, 0.42, 1)

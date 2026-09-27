@@ -82,7 +82,7 @@ exactly the expected set for a given position; rebase preserves absolute positio
 
 ## Phase 3 — Distance-driven biomes → **M1**
 
-- [ ] `BiomeDefinition` resource + 4 biomes in `data/biomes/` (meadow, forest, river valley, hills).
+- [x] `BiomeDefinition` resource + 4 biomes in `data/biomes/` (meadow, forest, river valley, hills).
 - [ ] `BiomeResolver.weights_at()` using distance bands + boundary noise + blend width.
 - [ ] Biome-dependent height parameters and ground vertex colours.
 - [ ] Terrain shader: blends ground palettes by weight, slope-based rock tint, distance fog.

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="BiomeDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/world/biome_definition.gd" id="1_s8i2t"]
+
+[resource]
+script = ExtResource("1_s8i2t")
+id = &"forest"
+display_name = "Forest"
+band_width = 800.0
+height_offset = 2.0
+continental_scale = 0.9
+detail_scale = 1.6
+ridged_scale = 0.5
+ground_color_a = Color(0.27, 0.44, 0.22, 1)
+ground_color_b = Color(0.4, 0.36, 0.23, 1)
