@@ -1,0 +1,97 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+
+      - name: Install dev tooling
+        run: pip install -r requirements-dev.txt
+
+      - name: gdlint
+        run: gdlint scripts/ tests/
+
+      - name: gdformat
+        run: gdformat --check scripts/ tests/
+
+      - name: ruff
+        run: |
+          ruff check tools/
+          ruff format --check tools/
+
+      - name: pytest
+        run: python -m pytest tools/tests
+
+  import:
+    name: Headless import
+    needs: lint
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          lfs: true
+
+      - uses: ./.github/actions/setup-godot
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+
+      - name: Check Godot matches .godot-version
+        run: python -m tools.godot_version
+
+      - name: Import project
+        run: |
+          set -o pipefail
+          godot --headless --path . --import 2>&1 | tee import.log
+          if grep -E "^(ERROR|SCRIPT ERROR|USER ERROR):" import.log; then
+            echo "::error::Godot import reported errors"
+            exit 1
+          fi
+
+  test:
+    name: gdUnit4 tests
+    needs: import
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          lfs: true
+
+      - uses: ./.github/actions/setup-godot
+
+      - name: Import project
+        run: godot --headless --path . --import
+
+      - name: Run gdUnit4
+        run: ./addons/gdUnit4/runtest.sh --headless --ignoreHeadlessMode -a res://tests
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: gdunit4-reports
+          path: reports/
+          if-no-files-found: warn
