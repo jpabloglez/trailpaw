@@ -1,0 +1,42 @@
+name: Setup Godot
+description: >
+  Install the Godot version pinned in .godot-version (Linux x86_64, SHA512-verified,
+  cached) and export GODOT_BIN.
+
+runs:
+  using: composite
+  steps:
+    - name: Read pinned version
+      id: pin
+      shell: bash
+      run: echo "version=$(tr -d '[:space:]' < .godot-version)" >> "$GITHUB_OUTPUT"
+
+    - name: Cache Godot binary
+      id: cache
+      uses: actions/cache@v6
+      with:
+        path: ~/godot
+        key: godot-${{ steps.pin.outputs.version }}-linux-x86_64
+
+    - name: Download and verify Godot
+      if: steps.cache.outputs.cache-hit != 'true'
+      shell: bash
+      env:
+        VERSION: ${{ steps.pin.outputs.version }}
+      run: |
+        set -euo pipefail
+        base="https://github.com/godotengine/godot/releases/download/${VERSION}"
+        zip="Godot_v${VERSION}_linux.x86_64.zip"
+        mkdir -p ~/godot && cd ~/godot
+        curl -fsSLO "${base}/${zip}"
+        curl -fsSLO "${base}/SHA512-SUMS.txt"
+        grep " ${zip}\$" SHA512-SUMS.txt | sha512sum -c -
+        unzip -q "${zip}"
+        mv "Godot_v${VERSION}_linux.x86_64" godot
+        rm -f "${zip}" SHA512-SUMS.txt
+
+    - name: Put Godot on PATH
+      shell: bash
+      run: |
+        echo "$HOME/godot" >> "$GITHUB_PATH"
+        echo "GODOT_BIN=$HOME/godot/godot" >> "$GITHUB_ENV"
