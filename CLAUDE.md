@@ -44,8 +44,10 @@ GODOT_BIN=$(readlink -f "$(command -v godot)") \
 gdlint scripts/ tests/
 gdformat --check scripts/ tests/
 
-# Python tooling
+# Python tooling (inside the project venv: python -m venv .venv && .venv/bin/pip install -r requirements-dev.txt)
+ruff check tools/ && ruff format --check tools/
 python -m pytest tools/tests
+python -m tools.godot_version       # installed Godot matches .godot-version
 ```
 
 **Definition of done for any task:** import succeeds with no errors, `gdlint` and

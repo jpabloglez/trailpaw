@@ -1,0 +1,4 @@
+# Development tooling (see CLAUDE.md §1). Pinned exactly; bump via a dedicated task.
+gdtoolkit==4.5.0
+ruff==0.16.9
+pytest==9.1.1
