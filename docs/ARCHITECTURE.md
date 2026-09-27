@@ -107,6 +107,10 @@ acceleration, turn rate, jump height, swim ability, need modifiers, sounds.
 Swapping species = swapping a `.tres`; no code changes.
 
 ### 4.2 Movement
+- Scene: `scenes/player/animal.tscn` — `Animal` (CharacterBody3D) with `%MovementComponent`,
+  `%PlayerInput` and `%StateMachine` (Idle, Locomotion, Jump, Fall). Forward is `-Z`.
+- Physics layers (named in `project.godot`): **1 `world`** (static geometry, terrain),
+  **2 `player`**. The player collides with `world`; camera collision only checks `world`.
 - `CharacterBody3D` with capsule collider oriented horizontally (or two-sphere approximation).
 - Camera-relative input; smooth acceleration and turning (quadrupeds turn in arcs, not in place).
 - Gaits: walk / trot / run (Shift) driven by speed thresholds.

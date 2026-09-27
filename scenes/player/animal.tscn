@@ -1,0 +1,80 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/player/animal.gd" id="1_ekx0x"]
+[ext_resource type="Script" path="res://scripts/components/movement_component.gd" id="2_3cfp3"]
+[ext_resource type="Resource" path="res://data/species/placeholder.tres" id="3_0f8yj"]
+[ext_resource type="Script" path="res://scripts/player/player_input.gd" id="4_bwuqq"]
+[ext_resource type="Script" path="res://scripts/components/state_machine.gd" id="5_wfrlh"]
+[ext_resource type="Script" path="res://scripts/player/states/idle_state.gd" id="6_uy5i5"]
+[ext_resource type="Script" path="res://scripts/player/states/locomotion_state.gd" id="7_mh34f"]
+[ext_resource type="Script" path="res://scripts/player/states/jump_state.gd" id="8_453ff"]
+[ext_resource type="Script" path="res://scripts/player/states/fall_state.gd" id="9_85roj"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ald35"]
+radius = 0.35
+height = 1.3
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_saixa"]
+albedo_color = Color(0.55, 0.38, 0.24, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_k0htq"]
+material = SubResource("StandardMaterial3D_saixa")
+size = Vector3(0.6, 0.5, 1.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4pnkw"]
+albedo_color = Color(0.95, 0.55, 0.15, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_by8u3"]
+material = SubResource("StandardMaterial3D_4pnkw")
+size = Vector3(0.24, 0.2, 0.2)
+
+[node name="Animal" type="CharacterBody3D" unique_id=858224225]
+collision_layer = 2
+floor_constant_speed = true
+floor_snap_length = 0.3
+script = ExtResource("1_ekx0x")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=2137722994]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0.35, 0)
+shape = SubResource("CapsuleShape3D_ald35")
+
+[node name="Body" type="MeshInstance3D" parent="." unique_id=1284224033]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+mesh = SubResource("BoxMesh_k0htq")
+
+[node name="Nose" type="MeshInstance3D" parent="." unique_id=338581139]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -0.68)
+mesh = SubResource("BoxMesh_by8u3")
+
+[node name="MovementComponent" type="Node" parent="." unique_id=1908281299]
+unique_name_in_owner = true
+script = ExtResource("2_3cfp3")
+species = ExtResource("3_0f8yj")
+
+[node name="PlayerInput" type="Node" parent="." unique_id=254887723 node_paths=PackedStringArray("movement")]
+unique_name_in_owner = true
+script = ExtResource("4_bwuqq")
+movement = NodePath("../MovementComponent")
+
+[node name="StateMachine" type="Node" parent="." unique_id=449749050 node_paths=PackedStringArray("initial_state")]
+unique_name_in_owner = true
+script = ExtResource("5_wfrlh")
+initial_state = NodePath("Idle")
+
+[node name="Idle" type="Node" parent="StateMachine" unique_id=1513262780 node_paths=PackedStringArray("movement")]
+script = ExtResource("6_uy5i5")
+movement = NodePath("../../MovementComponent")
+
+[node name="Locomotion" type="Node" parent="StateMachine" unique_id=888872547 node_paths=PackedStringArray("movement")]
+script = ExtResource("7_mh34f")
+movement = NodePath("../../MovementComponent")
+
+[node name="Jump" type="Node" parent="StateMachine" unique_id=1657406246 node_paths=PackedStringArray("movement")]
+script = ExtResource("8_453ff")
+movement = NodePath("../../MovementComponent")
+
+[node name="Fall" type="Node" parent="StateMachine" unique_id=1469338723 node_paths=PackedStringArray("movement")]
+script = ExtResource("9_85roj")
+movement = NodePath("../../MovementComponent")
