@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="VegetationPalette" format=3]
+
+[ext_resource type="Script" path="res://scripts/world/vegetation_palette.gd" id="1_w4c52"]
+
+[resource]
+script = ExtResource("1_w4c52")
+colors = Dictionary[String, Color]({
+"_defaultMat": Color(0.56, 0.54, 0.51, 1),
+"colorPurple": Color(0.62, 0.5, 0.85, 1),
+"colorRed": Color(0.85, 0.32, 0.3, 1),
+"colorYellow": Color(0.96, 0.8, 0.3, 1),
+"dirt": Color(0.45, 0.35, 0.26, 1),
+"grass": Color(0.46, 0.62, 0.3, 1),
+"leafsDark": Color(0.24, 0.42, 0.24, 1),
+"leafsGreen": Color(0.36, 0.56, 0.26, 1),
+"woodBark": Color(0.45, 0.33, 0.24, 1),
+"woodBarkDark": Color(0.34, 0.26, 0.2, 1),
+"woodInner": Color(0.78, 0.66, 0.48, 1)
+})

@@ -25,6 +25,8 @@ const DEBUG_LINES_GROUP: StringName = &"debug_lines"
 ## Global shader uniform holding [member TerrainSettings.sea_level] (declared in
 ## [code]project.godot[/code]). Absolute height: floating-origin rebases never shift Y.
 const WATER_LEVEL_PARAM: StringName = &"water_level"
+## Global shader uniform with the packed [WindSettings] (see [code]foliage.gdshader[/code]).
+const WIND_PARAM: StringName = &"wind"
 
 ## Terrain shape and chunk geometry.
 @export var terrain: TerrainSettings
@@ -36,6 +38,10 @@ const WATER_LEVEL_PARAM: StringName = &"water_level"
 @export var chunk_scene: PackedScene
 ## Material applied to every chunk surface.
 @export var material: Material
+## Wind published to foliage shaders (optional).
+@export var wind: WindSettings
+## Optional recolouring of imported vegetation materials.
+@export var vegetation_palette: VegetationPalette
 
 ## Multiplier for every vegetation density (quality presets scale it).
 var vegetation_density: float = 1.0
@@ -74,7 +80,9 @@ func _ready() -> void:
 	if terrain.biomes != null:
 		# Immutable snapshot of the vegetation tables, shared read-only by every job.
 		_scatterer = VegetationScatterer.new(terrain.biomes)
-		_library = VegetationLibrary.new(terrain.biomes)
+		_library = VegetationLibrary.new(terrain.biomes, vegetation_palette)
+	if wind != null:
+		RenderingServer.global_shader_parameter_set(WIND_PARAM, wind.as_uniform())
 	# Shaders (terrain shores, underwater tint) need the absolute water height.
 	RenderingServer.global_shader_parameter_set(WATER_LEVEL_PARAM, terrain.sea_level)
 	EventBus.origin_shifted.connect(_on_origin_shifted)

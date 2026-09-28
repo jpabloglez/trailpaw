@@ -119,6 +119,10 @@ common/physics_interpolation=true
 
 [shader_globals]
 
+wind={
+"type": "vec4",
+"value": Vector4(1, 0, 0, 0)
+}
 water_level={
 "type": "float",
 "value": 0.0

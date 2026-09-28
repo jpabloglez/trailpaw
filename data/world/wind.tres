@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="WindSettings" format=3]
+
+[ext_resource type="Script" path="res://scripts/world/wind_settings.gd" id="1_w4cdr"]
+
+[resource]
+script = ExtResource("1_w4cdr")
+direction_degrees = 30.0
+strength = 0.12
+speed = 1.3

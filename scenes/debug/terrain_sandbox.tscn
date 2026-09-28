@@ -16,6 +16,9 @@
 [ext_resource type="Script" path="res://scripts/world/biome_tracker.gd" id="20_btrk"]
 [ext_resource type="PackedScene" path="res://scenes/ui/biome_toast.tscn" id="21_btst"]
 
+[ext_resource type="Resource" path="res://data/world/wind.tres" id="22_wind"]
+[ext_resource type="Resource" path="res://data/vegetation_palettes/natural.tres" id="23_palette"]
+
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_k7oal"]
 
 [sub_resource type="Sky" id="Sky_qqnsy"]
@@ -57,6 +60,8 @@ streaming = ExtResource("4_nu80k")
 target = NodePath("../Animal")
 chunk_scene = ExtResource("5_t448s")
 material = ExtResource("6_elxu1")
+wind = ExtResource("22_wind")
+vegetation_palette = ExtResource("23_palette")
 
 [node name="Animal" parent="." unique_id=858224225 instance=ExtResource("7_u3weh")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 30, 32)
