@@ -11,6 +11,15 @@ extends Resource
 ## Human-readable species name.
 @export var display_name: String = ""
 
+@export_group("Model")
+## Rigged, animated model (a [code].glb[/code] with a [Skeleton3D] and an [AnimationPlayer]).
+## Empty for the Phase 1 placeholder box.
+@export var model_scene: PackedScene
+## Uniform scale applied to the model so it matches the collision capsule.
+@export_range(0.001, 100.0, 0.001) var model_scale: float = 1.0
+## Yaw applied to the model so it faces the game's forward (-Z).
+@export_range(-180.0, 180.0, 1.0, "suffix:°") var model_yaw_degrees: float = 0.0
+
 @export_group("Gaits")
 ## Target speed of the walk gait; speeds below this read as walking.
 @export_range(0.1, 20.0, 0.1, "suffix:m/s") var walk_speed: float = 0.0
@@ -62,6 +71,8 @@ func get_validation_errors() -> PackedStringArray:
 		errors.append("air_control must be within [0, 1]")
 	if max_slope_degrees <= 0.0 or max_slope_degrees >= 90.0:
 		errors.append("max_slope_degrees must be within (0, 90)")
+	if model_scale <= 0.0:
+		errors.append("model_scale must be > 0")
 	return errors
 
 

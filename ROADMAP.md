@@ -111,8 +111,8 @@ exactly the expected set for a given position; rebase preserves absolute positio
 
 ## Phase 5 — Quadruped character
 
-- [ ] Choose first species (e.g. capybara or dog); create `data/species/<name>.tres`.
-- [ ] Source or model a rigged animal in Blender (Quaternius animated animals are a good start); export `.glb`.
+- [x] Choose first species (e.g. capybara or dog); create `data/species/<name>.tres`.
+- [x] Source or model a rigged animal in Blender (Quaternius animated animals are a good start); export `.glb`.
 - [ ] Animation set: idle, walk, trot, run, jump, fall, eat, drink, lie down, sniff, swim.
 - [ ] `AnimationController`: `AnimationTree` state machine + `BlendSpace1D` locomotion.
 - [ ] Ground alignment with front/rear raycasts, smoothed pitch/roll.

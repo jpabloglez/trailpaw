@@ -202,6 +202,11 @@ Y is never shifted. This avoids needing a custom double-precision engine build (
 `AnimalSpecies` (Resource): mesh scene, animation library, walk/trot/run speeds,
 acceleration, turn rate, jump height, swim ability, need modifiers, sounds.
 Swapping species = swapping a `.tres`; no code changes.
+First species: **Husky** (`data/species/husky.tres`), Quaternius' Ultimate Animated Animal
+Pack (CC0) in `assets/animals/husky/husky.glb`: 49-bone skeleton, 12 clips (Idle, Idle_2,
+Idle_2_HeadLow, Walk, Gallop, Gallop_Jump, Jump_ToIdle, Eating, Attack, Death, hit reacts),
+none looped in the file. `model_scale` 0.34 fits the 1.3 m capsule; `model_yaw_degrees` 180
+turns its +Z-facing rig to the game's −Z forward.
 
 ### 4.2 Movement
 - Scene: `scenes/player/animal.tscn` — `Animal` (CharacterBody3D) with `%MovementComponent`,
