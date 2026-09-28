@@ -25,6 +25,10 @@ extends Resource
 ## Multiplier for the ridged layer amplitude.
 @export_range(0.0, 5.0, 0.01) var ridged_scale: float = 0.0
 
+@export_group("Vegetation")
+## What grows in this biome and where (see [VegetationEntry]).
+@export var vegetation: Array[VegetationEntry] = []
+
 @export_group("Ground palette")
 ## First ground colour; the terrain shader varies between A and B across the landscape.
 @export var ground_color_a: Color = Color.BLACK
@@ -43,6 +47,12 @@ func get_validation_errors() -> PackedStringArray:
 		errors.append("band_width must be > 0")
 	if continental_scale < 0.0 or detail_scale < 0.0 or ridged_scale < 0.0:
 		errors.append("height scales must be >= 0")
+	for i in vegetation.size():
+		if vegetation[i] == null:
+			errors.append("vegetation[%d] is null" % i)
+			continue
+		for problem: String in vegetation[i].get_validation_errors():
+			errors.append("vegetation[%d]: %s" % [i, problem])
 	return errors
 
 

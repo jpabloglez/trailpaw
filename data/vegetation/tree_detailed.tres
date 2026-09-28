@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="VegetationType" format=3]
+
+[ext_resource type="PackedScene" path="res://assets/environment/nature/tree_detailed.glb" id="1_kmqb4"]
+[ext_resource type="Script" path="res://scripts/world/vegetation_type.gd" id="2_2vvwd"]
+
+[resource]
+script = ExtResource("2_2vvwd")
+id = &"tree_detailed"
+scene = ExtResource("1_kmqb4")
+scale_min = 5.0
+scale_max = 6.5
+visibility_range = 260.0
+sway = 0.25
+collision_radius = 0.08
+collision_height = 1.0

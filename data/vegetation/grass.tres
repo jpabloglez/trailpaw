@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="VegetationType" format=3]
+
+[ext_resource type="PackedScene" path="res://assets/environment/nature/grass.glb" id="1_1k03m"]
+[ext_resource type="Script" path="res://scripts/world/vegetation_type.gd" id="2_q830t"]
+
+[resource]
+script = ExtResource("2_q830t")
+id = &"grass"
+scene = ExtResource("1_1k03m")
+scale_min = 1.4
+scale_max = 2.2
+align_to_ground = 0.8
+visibility_range = 35.0
+near_only = true
+sway = 1.0

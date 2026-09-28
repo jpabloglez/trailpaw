@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="VegetationType" format=3]
+
+[ext_resource type="PackedScene" path="res://assets/environment/nature/log.glb" id="1_gqtuk"]
+[ext_resource type="Script" path="res://scripts/world/vegetation_type.gd" id="2_fh8q1"]
+
+[resource]
+script = ExtResource("2_fh8q1")
+id = &"log"
+scene = ExtResource("1_gqtuk")
+scale_min = 3.0
+scale_max = 4.0
+align_to_ground = 1.0
+visibility_range = 90.0

@@ -1,6 +1,127 @@
 [gd_resource type="Resource" script_class="BiomeDefinition" format=3]
 
 [ext_resource type="Script" path="res://scripts/world/biome_definition.gd" id="1_s8i2t"]
+[ext_resource type="Script" path="res://scripts/world/vegetation_entry.gd" id="2_w3brh"]
+[ext_resource type="Resource" path="res://data/vegetation/tree_detailed.tres" id="3_3w5kj"]
+[ext_resource type="Resource" path="res://data/vegetation/tree_oak.tres" id="4_n0yg2"]
+[ext_resource type="Resource" path="res://data/vegetation/tree_pineRoundB.tres" id="5_2kcx4"]
+[ext_resource type="Resource" path="res://data/vegetation/tree_default.tres" id="6_qbkdq"]
+[ext_resource type="Resource" path="res://data/vegetation/plant_bushLarge.tres" id="7_v4fcn"]
+[ext_resource type="Resource" path="res://data/vegetation/plant_flatShort.tres" id="8_582wn"]
+[ext_resource type="Resource" path="res://data/vegetation/plant_flatTall.tres" id="9_0fhd4"]
+[ext_resource type="Resource" path="res://data/vegetation/grass_leafs.tres" id="10_axxst"]
+[ext_resource type="Resource" path="res://data/vegetation/log.tres" id="11_gg57d"]
+[ext_resource type="Resource" path="res://data/vegetation/stump_round.tres" id="12_2dhnt"]
+[ext_resource type="Resource" path="res://data/vegetation/mushroom_redGroup.tres" id="13_0avys"]
+[ext_resource type="Resource" path="res://data/vegetation/rock_smallA.tres" id="14_1macx"]
+
+[sub_resource type="Resource" id="Resource_rgie2"]
+script = ExtResource("2_w3brh")
+type = ExtResource("3_3w5kj")
+density = 0.6
+max_slope_degrees = 30.0
+min_height = 1.0
+max_height = 80.0
+cluster = 0.3
+
+[sub_resource type="Resource" id="Resource_qej8q"]
+script = ExtResource("2_w3brh")
+type = ExtResource("4_n0yg2")
+density = 0.4
+max_slope_degrees = 30.0
+min_height = 1.0
+max_height = 80.0
+cluster = 0.3
+
+[sub_resource type="Resource" id="Resource_005t4"]
+script = ExtResource("2_w3brh")
+type = ExtResource("5_2kcx4")
+density = 0.3
+max_slope_degrees = 32.0
+min_height = 1.0
+max_height = 80.0
+cluster = 0.4
+
+[sub_resource type="Resource" id="Resource_eedph"]
+script = ExtResource("2_w3brh")
+type = ExtResource("6_qbkdq")
+density = 0.3
+max_slope_degrees = 30.0
+min_height = 1.0
+max_height = 80.0
+cluster = 0.3
+
+[sub_resource type="Resource" id="Resource_fuf42"]
+script = ExtResource("2_w3brh")
+type = ExtResource("7_v4fcn")
+density = 0.8
+max_slope_degrees = 30.0
+min_height = 0.5
+max_height = 80.0
+cluster = 0.4
+
+[sub_resource type="Resource" id="Resource_23ltr"]
+script = ExtResource("2_w3brh")
+type = ExtResource("8_582wn")
+density = 4.0
+max_slope_degrees = 32.0
+min_height = 0.5
+max_height = 80.0
+cluster = 0.5
+
+[sub_resource type="Resource" id="Resource_nbifi"]
+script = ExtResource("2_w3brh")
+type = ExtResource("9_0fhd4")
+density = 2.0
+max_slope_degrees = 32.0
+min_height = 0.5
+max_height = 80.0
+cluster = 0.5
+
+[sub_resource type="Resource" id="Resource_67o0g"]
+script = ExtResource("2_w3brh")
+type = ExtResource("10_axxst")
+density = 6.0
+max_slope_degrees = 35.0
+min_height = 0.3
+max_height = 80.0
+cluster = 0.4
+
+[sub_resource type="Resource" id="Resource_1knfq"]
+script = ExtResource("2_w3brh")
+type = ExtResource("11_gg57d")
+density = 0.1
+max_slope_degrees = 20.0
+min_height = 0.5
+max_height = 80.0
+cluster = 0.2
+
+[sub_resource type="Resource" id="Resource_7mx0i"]
+script = ExtResource("2_w3brh")
+type = ExtResource("12_2dhnt")
+density = 0.1
+max_slope_degrees = 25.0
+min_height = 0.5
+max_height = 80.0
+cluster = 0.2
+
+[sub_resource type="Resource" id="Resource_y2act"]
+script = ExtResource("2_w3brh")
+type = ExtResource("13_0avys")
+density = 0.4
+max_slope_degrees = 25.0
+min_height = 0.5
+max_height = 80.0
+cluster = 0.7
+
+[sub_resource type="Resource" id="Resource_3t70u"]
+script = ExtResource("2_w3brh")
+type = ExtResource("14_1macx")
+density = 0.2
+max_slope_degrees = 40.0
+min_height = 0.3
+max_height = 80.0
+cluster = 0.3
 
 [resource]
 script = ExtResource("1_s8i2t")
@@ -11,5 +132,6 @@ height_offset = 2.0
 continental_scale = 0.9
 detail_scale = 1.6
 ridged_scale = 0.5
+vegetation = Array[ExtResource("2_w3brh")]([SubResource("Resource_rgie2"), SubResource("Resource_qej8q"), SubResource("Resource_005t4"), SubResource("Resource_eedph"), SubResource("Resource_fuf42"), SubResource("Resource_23ltr"), SubResource("Resource_nbifi"), SubResource("Resource_67o0g"), SubResource("Resource_1knfq"), SubResource("Resource_7mx0i"), SubResource("Resource_y2act"), SubResource("Resource_3t70u")])
 ground_color_a = Color(0.27, 0.44, 0.22, 1)
 ground_color_b = Color(0.4, 0.36, 0.23, 1)
