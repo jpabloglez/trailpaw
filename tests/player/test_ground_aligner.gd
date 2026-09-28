@@ -2,13 +2,13 @@
 extends GdUnitTestSuite
 
 const ANIMAL_SCENE: String = "res://scenes/player/animal.tscn"
-const HUSKY: String = "res://data/species/husky.tres"
+const PLAYER_SPECIES: String = "res://data/species/fox.tres"  # the player species
 
 var _species: AnimalSpecies
 
 
 func before() -> void:
-	_species = load(HUSKY)
+	_species = load(PLAYER_SPECIES)
 
 
 func _heights(fl: float, fr: float, bl: float, br: float) -> PackedFloat32Array:

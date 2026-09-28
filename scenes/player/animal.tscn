@@ -9,7 +9,7 @@
 [ext_resource type="Script" path="res://scripts/player/states/jump_state.gd" id="8_453ff"]
 [ext_resource type="Script" path="res://scripts/player/states/fall_state.gd" id="9_85roj"]
 
-[ext_resource type="Resource" path="res://data/species/husky.tres" id="20_husky"]
+[ext_resource type="Resource" path="res://data/species/fox.tres" id="20_fox"]
 [ext_resource type="Script" path="res://scripts/player/animation_controller.gd" id="21_anim"]
 
 [ext_resource type="Script" path="res://scripts/player/ground_aligner.gd" id="22_align"]
@@ -55,7 +55,7 @@ mesh = SubResource("BoxMesh_by8u3")
 [node name="MovementComponent" type="Node" parent="." unique_id=1908281299]
 unique_name_in_owner = true
 script = ExtResource("2_3cfp3")
-species = ExtResource("20_husky")
+species = ExtResource("20_fox")
 
 [node name="PlayerInput" type="Node" parent="." unique_id=254887723 node_paths=PackedStringArray("movement")]
 unique_name_in_owner = true

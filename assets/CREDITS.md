@@ -30,5 +30,6 @@ Every third-party asset in `assets/` must be listed here (see CLAUDE.md §1).
 | `tree_pineSmallA` | `assets/environment/nature/tree_pineSmallA.glb` | Kenney (kenney.nl), Nature Kit 2.1 | CC0 1.0 | https://kenney.nl/assets/nature-kit |
 | `tree_pineTallA` | `assets/environment/nature/tree_pineTallA.glb` | Kenney (kenney.nl), Nature Kit 2.1 | CC0 1.0 | https://kenney.nl/assets/nature-kit |
 | `husky` | `assets/animals/husky/husky.glb` | Quaternius, Ultimate Animated Animal Pack (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/wcWiuEqwzq |
+| `fox` | `assets/animals/fox/fox.glb` | Quaternius, Ultimate Animated Animal Pack (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/Bc97C66HKi |
 
 The Nature Kit licence text is kept next to the models in `assets/environment/nature/License.txt`. Only a curated subset of the pack's 329 models is committed; add new ones here in the same pull request.
