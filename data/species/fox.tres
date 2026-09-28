@@ -1,0 +1,53 @@
+[gd_resource type="Resource" script_class="AnimalSpecies" format=3]
+
+[ext_resource type="PackedScene" path="res://assets/animals/fox/fox.glb" id="1_atbhr"]
+[ext_resource type="Script" path="res://scripts/player/animal_species.gd" id="2_ec85q"]
+
+[resource]
+script = ExtResource("2_ec85q")
+display_name = "Fox"
+model_scene = ExtResource("1_atbhr")
+model_scale = 0.28
+model_yaw_degrees = 180.0
+animations = Dictionary[StringName, String]({
+&"drink": "Eating",
+&"eat": "Eating",
+&"fall": "Jump_ToIdle",
+&"idle": "Idle",
+&"jump": "Gallop_Jump",
+&"lie_down": "Idle_2_HeadLow",
+&"run": "Gallop",
+&"sniff": "Idle_2_HeadLow",
+&"swim": "Walk",
+&"trot": "Gallop",
+&"walk": "Walk"
+})
+looping = Array[StringName]([&"idle", &"walk", &"trot", &"run", &"swim"])
+animation_fallbacks = Dictionary[StringName, String]({
+&"drink": "No drinking clip: Eating (head down at the water).",
+&"fall": "No airborne loop: Jump_ToIdle (the landing half of a jump).",
+&"lie_down": "No lying clip: Idle_2_HeadLow (resting pose) until a species provides one.",
+&"swim": "No swim clip: a slowed Walk (paddling) while floating.",
+&"trot": "No trot clip: the gallop, played slower (matched to trot speed)."
+})
+clip_ground_speeds = Dictionary[String, float]({
+"Gallop": 2.27,
+"Walk": 0.45
+})
+max_animation_time_scale = 2.5
+paw_bones = PackedStringArray("FF.L", "FF.R", "FFB.L", "FFB.R")
+max_tilt_degrees = 25.0
+tilt_smoothing = 10.0
+paw_half_length = 0.29
+paw_half_width = 0.095
+walk_speed = 1.1
+trot_speed = 4.0
+run_speed = 7.5
+acceleration = 12.0
+deceleration = 16.0
+turn_rate_slow = 6.0
+turn_rate_fast = 2.5
+turn_slowdown = 0.6
+jump_height = 1.0
+air_control = 0.3
+max_slope_degrees = 45.0

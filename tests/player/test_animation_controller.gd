@@ -3,14 +3,14 @@
 extends GdUnitTestSuite
 
 const ANIMAL_SCENE: String = "res://scenes/player/animal.tscn"
-const HUSKY: String = "res://data/species/husky.tres"
+const PLAYER_SPECIES: String = "res://data/species/fox.tres"  # the player species
 const EPSILON: float = 1e-4
 
 var _species: AnimalSpecies
 
 
 func before() -> void:
-	_species = load(HUSKY)
+	_species = load(PLAYER_SPECIES)
 
 
 func _animal_on_floor() -> Animal:

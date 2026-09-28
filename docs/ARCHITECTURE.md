@@ -207,6 +207,10 @@ Pack (CC0) in `assets/animals/husky/husky.glb`: 49-bone skeleton, 12 clips (Idle
 Idle_2_HeadLow, Walk, Gallop, Gallop_Jump, Jump_ToIdle, Eating, Attack, Death, hit reacts),
 none looped in the file. `model_scale` 0.34 fits the 1.3 m capsule; `model_yaw_degrees` 180
 turns its +Z-facing rig to the game's −Z forward.
+**The player currently plays the Fox** (`data/species/fox.tres`, user's choice after the Husky):
+same Quaternius rig and clip names (51 bones, longer 8-bone tail), `model_scale` 0.28 (≈ 1.3 m
+nose to tail tip), clip speeds Walk 0.45 / Gallop 2.27 m/s, `walk_speed` 1.1 m/s. The Husky
+stays in `data/species/` as an alternative; switching is a one-line change in `animal.tscn`.
 
 ### 4.2 Movement
 - Scene: `scenes/player/animal.tscn` — `Animal` (CharacterBody3D) with `%MovementComponent`,
