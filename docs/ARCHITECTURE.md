@@ -176,6 +176,11 @@ Y is never shifted. This avoids needing a custom double-precision engine build (
   `PackedFloat32Array` in `MultiMesh.buffer` layout. The scatterer is an immutable snapshot
   built once by `WorldStreamer` and shared read-only by all jobs. Cost ≈ +6–8 ms per LOD 0
   chunk on the worker (+17 ms at band boundaries).
+- Rendering: `VegetationLibrary` extracts each type's mesh once (original materials) and
+  `TerrainChunk` keeps one reused `MultiMeshInstance3D` per type, filled by copying the
+  worker's buffer (`multimesh.buffer = …`). Near-only plants cast no shadows. Tree and rock
+  draw distances stop at the fog end (≤ 200 m): nothing is drawn that fog hides. Note:
+  `visibility_range` applies to the whole chunk MultiMesh, not per instance.
 
 ## 4. Player (quadruped animal)
 

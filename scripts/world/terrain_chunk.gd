@@ -7,7 +7,8 @@ extends Node3D
 ## The chunk's origin is its corner; [code]WorldStreamer[/code] positions it relative to
 ## the floating origin.
 ## [br][br]
-## Budget (main thread): one [method ArrayMesh.add_surface_from_arrays] plus, for LOD 0,
+## Budget (main thread): one [method ArrayMesh.add_surface_from_arrays], one buffer copy per
+## vegetation type (MultiMeshes reused) plus, for LOD 0,
 ## one height-map upload. Measured on the target GTX 1050 (WSL, gl_compatibility): mesh
 ## upload ≈ 0.33 ms steady (first upload ≈ 4 ms: one-off material warm-up), height map
 ## ≈ 0.04 ms. No per-call allocations besides what the engine does internally.
@@ -19,6 +20,7 @@ var lod: int = -1
 
 var _border := PackedVector3Array()
 var _mesh := ArrayMesh.new()
+var _vegetation: Dictionary[StringName, MultiMeshInstance3D] = {}
 var _arrays: Array = []
 var _heightmap := HeightMapShape3D.new()
 
@@ -34,8 +36,9 @@ func _ready() -> void:
 	_collision.disabled = true
 
 
-## Replaces the chunk's geometry and collision with [param data].
-func apply(data: ChunkData, material: Material) -> void:
+## Replaces the chunk's geometry, collision and vegetation with [param data]. Vegetation is
+## drawn only when a [param library] is given.
+func apply(data: ChunkData, material: Material, library: VegetationLibrary = null) -> void:
 	coord = data.coord
 	lod = data.lod
 	_border = data.border
@@ -64,12 +67,24 @@ func apply(data: ChunkData, material: Material) -> void:
 		var side := data.step * float(data.resolution - 1)
 		_water.position = Vector3(side * 0.5, data.water_level, side * 0.5)
 		_water.scale = Vector3(side, 1.0, side)
+	_apply_vegetation(data, library)
 	visible = true
 
 
 ## Closed outline of the chunk's surface border in local space (for debug gizmos).
 func border_outline() -> PackedVector3Array:
 	return _border
+
+
+## Number of visible vegetation instances of type [param id].
+func vegetation_count(id: StringName) -> int:
+	var node: MultiMeshInstance3D = _vegetation.get(id)
+	return node.multimesh.instance_count if node != null and node.visible else 0
+
+
+## The MultiMesh node drawing type [param id], or [code]null[/code].
+func vegetation_node(id: StringName) -> MultiMeshInstance3D:
+	return _vegetation.get(id)
 
 
 ## Whether this chunk currently shows a water plane.
@@ -88,3 +103,36 @@ func reset() -> void:
 	_collision.disabled = true
 	_water.visible = false
 	lod = -1
+	for node: MultiMeshInstance3D in _vegetation.values():
+		node.visible = false
+
+
+## One reused MultiMeshInstance3D per type: the buffer is copied as-is from the worker.
+func _apply_vegetation(data: ChunkData, library: VegetationLibrary) -> void:
+	for node: MultiMeshInstance3D in _vegetation.values():
+		node.visible = false
+	if library == null:
+		return
+	for id: StringName in data.vegetation:
+		var buffer: PackedFloat32Array = data.vegetation[id]
+		var node: MultiMeshInstance3D = _vegetation.get(id)
+		if node == null:
+			node = MultiMeshInstance3D.new()
+			node.name = "Vegetation_" + String(id)
+			var multimesh := MultiMesh.new()
+			multimesh.transform_format = MultiMesh.TRANSFORM_3D
+			multimesh.mesh = library.mesh_for(id)
+			node.multimesh = multimesh
+			node.visibility_range_end = library.visibility_range(id)
+			node.cast_shadow = (
+				GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+				if library.casts_shadows(id)
+				else GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			)
+			add_child(node)
+			_vegetation[id] = node
+		var count := buffer.size() / VegetationScatterer.FLOATS_PER_INSTANCE
+		if node.multimesh.instance_count != count:
+			node.multimesh.instance_count = count
+		node.multimesh.buffer = buffer
+		node.visible = true

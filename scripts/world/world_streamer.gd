@@ -42,6 +42,7 @@ var vegetation_density: float = 1.0
 
 var _changed: bool = false
 var _scatterer: VegetationScatterer
+var _library: VegetationLibrary
 var _center: Vector2i = Vector2i.ZERO
 var _has_center: bool = false
 var _desired: Dictionary[Vector2i, int] = {}
@@ -73,6 +74,7 @@ func _ready() -> void:
 	if terrain.biomes != null:
 		# Immutable snapshot of the vegetation tables, shared read-only by every job.
 		_scatterer = VegetationScatterer.new(terrain.biomes)
+		_library = VegetationLibrary.new(terrain.biomes)
 	# Shaders (terrain shores, underwater tint) need the absolute water height.
 	RenderingServer.global_shader_parameter_set(WATER_LEVEL_PARAM, terrain.sea_level)
 	EventBus.origin_shifted.connect(_on_origin_shifted)
@@ -223,7 +225,7 @@ func _build_ready() -> void:
 		if chunk == null:
 			chunk = _acquire()
 		chunk.position = chunk_origin(job.coord)
-		chunk.apply(job.data, material)
+		chunk.apply(job.data, material, _library)
 		_max_chunk_ms = maxf(_max_chunk_ms, float(Time.get_ticks_usec() - chunk_start) / 1000.0)
 		_loaded[job.coord] = chunk
 		built += 1
