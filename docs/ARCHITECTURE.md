@@ -132,7 +132,11 @@ Scene-tree mutations happen only on the main thread; worker threads produce plai
 - Water v1: `TerrainSettings.sea_level` (−6 m). A chunk whose ground dips below it shows a
   translucent plane (`shaders/water.gdshader`, ripples in absolute coordinates, no depth
   texture so Forward+ and Compatibility match) — one shared 1×1 `PlaneMesh` scaled to the
-  chunk. Coverage (seed 12345): river valley ≈ 42 %, forest 2 %, hills 1 %, meadow 0 %.
+  chunk. The valley has mid-scale relief (detail ×2.5) so water forms several smaller lakes
+  with coves and islands (≈ 21 % coverage, seed 12345) rather than one sheet. The terrain
+  shader reads the `water_level` global (set by `WorldStreamer`) to paint a sand/mud shore
+  band and darken the bed with depth; semi-transparent water then shows light shallows and
+  dark deeps without a depth texture.
   No swimming/drinking yet (Phases 5 and 7): the animal walks along the bed.
 - Events: `BiomeTracker` samples the focus node's absolute position at 4 Hz and announces a
   new biome only once its weight reaches 0.6 (hysteresis; the first sample announces the

@@ -9,6 +9,8 @@ global uniform vec3 world_origin_offset;
 uniform vec3 shallow_color : source_color = vec3(0.30, 0.55, 0.60);
 uniform vec3 deep_color : source_color = vec3(0.10, 0.28, 0.38);
 uniform float opacity : hint_range(0.0, 1.0) = 0.78;
+// Opacity at grazing angles (fresnel-like); below 1 so shallow beds show even far away.
+uniform float grazing_opacity : hint_range(0.0, 1.0) = 0.85;
 uniform sampler2D ripple_noise : hint_normal, filter_linear_mipmap, repeat_enable;
 uniform float ripple_scale : hint_range(0.001, 1.0) = 0.08;
 uniform float ripple_speed : hint_range(0.0, 1.0) = 0.03;
@@ -28,7 +30,7 @@ void fragment() {
 	NORMAL_MAP = mix(vec3(0.5, 0.5, 1.0), (n1 + n2) * 0.5, ripple_strength);
 	float facing = clamp(dot(NORMAL, VIEW), 0.0, 1.0);
 	ALBEDO = mix(shallow_color, deep_color, facing);
-	ALPHA = mix(1.0, opacity, facing);  // more opaque at grazing angles (fresnel-like)
+	ALPHA = mix(grazing_opacity, opacity, facing);  // more opaque at grazing angles
 	ROUGHNESS = roughness_value;
 	SPECULAR = 0.5;
 }

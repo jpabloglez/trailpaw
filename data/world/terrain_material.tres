@@ -22,3 +22,7 @@ shader_parameter/rock_color = Color(0.47, 0.44, 0.4, 1)
 shader_parameter/rock_start_degrees = 28.0
 shader_parameter/rock_full_degrees = 40.0
 shader_parameter/roughness_value = 0.95
+shader_parameter/shore_color = Color(0.62, 0.56, 0.42, 1)
+shader_parameter/shore_height = 0.6
+shader_parameter/underwater_color = Color(0.1, 0.2, 0.22, 1)
+shader_parameter/underwater_depth = 4.0
