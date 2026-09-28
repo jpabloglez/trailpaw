@@ -53,6 +53,16 @@ const LOGICAL_ANIMATIONS: Array[StringName] = [
 ## Paw bones (front left/right, back left/right) used for ground speed and footsteps.
 @export var paw_bones: PackedStringArray = PackedStringArray()
 
+@export_group("Ground alignment")
+## Largest pitch/roll the model tilts to follow the ground.
+@export_range(0.0, 60.0, 0.5, "suffix:°") var max_tilt_degrees: float = 0.0
+## How fast the tilt follows the ground (higher is snappier).
+@export_range(0.1, 50.0, 0.1, "suffix:1/s") var tilt_smoothing: float = 0.0
+## Distance from the body centre to the front/back paws (ground probes).
+@export_range(0.01, 5.0, 0.01, "suffix:m") var paw_half_length: float = 0.0
+## Distance from the body centre to the left/right paws (ground probes).
+@export_range(0.01, 2.0, 0.01, "suffix:m") var paw_half_width: float = 0.0
+
 @export_group("Gaits")
 ## Target speed of the walk gait; speeds below this read as walking.
 @export_range(0.1, 20.0, 0.1, "suffix:m/s") var walk_speed: float = 0.0
@@ -112,6 +122,10 @@ func get_validation_errors() -> PackedStringArray:
 				errors.append("animations is missing '%s'" % logical)
 		if paw_bones.size() != 4:
 			errors.append("paw_bones must list 4 bones")
+		if max_tilt_degrees <= 0.0 or tilt_smoothing <= 0.0:
+			errors.append("max_tilt_degrees and tilt_smoothing must be > 0")
+		if paw_half_length <= 0.0 or paw_half_width <= 0.0:
+			errors.append("paw_half_length and paw_half_width must be > 0")
 	return errors
 
 

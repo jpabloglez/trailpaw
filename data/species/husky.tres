@@ -47,3 +47,7 @@ turn_slowdown = 0.6
 jump_height = 1.0
 air_control = 0.3
 max_slope_degrees = 45.0
+max_tilt_degrees = 25.0
+tilt_smoothing = 10.0
+paw_half_length = 0.35
+paw_half_width = 0.12
