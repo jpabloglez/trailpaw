@@ -75,3 +75,9 @@ Split timing of `TerrainChunk.apply` during that run (temporary instrumentation)
 The spikes are the same WSL GL→D3D12 mesh-creation stall as in Phase 2 (vegetation itself
 never spiked), now longer because the GPU is busier. **Verify on native Windows + Forward+**;
 if spikes appear there, apply the plan B below (in-place vertex buffer updates).
+
+### Native Windows (Phase 4)
+The user ran the terrain sandbox and the GPU probe on **native Windows with Forward+** and
+reported everything correct: no streaming spikes, the forest runs smoothly on Medium. As in
+Phase 2, the WSL2 mesh-upload stalls do not occur natively; plan B stays documented above.
+(Exact native numbers were not recorded.)
