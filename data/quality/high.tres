@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="QualityPreset" format=3]
+
+[ext_resource type="Script" path="res://scripts/world/quality_preset.gd" id="1_4h4ul"]
+
+[resource]
+script = ExtResource("1_4h4ul")
+id = &"high"
+display_name = "High"
+vegetation_density = 1.0

@@ -15,6 +15,8 @@ var lod: int
 var data: ChunkData
 ## [WorkerThreadPool] task id, set by the submitter.
 var task_id: int = -1
+## Streamer generation this job belongs to (results of older generations are dropped).
+var generation: int = 0
 
 var _settings: TerrainSettings
 var _sampler: HeightSampler

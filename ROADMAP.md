@@ -101,7 +101,7 @@ exactly the expected set for a given position; rebase preserves absolute positio
 - [x] Seeded scattering on worker threads → one `MultiMeshInstance3D` per type per chunk.
 - [x] Collision only for trees and large rocks (simple shapes).
 - [x] Visibility ranges and dithered fade; wind sway vertex shader for grass/foliage.
-- [ ] Density scales with the quality preset.
+- [x] Density scales with the quality preset.
 
 **Tests:** deterministic placement; nothing placed underwater or on steep slopes beyond limits.
 **Perf:** Medium preset ≥ 60 FPS on GTX 1050 in the densest biome.

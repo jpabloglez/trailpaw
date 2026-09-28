@@ -51,3 +51,27 @@ is considered met. (Exact native numbers were not recorded; add them here on the
   (`RenderingServer.mesh_surface_update_vertex_region`) for same-LOD reuse. Godot 4.7 has no
   public helper to build surface bytes, so this needs a hand-written encoder for Godot's
   vertex format — keep it behind a golden test.
+
+## Phase 4 update: vegetation (2026-09-28)
+
+| Run | Build ms max | Spikes > 4 ms | Holes / gaps | Result |
+|---|---|---|---|---|
+| Headless, 10 km, Medium | 1.98 | 0 | 0 / 0 | **PASS** |
+| GPU (WSL2, Compatibility), 3.3 km, Medium | 20.9 | 78 | 0 / 0 | FAIL |
+
+Frame time per biome on that GPU run (Medium): meadow 16.0 ms (≈ 63 FPS), **forest 17.5 ms
+(≈ 57 FPS)**, river valley 15.0 ms (≈ 67 FPS), hills 16.1 ms (≈ 62 FPS). Baseline without
+vegetation was ≈ 67–69 FPS.
+
+Split timing of `TerrainChunk.apply` during that run (temporary instrumentation):
+
+| Part | Max | Frames > 4 ms |
+|---|---|---|
+| Terrain mesh upload | 18.4 ms | 52 |
+| Vegetation MultiMesh buffers | 3.8 ms | 0 |
+| Tree/rock collision | 0.9 ms | 0 |
+| Terrain collision | 0.3 ms | 0 |
+
+The spikes are the same WSL GL→D3D12 mesh-creation stall as in Phase 2 (vegetation itself
+never spiked), now longer because the GPU is busier. **Verify on native Windows + Forward+**;
+if spikes appear there, apply the plan B below (in-place vertex buffer updates).

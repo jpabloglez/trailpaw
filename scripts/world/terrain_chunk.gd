@@ -20,6 +20,8 @@ const FADE_MARGIN: float = 0.1
 var coord: Vector2i = Vector2i.ZERO
 ## LOD of the data currently applied, or -1 when empty.
 var lod: int = -1
+## Streamer generation of the data currently applied (see [method WorldStreamer.refresh]).
+var generation: int = 0
 
 var _border := PackedVector3Array()
 var _mesh := ArrayMesh.new()

@@ -36,6 +36,7 @@ var _sampler: HeightSampler
 var _probe: Dictionary = {}
 # Packed arrays are value types: keep frame times in a member, not inside the dictionary.
 var _probe_frame_ms := PackedFloat32Array()
+var _probe_biome_ms: Dictionary = {}
 
 
 func _ready() -> void:
@@ -148,6 +149,7 @@ func _start_probe(distance: float, speed: float) -> void:
 				(_probe["biomes"] as Array).append(id)
 	)
 	_probe_frame_ms.clear()
+	_probe_biome_ms.clear()
 	print("[probe] %.0f m along +X at %.1f m/s (seed %d)" % [distance, speed, world_seed])
 
 
@@ -165,6 +167,12 @@ func _probe_step(delta: float) -> void:
 	var built_ms: float = stats["last_build_ms"] if stats["last_frame_built"] > 0 else 0.0
 	_probe["frames"] += 1
 	_probe_frame_ms.append(delta * 1000.0)
+	var biome := String(GameState.current_biome)
+	if not _probe_biome_ms.has(biome):
+		_probe_biome_ms[biome] = PackedFloat32Array()
+	var per_biome: PackedFloat32Array = _probe_biome_ms[biome]
+	per_biome.append(delta * 1000.0)
+	_probe_biome_ms[biome] = per_biome
 	_probe["process_ms_sum"] += Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0
 	_probe["physics_ms_sum"] += (Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS) * 1000.0)
 	_probe["build_ms_max"] = maxf(_probe["build_ms_max"], built_ms)
@@ -246,6 +254,21 @@ func _finish_probe(absolute: Vector3) -> void:
 			"[probe] RESULT %s" % ("PASS" if ok else "FAIL"),
 		]
 	)
+	for biome: String in _probe_biome_ms:
+		var ms: PackedFloat32Array = _probe_biome_ms[biome]
+		ms.sort()
+		lines.append(
+			(
+				"[probe] %-13s frame ms p50 %.2f  p95 %.2f  (≈ %.0f FPS)"
+				% [
+					biome,
+					_percentile(ms, 0.5),
+					_percentile(ms, 0.95),
+					1000.0 / maxf(_percentile(ms, 0.5), 0.001)
+				]
+			)
+		)
+	lines.append("[probe] quality preset: %s" % Settings.quality.display_name)
 	print("\n".join(lines))
 	_probe.clear()
 	get_tree().quit(0 if ok else 1)
