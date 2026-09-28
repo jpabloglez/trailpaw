@@ -33,6 +33,9 @@ var min_height: float = INF
 var water_level: float = 0.0
 ## Closed outline of the chunk surface border (local positions), for debug gizmos.
 var border := PackedVector3Array()
+## Vegetation instances: type id → [PackedFloat32Array] in [member MultiMesh.buffer]
+## layout (12 floats per instance, local to the chunk corner). See [VegetationScatterer].
+var vegetation: Dictionary = {}
 ## Heights for a [HeightMapShape3D] ([code]resolution²[/code], row-major). Empty when the
 ## chunk gets no collision.
 var collision_heights := PackedFloat32Array()
@@ -41,6 +44,12 @@ var collision_heights := PackedFloat32Array()
 ## Whether any ground in this chunk lies below the water surface.
 func has_water() -> bool:
 	return min_height < water_level
+
+
+## Number of vegetation instances of type [param id].
+func vegetation_count(id: StringName) -> int:
+	var buffer: PackedFloat32Array = vegetation.get(id, PackedFloat32Array())
+	return buffer.size() / VegetationScatterer.FLOATS_PER_INSTANCE
 
 
 ## Number of vertices of the surface grid (excluding any skirt).
@@ -60,4 +69,9 @@ func content_hash() -> String:
 	ctx.update(uv2.to_byte_array())
 	ctx.update(indices.to_byte_array())
 	ctx.update(collision_heights.to_byte_array())
+	var ids := vegetation.keys()
+	ids.sort()
+	for id: StringName in ids:
+		ctx.update(String(id).to_utf8_buffer())
+		ctx.update((vegetation[id] as PackedFloat32Array).to_byte_array())
 	return ctx.finish().hex_encode()

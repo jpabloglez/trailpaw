@@ -37,7 +37,11 @@ const WATER_LEVEL_PARAM: StringName = &"water_level"
 ## Material applied to every chunk surface.
 @export var material: Material
 
+## Multiplier for every vegetation density (quality presets scale it).
+var vegetation_density: float = 1.0
+
 var _changed: bool = false
+var _scatterer: VegetationScatterer
 var _center: Vector2i = Vector2i.ZERO
 var _has_center: bool = false
 var _desired: Dictionary[Vector2i, int] = {}
@@ -66,6 +70,9 @@ func _ready() -> void:
 		set_process(false)
 		return
 	add_to_group(DEBUG_LINES_GROUP)
+	if terrain.biomes != null:
+		# Immutable snapshot of the vegetation tables, shared read-only by every job.
+		_scatterer = VegetationScatterer.new(terrain.biomes)
 	# Shaders (terrain shores, underwater tint) need the absolute water height.
 	RenderingServer.global_shader_parameter_set(WATER_LEVEL_PARAM, terrain.sea_level)
 	EventBus.origin_shifted.connect(_on_origin_shifted)
@@ -233,7 +240,17 @@ func _submit_tasks() -> void:
 		var coord: Vector2i = _queue.pop_front()
 		if not _desired.has(coord) or _has_lod(coord, _desired[coord]):
 			continue
-		var job := ChunkJob.new(coord, _desired[coord], terrain.duplicate(), GameState.world_seed)
+		var job := (
+			ChunkJob
+			. new(
+				coord,
+				_desired[coord],
+				terrain.duplicate(),
+				GameState.world_seed,
+				_scatterer,
+				vegetation_density,
+			)
+		)
 		job.task_id = WorkerThreadPool.add_task(job.run, false, "terrain chunk")
 		_in_flight.append(job)
 
