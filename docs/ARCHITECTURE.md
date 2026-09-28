@@ -137,7 +137,7 @@ Scene-tree mutations happen only on the main thread; worker threads produce plai
   shader reads the `water_level` global (set by `WorldStreamer`) to paint a sand/mud shore
   band and darken the bed with depth; semi-transparent water then shows light shallows and
   dark deeps without a depth texture.
-  No swimming/drinking yet (Phases 5 and 7): the animal walks along the bed.
+  Swimming since Phase 5 (see §4.2); drinking in Phase 7.
 - Events: `BiomeTracker` samples the focus node's absolute position at 4 Hz and announces a
   new biome only once its weight reaches 0.6 (hysteresis; the first sample announces the
   start biome): it sets `GameState.current_biome` and emits
@@ -226,6 +226,12 @@ stays in `data/species/` as an alternative; switching is a one-line change in `a
   pivot (`%Model`) tilts; the CharacterBody3D and its capsule stay upright. Level in the air or
   when `level` is set (swimming).
 - States (`StateMachine` component): Idle, Locomotion, Jump, Fall, Swim, Interact, Rest.
+- **Swimming:** `GameState.water_level` (published by `WorldStreamer`); water depth over the
+  paws = water level − body height. `Swim` starts above `swim_enter_depth` and ends below
+  `swim_exit_depth` with the paws on the bottom (hysteresis). While swimming, buoyancy pulls
+  the body to `float_depth` under the surface instead of gravity, speed × `swim_speed_factor`,
+  jumps are dropped and the model stays level. A species with `swim_enter_depth` 0 walks along
+  the bottom.
 - **Intent-based control:** `MovementComponent` never reads `Input`. A controller writes
   its intent (`move_input`, `sprint`, `request_jump()`): `PlayerInput` for the player,
   the AI for fauna (Phase 8). The maths lives in the pure `LocomotionModel` (unit-tested).

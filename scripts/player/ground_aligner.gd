@@ -3,7 +3,7 @@ extends Node
 ## Tilts the animal's visual model to follow the ground: four rays under the paws give front/
 ## back and left/right heights, turned into pitch and roll, clamped to the species' maximum and
 ## smoothed. Only the model pivot rotates; the [CharacterBody3D] and its capsule stay upright.
-## In the air or while swimming the model eases back to level.
+## In the air, while swimming or when [member level] is set, the model eases back to level.
 ## [br][br]
 ## Budget: four ray casts per physics tick.
 
@@ -31,7 +31,7 @@ func _physics_process(delta: float) -> void:
 	if species == null or species.max_tilt_degrees <= 0.0:
 		return
 	var target := Vector2.ZERO
-	if movement.is_grounded() and not level:
+	if movement.is_grounded() and not level and not movement.swimming:
 		target = tilt_from_heights(_probe_heights(species), species)
 	tilt = tilt.lerp(target, 1.0 - exp(-species.tilt_smoothing * delta))
 	pivot.rotation = Vector3(tilt.x, 0.0, -tilt.y)

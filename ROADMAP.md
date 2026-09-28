@@ -116,7 +116,7 @@ exactly the expected set for a given position; rebase preserves absolute positio
 - [x] Animation set: idle, walk, trot, run, jump, fall, eat, drink, lie down, sniff, swim.
 - [x] `AnimationController`: `AnimationTree` state machine + `BlendSpace1D` locomotion.
 - [x] Ground alignment with front/rear raycasts, smoothed pitch/roll.
-- [ ] Swim state when in water (float at surface, slower speed).
+- [x] Swim state when in water (float at surface, slower speed).
 - [ ] Footstep events from animation for later audio.
 
 **Tests:** alignment angles clamped; swim state enters/exits at water line.

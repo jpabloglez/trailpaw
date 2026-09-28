@@ -14,6 +14,8 @@
 
 [ext_resource type="Script" path="res://scripts/player/ground_aligner.gd" id="22_align"]
 
+[ext_resource type="Script" path="res://scripts/player/states/swim_state.gd" id="23_swim"]
+
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ald35"]
 radius = 0.35
 height = 1.3
@@ -81,6 +83,10 @@ movement = NodePath("../../MovementComponent")
 
 [node name="Fall" type="Node" parent="StateMachine" unique_id=1469338723 node_paths=PackedStringArray("movement")]
 script = ExtResource("9_85roj")
+movement = NodePath("../../MovementComponent")
+
+[node name="Swim" type="Node" parent="StateMachine" node_paths=PackedStringArray("movement")]
+script = ExtResource("23_swim")
 movement = NodePath("../../MovementComponent")
 
 [node name="Model" type="Node3D" parent="."]

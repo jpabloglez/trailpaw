@@ -136,10 +136,10 @@ func _build_state_machine() -> AnimationNodeStateMachine:
 	var gait := AnimationNodeBlendSpace1D.new()
 	gait.min_space = 0.0
 	gait.max_space = _species.run_speed
-	gait.add_blend_point(_clip_node(&"idle"), 0.0)
-	gait.add_blend_point(_clip_node(&"walk"), _species.walk_speed)
-	gait.add_blend_point(_clip_node(&"trot"), _species.trot_speed)
-	gait.add_blend_point(_clip_node(&"run"), _species.run_speed)
+	gait.add_blend_point(_clip_node(&"idle"), 0.0, -1, &"idle")
+	gait.add_blend_point(_clip_node(&"walk"), _species.walk_speed, -1, &"walk")
+	gait.add_blend_point(_clip_node(&"trot"), _species.trot_speed, -1, &"trot")
+	gait.add_blend_point(_clip_node(&"run"), _species.run_speed, -1, &"run")
 	var locomotion := AnimationNodeBlendTree.new()
 	locomotion.add_node(&"gait", gait)
 	locomotion.add_node(&"scale", AnimationNodeTimeScale.new())
