@@ -63,3 +63,21 @@ func test_river_valley_sits_lowest_and_hills_highest() -> void:
 		offsets[biome.id] = biome.height_offset
 	assert_float(offsets[&"river_valley"]).is_less(offsets[&"meadow"])
 	assert_float(offsets[&"hills"]).is_greater(offsets[&"meadow"])
+
+
+func test_hills_do_not_look_like_meadow() -> void:
+	var by_id := {}
+	for biome in _table.biomes:
+		by_id[biome.id] = biome
+	var meadow: BiomeDefinition = by_id[&"meadow"]
+	var hills: BiomeDefinition = by_id[&"hills"]
+	# Distinct palettes: clearly different colours, not two similar greens.
+	var diff_a := Vector3(
+		meadow.ground_color_a.r - hills.ground_color_a.r,
+		meadow.ground_color_a.g - hills.ground_color_a.g,
+		meadow.ground_color_a.b - hills.ground_color_a.b
+	)
+	assert_float(diff_a.length()).is_greater(0.12)
+	# Clearly taller and rougher.
+	assert_float(hills.height_offset - meadow.height_offset).is_greater_equal(5.0)
+	assert_float(hills.ridged_scale).is_greater(4.0 * meadow.ridged_scale)
