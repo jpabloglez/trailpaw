@@ -99,7 +99,7 @@ exactly the expected set for a given position; rebase preserves absolute positio
 - [x] Import CC0 low-poly plants/rocks/trees; record in `assets/CREDITS.md`.
 - [x] `VegetationTable` per biome (type, density, slope/height limits, scale range).
 - [x] Seeded scattering on worker threads → one `MultiMeshInstance3D` per type per chunk.
-- [ ] Collision only for trees and large rocks (simple shapes).
+- [x] Collision only for trees and large rocks (simple shapes).
 - [ ] Visibility ranges and dithered fade; wind sway vertex shader for grass/foliage.
 - [ ] Density scales with the quality preset.
 

@@ -6,6 +6,7 @@ extends RefCounted
 var _meshes: Dictionary[StringName, Mesh] = {}
 var _ranges: Dictionary[StringName, float] = {}
 var _shadows: Dictionary[StringName, bool] = {}
+var _collision: Dictionary[StringName, Vector2] = {}
 
 
 func _init(table: BiomeTable) -> void:
@@ -21,6 +22,8 @@ func _init(table: BiomeTable) -> void:
 			_ranges[type.id] = type.visibility_range
 			# Small near-only plants skip shadows: many instances, little visual gain.
 			_shadows[type.id] = not type.near_only
+			if type.has_collision():
+				_collision[type.id] = Vector2(type.collision_radius, type.collision_height)
 
 
 ## Mesh shared by every instance of type [param id].
@@ -36,6 +39,11 @@ func visibility_range(id: StringName) -> float:
 ## Whether instances of type [param id] cast shadows.
 func casts_shadows(id: StringName) -> bool:
 	return _shadows.get(id, false)
+
+
+## Collision cylinder (radius, height) in model units for type [param id]; zero if none.
+func collision_for(id: StringName) -> Vector2:
+	return _collision.get(id, Vector2.ZERO)
 
 
 ## Type ids known to the library.

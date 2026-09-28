@@ -181,6 +181,9 @@ Y is never shifted. This avoids needing a custom double-precision engine build (
   worker's buffer (`multimesh.buffer = …`). Near-only plants cast no shadows. Tree and rock
   draw distances stop at the fog end (≤ 200 m): nothing is drawn that fog hides. Note:
   `visibility_range` applies to the whole chunk MultiMesh, not per instance.
+- Collision: trees and large rocks get an upright `CylinderShape3D` per instance (model-unit
+  size × instance scale) in the chunk's `StaticBody3D` (`world` layer), LOD 0 chunks only.
+  Shape nodes and shapes are pooled per chunk node and reused across applies.
 
 ## 4. Player (quadruped animal)
 

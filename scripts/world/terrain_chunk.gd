@@ -21,12 +21,15 @@ var lod: int = -1
 var _border := PackedVector3Array()
 var _mesh := ArrayMesh.new()
 var _vegetation: Dictionary[StringName, MultiMeshInstance3D] = {}
+var _obstacles: Array[CollisionShape3D] = []
+var _obstacles_used: int = 0
 var _arrays: Array = []
 var _heightmap := HeightMapShape3D.new()
 
 @onready var _mesh_instance: MeshInstance3D = %Mesh
 @onready var _collision: CollisionShape3D = %Collision
 @onready var _water: MeshInstance3D = %Water
+@onready var _body: StaticBody3D = %Body
 
 
 func _ready() -> void:
@@ -68,6 +71,7 @@ func apply(data: ChunkData, material: Material, library: VegetationLibrary = nul
 		_water.position = Vector3(side * 0.5, data.water_level, side * 0.5)
 		_water.scale = Vector3(side, 1.0, side)
 	_apply_vegetation(data, library)
+	_apply_obstacles(data, library)
 	visible = true
 
 
@@ -85,6 +89,11 @@ func vegetation_count(id: StringName) -> int:
 ## The MultiMesh node drawing type [param id], or [code]null[/code].
 func vegetation_node(id: StringName) -> MultiMeshInstance3D:
 	return _vegetation.get(id)
+
+
+## Number of active tree/rock collision shapes.
+func obstacle_count() -> int:
+	return _obstacles_used
 
 
 ## Whether this chunk currently shows a water plane.
@@ -105,6 +114,7 @@ func reset() -> void:
 	lod = -1
 	for node: MultiMeshInstance3D in _vegetation.values():
 		node.visible = false
+	_disable_obstacles(0)
 
 
 ## One reused MultiMeshInstance3D per type: the buffer is copied as-is from the worker.
@@ -136,3 +146,44 @@ func _apply_vegetation(data: ChunkData, library: VegetationLibrary) -> void:
 			node.multimesh.instance_count = count
 		node.multimesh.buffer = buffer
 		node.visible = true
+
+
+## Upright collision cylinders for trees and large rocks, in LOD 0 chunks only (the player
+## never walks on coarse chunks). Shape nodes and their CylinderShape3Ds are pooled.
+func _apply_obstacles(data: ChunkData, library: VegetationLibrary) -> void:
+	var used := 0
+	if library != null and data.lod == 0:
+		for id: StringName in data.vegetation:
+			var size := library.collision_for(id)
+			if size.x <= 0.0:
+				continue
+			var buffer: PackedFloat32Array = data.vegetation[id]
+			var stride := VegetationScatterer.FLOATS_PER_INSTANCE
+			for o in range(0, buffer.size(), stride):
+				var scale := Vector3(buffer[o], buffer[o + 4], buffer[o + 8]).length()
+				var node := _obstacle(used)
+				var cylinder := node.shape as CylinderShape3D
+				cylinder.radius = size.x * scale
+				cylinder.height = size.y * scale
+				node.position = Vector3(
+					buffer[o + 3], buffer[o + 7] + cylinder.height * 0.5, buffer[o + 11]
+				)
+				node.disabled = false
+				used += 1
+	_disable_obstacles(used)
+
+
+func _obstacle(index: int) -> CollisionShape3D:
+	if index < _obstacles.size():
+		return _obstacles[index]
+	var node := CollisionShape3D.new()
+	node.shape = CylinderShape3D.new()
+	_body.add_child(node)
+	_obstacles.append(node)
+	return node
+
+
+func _disable_obstacles(from: int) -> void:
+	for i in range(from, _obstacles.size()):
+		_obstacles[i].disabled = true
+	_obstacles_used = from
