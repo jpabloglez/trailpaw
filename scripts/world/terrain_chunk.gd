@@ -13,6 +13,9 @@ extends Node3D
 ## upload ≈ 0.33 ms steady (first upload ≈ 4 ms: one-off material warm-up), height map
 ## ≈ 0.04 ms. No per-call allocations besides what the engine does internally.
 
+## Fraction of a vegetation type's draw distance used to fade it out.
+const FADE_MARGIN: float = 0.1
+
 ## Grid coordinate of the data currently applied (absolute).
 var coord: Vector2i = Vector2i.ZERO
 ## LOD of the data currently applied, or -1 when empty.
@@ -134,6 +137,9 @@ func _apply_vegetation(data: ChunkData, library: VegetationLibrary) -> void:
 			multimesh.mesh = library.mesh_for(id)
 			node.multimesh = multimesh
 			node.visibility_range_end = library.visibility_range(id)
+			# Dithered fade over the last 10 % (Forward+; Compatibility cuts instead).
+			node.visibility_range_end_margin = library.visibility_range(id) * FADE_MARGIN
+			node.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_SELF
 			node.cast_shadow = (
 				GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 				if library.casts_shadows(id)

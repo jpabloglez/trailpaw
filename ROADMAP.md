@@ -100,7 +100,7 @@ exactly the expected set for a given position; rebase preserves absolute positio
 - [x] `VegetationTable` per biome (type, density, slope/height limits, scale range).
 - [x] Seeded scattering on worker threads → one `MultiMeshInstance3D` per type per chunk.
 - [x] Collision only for trees and large rocks (simple shapes).
-- [ ] Visibility ranges and dithered fade; wind sway vertex shader for grass/foliage.
+- [x] Visibility ranges and dithered fade; wind sway vertex shader for grass/foliage.
 - [ ] Density scales with the quality preset.
 
 **Tests:** deterministic placement; nothing placed underwater or on steep slopes beyond limits.

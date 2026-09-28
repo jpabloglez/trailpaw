@@ -184,6 +184,13 @@ Y is never shifted. This avoids needing a custom double-precision engine build (
 - Collision: trees and large rocks get an upright `CylinderShape3D` per instance (model-unit
   size × instance scale) in the chunk's `StaticBody3D` (`world` layer), LOD 0 chunks only.
   Shape nodes and shapes are pooled per chunk node and reused across applies.
+- Look: every vegetation surface uses `shaders/foliage.gdshader` (created once per surface by
+  `VegetationLibrary`): the imported colour, recoloured by `data/vegetation_palettes/natural.tres`
+  (Kenney's teal/salmon palette clashed with the terrain; user chose the natural palette),
+  plus wind sway ∝ (height above base)² so bases stay planted, a per-instance phase in absolute
+  coordinates and a coherent world wind direction. Wind is the `wind` global uniform (set from
+  `data/world/wind.tres` by `WorldStreamer`, ready for weather). Each type fades over the last
+  10 % of its range (`VISIBILITY_RANGE_FADE_SELF`: dithered in Forward+, a cut in Compatibility).
 
 ## 4. Player (quadruped animal)
 
