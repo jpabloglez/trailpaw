@@ -246,7 +246,13 @@ auto-recentre behind the animal while moving. Sensitivity and invert-Y in Settin
   lie_down → Idle_2_HeadLow, swim → slowed Walk.
 - Anti-slide: `ClipAnalysis` measures each locomotion clip's authored ground speed from its
   planted paws (Husky: Walk 0.57, Gallop 2.51 m/s); playback scale = speed / that, capped at
-  `max_animation_time_scale` (2.0) so legs never cycle frantically (a little slide at full run).
+  `max_animation_time_scale` (2.5) so legs never cycle frantically (a little slide at full run;
+  Husky `walk_speed` is 1.2 m/s so walking matches exactly).
+- `AnimationController` (on the Animal) builds its `AnimationTree` in code once `Animal` has
+  instanced the species model under `%Model`: a state machine with `locomotion` (BlendSpace1D
+  idle/walk/trot/run by speed → TimeScale for anti-slide), `jump`, `fall`, `swim` and one-shot
+  `eat`/`drink`/`lie_down`/`sniff` that return to locomotion at their end. It follows
+  `StateMachine.state_changed`; loops are set on copies of the clips in its own library.
 `AnimationTree` with a state machine; locomotion via `BlendSpace1D` (speed) and additive
 head-look. Procedural foot placement using Godot's `SkeletonModifier3D`-based IK is a
 Phase 11 polish item.

@@ -2,13 +2,15 @@
 
 [ext_resource type="Script" path="res://scripts/player/animal.gd" id="1_ekx0x"]
 [ext_resource type="Script" path="res://scripts/components/movement_component.gd" id="2_3cfp3"]
-[ext_resource type="Resource" path="res://data/species/placeholder.tres" id="3_0f8yj"]
 [ext_resource type="Script" path="res://scripts/player/player_input.gd" id="4_bwuqq"]
 [ext_resource type="Script" path="res://scripts/components/state_machine.gd" id="5_wfrlh"]
 [ext_resource type="Script" path="res://scripts/player/states/idle_state.gd" id="6_uy5i5"]
 [ext_resource type="Script" path="res://scripts/player/states/locomotion_state.gd" id="7_mh34f"]
 [ext_resource type="Script" path="res://scripts/player/states/jump_state.gd" id="8_453ff"]
 [ext_resource type="Script" path="res://scripts/player/states/fall_state.gd" id="9_85roj"]
+
+[ext_resource type="Resource" path="res://data/species/husky.tres" id="20_husky"]
+[ext_resource type="Script" path="res://scripts/player/animation_controller.gd" id="21_anim"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ald35"]
 radius = 0.35
@@ -51,7 +53,7 @@ mesh = SubResource("BoxMesh_by8u3")
 [node name="MovementComponent" type="Node" parent="." unique_id=1908281299]
 unique_name_in_owner = true
 script = ExtResource("2_3cfp3")
-species = ExtResource("3_0f8yj")
+species = ExtResource("20_husky")
 
 [node name="PlayerInput" type="Node" parent="." unique_id=254887723 node_paths=PackedStringArray("movement")]
 unique_name_in_owner = true
@@ -78,3 +80,13 @@ movement = NodePath("../../MovementComponent")
 [node name="Fall" type="Node" parent="StateMachine" unique_id=1469338723 node_paths=PackedStringArray("movement")]
 script = ExtResource("9_85roj")
 movement = NodePath("../../MovementComponent")
+
+[node name="Model" type="Node3D" parent="."]
+unique_name_in_owner = true
+
+[node name="AnimationController" type="Node" parent="." node_paths=PackedStringArray("movement", "state_machine", "model_root")]
+unique_name_in_owner = true
+script = ExtResource("21_anim")
+movement = NodePath("../MovementComponent")
+state_machine = NodePath("../StateMachine")
+model_root = NodePath("../Model")
