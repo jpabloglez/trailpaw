@@ -8,6 +8,21 @@ extends Resource
 ## Defaults are deliberately zero: every tunable must come from data, so a fresh
 ## [AnimalSpecies] is invalid until configured (see [method get_validation_errors]).
 
+## Animations every species with a model must provide (ROADMAP Phase 5).
+const LOGICAL_ANIMATIONS: Array[StringName] = [
+	&"idle",
+	&"walk",
+	&"trot",
+	&"run",
+	&"jump",
+	&"fall",
+	&"eat",
+	&"drink",
+	&"lie_down",
+	&"sniff",
+	&"swim",
+]
+
 ## Human-readable species name.
 @export var display_name: String = ""
 
@@ -19,6 +34,24 @@ extends Resource
 @export_range(0.001, 100.0, 0.001) var model_scale: float = 1.0
 ## Yaw applied to the model so it faces the game's forward (-Z).
 @export_range(-180.0, 180.0, 1.0, "suffix:°") var model_yaw_degrees: float = 0.0
+
+@export_group("Animation")
+## Logical animation → clip name in the model's [AnimationPlayer]. Must cover
+## [constant LOGICAL_ANIMATIONS] when a model is set.
+@export var animations: Dictionary[StringName, String] = {}
+## Logical animations played on a loop (the clips are not looped in the file).
+@export var looping: Array[StringName] = []
+## Logical animations that reuse a clip made for something else, with the reason. Only these
+## may share clips or stand in for missing ones.
+@export var animation_fallbacks: Dictionary[StringName, String] = {}
+## Ground speed (m/s at [member model_scale]) each locomotion clip is authored for, measured
+## with [ClipAnalysis]. Playback speed = movement speed / this, so paws do not slide.
+@export var clip_ground_speeds: Dictionary[String, float] = {}
+## Cap on locomotion playback speed-up; above it paws slide a little instead of the legs
+## cycling frantically.
+@export_range(1.0, 5.0, 0.05) var max_animation_time_scale: float = 1.0
+## Paw bones (front left/right, back left/right) used for ground speed and footsteps.
+@export var paw_bones: PackedStringArray = PackedStringArray()
 
 @export_group("Gaits")
 ## Target speed of the walk gait; speeds below this read as walking.
@@ -73,6 +106,12 @@ func get_validation_errors() -> PackedStringArray:
 		errors.append("max_slope_degrees must be within (0, 90)")
 	if model_scale <= 0.0:
 		errors.append("model_scale must be > 0")
+	if model_scene != null:
+		for logical: StringName in LOGICAL_ANIMATIONS:
+			if not animations.has(logical):
+				errors.append("animations is missing '%s'" % logical)
+		if paw_bones.size() != 4:
+			errors.append("paw_bones must list 4 bones")
 	return errors
 
 

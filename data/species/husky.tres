@@ -9,6 +9,33 @@ display_name = "Husky"
 model_scene = ExtResource("1_lpn18")
 model_scale = 0.34
 model_yaw_degrees = 180.0
+animations = Dictionary[StringName, String]({
+&"drink": "Eating",
+&"eat": "Eating",
+&"fall": "Jump_ToIdle",
+&"idle": "Idle",
+&"jump": "Gallop_Jump",
+&"lie_down": "Idle_2_HeadLow",
+&"run": "Gallop",
+&"sniff": "Idle_2_HeadLow",
+&"swim": "Walk",
+&"trot": "Gallop",
+&"walk": "Walk"
+})
+looping = Array[StringName]([&"idle", &"walk", &"trot", &"run", &"swim"])
+animation_fallbacks = Dictionary[StringName, String]({
+&"drink": "No drinking clip: Eating (head down at the water).",
+&"fall": "No airborne loop: Jump_ToIdle (the landing half of a jump).",
+&"lie_down": "No lying clip: Idle_2_HeadLow (resting pose) until a species provides one.",
+&"swim": "No swim clip: a slowed Walk (paddling) while floating.",
+&"trot": "No trot clip: the gallop, played slower (matched to trot speed)."
+})
+clip_ground_speeds = Dictionary[String, float]({
+"Gallop": 2.5100000000000002,
+"Walk": 0.5700000000000001
+})
+max_animation_time_scale = 2.0
+paw_bones = PackedStringArray("FF.L", "FF.R", "FFB.L", "FFB.R")
 walk_speed = 1.5
 trot_speed = 4.0
 run_speed = 7.5

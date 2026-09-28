@@ -240,6 +240,13 @@ auto-recentre behind the animal while moving. Sensitivity and invert-Y in Settin
 - Cursor: captured on left click, released with `pause` (Esc).
 
 ### 4.4 Animation
+- Animation set (`AnimalSpecies.animations`, logical → clip) covers idle, walk, trot, run, jump,
+  fall, eat, drink, lie_down, sniff and swim. Husky fallbacks, each documented in
+  `animation_fallbacks`: trot → Gallop (slower), fall → Jump_ToIdle, drink → Eating,
+  lie_down → Idle_2_HeadLow, swim → slowed Walk.
+- Anti-slide: `ClipAnalysis` measures each locomotion clip's authored ground speed from its
+  planted paws (Husky: Walk 0.57, Gallop 2.51 m/s); playback scale = speed / that, capped at
+  `max_animation_time_scale` (2.0) so legs never cycle frantically (a little slide at full run).
 `AnimationTree` with a state machine; locomotion via `BlendSpace1D` (speed) and additive
 head-look. Procedural foot placement using Godot's `SkeletonModifier3D`-based IK is a
 Phase 11 polish item.
