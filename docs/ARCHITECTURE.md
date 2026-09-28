@@ -216,8 +216,11 @@ turns its +Z-facing rig to the game's −Z forward.
 - `CharacterBody3D` with capsule collider oriented horizontally (or two-sphere approximation).
 - Camera-relative input; smooth acceleration and turning (quadrupeds turn in arcs, not in place).
 - Gaits: walk / trot / run (Shift) driven by speed thresholds.
-- **Ground alignment:** raycasts at front and rear feet → body pitch/roll follows terrain
-  normal with smoothing and clamping.
+- **Ground alignment** (`GroundAligner`): four rays under the paws (front/back × left/right,
+  species `paw_half_length`/`paw_half_width`) → pitch from front vs back, roll from left vs
+  right, clamped to `max_tilt_degrees` (Husky 25°) and exponentially smoothed. Only the model
+  pivot (`%Model`) tilts; the CharacterBody3D and its capsule stay upright. Level in the air or
+  when `level` is set (swimming).
 - States (`StateMachine` component): Idle, Locomotion, Jump, Fall, Swim, Interact, Rest.
 - **Intent-based control:** `MovementComponent` never reads `Input`. A controller writes
   its intent (`move_input`, `sprint`, `request_jump()`): `PlayerInput` for the player,
