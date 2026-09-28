@@ -43,10 +43,11 @@ const WIND_PARAM: StringName = &"wind"
 ## Optional recolouring of imported vegetation materials.
 @export var vegetation_palette: VegetationPalette
 
-## Multiplier for every vegetation density (quality presets scale it).
+## Multiplier for every vegetation density; follows [code]Settings.quality[/code].
 var vegetation_density: float = 1.0
 
 var _changed: bool = false
+var _generation: int = 0
 var _scatterer: VegetationScatterer
 var _library: VegetationLibrary
 var _center: Vector2i = Vector2i.ZERO
@@ -86,6 +87,8 @@ func _ready() -> void:
 	# Shaders (terrain shores, underwater tint) need the absolute water height.
 	RenderingServer.global_shader_parameter_set(WATER_LEVEL_PARAM, terrain.sea_level)
 	EventBus.origin_shifted.connect(_on_origin_shifted)
+	vegetation_density = Settings.quality.vegetation_density
+	Settings.quality_changed.connect(_on_quality_changed)
 
 
 func _process(_delta: float) -> void:
@@ -184,6 +187,19 @@ func _chunk_for_local(local_position: Vector3) -> Vector2i:
 	return local + GameState.origin_chunk
 
 
+## Regenerates every loaded chunk (e.g. after a quality change). Chunks stay visible until
+## their replacement is built, like LOD changes.
+func refresh() -> void:
+	_generation += 1
+	if _has_center:
+		_replan(_center)
+
+
+func _on_quality_changed(preset: QualityPreset) -> void:
+	vegetation_density = preset.vegetation_density
+	refresh()
+
+
 func _on_origin_shifted(_offset: Vector3) -> void:
 	# Re-derive every chunk position from its exact integer coordinate (no drift).
 	for coord: Vector2i in _loaded:
@@ -225,7 +241,11 @@ func _build_ready() -> void:
 		if built > 0 and float(Time.get_ticks_usec() - start) >= budget_us:
 			break
 		var job: ChunkJob = _ready_jobs.pop_front()
-		if _desired.get(job.coord, -1) != job.lod or _has_lod(job.coord, job.lod):
+		if (
+			_desired.get(job.coord, -1) != job.lod
+			or job.generation != _generation
+			or _has_lod(job.coord, job.lod)
+		):
 			continue  # stale: the target moved on (or the LOD changed) while generating
 		# A chunk changing LOD is rebuilt in place, so it never disappears for a frame.
 		var chunk_start := Time.get_ticks_usec()
@@ -234,6 +254,7 @@ func _build_ready() -> void:
 			chunk = _acquire()
 		chunk.position = chunk_origin(job.coord)
 		chunk.apply(job.data, material, _library)
+		chunk.generation = _generation
 		_max_chunk_ms = maxf(_max_chunk_ms, float(Time.get_ticks_usec() - chunk_start) / 1000.0)
 		_loaded[job.coord] = chunk
 		built += 1
@@ -261,21 +282,22 @@ func _submit_tasks() -> void:
 				vegetation_density,
 			)
 		)
+		job.generation = _generation
 		job.task_id = WorkerThreadPool.add_task(job.run, false, "terrain chunk")
 		_in_flight.append(job)
 
 
 func _has_lod(coord: Vector2i, lod: int) -> bool:
 	var chunk: TerrainChunk = _loaded.get(coord)
-	return chunk != null and chunk.lod == lod
+	return chunk != null and chunk.lod == lod and chunk.generation == _generation
 
 
 func _is_in_flight(coord: Vector2i, lod: int) -> bool:
 	for job in _in_flight:
-		if job.coord == coord and job.lod == lod:
+		if job.coord == coord and job.lod == lod and job.generation == _generation:
 			return true
 	for job in _ready_jobs:
-		if job.coord == coord and job.lod == lod:
+		if job.coord == coord and job.lod == lod and job.generation == _generation:
 			return true
 	return false
 

@@ -191,6 +191,10 @@ Y is never shifted. This avoids needing a custom double-precision engine build (
   coordinates and a coherent world wind direction. Wind is the `wind` global uniform (set from
   `data/world/wind.tres` by `WorldStreamer`, ready for weather). Each type fades over the last
   10 % of its range (`VISIBILITY_RANGE_FADE_SELF`: dithered in Forward+, a cut in Compatibility).
+- Quality: `Settings.quality` (a `QualityPreset`, default `data/quality/medium.tres`) scales
+  every vegetation density (Low 0.4 / Medium 0.7 / High 1.0, §10). On `quality_changed`,
+  `WorldStreamer.refresh()` bumps a generation counter and regenerates every chunk in place
+  (old chunks stay visible until replaced).
 
 ## 4. Player (quadruped animal)
 
