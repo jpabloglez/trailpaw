@@ -10,10 +10,12 @@ const PLAYER_GROUP: StringName = &"player"
 
 @onready var movement: MovementComponent = %MovementComponent
 @onready var state_machine: StateMachine = %StateMachine
+@onready var model_root: Node3D = %Model
 
 
 func _ready() -> void:
 	add_to_group(PLAYER_GROUP)
+	_spawn_model()
 	add_to_group(FloatingOrigin.SHIFTABLE_GROUP)
 
 
@@ -26,3 +28,19 @@ func get_debug_info() -> Dictionary:
 		"position": global_position,
 		"grounded": is_on_floor(),
 	}
+
+
+## Instances the species model under [member model_root] and hides the placeholder box. A
+## species without a model keeps the Phase 1 placeholder.
+func _spawn_model() -> void:
+	var species := movement.species
+	if species == null or species.model_scene == null:
+		return
+	var model := species.model_scene.instantiate() as Node3D
+	model.name = "Species"
+	model.scale = Vector3.ONE * species.model_scale
+	model.rotation.y = deg_to_rad(species.model_yaw_degrees)
+	model_root.add_child(model)
+	for placeholder: String in ["Body", "Nose"]:
+		(get_node(placeholder) as Node3D).visible = false
+	(%AnimationController as AnimationController).initialize()
