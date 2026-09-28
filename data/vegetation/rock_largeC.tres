@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="VegetationType" format=3]
+
+[ext_resource type="PackedScene" path="res://assets/environment/nature/rock_largeC.glb" id="1_frco8"]
+[ext_resource type="Script" path="res://scripts/world/vegetation_type.gd" id="2_v1pi3"]
+
+[resource]
+script = ExtResource("2_v1pi3")
+id = &"rock_largeC"
+scene = ExtResource("1_frco8")
+scale_min = 2.5
+scale_max = 4.0
+align_to_ground = 0.7
+visibility_range = 220.0
+collision_radius = 0.4
+collision_height = 0.35

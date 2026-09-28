@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="VegetationType" format=3]
+
+[ext_resource type="PackedScene" path="res://assets/environment/nature/flower_redA.glb" id="1_d5skg"]
+[ext_resource type="Script" path="res://scripts/world/vegetation_type.gd" id="2_cjprr"]
+
+[resource]
+script = ExtResource("2_cjprr")
+id = &"flower_redA"
+scene = ExtResource("1_d5skg")
+scale_min = 1.6
+scale_max = 2.2
+align_to_ground = 0.5
+visibility_range = 40.0
+near_only = true
+sway = 1.0

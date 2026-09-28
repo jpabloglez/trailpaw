@@ -1,6 +1,107 @@
 [gd_resource type="Resource" script_class="BiomeDefinition" format=3]
 
 [ext_resource type="Script" path="res://scripts/world/biome_definition.gd" id="1_fpjyh"]
+[ext_resource type="Script" path="res://scripts/world/vegetation_entry.gd" id="2_1wuxw"]
+[ext_resource type="Resource" path="res://data/vegetation/grass.tres" id="3_4dplr"]
+[ext_resource type="Resource" path="res://data/vegetation/grass_large.tres" id="4_rmthy"]
+[ext_resource type="Resource" path="res://data/vegetation/flower_yellowA.tres" id="5_ryhju"]
+[ext_resource type="Resource" path="res://data/vegetation/flower_purpleA.tres" id="6_mssyb"]
+[ext_resource type="Resource" path="res://data/vegetation/flower_redA.tres" id="7_ia15k"]
+[ext_resource type="Resource" path="res://data/vegetation/plant_bushSmall.tres" id="8_ctk6o"]
+[ext_resource type="Resource" path="res://data/vegetation/tree_oak.tres" id="9_a7xn3"]
+[ext_resource type="Resource" path="res://data/vegetation/tree_default.tres" id="10_vd6c8"]
+[ext_resource type="Resource" path="res://data/vegetation/rock_smallA.tres" id="11_21p55"]
+[ext_resource type="Resource" path="res://data/vegetation/mushroom_redGroup.tres" id="12_negk8"]
+
+[sub_resource type="Resource" id="Resource_1sqo5"]
+script = ExtResource("2_1wuxw")
+type = ExtResource("3_4dplr")
+density = 12.0
+max_slope_degrees = 35.0
+min_height = 0.3
+max_height = 60.0
+cluster = 0.3
+
+[sub_resource type="Resource" id="Resource_mtkay"]
+script = ExtResource("2_1wuxw")
+type = ExtResource("4_rmthy")
+density = 4.0
+max_slope_degrees = 35.0
+min_height = 0.3
+max_height = 60.0
+cluster = 0.5
+
+[sub_resource type="Resource" id="Resource_uxamn"]
+script = ExtResource("2_1wuxw")
+type = ExtResource("5_ryhju")
+density = 2.0
+max_slope_degrees = 30.0
+min_height = 0.5
+max_height = 60.0
+cluster = 0.7
+
+[sub_resource type="Resource" id="Resource_4dffp"]
+script = ExtResource("2_1wuxw")
+type = ExtResource("6_mssyb")
+density = 1.5
+max_slope_degrees = 30.0
+min_height = 0.5
+max_height = 60.0
+cluster = 0.7
+
+[sub_resource type="Resource" id="Resource_rc247"]
+script = ExtResource("2_1wuxw")
+type = ExtResource("7_ia15k")
+density = 1.0
+max_slope_degrees = 30.0
+min_height = 0.5
+max_height = 60.0
+cluster = 0.7
+
+[sub_resource type="Resource" id="Resource_7n2aq"]
+script = ExtResource("2_1wuxw")
+type = ExtResource("8_ctk6o")
+density = 0.3
+max_slope_degrees = 30.0
+min_height = 0.5
+max_height = 60.0
+cluster = 0.4
+
+[sub_resource type="Resource" id="Resource_saoou"]
+script = ExtResource("2_1wuxw")
+type = ExtResource("9_a7xn3")
+density = 0.04
+max_slope_degrees = 25.0
+min_height = 1.0
+max_height = 60.0
+cluster = 0.6
+
+[sub_resource type="Resource" id="Resource_p4krg"]
+script = ExtResource("2_1wuxw")
+type = ExtResource("10_vd6c8")
+density = 0.03
+max_slope_degrees = 25.0
+min_height = 1.0
+max_height = 60.0
+cluster = 0.6
+
+[sub_resource type="Resource" id="Resource_8lxc3"]
+script = ExtResource("2_1wuxw")
+type = ExtResource("11_21p55")
+density = 0.1
+max_slope_degrees = 40.0
+min_height = 0.3
+max_height = 60.0
+cluster = 0.3
+
+[sub_resource type="Resource" id="Resource_qkras"]
+script = ExtResource("2_1wuxw")
+type = ExtResource("12_negk8")
+density = 0.05
+max_slope_degrees = 25.0
+min_height = 0.5
+max_height = 60.0
+cluster = 0.8
 
 [resource]
 script = ExtResource("1_fpjyh")
@@ -11,5 +112,6 @@ height_offset = 3.0
 continental_scale = 0.6
 detail_scale = 0.8
 ridged_scale = 0.2
+vegetation = Array[ExtResource("2_1wuxw")]([SubResource("Resource_1sqo5"), SubResource("Resource_mtkay"), SubResource("Resource_uxamn"), SubResource("Resource_4dffp"), SubResource("Resource_rc247"), SubResource("Resource_7n2aq"), SubResource("Resource_saoou"), SubResource("Resource_p4krg"), SubResource("Resource_8lxc3"), SubResource("Resource_qkras")])
 ground_color_a = Color(0.52, 0.68, 0.34, 1)
 ground_color_b = Color(0.72, 0.73, 0.42, 1)

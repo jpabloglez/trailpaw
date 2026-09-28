@@ -97,7 +97,7 @@ exactly the expected set for a given position; rebase preserves absolute positio
 ## Phase 4 — Vegetation and props
 
 - [x] Import CC0 low-poly plants/rocks/trees; record in `assets/CREDITS.md`.
-- [ ] `VegetationTable` per biome (type, density, slope/height limits, scale range).
+- [x] `VegetationTable` per biome (type, density, slope/height limits, scale range).
 - [ ] Seeded scattering on worker threads → one `MultiMeshInstance3D` per type per chunk.
 - [ ] Collision only for trees and large rocks (simple shapes).
 - [ ] Visibility ranges and dithered fade; wind sway vertex shader for grass/foliage.

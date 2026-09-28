@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="VegetationType" format=3]
+
+[ext_resource type="PackedScene" path="res://assets/environment/nature/plant_flatTall.glb" id="1_78ndy"]
+[ext_resource type="Script" path="res://scripts/world/vegetation_type.gd" id="2_l4aeg"]
+
+[resource]
+script = ExtResource("2_l4aeg")
+id = &"plant_flatTall"
+scene = ExtResource("1_78ndy")
+scale_min = 2.0
+scale_max = 3.0
+align_to_ground = 0.6
+visibility_range = 55.0
+near_only = true
+sway = 0.8

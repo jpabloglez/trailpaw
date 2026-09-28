@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="VegetationType" format=3]
+
+[ext_resource type="PackedScene" path="res://assets/environment/nature/tree_pineSmallA.glb" id="1_aa7iu"]
+[ext_resource type="Script" path="res://scripts/world/vegetation_type.gd" id="2_udn3l"]
+
+[resource]
+script = ExtResource("2_udn3l")
+id = &"tree_pineSmallA"
+scene = ExtResource("1_aa7iu")
+scale_min = 3.0
+scale_max = 4.5
+visibility_range = 200.0
+sway = 0.2
+collision_radius = 0.07
+collision_height = 0.8

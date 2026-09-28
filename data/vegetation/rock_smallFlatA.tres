@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="VegetationType" format=3]
+
+[ext_resource type="PackedScene" path="res://assets/environment/nature/rock_smallFlatA.glb" id="1_7vssa"]
+[ext_resource type="Script" path="res://scripts/world/vegetation_type.gd" id="2_6wxud"]
+
+[resource]
+script = ExtResource("2_6wxud")
+id = &"rock_smallFlatA"
+scene = ExtResource("1_7vssa")
+scale_min = 2.0
+scale_max = 3.0
+align_to_ground = 1.0
+visibility_range = 60.0
+near_only = true

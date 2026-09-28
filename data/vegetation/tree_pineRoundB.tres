@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="VegetationType" format=3]
+
+[ext_resource type="PackedScene" path="res://assets/environment/nature/tree_pineRoundB.glb" id="1_nix5m"]
+[ext_resource type="Script" path="res://scripts/world/vegetation_type.gd" id="2_7j3rl"]
+
+[resource]
+script = ExtResource("2_7j3rl")
+id = &"tree_pineRoundB"
+scene = ExtResource("1_nix5m")
+scale_min = 5.0
+scale_max = 6.5
+visibility_range = 260.0
+sway = 0.2
+collision_radius = 0.07
+collision_height = 1.0

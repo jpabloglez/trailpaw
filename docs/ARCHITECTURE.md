@@ -159,6 +159,14 @@ physics). When the tracked target is further than `rebase_distance` (2 km, in
   its integer coordinate and `CameraRig` corrects its cached follow goal.
 Y is never shifted. This avoids needing a custom double-precision engine build (ADR-004).
 
+### 3.6 Vegetation and props (Phase 4)
+- Data: one `VegetationType` per model (`data/vegetation/*.tres`: scene, scale range, ground
+  alignment, visibility range, `near_only`, wind sway, collision cylinder in model units) and a
+  `VegetationEntry` table per biome (`BiomeDefinition.vegetation`: density per 100 m², max
+  slope, height band relative to the water — never below it — and clumping).
+- Models: a curated Kenney Nature Kit selection (CC0) in `assets/environment/nature/`, each a
+  single mesh standing on its origin (MultiMesh-friendly, test-enforced).
+
 ## 4. Player (quadruped animal)
 
 ### 4.1 Species as data
