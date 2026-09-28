@@ -10,6 +10,7 @@
 shader_type spatial;
 
 global uniform vec3 world_origin_offset;
+global uniform float water_level;
 
 uniform sampler2D pattern_noise : hint_default_white, filter_linear_mipmap, repeat_enable;
 // Macro pattern mixing palette A and B (1 / wavelength in m).
@@ -24,6 +25,13 @@ uniform vec3 rock_color : source_color = vec3(0.47, 0.44, 0.40);
 uniform float rock_start_degrees : hint_range(0.0, 90.0) = 28.0;
 uniform float rock_full_degrees : hint_range(0.0, 90.0) = 40.0;
 uniform float roughness_value : hint_range(0.0, 1.0) = 0.95;
+// Shore: wet sand/mud band just above the water line (m above water_level).
+uniform vec3 shore_color : source_color = vec3(0.62, 0.56, 0.42);
+uniform float shore_height : hint_range(0.0, 5.0) = 1.2;
+// Underwater: the bed darkens and turns blue-green with depth (m below water_level),
+// so shallow water reads light and deep water dark without a depth texture.
+uniform vec3 underwater_color : source_color = vec3(0.10, 0.20, 0.22);
+uniform float underwater_depth : hint_range(0.1, 20.0) = 4.0;
 
 varying vec3 absolute_position;
 varying vec3 world_normal;
@@ -47,6 +55,12 @@ void fragment() {
 	ground *= 1.0 + detail * 2.0 * detail_strength;
 	float slope_degrees = degrees(acos(clamp(world_normal.y, 0.0, 1.0)));
 	float rock = smoothstep(rock_start_degrees, rock_full_degrees, slope_degrees);
-	ALBEDO = mix(ground, rock_color, rock);
+	vec3 albedo = mix(ground, rock_color, rock);
+	float height = absolute_position.y - water_level;
+	float shore = 1.0 - smoothstep(0.0, shore_height, height);
+	albedo = mix(albedo, shore_color, shore * (1.0 - rock));
+	float depth = clamp(-height / underwater_depth, 0.0, 1.0);
+	albedo = mix(albedo, underwater_color, depth);
+	ALBEDO = albedo;
 	ROUGHNESS = roughness_value;
 }

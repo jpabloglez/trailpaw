@@ -101,3 +101,49 @@ func test_water_stays_at_absolute_sea_level_after_rebase() -> void:
 		before, Vector3.ONE * 1e-3
 	)
 	assert_float(water.global_position.y).is_equal(_settings.sea_level)
+
+
+func test_valley_has_several_moderate_lakes_not_one_sheet() -> void:
+	var sampler := HeightSampler.new(_settings, SEED)
+	var resolver := sampler.resolver()
+	var wet := 0
+	var total := 0
+	var lakes := 0
+	for a in 24:
+		var direction := Vector2.from_angle(a * TAU / 24.0)
+		var was_wet := false
+		var d := resolver.band_start(2) + 150.0
+		while d < resolver.band_start(3) - 150.0:
+			var p := direction * d
+			var is_wet := sampler.height_at(p.x, p.y) < _settings.sea_level
+			if is_wet and not was_wet:
+				lakes += 1
+			was_wet = is_wet
+			wet += int(is_wet)
+			total += 1
+			d += 4.0
+	var coverage := float(wet) / total
+	assert_float(coverage).is_between(0.1, 0.35)
+	assert_float(float(lakes) / 24.0).is_greater(1.5)  # separate lakes per 500 m line
+
+
+func test_water_level_is_published_to_shaders() -> void:
+	var entry: Dictionary = ProjectSettings.get_setting("shader_globals/water_level")
+	assert_str(entry["type"]).is_equal("float")
+	var code := (load("res://shaders/terrain.gdshader") as Shader).code
+	assert_str(code).contains("global uniform float water_level")
+	assert_str(code).contains("shore_color")
+	assert_str(code).contains("underwater_color")
+
+
+func test_shore_and_underwater_tunables_are_in_the_materials() -> void:
+	var terrain := load("res://data/world/terrain_material.tres") as ShaderMaterial
+	for param: String in ["shore_color", "shore_height", "underwater_color", "underwater_depth"]:
+		(
+			assert_bool(terrain.get_shader_parameter(param) != null)
+			. override_failure_message("%s missing from terrain material" % param)
+			. is_true()
+		)
+	var water := load("res://data/world/water_material.tres") as ShaderMaterial
+	var grazing: float = water.get_shader_parameter("grazing_opacity")
+	assert_float(grazing).is_less(1.0)  # shallow beds must show through

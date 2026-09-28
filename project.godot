@@ -119,6 +119,10 @@ common/physics_interpolation=true
 
 [shader_globals]
 
+water_level={
+"type": "float",
+"value": 0.0
+}
 world_origin_offset={
 "type": "vec3",
 "value": Vector3(0, 0, 0)

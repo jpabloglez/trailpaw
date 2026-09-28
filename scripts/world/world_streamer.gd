@@ -22,6 +22,10 @@ signal chunks_changed
 ## Group of nodes providing [code]get_debug_lines()[/code] for the F3 overlay.
 const DEBUG_LINES_GROUP: StringName = &"debug_lines"
 
+## Global shader uniform holding [member TerrainSettings.sea_level] (declared in
+## [code]project.godot[/code]). Absolute height: floating-origin rebases never shift Y.
+const WATER_LEVEL_PARAM: StringName = &"water_level"
+
 ## Terrain shape and chunk geometry.
 @export var terrain: TerrainSettings
 ## Radii, budget and concurrency.
@@ -62,6 +66,8 @@ func _ready() -> void:
 		set_process(false)
 		return
 	add_to_group(DEBUG_LINES_GROUP)
+	# Shaders (terrain shores, underwater tint) need the absolute water height.
+	RenderingServer.global_shader_parameter_set(WATER_LEVEL_PARAM, terrain.sea_level)
 	EventBus.origin_shifted.connect(_on_origin_shifted)
 
 
