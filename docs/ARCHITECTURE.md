@@ -166,6 +166,16 @@ Y is never shifted. This avoids needing a custom double-precision engine build (
   slope, height band relative to the water — never below it — and clumping).
 - Models: a curated Kenney Nature Kit selection (CC0) in `assets/environment/nature/`, each a
   single mesh standing on its origin (MultiMesh-friendly, test-enforced).
+- Scattering (`VegetationScatterer`, inside each `ChunkJob` on the worker): per type a
+  jittered grid sized for its densest biome; a candidate is kept with probability
+  Σ(biome weight × biome density passing that biome's slope/height rules) / max density,
+  shaped by a clumping noise, so boundaries mix vegetation smoothly. Height and slope come
+  from the exact mesh triangle under the point (instances sit on the rendered surface at any
+  LOD). Seeded per (world seed, chunk, type) and LOD-independent, so trees keep their place
+  when a chunk changes LOD; `near_only` types only in LOD 0. Output per type is a
+  `PackedFloat32Array` in `MultiMesh.buffer` layout. The scatterer is an immutable snapshot
+  built once by `WorldStreamer` and shared read-only by all jobs. Cost ≈ +6–8 ms per LOD 0
+  chunk on the worker (+17 ms at band boundaries).
 
 ## 4. Player (quadruped animal)
 

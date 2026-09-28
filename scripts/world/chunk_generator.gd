@@ -24,9 +24,16 @@ static func generate(
 
 
 ## Generates the chunk with a caller-owned [param sampler] (built on the main thread so
-## worker tasks never read shared resources).
+## worker tasks never read shared resources). With a [param scatterer], also scatters
+## vegetation (densities × [param density_scale]).
 static func generate_with(
-	coord: Vector2i, lod: int, settings: TerrainSettings, sampler: HeightSampler
+	coord: Vector2i,
+	lod: int,
+	settings: TerrainSettings,
+	sampler: HeightSampler,
+	scatterer: VegetationScatterer = null,
+	world_seed: int = 0,
+	density_scale: float = 1.0
 ) -> ChunkData:
 	var res := settings.resolution_for_lod(lod)
 	var step := settings.step_for_lod(lod)
@@ -43,6 +50,8 @@ static func generate_with(
 	_build_skirt(data, settings.skirt_depth)
 	if lod == 0:
 		data.collision_heights = _interior(heights, res)
+	if scatterer != null:
+		scatterer.scatter(data, sampler, world_seed, settings.sea_level, density_scale)
 	return data
 
 
