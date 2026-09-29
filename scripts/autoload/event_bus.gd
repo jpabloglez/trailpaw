@@ -20,3 +20,11 @@ signal debug_overlay_toggled(overlay_visible: bool)
 ## The player entered a new biome (dominant with weight >= the tracker's threshold).
 @warning_ignore("unused_signal")
 signal biome_entered(biome_id: StringName, display_name: String)
+
+## A need of the player reached its critical threshold (soft consequences start, ADR-003).
+@warning_ignore("unused_signal")
+signal need_critical(need_id: StringName)
+
+## A critical need of the player recovered above its threshold + recover margin.
+@warning_ignore("unused_signal")
+signal need_recovered(need_id: StringName)

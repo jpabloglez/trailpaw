@@ -88,6 +88,7 @@ script = ExtResource("1_muwrv")
 id = &"hills"
 display_name = "Hills"
 band_width = 800.0
+warmth = 1.0
 height_offset = 10.0
 continental_scale = 1.8
 detail_scale = 1.0

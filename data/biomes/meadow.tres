@@ -108,6 +108,7 @@ script = ExtResource("1_fpjyh")
 id = &"meadow"
 display_name = "Meadow"
 band_width = 800.0
+warmth = 0.3
 height_offset = 3.0
 continental_scale = 0.6
 detail_scale = 0.8

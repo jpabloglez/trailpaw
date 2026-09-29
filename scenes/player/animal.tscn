@@ -16,6 +16,15 @@
 
 [ext_resource type="Script" path="res://scripts/player/states/swim_state.gd" id="23_swim"]
 
+[ext_resource type="Script" path="res://scripts/needs/needs_component.gd" id="24_needs"]
+[ext_resource type="Script" path="res://scripts/needs/need_definition.gd" id="31_needdef"]
+[ext_resource type="Resource" path="res://data/needs/hunger.tres" id="25_hunger"]
+[ext_resource type="Resource" path="res://data/needs/thirst.tres" id="26_thirst"]
+[ext_resource type="Resource" path="res://data/needs/temperature.tres" id="27_temp"]
+[ext_resource type="Resource" path="res://data/needs/energy.tres" id="28_energy"]
+[ext_resource type="Resource" path="res://data/needs/need_modifiers.tres" id="29_mods"]
+[ext_resource type="Resource" path="res://data/biomes/biome_table.tres" id="30_biomes"]
+
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ald35"]
 radius = 0.35
 height = 1.3
@@ -105,3 +114,11 @@ script = ExtResource("22_align")
 body = NodePath("..")
 movement = NodePath("../MovementComponent")
 pivot = NodePath("../Model")
+
+[node name="NeedsComponent" type="Node" parent="." node_paths=PackedStringArray("movement")]
+unique_name_in_owner = true
+script = ExtResource("24_needs")
+needs = Array[ExtResource("31_needdef")]([ExtResource("25_hunger"), ExtResource("26_thirst"), ExtResource("27_temp"), ExtResource("28_energy")])
+modifiers = ExtResource("29_mods")
+movement = NodePath("../MovementComponent")
+biomes = ExtResource("30_biomes")

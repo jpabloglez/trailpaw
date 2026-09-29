@@ -102,7 +102,7 @@ Scene-tree mutations happen only on the main thread; worker threads produce plai
   (`data/biomes/biome_table.tres`): 800 m bands that **repeat in a cycle**, 150 m blend,
   ±110 m boundary noise, measured from the spawn point.
 - `BiomeDefinition` (Resource): name, height params, ground palette, vegetation table,
-  fauna table, ambient audio, temperature, water frequency.
+  fauna table, ambient audio, temperature (`warmth`, Phase 6), water frequency.
 - `BiomeResolver` (pure, seeded, one per worker task): noisy distance
   `d' = |pos − spawn| + noise(pos) · amplitude`; the band containing `d'` cross-fades with
   its neighbour over `blend_width` (smoothstep), so weights sum to exactly 1, at most two
@@ -288,6 +288,8 @@ Phase 11 polish item.
 | `camera_zoom_in` / `camera_zoom_out` | Mouse wheel up / down |
 | `pause` | Esc |
 | `toggle_debug_overlay` (debug) | F3 |
+| `toggle_free_fly` (debug) | F4 |
+| `debug_refill_needs` (debug) | F5 |
 | *camera orbit* | Mouse move (captured) — not an action, see below |
 
 All actions are defined in `project.godot` `InputMap` and remappable at runtime. Keys are
@@ -314,6 +316,18 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
   critical at a trot: thirst 8 min, hunger 12 min, energy 15 min, comfort 10 min in a fully
   warm biome. Critical at ≤ 25, recovered only above 35 (`recover_margin`, no flicker).
   Effects when critical: speed × 0.85 (energy × 0.8, and only energy looks tired).
+- Modifiers (`NeedModifiers`, `data/needs/need_modifiers.tres`): hunger, thirst and energy change
+  at `−decay × multiplier` of the activity (idle / walk / trot / run / swim; missing = 1, negative
+  = recovery: energy recovers while idle, 15 min from empty to full). Temperature comfort follows
+  the felt warmth instead, `−decay × (biome warmth + activity heat)`: `BiomeDefinition.warmth`
+  (hills 1.0, meadow 0.3, forest −0.4, river valley −0.6), running +0.5, idle −0.2; in water
+  (wading or swimming) the felt warmth is −1.5, so water always cools off.
+- `NeedsModel` (pure): values, `rate_for()`, `tick()`, clamping and critical state with signals
+  `value_changed` / `critical_entered` / `critical_exited`. `NeedsComponent` (on the Animal) ticks
+  it at 4 Hz with the activity from `MovementComponent`, the warmth of `GameState.current_biome`
+  and water depth; it emits `need_changed(id, value)` and relays crossings to
+  `EventBus.need_critical` / `need_recovered`. F3 shows the values; F5
+  (`debug_refill_needs`) refills them until eating and drinking exist (Phase 7).
 
 ## 6. Interaction system
 

@@ -76,6 +76,7 @@ script = ExtResource("1_uryr0")
 id = &"river_valley"
 display_name = "River Valley"
 band_width = 800.0
+warmth = -0.6
 height_offset = -4.0
 continental_scale = 0.6
 detail_scale = 2.5
