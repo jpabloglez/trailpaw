@@ -413,6 +413,13 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
     O(trees in the chunk)), else OPEN. Dens are `den_log` props (Kenney `log_large`, rare in
     every biome) whose `interaction` is `den.tres`; vegetation `food` became `interaction`, so
     chunk targets also carry non-food interactions (dens never deplete, need no diet).
+  - **Sniff (Q):** `Sniffer` (on the Animal, `data/interaction/sniff.tres`) plays the sniff
+    animation when nearly still and, with one sphere query on the interactable layer (same
+    provider protocol), lights up the nearest 24 available foods in the diet within 25 m with
+    pooled billboard sparkles (`shaders/sniff_marker.gdshader`: unshaded, additive, pulsing;
+    growing with distance beyond 8 m so far ones stay legible), plus one blue sparkle at the
+    nearest water (16 directions × 6 rings of downward rays). Sparkles last 4 s, fading over the
+    last 1.2 s; 2 s cooldown. Sparkles are floating-origin shiftable.
 
 ## 7. Fauna AI
 
