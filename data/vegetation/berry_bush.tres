@@ -17,7 +17,7 @@ radius_min = 0.46
 radius_max = 0.54
 height_min = 0.22
 height_max = 0.5
-food = ExtResource("4_berries")
+interaction = ExtResource("4_berries")
 
 [resource]
 script = ExtResource("2_vtype")

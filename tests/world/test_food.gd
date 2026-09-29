@@ -208,6 +208,8 @@ func test_target_carries_the_food_definition_and_position() -> void:
 	var kinds := {}
 	for i in chunk.food_count():
 		var target := chunk.interaction_target(i)
+		if target.definition.type != InteractionDefinition.Type.EAT:
+			continue  # dens (REST) are chunk targets too
 		kinds[target.definition.food_kind] = true
 		assert_bool(FOX_DIET.has(target.definition.food_kind)).is_true()
 	assert_int(kinds.size()).is_equal(3)

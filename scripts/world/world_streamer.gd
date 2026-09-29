@@ -19,6 +19,8 @@ extends Node3D
 ## changed (after building or unloading, and after a floating-origin rebase).
 signal chunks_changed
 
+## Group of the streamer (found by gameplay queries such as shade, without node paths).
+const GROUP: StringName = &"world_streamer"
 ## Group of nodes providing [code]get_debug_lines()[/code] for the F3 overlay.
 const DEBUG_LINES_GROUP: StringName = &"debug_lines"
 
@@ -79,6 +81,7 @@ func _ready() -> void:
 		set_process(false)
 		return
 	add_to_group(DEBUG_LINES_GROUP)
+	add_to_group(GROUP)
 	if terrain.biomes != null:
 		# Immutable snapshot of the vegetation tables, shared read-only by every job.
 		_scatterer = VegetationScatterer.new(terrain.biomes)
@@ -156,6 +159,13 @@ func stats() -> Dictionary:
 		"last_frame_built": _last_frame_built,
 		"total_built": _total_built,
 	}
+
+
+## Whether the local (scene) [param local_position] lies in a tree's shade (false where no chunk
+## is loaded).
+func is_shaded(local_position: Vector3) -> bool:
+	var chunk: TerrainChunk = _loaded.get(_chunk_for_local(local_position))
+	return chunk != null and chunk.is_shaded(chunk.to_local(local_position))
 
 
 ## Food kinds that get interaction targets: the diet of the [member target]'s species when

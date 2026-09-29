@@ -10,6 +10,7 @@ const JUMP: StringName = &"Jump"
 const FALL: StringName = &"Fall"
 const SWIM: StringName = &"Swim"
 const INTERACT: StringName = &"Interact"
+const REST: StringName = &"Rest"
 
 ## Component this state drives. Assigned in the scene (or by tests).
 @export var movement: MovementComponent

@@ -13,4 +13,4 @@ scale_max = 2.0
 align_to_ground = 0.6
 visibility_range = 30.0
 near_only = true
-food = ExtResource("3_food")
+interaction = ExtResource("3_food")

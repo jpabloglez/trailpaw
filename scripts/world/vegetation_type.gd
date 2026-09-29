@@ -31,9 +31,11 @@ extends Resource
 @export_range(0.0, 5.0, 0.01) var collision_radius: float = 0.0
 ## Collision cylinder height in model units.
 @export_range(0.0, 10.0, 0.01) var collision_height: float = 0.0
-## What eating an instance does (null = not edible). Edible instances in full-detail chunks
-## become interaction targets.
-@export var food: InteractionDefinition
+## What interacting with an instance does (null = none): eating it, resting by it. Such
+## instances in full-detail chunks become interaction targets.
+@export var interaction: InteractionDefinition
+## Radius of the shade the instance casts, in model units (0 = none; trees).
+@export_range(0.0, 5.0, 0.01) var shade_radius: float = 0.0
 ## Props derived from each instance (berries on a bush, apples under an oak).
 @export var drop: VegetationDrop
 
@@ -53,8 +55,8 @@ func get_validation_errors() -> PackedStringArray:
 		errors.append("visibility_range must be > 0")
 	if collision_radius > 0.0 and collision_height <= 0.0:
 		errors.append("collision_height must be > 0 when collision_radius is set")
-	if food != null and not food.is_valid():
-		errors.append("food: %s" % ", ".join(food.get_validation_errors()))
+	if interaction != null and not interaction.is_valid():
+		errors.append("interaction: %s" % ", ".join(interaction.get_validation_errors()))
 	if drop != null:
 		for problem in drop.get_validation_errors():
 			errors.append("drop: %s" % problem)

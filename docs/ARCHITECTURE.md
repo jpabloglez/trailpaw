@@ -403,6 +403,16 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
     offers whichever of thirst and comfort is lower; each target stays available while its own
     condition holds, so a drink is never cut short. No water targets while swimming; water
     never runs out.
+  - **Rest:** holding R on the ground (from Idle or Locomotion, not swimming) — or choosing a
+    REST target such as a den with E — switches to the `Rest` state (lying, tired-idle loop):
+    energy recovers at `data/interaction/rest.tres` × place (open 1.67/s, **shade** ×2, **den**
+    ×3; on top of the idle recovery) and `GameState.clock_scale` is ×10 (reset on leaving, even
+    if freed). It gets up on release or move input. `Rester` decides the place: DEN when the
+    `Interactor`'s target is a REST target, SHADE when `WorldStreamer.is_shaded()` (group
+    `world_streamer`) finds a tree within `VegetationType.shade_radius` × scale (trees only;
+    O(trees in the chunk)), else OPEN. Dens are `den_log` props (Kenney `log_large`, rare in
+    every biome) whose `interaction` is `den.tres`; vegetation `food` became `interaction`, so
+    chunk targets also carry non-food interactions (dens never deplete, need no diet).
 
 ## 7. Fauna AI
 

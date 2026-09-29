@@ -142,7 +142,7 @@ exactly the expected set for a given position; rebase preserves absolute positio
 - [x] `Interactable` component and `Interactor` (shape-cast, target scoring, prompt UI).
 - [x] EAT: berry bushes, grass patches, fallen fruit with depletion/regrowth.
 - [x] DRINK and COOL_OFF: water edges and shallow water.
-- [ ] REST: shaded spots and dens (restores energy, advances time).
+- [x] REST: shaded spots and dens (restores energy, advances time).
 - [ ] `sniff` action: highlights nearby resources briefly.
 - [ ] Per-chunk delta storage for depleted resources.
 

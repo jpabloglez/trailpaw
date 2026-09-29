@@ -34,6 +34,7 @@ const STATE_MAP: Dictionary = {
 	&"Fall": &"fall",
 	&"Swim": &"swim",
 	&"Interact": &"",  # the Interact state plays its own action
+	&"Rest": &"rest",
 }
 ## Below this horizontal speed no footsteps are emitted (standing, turning on the spot).
 const FOOTSTEP_MIN_SPEED: float = 0.3
@@ -199,6 +200,8 @@ func _build_state_machine() -> AnimationNodeStateMachine:
 	for logical: StringName in [&"jump", &"fall", &"swim"]:
 		machine.add_node(logical, _clip_node(logical))
 		_connect(machine, &"locomotion", logical)
+	machine.add_node(&"rest", _clip_node(&"tired_idle"))  # lying with the head low, looped
+	_connect(machine, &"locomotion", &"rest")
 	_connect(machine, &"jump", &"fall")
 	_connect(machine, &"fall", &"swim")
 	_connect(machine, &"jump", &"swim")
