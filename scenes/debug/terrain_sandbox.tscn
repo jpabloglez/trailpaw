@@ -20,6 +20,7 @@
 [ext_resource type="Resource" path="res://data/vegetation_palettes/natural.tres" id="23_palette"]
 [ext_resource type="PackedScene" path="res://scenes/ui/needs_vignette.tscn" id="40_vign"]
 [ext_resource type="PackedScene" path="res://scenes/ui/needs_hud.tscn" id="41_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/interaction_prompt.tscn" id="42_prompt"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_k7oal"]
 
@@ -94,3 +95,6 @@ needs = NodePath("../Animal/NeedsComponent")
 
 [node name="NeedsHud" parent="." node_paths=PackedStringArray("needs") instance=ExtResource("41_hud")]
 needs = NodePath("../Animal/NeedsComponent")
+
+[node name="InteractionPrompt" parent="." node_paths=PackedStringArray("interactor") instance=ExtResource("42_prompt")]
+interactor = NodePath("../Animal/Interactor")

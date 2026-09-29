@@ -125,6 +125,16 @@ func set_value(need_id: StringName, new_value: float) -> void:
 	model.set_value(need_id, new_value)
 
 
+## Adds [param amount] to [param need_id] (clamped); negative amounts subtract.
+func add(need_id: StringName, amount: float) -> void:
+	model.set_value(need_id, model.value(need_id) + amount)
+
+
+## Whether [param need_id] is at its maximum.
+func is_full(need_id: StringName) -> bool:
+	return model.fraction(need_id) >= 1.0
+
+
 ## Lines for the F3 overlay.
 func get_debug_lines() -> PackedStringArray:
 	var parts := PackedStringArray()

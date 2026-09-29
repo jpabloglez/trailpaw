@@ -216,7 +216,8 @@ stays in `data/species/` as an alternative; switching is a one-line change in `a
 - Scene: `scenes/player/animal.tscn` — `Animal` (CharacterBody3D) with `%MovementComponent`,
   `%PlayerInput` and `%StateMachine` (Idle, Locomotion, Jump, Fall). Forward is `-Z`.
 - Physics layers (named in `project.godot`): **1 `world`** (static geometry, terrain),
-  **2 `player`**. The player collides with `world`; camera collision only checks `world`.
+  **2 `player`**, **3 `interactable`** (interaction targets, Phase 7). The player collides
+  with `world`; camera collision only checks `world`.
 - `CharacterBody3D` with capsule collider oriented horizontally (or two-sphere approximation).
 - Camera-relative input; smooth acceleration and turning (quadrupeds turn in arcs, not in place).
 - Gaits: walk / trot / run (Shift) driven by speed thresholds.
@@ -225,7 +226,8 @@ stays in `data/species/` as an alternative; switching is a one-line change in `a
   right, clamped to `max_tilt_degrees` (Husky 25°) and exponentially smoothed. Only the model
   pivot (`%Model`) tilts; the CharacterBody3D and its capsule stay upright. Level in the air or
   when `level` is set (swimming).
-- States (`StateMachine` component): Idle, Locomotion, Jump, Fall, Swim, Interact, Rest.
+- States (`StateMachine` component): Idle, Locomotion, Jump, Fall, Swim, Interact (Phase 7),
+  Rest.
 - **Swimming:** `GameState.water_level` (published by `WorldStreamer`); water depth over the
   paws = water level − body height. `Swim` starts above `swim_enter_depth` and ends below
   `swim_exit_depth` with the paws on the bottom (hysteresis). While swimming, buoyancy pulls
@@ -354,6 +356,25 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
 - Water: chunks with water planes expose DRINK and COOL_OFF (wading/swimming).
 - Food sources (berries, grass, fallen fruit) deplete and regrow; state stored per chunk
   as a delta so saves stay small.
+- **Implemented (Phase 7):**
+  - Physics layer 3 `interactable`. `InteractionDefinition` (`data/interactions/`): type,
+    prompt, mode `ONCE` (effects once at the end of `duration`) or `HOLD` (effects per second
+    while E is held; stops when those needs are full), `need_effects`, logical animation,
+    `food_kind`, `regrowth_minutes`.
+  - Providers are colliders on layer 3 implementing `interaction_target(shape_index)` and the
+    `is_target_available(key)` / `consume_target(key)` protocol behind `InteractionTarget`;
+    `Interactable` (Area3D) is the discrete one.
+  - `Interactor` (Node3D on the Animal, `data/interaction/interactor.tres`): a ShapeCast3D
+    sphere 0.9 m ahead of the body, probed at 10 Hz and on request; `InteractionScoring`
+    (pure) ranks by horizontal distance and facing (≤ 1.8 m, ≤ 80°). `PlayerInput` writes the
+    intent (`request_interaction()`, `interact_held`); a request on the ground from Idle or
+    Locomotion switches the `StateMachine` to `Interact`.
+  - `Interact` state: stops the animal, plays the action through
+    `AnimationController.play_action()`, applies the effects via `NeedsComponent.add()`,
+    consumes the target and emits `EventBus.interaction_performed(type, id)`. Moving or the
+    target going away cancels without effects.
+  - `InteractionPrompt` (`scenes/ui/`): "E · Eat berries" at the bottom centre, fading in and
+    out with the target and hidden while interacting. F3 shows the current target.
 
 ## 7. Fauna AI
 
