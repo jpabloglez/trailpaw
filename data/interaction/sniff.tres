@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="SniffSettings" format=3]
+
+[ext_resource type="Script" path="res://scripts/interaction/sniff_settings.gd" id="1_sniff"]
+
+[resource]
+script = ExtResource("1_sniff")
+radius = 25.0
+max_highlights = 24
+duration = 4.0
+fade = 1.2
+cooldown = 2.0
+lift = 0.6
+size = 1.0
+grow_distance = 8.0
+food_color = Color(1, 0.82, 0.38, 1)
+water_color = Color(0.45, 0.8, 1, 1)
+water_directions = 16
+water_rings = 6

@@ -143,7 +143,7 @@ exactly the expected set for a given position; rebase preserves absolute positio
 - [x] EAT: berry bushes, grass patches, fallen fruit with depletion/regrowth.
 - [x] DRINK and COOL_OFF: water edges and shallow water.
 - [x] REST: shaded spots and dens (restores energy, advances time).
-- [ ] `sniff` action: highlights nearby resources briefly.
+- [x] `sniff` action: highlights nearby resources briefly.
 - [ ] Per-chunk delta storage for depleted resources.
 
 **Tests:** interactor picks correct target; effects applied once; regrowth timing; deltas persist across chunk reload.
