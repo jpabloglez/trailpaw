@@ -127,7 +127,7 @@ exactly the expected set for a given position; rebase preserves absolute positio
 
 ## Phase 6 — Needs system and HUD
 
-- [ ] `NeedDefinition` resources: hunger, thirst, temperature, energy.
+- [x] `NeedDefinition` resources: hunger, thirst, temperature, energy.
 - [ ] `NeedsModel` (pure logic) + `NeedsComponent` (4 Hz tick, modifiers from activity/biome).
 - [ ] Soft consequences: slowed movement, tired idle animation, visual vignette hint.
 - [ ] Minimal, cozy HUD: four icon meters that fade when full.
