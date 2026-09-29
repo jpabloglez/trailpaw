@@ -25,6 +25,11 @@ extends Resource
 ## Multiplier for the ridged layer amplitude.
 @export_range(0.0, 5.0, 0.01) var ridged_scale: float = 0.0
 
+@export_group("Climate")
+## How warm the biome feels (-1 cool … +1 warm). Warm biomes lower temperature comfort, cool
+## ones restore it ([code]NeedsModel[/code]).
+@export_range(-1.0, 1.0, 0.05) var warmth: float = 0.0
+
 @export_group("Vegetation")
 ## What grows in this biome and where (see [VegetationEntry]).
 @export var vegetation: Array[VegetationEntry] = []
@@ -47,6 +52,8 @@ func get_validation_errors() -> PackedStringArray:
 		errors.append("band_width must be > 0")
 	if continental_scale < 0.0 or detail_scale < 0.0 or ridged_scale < 0.0:
 		errors.append("height scales must be >= 0")
+	if warmth < -1.0 or warmth > 1.0:
+		errors.append("warmth must be within [-1, 1]")
 	for i in vegetation.size():
 		if vegetation[i] == null:
 			errors.append("vegetation[%d] is null" % i)

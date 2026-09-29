@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="NeedModifiers" format=3]
+
+[ext_resource type="Script" path="res://scripts/needs/need_modifiers.gd" id="1_mods"]
+
+[resource]
+script = ExtResource("1_mods")
+warmth_need = &"temperature"
+idle = Dictionary[StringName, float]({
+&"energy": -1.0,
+&"hunger": 0.5,
+&"thirst": 0.5
+})
+walk = Dictionary[StringName, float]({
+&"energy": 0.6,
+&"hunger": 0.75,
+&"thirst": 0.75
+})
+trot = Dictionary[StringName, float]({})
+run = Dictionary[StringName, float]({
+&"energy": 1.75,
+&"hunger": 1.25,
+&"thirst": 1.5
+})
+swim = Dictionary[StringName, float]({
+&"energy": 1.5,
+&"hunger": 1.0,
+&"thirst": 0.5
+})
+activity_heat = Dictionary[StringName, float]({
+&"idle": -0.2,
+&"run": 0.5,
+&"walk": 0.0
+})
+water_warmth = -1.5

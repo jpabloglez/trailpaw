@@ -128,6 +128,7 @@ script = ExtResource("1_s8i2t")
 id = &"forest"
 display_name = "Forest"
 band_width = 800.0
+warmth = -0.4
 height_offset = 2.0
 continental_scale = 0.9
 detail_scale = 1.6

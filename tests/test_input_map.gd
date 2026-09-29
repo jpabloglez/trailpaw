@@ -15,6 +15,7 @@ const KEY_ACTIONS: Dictionary = {
 	&"pause": KEY_ESCAPE,
 	&"toggle_debug_overlay": KEY_F3,
 	&"toggle_free_fly": KEY_F4,
+	&"debug_refill_needs": KEY_F5,
 }
 
 ## Expected default mouse-button bindings.
