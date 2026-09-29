@@ -130,7 +130,7 @@ exactly the expected set for a given position; rebase preserves absolute positio
 - [x] `NeedDefinition` resources: hunger, thirst, temperature, energy.
 - [x] `NeedsModel` (pure logic) + `NeedsComponent` (4 Hz tick, modifiers from activity/biome).
 - [x] Soft consequences: slowed movement, tired idle animation, visual vignette hint.
-- [ ] Minimal, cozy HUD: four icon meters that fade when full.
+- [x] Minimal, cozy HUD: four icon meters that fade when full.
 
 **Tests:** decay rates, clamping, modifiers, critical-threshold signals.
 **Exit:** needs create gentle motivation to explore without stress.

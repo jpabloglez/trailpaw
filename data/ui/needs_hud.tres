@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="NeedsHudSettings" format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/needs_hud_settings.gd" id="1_hud"]
+
+[resource]
+script = ExtResource("1_hud")
+meter_size = 56.0
+ring_width = 5.0
+backdrop_color = Color(0.08, 0.1, 0.08, 0.45)
+icon_color = Color(1, 0.98, 0.92, 0.95)
+full_fraction = 0.9
+full_hold = 2.0
+fade_per_second = 1.5
+pulse_amount = 0.4
+pulse_hz = 0.6

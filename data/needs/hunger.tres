@@ -6,6 +6,8 @@
 script = ExtResource("1_need")
 id = &"hunger"
 display_name = "Hunger"
+icon_shape = "apple"
+color = Color(0.93, 0.55, 0.45, 1)
 max_value = 100.0
 decay_per_minute = 6.25
 critical_threshold = 25.0

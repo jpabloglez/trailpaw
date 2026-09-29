@@ -6,6 +6,8 @@
 script = ExtResource("1_need")
 id = &"temperature"
 display_name = "Comfort"
+icon_shape = "sun"
+color = Color(0.98, 0.8, 0.4, 1)
 max_value = 100.0
 decay_per_minute = 7.5
 critical_threshold = 25.0

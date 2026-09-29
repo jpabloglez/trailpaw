@@ -15,8 +15,10 @@ extends Resource
 @export var id: StringName = &""
 ## Name shown to the player.
 @export var display_name: String = ""
-## HUD icon (set with the needs HUD).
-@export var icon: Texture2D
+## HUD icon, drawn in code by [NeedIcon].
+@export_enum("drop", "apple", "sun", "moon") var icon_shape: String = ""
+## HUD meter colour.
+@export var color: Color = Color.WHITE
 ## Value when fully satisfied (the need starts here).
 @export_range(1.0, 1000.0, 1.0) var max_value: float = 0.0
 ## Base loss per minute while trotting in neutral conditions.
@@ -47,6 +49,8 @@ func get_validation_errors() -> PackedStringArray:
 		errors.append("id must not be empty")
 	if display_name.strip_edges().is_empty():
 		errors.append("display_name must not be empty")
+	if not NeedIcon.SHAPES.has(icon_shape):
+		errors.append("icon_shape must be one of %s" % [NeedIcon.SHAPES])
 	if max_value <= 0.0:
 		errors.append("max_value must be > 0")
 	if decay_per_minute <= 0.0:

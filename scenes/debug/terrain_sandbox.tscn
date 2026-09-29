@@ -19,6 +19,7 @@
 [ext_resource type="Resource" path="res://data/world/wind.tres" id="22_wind"]
 [ext_resource type="Resource" path="res://data/vegetation_palettes/natural.tres" id="23_palette"]
 [ext_resource type="PackedScene" path="res://scenes/ui/needs_vignette.tscn" id="40_vign"]
+[ext_resource type="PackedScene" path="res://scenes/ui/needs_hud.tscn" id="41_hud"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_k7oal"]
 
@@ -89,4 +90,7 @@ target = NodePath("../Animal")
 [node name="BiomeToast" parent="." instance=ExtResource("21_btst")]
 
 [node name="NeedsVignette" parent="." node_paths=PackedStringArray("needs") instance=ExtResource("40_vign")]
+needs = NodePath("../Animal/NeedsComponent")
+
+[node name="NeedsHud" parent="." node_paths=PackedStringArray("needs") instance=ExtResource("41_hud")]
 needs = NodePath("../Animal/NeedsComponent")
