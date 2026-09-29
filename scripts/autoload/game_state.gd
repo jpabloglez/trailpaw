@@ -16,6 +16,9 @@ var origin_chunk: Vector2i = Vector2i.ZERO
 ## [code]FloatingOrigin.configure()[/code].
 var chunk_size: float = 0.0
 
+## Absolute height of the water surface ([code]-INF[/code] when the world has no water).
+## Published by the terrain streamer; Y is never shifted by rebases.
+var water_level: float = -INF
 ## Biome the player is currently in (as last announced by the biome tracker).
 var current_biome: StringName = &""
 

@@ -12,6 +12,8 @@ extends Node
 const INPUT_DEADZONE_SQ: float = 0.01
 ## A jump request stays valid for this many physics frames (covers node update order).
 const JUMP_REQUEST_FRAMES: int = 1
+## Vertical speed cap of the buoyancy pull (m/s): gentle bobbing, no launch.
+const MAX_BUOYANCY_SPEED: float = 3.0
 
 ## Locomotion tunables. Must be valid (see [method AnimalSpecies.get_validation_errors]).
 @export var species: AnimalSpecies
@@ -20,6 +22,8 @@ const JUMP_REQUEST_FRAMES: int = 1
 var move_input: Vector2 = Vector2.ZERO
 ## Whether the controller wants to run.
 var sprint: bool = false
+## Whether the body is swimming (set by the swim state).
+var swimming: bool = false
 
 var _body: CharacterBody3D
 var _gravity: float = 0.0
@@ -81,6 +85,29 @@ func gait() -> LocomotionModel.Gait:
 	return LocomotionModel.gait_for_speed(_speed, species)
 
 
+## Water depth over the paws (m); 0 or less on dry land.
+func water_depth() -> float:
+	return GameState.water_level - _body.global_position.y
+
+
+## Whether the water is deep enough to start swimming.
+func should_start_swimming() -> bool:
+	return species.can_swim() and water_depth() > species.swim_enter_depth
+
+
+## Whether the animal stands on the bottom in shallow enough water to stop swimming.
+func should_stop_swimming() -> bool:
+	return water_depth() < species.swim_exit_depth and _body.is_on_floor()
+
+
+## Swimming: slower horizontal movement and buoyancy towards the floating height.
+func apply_swim_movement(delta: float) -> void:
+	_step_horizontal(delta, 1.0, species.swim_speed_factor)
+	var float_height := GameState.water_level - species.float_depth
+	var pull := (float_height - _body.global_position.y) * species.buoyancy
+	_body.velocity.y = clampf(pull, -MAX_BUOYANCY_SPEED, MAX_BUOYANCY_SPEED)
+
+
 ## Full-control horizontal movement: turning in arcs and accelerating along the heading.
 func apply_ground_movement(delta: float) -> void:
 	_step_horizontal(delta, 1.0)
@@ -109,14 +136,16 @@ func move() -> void:
 	_speed = minf(_speed, real_speed)
 
 
-func _step_horizontal(delta: float, control: float) -> void:
+func _step_horizontal(delta: float, control: float, speed_factor: float = 1.0) -> void:
 	var desired := LocomotionModel.camera_relative_direction(move_input, _camera_basis())
 	var yaw := LocomotionModel.step_heading(
 		_body.rotation.y, desired, _speed, species, delta, control
 	)
 	_body.rotation.y = yaw
 	var error := LocomotionModel.heading_error(yaw, desired)
-	var target := LocomotionModel.target_speed(desired.length(), sprint, error, species)
+	var target := (
+		LocomotionModel.target_speed(desired.length(), sprint, error, species) * speed_factor
+	)
 	_speed = LocomotionModel.step_speed(_speed, target, species, delta, control)
 	var velocity := LocomotionModel.forward_for_yaw(yaw) * _speed
 	_body.velocity.x = velocity.x

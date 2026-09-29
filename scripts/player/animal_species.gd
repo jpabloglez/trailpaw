@@ -63,6 +63,18 @@ const LOGICAL_ANIMATIONS: Array[StringName] = [
 ## Distance from the body centre to the left/right paws (ground probes).
 @export_range(0.01, 2.0, 0.01, "suffix:m") var paw_half_width: float = 0.0
 
+@export_group("Swimming")
+## Water depth over the paws that starts swimming (0 = this species never swims).
+@export_range(0.0, 5.0, 0.01, "suffix:m") var swim_enter_depth: float = 0.0
+## Depth below which, standing on the bottom, swimming ends (< enter depth: hysteresis).
+@export_range(0.0, 5.0, 0.01, "suffix:m") var swim_exit_depth: float = 0.0
+## How deep the paws hang below the surface while floating.
+@export_range(0.0, 5.0, 0.01, "suffix:m") var float_depth: float = 0.0
+## Fraction of the land speed available while swimming.
+@export_range(0.0, 1.0, 0.01) var swim_speed_factor: float = 0.0
+## How fast buoyancy pulls the body to its floating height.
+@export_range(0.0, 50.0, 0.1, "suffix:1/s") var buoyancy: float = 0.0
+
 @export_group("Gaits")
 ## Target speed of the walk gait; speeds below this read as walking.
 @export_range(0.1, 20.0, 0.1, "suffix:m/s") var walk_speed: float = 0.0
@@ -114,6 +126,11 @@ func get_validation_errors() -> PackedStringArray:
 		errors.append("air_control must be within [0, 1]")
 	if max_slope_degrees <= 0.0 or max_slope_degrees >= 90.0:
 		errors.append("max_slope_degrees must be within (0, 90)")
+	if can_swim():
+		if swim_exit_depth <= 0.0 or swim_exit_depth >= swim_enter_depth:
+			errors.append("swim depths must satisfy 0 < swim_exit_depth < swim_enter_depth")
+		if float_depth <= 0.0 or swim_speed_factor <= 0.0 or buoyancy <= 0.0:
+			errors.append("float_depth, swim_speed_factor and buoyancy must be > 0")
 	if model_scale <= 0.0:
 		errors.append("model_scale must be > 0")
 	if model_scene != null:
@@ -127,6 +144,11 @@ func get_validation_errors() -> PackedStringArray:
 		if paw_half_length <= 0.0 or paw_half_width <= 0.0:
 			errors.append("paw_half_length and paw_half_width must be > 0")
 	return errors
+
+
+## Whether this species swims (otherwise it walks along the bottom).
+func can_swim() -> bool:
+	return swim_enter_depth > 0.0
 
 
 ## Returns [code]true[/code] when [method get_validation_errors] finds no problems.

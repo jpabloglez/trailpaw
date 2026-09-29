@@ -86,6 +86,7 @@ func _ready() -> void:
 		RenderingServer.global_shader_parameter_set(WIND_PARAM, wind.as_uniform())
 	# Shaders (terrain shores, underwater tint) need the absolute water height.
 	RenderingServer.global_shader_parameter_set(WATER_LEVEL_PARAM, terrain.sea_level)
+	GameState.water_level = terrain.sea_level
 	EventBus.origin_shifted.connect(_on_origin_shifted)
 	vegetation_density = Settings.quality.vegetation_density
 	Settings.quality_changed.connect(_on_quality_changed)

@@ -11,6 +11,8 @@ class FakeMovement:
 	var speed: float = 0.0
 	var rising_speed: float = 0.0
 	var jump_requested: bool = false
+	var deep: bool = false
+	var shallow_bottom: bool = false
 	var calls: Array[String] = []
 
 	func _ready() -> void:
@@ -32,6 +34,15 @@ class FakeMovement:
 		var requested := jump_requested
 		jump_requested = false
 		return requested
+
+	func should_start_swimming() -> bool:
+		return deep
+
+	func should_stop_swimming() -> bool:
+		return shallow_bottom
+
+	func apply_swim_movement(_delta: float) -> void:
+		calls.append("swim")
 
 	func apply_ground_movement(_delta: float) -> void:
 		calls.append("ground")
@@ -62,9 +73,14 @@ func before_test() -> void:
 		PlayerLocomotionState.new(),
 		PlayerJumpState.new(),
 		PlayerFallState.new(),
+		PlayerSwimState.new(),
 	]
 	var names: Array[StringName] = [
-		PlayerState.IDLE, PlayerState.LOCOMOTION, PlayerState.JUMP, PlayerState.FALL
+		PlayerState.IDLE,
+		PlayerState.LOCOMOTION,
+		PlayerState.JUMP,
+		PlayerState.FALL,
+		PlayerState.SWIM
 	]
 	for i in states.size():
 		states[i].name = names[i]
@@ -164,3 +180,38 @@ func test_air_states_use_air_control() -> void:
 	_movement.calls.clear()
 	_tick()
 	assert_array(_movement.calls).contains_exactly(["air", "gravity", "move"])
+
+
+# --- swimming -------------------------------------------------------------------------
+
+
+func test_deep_water_starts_swimming_from_ground_and_air() -> void:
+	_movement.deep = true
+	_tick()
+	assert_str(_state()).is_equal("Swim")
+	assert_bool(_movement.swimming).is_true()
+	_machine.transition_to(PlayerState.FALL)
+	_movement.grounded = false
+	_tick()
+	assert_str(_state()).is_equal("Swim")
+
+
+func test_no_jumping_while_swimming() -> void:
+	_movement.deep = true
+	_tick()
+	_movement.jump_requested = true
+	_tick()
+	assert_str(_state()).is_equal("Swim")
+	assert_array(_movement.calls).not_contains(["jump"])
+	assert_bool(_movement.jump_requested).is_false()  # request consumed, not buffered
+
+
+func test_reaching_the_shore_ends_swimming() -> void:
+	_movement.deep = true
+	_tick()
+	_movement.deep = false
+	_movement.shallow_bottom = true
+	_movement.moving = true
+	_tick()
+	assert_str(_state()).is_equal("Locomotion")
+	assert_bool(_movement.swimming).is_false()
