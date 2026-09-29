@@ -101,12 +101,13 @@ movement = NodePath("../../MovementComponent")
 [node name="Model" type="Node3D" parent="."]
 unique_name_in_owner = true
 
-[node name="AnimationController" type="Node" parent="." node_paths=PackedStringArray("movement", "state_machine", "model_root")]
+[node name="AnimationController" type="Node" parent="." node_paths=PackedStringArray("movement", "state_machine", "model_root", "needs")]
 unique_name_in_owner = true
 script = ExtResource("21_anim")
 movement = NodePath("../MovementComponent")
 state_machine = NodePath("../StateMachine")
 model_root = NodePath("../Model")
+needs = NodePath("../NeedsComponent")
 
 [node name="GroundAligner" type="Node" parent="." node_paths=PackedStringArray("body", "movement", "pivot")]
 unique_name_in_owner = true

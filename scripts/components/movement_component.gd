@@ -24,6 +24,9 @@ var move_input: Vector2 = Vector2.ZERO
 var sprint: bool = false
 ## Whether the body is swimming (set by the swim state).
 var swimming: bool = false
+## Multiplier on every target speed (soft consequences of critical needs, set by
+## [code]NeedsComponent[/code]; 1 = normal).
+var speed_multiplier: float = 1.0
 
 var _body: CharacterBody3D
 var _gravity: float = 0.0
@@ -144,7 +147,9 @@ func _step_horizontal(delta: float, control: float, speed_factor: float = 1.0) -
 	_body.rotation.y = yaw
 	var error := LocomotionModel.heading_error(yaw, desired)
 	var target := (
-		LocomotionModel.target_speed(desired.length(), sprint, error, species) * speed_factor
+		LocomotionModel.target_speed(desired.length(), sprint, error, species)
+		* speed_factor
+		* speed_multiplier
 	)
 	_speed = LocomotionModel.step_speed(_speed, target, species, delta, control)
 	var velocity := LocomotionModel.forward_for_yaw(yaw) * _speed

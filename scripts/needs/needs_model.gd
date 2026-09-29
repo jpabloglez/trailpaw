@@ -67,6 +67,29 @@ func is_critical(need_id: StringName) -> bool:
 	return _critical[_index[need_id]]
 
 
+## Number of critical needs.
+func critical_count() -> int:
+	return _critical.count(true)
+
+
+## Movement speed multiplier from the critical needs: the lowest
+## [member NeedDefinition.critical_speed_factor] among them (1 when none is critical).
+func critical_speed_factor() -> float:
+	var factor := 1.0
+	for i in _definitions.size():
+		if _critical[i]:
+			factor = minf(factor, _definitions[i].critical_speed_factor)
+	return factor
+
+
+## Whether a critical need makes the animal look tired.
+func is_tired() -> bool:
+	for i in _definitions.size():
+		if _critical[i] and _definitions[i].tired_when_critical:
+			return true
+	return false
+
+
 ## Sets [param need_id] to [param new_value] (clamped) and updates its critical state now.
 func set_value(need_id: StringName, new_value: float) -> void:
 	_apply(_index[need_id], new_value)

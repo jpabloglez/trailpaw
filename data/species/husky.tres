@@ -19,15 +19,17 @@ animations = Dictionary[StringName, String]({
 &"run": "Gallop",
 &"sniff": "Idle_2_HeadLow",
 &"swim": "Walk",
+&"tired_idle": "Idle_2_HeadLow",
 &"trot": "Gallop",
 &"walk": "Walk"
 })
-looping = Array[StringName]([&"idle", &"walk", &"trot", &"run", &"swim"])
+looping = Array[StringName]([&"idle", &"walk", &"trot", &"run", &"swim", &"tired_idle"])
 animation_fallbacks = Dictionary[StringName, String]({
 &"drink": "No drinking clip: Eating (head down at the water).",
 &"fall": "No airborne loop: Jump_ToIdle (the landing half of a jump).",
 &"lie_down": "No lying clip: Idle_2_HeadLow (resting pose) until a species provides one.",
 &"swim": "No swim clip: a slowed Walk (paddling) while floating.",
+&"tired_idle": "No tired clip: Idle_2_HeadLow looped (head hanging low).",
 &"trot": "No trot clip: the gallop, played slower (matched to trot speed)."
 })
 clip_ground_speeds = Dictionary[String, float]({

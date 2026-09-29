@@ -254,16 +254,18 @@ auto-recentre behind the animal while moving. Sensitivity and invert-Y in Settin
 
 ### 4.4 Animation
 - Animation set (`AnimalSpecies.animations`, logical → clip) covers idle, walk, trot, run, jump,
-  fall, eat, drink, lie_down, sniff and swim. Husky fallbacks, each documented in
-  `animation_fallbacks`: trot → Gallop (slower), fall → Jump_ToIdle, drink → Eating,
-  lie_down → Idle_2_HeadLow, swim → slowed Walk.
+  fall, eat, drink, lie_down, sniff, swim and tired_idle (Phase 6). Husky fallbacks, each
+  documented in `animation_fallbacks`: trot → Gallop (slower), fall → Jump_ToIdle, drink → Eating,
+  lie_down → Idle_2_HeadLow, swim → slowed Walk, tired_idle → Idle_2_HeadLow looped. A clip
+  used both looped and once gets a separate looped copy (`<clip>_loop`).
 - Anti-slide: `ClipAnalysis` measures each locomotion clip's authored ground speed from its
   planted paws (Husky: Walk 0.57, Gallop 2.51 m/s); playback scale = speed / that, capped at
   `max_animation_time_scale` (2.5) so legs never cycle frantically (a little slide at full run;
   Husky `walk_speed` is 1.2 m/s so walking matches exactly).
 - `AnimationController` (on the Animal) builds its `AnimationTree` in code once `Animal` has
   instanced the species model under `%Model`: a state machine with `locomotion` (BlendSpace1D
-  idle/walk/trot/run by speed → TimeScale for anti-slide), `jump`, `fall`, `swim` and one-shot
+  idle/walk/trot/run by speed → TimeScale for anti-slide; the idle point is a Blend2 of rested
+  and tired idle driven by `NeedsComponent.tiredness()`), `jump`, `fall`, `swim` and one-shot
   `eat`/`drink`/`lie_down`/`sniff` that return to locomotion at their end. It follows
   `StateMachine.state_changed`; loops are set on copies of the clips in its own library.
 - Footsteps: at start-up `ClipAnalysis.contact_times()` finds when each paw touches down in the
@@ -328,6 +330,13 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
   and water depth; it emits `need_changed(id, value)` and relays crossings to
   `EventBus.need_critical` / `need_recovered`. F3 shows the values; F5
   (`debug_refill_needs`) refills them until eating and drinking exist (Phase 7).
+- Soft consequences (ADR-003), all eased so nothing snaps: `NeedsComponent` moves
+  `MovementComponent.speed_multiplier` (multiplies every target speed) towards the lowest
+  `critical_speed_factor` of the critical needs at 0.1/s; `tiredness()` eases to 1 (0.5/s) while a
+  `tired_when_critical` need (energy) is critical and drives the tired idle blend (§4.4);
+  `NeedsVignette` (`scenes/ui/needs_vignette.tscn`, `shaders/needs_vignette.gdshader`,
+  `data/ui/needs_vignette.tres`) warms and darkens the screen edges, half intensity for one
+  critical need and full for two or more, fading at 0.25/s.
 
 ## 6. Interaction system
 

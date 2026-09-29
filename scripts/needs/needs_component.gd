@@ -8,6 +8,10 @@ extends Node
 ## [code]debug_refill_needs[/code] (F5) refills everything until eating and drinking exist
 ## (Phase 7).
 ## [br][br]
+## Soft consequences (ADR-003): while needs are critical it eases
+## [member MovementComponent.speed_multiplier] down to the lowest critical speed factor and
+## eases [method tiredness] up (tired idle animation); both ease back when the needs recover.
+## [br][br]
 ## Budget: one [method NeedsModel.tick] (a few float ops per need) every 250 ms.
 
 ## A need's value changed.
@@ -35,6 +39,8 @@ const IDLE_SPEED: float = 0.2
 var model: NeedsModel
 
 var _since_tick: float = 0.0
+var _speed_multiplier: float = 1.0
+var _tiredness: float = 0.0
 var _warmth: Dictionary[StringName, float] = {}
 
 
@@ -55,6 +61,7 @@ func _process(delta: float) -> void:
 	while _since_tick >= step:
 		_since_tick -= step
 		tick(step)
+	_ease_effects(delta)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -65,6 +72,21 @@ func _unhandled_input(event: InputEvent) -> void:
 ## Advances the needs by [param delta] seconds with the current conditions.
 func tick(delta: float) -> void:
 	model.tick(delta, activity(), biome_warmth(), in_water())
+
+
+## Current movement speed multiplier from critical needs (eased; 1 = normal).
+func speed_multiplier() -> float:
+	return _speed_multiplier
+
+
+## How tired the animal looks (eased 0…1; drives the tired idle animation).
+func tiredness() -> float:
+	return _tiredness
+
+
+## Number of critical needs.
+func critical_count() -> int:
+	return model.critical_count()
 
 
 ## What the animal is doing now, as far as needs are concerned.
@@ -110,6 +132,16 @@ func get_debug_lines() -> PackedStringArray:
 		parts.append("%s %.0f%s" % [id, model.value(id), "!" if model.is_critical(id) else ""])
 	var activity_name := NeedsModel.ACTIVITY_NAMES[activity()]
 	return PackedStringArray(["needs %s  (%s)" % ["  ".join(parts), activity_name]])
+
+
+func _ease_effects(delta: float) -> void:
+	_speed_multiplier = move_toward(
+		_speed_multiplier, model.critical_speed_factor(), modifiers.speed_ease_per_second * delta
+	)
+	var tired_target := 1.0 if model.is_tired() else 0.0
+	_tiredness = move_toward(_tiredness, tired_target, modifiers.tired_ease_per_second * delta)
+	if movement != null:
+		movement.speed_multiplier = _speed_multiplier
 
 
 func _on_critical_entered(need_id: StringName) -> void:

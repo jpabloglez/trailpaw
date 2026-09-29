@@ -63,7 +63,7 @@ func test_only_documented_fallbacks_share_or_substitute_clips() -> void:
 func test_locomotion_loops_and_one_shots_do_not() -> void:
 	for species in _each():
 		_species = species
-		for logical: StringName in [&"idle", &"walk", &"trot", &"run", &"swim"]:
+		for logical: StringName in [&"idle", &"walk", &"trot", &"run", &"swim", &"tired_idle"]:
 			assert_bool(_species.looping.has(logical)).is_true()
 		for logical: StringName in [&"jump", &"eat", &"drink", &"sniff"]:
 			assert_bool(_species.looping.has(logical)).is_false()
