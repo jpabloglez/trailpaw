@@ -337,6 +337,13 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
   `NeedsVignette` (`scenes/ui/needs_vignette.tscn`, `shaders/needs_vignette.gdshader`,
   `data/ui/needs_vignette.tres`) warms and darkens the screen edges, half intensity for one
   critical need and full for two or more, fading at 0.25/s.
+- HUD (`NeedsHud`, `scenes/ui/needs_hud.tscn`, `data/ui/needs_hud.tres`): bottom left, one
+  `NeedMeter` per need, an icon inside a ring that empties with the need (ring colour
+  `NeedDefinition.color`). Icons are silhouettes drawn in code by `NeedIcon`: a drop (thirst), an
+  apple (hunger), a sun (comfort) and a moon (energy). Kenney's icon packs had no matching set,
+  and the user chose code-drawn icons. Meters start hidden, fade in when their need drops below 90 %
+  and fade out 2 s after it is full again; a critical meter pulses gently (dims and brightens, no
+  red, no sound). The HUD and vignette live in both sandboxes (`main.tscn` is still empty).
 
 ## 6. Interaction system
 

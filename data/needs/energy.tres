@@ -6,6 +6,8 @@
 script = ExtResource("1_need")
 id = &"energy"
 display_name = "Energy"
+icon_shape = "moon"
+color = Color(0.75, 0.7, 0.95, 1)
 max_value = 100.0
 decay_per_minute = 5.0
 critical_threshold = 25.0

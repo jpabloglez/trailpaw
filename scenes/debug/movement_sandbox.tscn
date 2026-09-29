@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" path="res://scenes/player/camera_rig.tscn" id="3_1wrq4"]
 [ext_resource type="PackedScene" path="res://scenes/ui/debug_overlay.tscn" id="4_dbgov"]
 [ext_resource type="PackedScene" path="res://scenes/ui/needs_vignette.tscn" id="40_vign"]
+[ext_resource type="PackedScene" path="res://scenes/ui/needs_hud.tscn" id="41_hud"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_grbc7"]
 
@@ -591,4 +592,7 @@ target = NodePath("../Animal")
 [node name="DebugOverlay" parent="." instance=ExtResource("4_dbgov")]
 
 [node name="NeedsVignette" parent="." node_paths=PackedStringArray("needs") instance=ExtResource("40_vign")]
+needs = NodePath("../Animal/NeedsComponent")
+
+[node name="NeedsHud" parent="." node_paths=PackedStringArray("needs") instance=ExtResource("41_hud")]
 needs = NodePath("../Animal/NeedsComponent")
