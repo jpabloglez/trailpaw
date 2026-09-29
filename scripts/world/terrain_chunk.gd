@@ -4,6 +4,8 @@ extends Node3D
 ## the main thread from [ChunkData]. Designed to be pooled: [method apply] reuses the same
 ## [ArrayMesh], array container and collision shape every time.
 ##
+## Depleted food lives in the shared [member delta_store], so it survives unloading.
+##
 ## Edible vegetation and drops, and props to rest by
 ## ([method VegetationLibrary.interaction_for]), in LOD 0 get one pooled sphere each in a
 ## [FoodArea] on the [code]interactable[/code] layer, so the [Interactor] finds them; the chunk
@@ -36,6 +38,9 @@ var coord: Vector2i = Vector2i.ZERO
 var lod: int = -1
 ## Streamer generation of the data currently applied (see [method WorldStreamer.refresh]).
 var generation: int = 0
+## Depleted resources of every chunk (shared through the [WorldStreamer]; a private store when
+## the chunk is used alone, e.g. in tests).
+var delta_store: ChunkDeltaStore = ChunkDeltaStore.new()
 
 var _border := PackedVector3Array()
 var _mesh := ArrayMesh.new()
@@ -54,9 +59,9 @@ var _food_keys := PackedInt32Array()
 var _food_slots: Array[StringName] = []
 var _food_definitions: Array[InteractionDefinition] = []
 var _buffers: Dictionary[StringName, PackedFloat32Array] = {}
-## Food id → {instance index → game minute it regrows at}.
-var _depleted: Dictionary[StringName, Dictionary] = {}
 var _since_regrow_check: float = 0.0
+## Food id → {instance index → true} for instances drawn hidden (zero scale) now.
+var _hidden: Dictionary[StringName, Dictionary] = {}
 var _shade_buffers: Array[PackedFloat32Array] = []
 var _shade_radii := PackedFloat32Array()
 
@@ -93,8 +98,6 @@ func apply(
 	library: VegetationLibrary = null,
 	edible_kinds: Array[StringName] = []
 ) -> void:
-	if data.coord != coord:
-		_depleted.clear()  # a different chunk: its own (fresh) state
 	coord = data.coord
 	lod = data.lod
 	_border = data.border
@@ -185,9 +188,16 @@ func is_shaded(local_position: Vector3) -> bool:
 	return false
 
 
-## Whether instance [param index] of food [param id] is eaten and not yet regrown.
+## Whether instance [param index] of food [param id] is drawn hidden (eaten) right now.
+func is_hidden(id: StringName, index: int) -> bool:
+	return _hidden.has(id) and (_hidden[id] as Dictionary).has(index)
+
+
+## Whether instance [param index] of food [param id] is eaten and not yet regrown. It counts as
+## depleted until [method regrow] shows it again, so it is never edible while invisible.
 func is_depleted(id: StringName, index: int) -> bool:
-	return _depleted.has(id) and (_depleted[id] as Dictionary).has(index)
+	var ids: Dictionary = delta_store.entries_for(coord).get(id, {})
+	return ids.has(index)
 
 
 ## The [param i]-th active food target (0 … [method food_count] − 1), or null.
@@ -222,25 +232,16 @@ func consume_target(key: int) -> void:
 		return
 	var id := _food_slots[slot]
 	var index := key & ((1 << FOOD_INDEX_BITS) - 1)
-	if not _depleted.has(id):
-		_depleted[id] = {}
-	(_depleted[id] as Dictionary)[index] = GameState.game_minutes + definition.regrowth_minutes
+	delta_store.deplete(coord, id, index, GameState.game_minutes + definition.regrowth_minutes)
 	_show_instance(id, index, false)
 	set_process(true)
 
 
 ## Brings back every depleted food whose regrowth time has passed.
 func regrow() -> void:
-	var now := GameState.game_minutes
-	for id: StringName in _depleted.keys():
-		var entries: Dictionary = _depleted[id]
-		for index: int in entries.keys():
-			if now >= float(entries[index]):
-				entries.erase(index)
-				_show_instance(id, index, true)
-		if entries.is_empty():
-			_depleted.erase(id)
-	if _depleted.is_empty():
+	for entry: Array in delta_store.take_regrown(coord, GameState.game_minutes):
+		_show_instance(entry[0], entry[1], true)
+	if delta_store.entries_for(coord).is_empty():
 		set_process(false)
 
 
@@ -339,6 +340,7 @@ func _apply_food(
 	_food_slots.clear()
 	_food_definitions.clear()
 	_buffers.clear()
+	_hidden.clear()  # fresh buffers draw every instance
 	# Shapes are shape owners of one area (no nodes). Moving them inside the physics space
 	# costs ~45 µs each; out of the tree they are registered once when the area comes back.
 	remove_child(_food_area)
@@ -372,10 +374,13 @@ func _apply_food(
 				used += 1
 	_disable_food(used)
 	add_child(_food_area)
-	for id: StringName in _depleted:
-		for index: int in _depleted[id] as Dictionary:
+	# Regrown while unloaded: drop those entries; the rest stay hidden.
+	delta_store.take_regrown(coord, GameState.game_minutes)
+	var depleted := delta_store.entries_for(coord)
+	for id: StringName in depleted:
+		for index: int in depleted[id] as Dictionary:
 			_show_instance(id, index, false)
-	set_process(not _depleted.is_empty())
+	set_process(not depleted.is_empty())
 
 
 func _food_owner(index: int) -> int:
@@ -410,6 +415,13 @@ func _show_instance(id: StringName, index: int, show: bool) -> void:
 	if not show:
 		basis = Basis.from_scale(Vector3.ZERO)
 	node.multimesh.set_instance_transform(index, Transform3D(basis, origin))
+	if show:
+		if _hidden.has(id):
+			(_hidden[id] as Dictionary).erase(index)
+	else:
+		if not _hidden.has(id):
+			_hidden[id] = {}
+		(_hidden[id] as Dictionary)[index] = true
 	var slot := _food_slots.find(id)
 	var key := (slot << FOOD_INDEX_BITS) | index
 	for i in _food_used:

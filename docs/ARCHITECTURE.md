@@ -391,9 +391,14 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
       (`WorldStreamer.edible_kinds()`) a sphere in its `FoodArea` (shape owners, no nodes —
       see `docs/notes/terrain-streaming-perf.md`); the chunk is the provider. Eating hides the
       instance (zero scale) and disables its sphere until `GameState.game_minutes` passes its
-      regrowth time (checked once a second only while something is depleted). The state is
-      kept while the same chunk is re-applied (LOD refresh); per-chunk deltas that survive
-      unloading come with item 6.
+      regrowth time (checked once a second only while something is depleted).
+    - **Per-chunk deltas:** depletion lives in one `ChunkDeltaStore` owned by the
+      `WorldStreamer` (`deltas()`) and shared by every chunk: absolute chunk coord → resource
+      id → instance index → regrow minute. Only changes are stored. A chunk that loads again
+      re-hides what is still depleted and drops what regrew meanwhile; LOD changes keep the
+      state; an instance counts as depleted until `regrow()` shows it, so it is never edible
+      while invisible. `to_dict()` / `from_dict()` (versioned, JSON-friendly rows) are ready for
+      saves (Phase 10, §9).
   - **Water:** `WaterAccess` (on the Animal) is a virtual provider (no shapes) registered with
     the `Interactor` (`add_virtual_provider()`), asked on every probe. DRINK (`drink.tres`,
     HOLD +12.5 thirst/s, empty → full in 8 s) when the ground 0.8 m ahead of the nose lies
