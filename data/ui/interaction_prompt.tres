@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="InteractionPromptSettings" format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/interaction_prompt_settings.gd" id="1_psett"]
+
+[resource]
+script = ExtResource("1_psett")
+fade_per_second = 5.0
+separator = "  ·  "

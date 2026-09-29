@@ -33,6 +33,7 @@ const STATE_MAP: Dictionary = {
 	&"Jump": &"jump",
 	&"Fall": &"fall",
 	&"Swim": &"swim",
+	&"Interact": &"",  # the Interact state plays its own action
 }
 ## Below this horizontal speed no footsteps are emitted (standing, turning on the spot).
 const FOOTSTEP_MIN_SPEED: float = 0.3
@@ -228,7 +229,9 @@ func _connect(machine: AnimationNodeStateMachine, a: StringName, b: StringName) 
 
 
 func _on_state_changed(_from: StringName, to: StringName) -> void:
-	_travel(STATE_MAP.get(to, &"locomotion"))
+	var state: StringName = STATE_MAP.get(to, &"locomotion")
+	if state != &"":
+		_travel(state)
 
 
 func _travel(state: StringName) -> void:

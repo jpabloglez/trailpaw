@@ -21,6 +21,11 @@ signal debug_overlay_toggled(overlay_visible: bool)
 @warning_ignore("unused_signal")
 signal biome_entered(biome_id: StringName, display_name: String)
 
+## The player completed an interaction ([param interaction_type] is an
+## [enum InteractionDefinition.Type]; [param definition_id] its data id).
+@warning_ignore("unused_signal")
+signal interaction_performed(interaction_type: int, definition_id: StringName)
+
 ## A need of the player reached its critical threshold (soft consequences start, ADR-003).
 @warning_ignore("unused_signal")
 signal need_critical(need_id: StringName)

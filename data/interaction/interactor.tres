@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="InteractorSettings" format=3]
+
+[ext_resource type="Script" path="res://scripts/interaction/interactor_settings.gd" id="1_isett"]
+
+[resource]
+script = ExtResource("1_isett")
+reach_distance = 0.9
+reach_radius = 0.7
+probe_height = 0.3
+max_distance = 1.8
+max_angle_degrees = 80.0
+distance_weight = 0.6

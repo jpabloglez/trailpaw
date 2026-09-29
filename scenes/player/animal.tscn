@@ -25,6 +25,10 @@
 [ext_resource type="Resource" path="res://data/needs/need_modifiers.tres" id="29_mods"]
 [ext_resource type="Resource" path="res://data/biomes/biome_table.tres" id="30_biomes"]
 
+[ext_resource type="Script" path="res://scripts/interaction/interactor.gd" id="32_inter"]
+[ext_resource type="Resource" path="res://data/interaction/interactor.tres" id="33_isett"]
+[ext_resource type="Script" path="res://scripts/player/states/interact_state.gd" id="34_istate"]
+
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ald35"]
 radius = 0.35
 height = 1.3
@@ -68,10 +72,11 @@ unique_name_in_owner = true
 script = ExtResource("2_3cfp3")
 species = ExtResource("20_fox")
 
-[node name="PlayerInput" type="Node" parent="." unique_id=254887723 node_paths=PackedStringArray("movement")]
+[node name="PlayerInput" type="Node" parent="." unique_id=254887723 node_paths=PackedStringArray("movement", "interactor")]
 unique_name_in_owner = true
 script = ExtResource("4_bwuqq")
 movement = NodePath("../MovementComponent")
+interactor = NodePath("../Interactor")
 
 [node name="StateMachine" type="Node" parent="." unique_id=449749050 node_paths=PackedStringArray("initial_state")]
 unique_name_in_owner = true
@@ -98,6 +103,13 @@ movement = NodePath("../../MovementComponent")
 script = ExtResource("23_swim")
 movement = NodePath("../../MovementComponent")
 
+[node name="Interact" type="Node" parent="StateMachine" node_paths=PackedStringArray("movement", "interactor", "needs", "animation")]
+script = ExtResource("34_istate")
+movement = NodePath("../../MovementComponent")
+interactor = NodePath("../../Interactor")
+needs = NodePath("../../NeedsComponent")
+animation = NodePath("../../AnimationController")
+
 [node name="Model" type="Node3D" parent="."]
 unique_name_in_owner = true
 
@@ -123,3 +135,11 @@ needs = Array[ExtResource("31_needdef")]([ExtResource("25_hunger"), ExtResource(
 modifiers = ExtResource("29_mods")
 movement = NodePath("../MovementComponent")
 biomes = ExtResource("30_biomes")
+
+[node name="Interactor" type="Node3D" parent="." node_paths=PackedStringArray("body", "movement", "state_machine")]
+unique_name_in_owner = true
+script = ExtResource("32_inter")
+settings = ExtResource("33_isett")
+body = NodePath("..")
+movement = NodePath("../MovementComponent")
+state_machine = NodePath("../StateMachine")
