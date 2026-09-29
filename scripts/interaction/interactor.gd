@@ -39,6 +39,7 @@ const INTERACT_STATE: StringName = &"Interact"
 var interact_held: bool = false
 
 var _cast: ShapeCast3D
+var _virtual_providers: Array[Node] = []
 var _target: InteractionTarget
 var _active: InteractionTarget
 var _since_probe: float = 0.0
@@ -109,7 +110,29 @@ func probe() -> void:
 		if score > best_score:
 			best = target
 			best_score = score
+	for provider in _virtual_providers:
+		var target: InteractionTarget = provider.call(&"virtual_target")
+		if target == null or not accepts(target):
+			continue
+		var score := InteractionScoring.score(
+			origin,
+			forward,
+			target.position,
+			settings.max_distance,
+			settings.max_angle_degrees,
+			settings.distance_weight
+		)
+		if score > best_score:
+			best = target
+			best_score = score
 	_set_target(best)
+
+
+## Registers a provider without shapes (e.g. [WaterAccess]): a node with
+## [code]virtual_target() -> InteractionTarget[/code], asked on every probe.
+func add_virtual_provider(provider: Node) -> void:
+	if not _virtual_providers.has(provider):
+		_virtual_providers.append(provider)
 
 
 ## Whether this animal can use [param target]: available and, for food, in its diet.
