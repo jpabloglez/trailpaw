@@ -41,7 +41,7 @@ Autoloads: EventBus · GameState · Settings · SaveSystem · FloatingOrigin
 | Autoload | Responsibility |
 |---|---|
 | `EventBus` | Global signals only (`need_critical`, `biome_entered`, `interaction_performed`, ...). No state. |
-| `GameState` | World seed, distance travelled, current biome, elapsed time, pause state. |
+| `GameState` | World seed, floating-origin chunk, current biome, water level, game clock (`game_minutes`, `clock_scale`, `time_of_day()`; pace in `data/world/clock.tres`: 1 real s = 1 game min, starts 08:00, ×10 while resting). |
 | `Settings` | Graphics presets, input remaps, audio volumes; persisted in `user://settings.cfg` via `ConfigFile`. |
 | `SaveSystem` | Serialises/deserialises a `SaveData` resource to `user://saves/`. Versioned schema. |
 | `FloatingOrigin` | Re-centres the world when the player exceeds a threshold distance from the origin. |
@@ -200,7 +200,7 @@ Y is never shifted. This avoids needing a custom double-precision engine build (
 
 ### 4.1 Species as data
 `AnimalSpecies` (Resource): mesh scene, animation library, walk/trot/run speeds,
-acceleration, turn rate, jump height, swim ability, need modifiers, sounds.
+acceleration, turn rate, jump height, swim ability, diet (Phase 7), need modifiers, sounds.
 Swapping species = swapping a `.tres`; no code changes.
 First species: **Husky** (`data/species/husky.tres`), Quaternius' Ultimate Animated Animal
 Pack (CC0) in `assets/animals/husky/husky.glb`: 49-bone skeleton, 12 clips (Idle, Idle_2,
@@ -375,6 +375,24 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
     target going away cancels without effects.
   - `InteractionPrompt` (`scenes/ui/`): "E · Eat berries" at the bottom centre, fading in and
     out with the target and hidden while interacting. F3 shows the current target.
+  - **Food:** `berries` (+20 hunger), `apple` (+15 hunger, +5 thirst), `mushroom` (+12),
+    `grass` (+10) in `data/interactions/`, 2 s to eat, regrowing after 3 / 5 / 4 / 2 game
+    hours. `AnimalSpecies.diet` lists the kinds a species eats (fox and husky: berries,
+    fruit, mushroom — no grass; the `Interactor` ignores the rest).
+    - Sources are vegetation: `VegetationType.food` (tan mushrooms, large grass) and
+      **drops** (`VegetationDrop`), props derived per parent instance on the worker: 4–6
+      berry clusters on each **berry bush** (a round bush built in code, `ProceduralMeshes`,
+      because the Nature Kit bushes are spiky plants) and 0–3 **apples** on the ground under
+      each oak. Drops are seeded per (seed, chunk, type, parent index), LOD 0 only, never under
+      water; their meshes (low-poly sphere clusters, plain material) are built by
+      `VegetationLibrary`.
+    - Each LOD 0 chunk gives every edible instance in the player's diet
+      (`WorldStreamer.edible_kinds()`) a sphere in its `FoodArea` (shape owners, no nodes —
+      see `docs/notes/terrain-streaming-perf.md`); the chunk is the provider. Eating hides the
+      instance (zero scale) and disables its sphere until `GameState.game_minutes` passes its
+      regrowth time (checked once a second only while something is depleted). The state is
+      kept while the same chunk is re-applied (LOD refresh); per-chunk deltas that survive
+      unloading come with item 6.
 
 ## 7. Fauna AI
 

@@ -90,6 +90,8 @@ func test_nothing_grows_on_slopes_steeper_than_its_limit() -> void:
 	for coord: Vector2i in [HILLS, HILLS + Vector2i(1, 1), FOREST]:
 		var data := _gen(coord)
 		for id: StringName in data.vegetation:
+			if not _scatterer.type_ids().has(id):
+				continue  # drops (berries, apples) follow their parent plant, see test_food
 			var limit := _max_slope(id) + 0.01
 			var buffer: PackedFloat32Array = data.vegetation[id]
 			for i in data.vegetation_count(id):

@@ -6,6 +6,7 @@
 [resource]
 script = ExtResource("2_ec85q")
 display_name = "Fox"
+diet = Array[StringName]([&"berries", &"fruit", &"mushroom"])
 model_scene = ExtResource("1_atbhr")
 model_scale = 0.28
 model_yaw_degrees = 180.0

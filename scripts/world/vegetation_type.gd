@@ -8,8 +8,13 @@ extends Resource
 
 ## Stable identifier (one MultiMesh per type per chunk).
 @export var id: StringName = &""
-## Model (a single-mesh [code].glb[/code]).
+## Model (a single-mesh [code].glb[/code]); empty for a [member procedural_shape].
 @export var scene: PackedScene
+## Mesh built in code instead of a model ([constant ProceduralMeshes.SHAPES]), e.g. the round
+## berry bush the CC0 packs lack.
+@export var procedural_shape: StringName = &""
+## Colour of a [member procedural_shape] mesh.
+@export var procedural_color: Color = Color.WHITE
 ## Instance scale range (uniform).
 @export_range(0.05, 20.0, 0.05) var scale_min: float = 0.0
 ## Instance scale range (uniform).
@@ -26,6 +31,11 @@ extends Resource
 @export_range(0.0, 5.0, 0.01) var collision_radius: float = 0.0
 ## Collision cylinder height in model units.
 @export_range(0.0, 10.0, 0.01) var collision_height: float = 0.0
+## What eating an instance does (null = not edible). Edible instances in full-detail chunks
+## become interaction targets.
+@export var food: InteractionDefinition
+## Props derived from each instance (berries on a bush, apples under an oak).
+@export var drop: VegetationDrop
 
 
 ## Returns human-readable problems with the data; empty when valid.
@@ -33,14 +43,21 @@ func get_validation_errors() -> PackedStringArray:
 	var errors := PackedStringArray()
 	if id == &"":
 		errors.append("id must not be empty")
-	if scene == null:
-		errors.append("scene must be set")
+	if scene == null and procedural_shape == &"":
+		errors.append("scene or procedural_shape must be set")
+	if procedural_shape != &"" and not ProceduralMeshes.SHAPES.has(procedural_shape):
+		errors.append("procedural_shape must be one of %s" % [ProceduralMeshes.SHAPES])
 	if scale_min <= 0.0 or scale_min > scale_max:
 		errors.append("scales must satisfy 0 < scale_min <= scale_max")
 	if visibility_range <= 0.0:
 		errors.append("visibility_range must be > 0")
 	if collision_radius > 0.0 and collision_height <= 0.0:
 		errors.append("collision_height must be > 0 when collision_radius is set")
+	if food != null and not food.is_valid():
+		errors.append("food: %s" % ", ".join(food.get_validation_errors()))
+	if drop != null:
+		for problem in drop.get_validation_errors():
+			errors.append("drop: %s" % problem)
 	return errors
 
 

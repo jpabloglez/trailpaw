@@ -14,6 +14,8 @@
 [ext_resource type="Resource" path="res://data/vegetation/stump_round.tres" id="12_2dhnt"]
 [ext_resource type="Resource" path="res://data/vegetation/mushroom_redGroup.tres" id="13_0avys"]
 [ext_resource type="Resource" path="res://data/vegetation/rock_smallA.tres" id="14_1macx"]
+[ext_resource type="Resource" path="res://data/vegetation/berry_bush.tres" id="50_berry_bush"]
+[ext_resource type="Resource" path="res://data/vegetation/mushroom_tan.tres" id="50_mushroom_tan"]
 
 [sub_resource type="Resource" id="Resource_rgie2"]
 script = ExtResource("2_w3brh")
@@ -123,6 +125,24 @@ min_height = 0.3
 max_height = 80.0
 cluster = 0.3
 
+[sub_resource type="Resource" id="Resource_berry_bush"]
+script = ExtResource("2_w3brh")
+type = ExtResource("50_berry_bush")
+density = 0.35
+max_slope_degrees = 30.0
+min_height = 0.3
+max_height = 60.0
+cluster = 0.6
+
+[sub_resource type="Resource" id="Resource_mushroom_tan"]
+script = ExtResource("2_w3brh")
+type = ExtResource("50_mushroom_tan")
+density = 0.3
+max_slope_degrees = 30.0
+min_height = 0.3
+max_height = 60.0
+cluster = 0.6
+
 [resource]
 script = ExtResource("1_s8i2t")
 id = &"forest"
@@ -133,6 +153,6 @@ height_offset = 2.0
 continental_scale = 0.9
 detail_scale = 1.6
 ridged_scale = 0.5
-vegetation = Array[ExtResource("2_w3brh")]([SubResource("Resource_rgie2"), SubResource("Resource_qej8q"), SubResource("Resource_005t4"), SubResource("Resource_eedph"), SubResource("Resource_fuf42"), SubResource("Resource_23ltr"), SubResource("Resource_nbifi"), SubResource("Resource_67o0g"), SubResource("Resource_1knfq"), SubResource("Resource_7mx0i"), SubResource("Resource_y2act"), SubResource("Resource_3t70u")])
+vegetation = Array[ExtResource("2_w3brh")]([SubResource("Resource_rgie2"), SubResource("Resource_qej8q"), SubResource("Resource_005t4"), SubResource("Resource_eedph"), SubResource("Resource_fuf42"), SubResource("Resource_23ltr"), SubResource("Resource_nbifi"), SubResource("Resource_67o0g"), SubResource("Resource_1knfq"), SubResource("Resource_7mx0i"), SubResource("Resource_y2act"), SubResource("Resource_3t70u"), SubResource("Resource_berry_bush"), SubResource("Resource_mushroom_tan")])
 ground_color_a = Color(0.27, 0.44, 0.22, 1)
 ground_color_b = Color(0.4, 0.36, 0.23, 1)

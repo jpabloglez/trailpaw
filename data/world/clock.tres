@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="ClockSettings" format=3]
+
+[ext_resource type="Script" path="res://scripts/world/clock_settings.gd" id="1_clock"]
+
+[resource]
+script = ExtResource("1_clock")
+minutes_per_second = 1.0
+start_minutes = 480.0
+rest_scale = 10.0

@@ -13,6 +13,10 @@ extends RefCounted
 ## Output: [member ChunkData.vegetation] maps type id → [PackedFloat32Array] in
 ## [member MultiMesh.buffer] layout (12 floats per instance, local to the chunk corner).
 ## [br][br]
+## Drops ([VegetationDrop]: berries on bushes, apples under oaks) are derived from each parent
+## instance with a seed per (world seed, chunk, type, parent index), in LOD 0 chunks only, and
+## stored under the drop's id. Drops on the ground outside the chunk or under water are skipped.
+## [br][br]
 ## Budget (worker thread): O(candidates) with one biome lookup per candidate in chunks that
 ## straddle a band boundary (constant otherwise).
 
@@ -20,6 +24,10 @@ extends RefCounted
 const FLOATS_PER_INSTANCE: int = 12
 ## Seed salt for the clumping noise.
 const CLUSTER_SALT: int = 0xC1A5
+## Seed salt for derived drops.
+const DROP_SALT: int = 0xD70B
+## Drops on the ground stay this far above the water surface (m).
+const DROP_DRY_MARGIN: float = 0.05
 
 var _type_ids: Array[StringName] = []
 var _scale_min := PackedFloat32Array()
@@ -34,6 +42,10 @@ var _min_height: Array[PackedFloat32Array] = []
 var _max_height: Array[PackedFloat32Array] = []
 var _cluster: Array[PackedFloat32Array] = []
 var _biome_index: Dictionary = {}
+## Per type: drop id (&"" = none) and its parameters
+## [count_min, count_max, placement, radius_min, radius_max, height_min, height_max, size].
+var _drop_ids: Array[StringName] = []
+var _drop_params: Array[PackedFloat32Array] = []
 var _cluster_frequency: float = 0.035
 
 
@@ -49,6 +61,7 @@ func _init(table: BiomeTable) -> void:
 				_align.append(entry.type.align_to_ground)
 				_near_only.append(entry.type.near_only)
 				_max_density.append(0.0)
+				_snapshot_drop(entry.type.drop)
 	var n := _type_ids.size()
 	for b in table.biomes.size():
 		var biome := table.biomes[b]
@@ -134,6 +147,80 @@ func scatter(
 				_append_transform(out, Vector3(lx, surface[0], lz), normal, _align[t], yaw, s)
 		if not out.is_empty():
 			data.vegetation[_type_ids[t]] = out
+			if data.lod == 0 and _drop_ids[t] != &"":
+				_derive_drops(data, t, out, world_seed, water_level)
+
+
+## Drop id of type [param type_id] (&"" when it has none).
+func drop_of(type_id: StringName) -> StringName:
+	var t := _type_ids.find(type_id)
+	return _drop_ids[t] if t >= 0 else &""
+
+
+func _snapshot_drop(drop: VegetationDrop) -> void:
+	if drop == null:
+		_drop_ids.append(&"")
+		_drop_params.append(PackedFloat32Array())
+		return
+	_drop_ids.append(drop.id)
+	(
+		_drop_params
+		. append(
+			PackedFloat32Array(
+				[
+					drop.count_min,
+					drop.count_max,
+					drop.placement,
+					drop.radius_min,
+					drop.radius_max,
+					drop.height_min,
+					drop.height_max,
+					drop.size,
+				]
+			)
+		)
+	)
+
+
+## Places the drops of every parent instance of type [param t] (in [param parents]).
+func _derive_drops(
+	data: ChunkData, t: int, parents: PackedFloat32Array, world_seed: int, water_level: float
+) -> void:
+	var p := _drop_params[t]
+	var on_ground := int(p[2]) == VegetationDrop.Placement.GROUND
+	var size := data.step * float(data.resolution - 1)
+	var base_seed := HeightSampler.layer_seed(
+		_chunk_type_seed(world_seed, data.coord, t), DROP_SALT
+	)
+	var rng := RandomNumberGenerator.new()
+	var out := PackedFloat32Array()
+	var stride := FLOATS_PER_INSTANCE
+	for parent in parents.size() / stride:
+		var o := parent * stride
+		rng.seed = HeightSampler.layer_seed(base_seed, parent + 1)
+		var count := rng.randi_range(int(p[0]), int(p[1]))
+		for d in count:
+			var angle := rng.randf() * TAU
+			var radius := lerpf(p[3], p[4], rng.randf())
+			var height := 0.0 if on_ground else lerpf(p[5], p[6], rng.randf())
+			var yaw := rng.randf() * TAU
+			# Offset in model units, through the parent's basis (rows of the buffer).
+			var v := Vector3(cos(angle) * radius, height, sin(angle) * radius)
+			var offset := Vector3(
+				parents[o] * v.x + parents[o + 1] * v.y + parents[o + 2] * v.z,
+				parents[o + 4] * v.x + parents[o + 5] * v.y + parents[o + 6] * v.z,
+				parents[o + 8] * v.x + parents[o + 9] * v.y + parents[o + 10] * v.z
+			)
+			var pos := Vector3(parents[o + 3], parents[o + 7], parents[o + 11]) + offset
+			if on_ground:
+				if pos.x < 0.0 or pos.z < 0.0 or pos.x > size or pos.z > size:
+					continue
+				pos.y = surface_at(data, pos.x, pos.z)[0]
+			if pos.y < water_level + DROP_DRY_MARGIN:
+				continue
+			_append_transform(out, pos, Vector3.UP, 0.0, yaw, p[7])
+	if not out.is_empty():
+		data.vegetation[_drop_ids[t]] = out
 
 
 ## Density (per 100 m²) of type [param t] accepted at a point: the blend of the two biomes'

@@ -9,6 +9,8 @@
 [ext_resource type="Resource" path="res://data/vegetation/tree_default.tres" id="7_tv1bm"]
 [ext_resource type="Resource" path="res://data/vegetation/flower_purpleA.tres" id="8_hvirr"]
 [ext_resource type="Resource" path="res://data/vegetation/rock_smallFlatA.tres" id="9_brrgx"]
+[ext_resource type="Resource" path="res://data/vegetation/berry_bush.tres" id="50_berry_bush"]
+[ext_resource type="Resource" path="res://data/vegetation/mushroom_tan.tres" id="50_mushroom_tan"]
 
 [sub_resource type="Resource" id="Resource_0mnhg"]
 script = ExtResource("2_rewjl")
@@ -71,6 +73,24 @@ max_slope_degrees = 35.0
 max_height = 40.0
 cluster = 0.4
 
+[sub_resource type="Resource" id="Resource_berry_bush"]
+script = ExtResource("2_rewjl")
+type = ExtResource("50_berry_bush")
+density = 0.3
+max_slope_degrees = 30.0
+min_height = 0.3
+max_height = 60.0
+cluster = 0.6
+
+[sub_resource type="Resource" id="Resource_mushroom_tan"]
+script = ExtResource("2_rewjl")
+type = ExtResource("50_mushroom_tan")
+density = 0.1
+max_slope_degrees = 30.0
+min_height = 0.3
+max_height = 60.0
+cluster = 0.6
+
 [resource]
 script = ExtResource("1_uryr0")
 id = &"river_valley"
@@ -81,6 +101,6 @@ height_offset = -4.0
 continental_scale = 0.6
 detail_scale = 2.5
 ridged_scale = 0.3
-vegetation = Array[ExtResource("2_rewjl")]([SubResource("Resource_0mnhg"), SubResource("Resource_amnyk"), SubResource("Resource_s0byp"), SubResource("Resource_qexg7"), SubResource("Resource_n1hqp"), SubResource("Resource_fg57t"), SubResource("Resource_qh2nm")])
+vegetation = Array[ExtResource("2_rewjl")]([SubResource("Resource_0mnhg"), SubResource("Resource_amnyk"), SubResource("Resource_s0byp"), SubResource("Resource_qexg7"), SubResource("Resource_n1hqp"), SubResource("Resource_fg57t"), SubResource("Resource_qh2nm"), SubResource("Resource_berry_bush"), SubResource("Resource_mushroom_tan")])
 ground_color_a = Color(0.4, 0.6, 0.37, 1)
 ground_color_b = Color(0.64, 0.58, 0.42, 1)

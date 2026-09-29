@@ -98,6 +98,15 @@ func test_ignores_targets_behind_and_unavailable() -> void:
 	assert_object(_interactor(animal).current_target()).is_null()
 
 
+func test_food_outside_the_diet_is_ignored() -> void:
+	var animal := _animal_on_floor()
+	var grass := _definition(ONCE, {&"hunger": 10.0}, "Graze")
+	grass.food_kind = &"grass"
+	_interactable(grass, Vector3(0, 0.3, -1.0))
+	await _frames(20)
+	assert_object(_interactor(animal).current_target()).is_null()  # the fox does not graze
+
+
 func test_target_changes_are_signalled() -> void:
 	var animal := _animal_on_floor()
 	var changes: Array = []

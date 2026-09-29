@@ -1,11 +1,16 @@
-## Session-wide game state: world seed, distance travelled, current biome, elapsed time
-## and pause state.
+## Session-wide game state: world seed, floating-origin offset, current biome, water level
+## and the game clock (Phase 7).
 ##
 ## Fields are added by the phase that needs them (see [code]docs/ARCHITECTURE.md[/code] §2).
 ## [br][br]
 ## Autoload name: [code]GameState[/code]. No [code]class_name[/code]: it would hide the
 ## autoload singleton.
 extends Node
+
+## Minutes in a game day.
+const DAY_MINUTES: float = 1440.0
+## Pace of the game clock.
+const CLOCK: ClockSettings = preload("res://data/world/clock.tres")
 
 ## Seed for all procedural world generation. Set before the world starts streaming.
 var world_seed: int = 0
@@ -21,6 +26,24 @@ var chunk_size: float = 0.0
 var water_level: float = -INF
 ## Biome the player is currently in (as last announced by the biome tracker).
 var current_biome: StringName = &""
+## Game clock: game minutes since midnight of the first day (advances in [method _process]).
+var game_minutes: float = CLOCK.start_minutes
+## Clock multiplier (1 = normal pace; resting speeds it up).
+var clock_scale: float = 1.0
+
+
+func _process(delta: float) -> void:
+	advance_clock(delta)
+
+
+## Advances the game clock by [param real_seconds] at the current pace.
+func advance_clock(real_seconds: float) -> void:
+	game_minutes += real_seconds * CLOCK.minutes_per_second * clock_scale
+
+
+## Minutes after midnight (0…1440) of the current game day.
+func time_of_day() -> float:
+	return fposmod(game_minutes, DAY_MINUTES)
 
 
 ## World-space offset of the local origin (m).

@@ -81,3 +81,20 @@ The user ran the terrain sandbox and the GPU probe on **native Windows with Forw
 reported everything correct: no streaming spikes, the forest runs smoothly on Medium. As in
 Phase 2, the WSL2 mesh-upload stalls do not occur natively; plan B stays documented above.
 (Exact native numbers were not recorded.)
+
+## Phase 7 — food targets
+
+Food sources (berry clusters, apples, tan mushrooms) add one interaction sphere each to a
+chunk's `FoodArea` in LOD 0 (~40–70 per chunk for the fox's diet). First implementation used
+one `CollisionShape3D` node per target: re-applying a forest chunk cost **+3.2 ms** (moving
+shapes inside the physics space ≈ 45 µs each), and the 10 km probe failed (one 5.0 ms build
+frame). Fix: the targets are **shape owners of one Area3D** (no nodes) and the area is taken
+out of the tree while they are rebuilt, so the physics server registers them once.
+
+| Headless 10 km probe (seed 12345) | Before Phase 7 | Nodes | Shape owners |
+|---|---|---|---|
+| Worst build frame | 1.47 ms | 5.04 ms (FAIL) | 3.86 ms (PASS) |
+| Most expensive chunk | 1.44 ms | 3.25 ms | 1.98 ms |
+
+Grass (not in the fox's diet) gets no targets: `WorldStreamer.edible_kinds()` filters by the
+player species' diet.

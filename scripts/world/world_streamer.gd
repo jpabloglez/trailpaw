@@ -63,6 +63,7 @@ var _max_build_ms: float = 0.0
 var _max_chunk_ms: float = 0.0
 var _last_frame_built: int = 0
 var _total_built: int = 0
+var _no_filter: Array[StringName] = []
 
 
 func _ready() -> void:
@@ -155,6 +156,15 @@ func stats() -> Dictionary:
 		"last_frame_built": _last_frame_built,
 		"total_built": _total_built,
 	}
+
+
+## Food kinds that get interaction targets: the diet of the [member target]'s species when
+## it has one (an [Animal]), otherwise every kind (empty).
+func edible_kinds() -> Array[StringName]:
+	var animal := target as Animal
+	if animal != null and animal.movement != null and animal.movement.species != null:
+		return animal.movement.species.diet
+	return _no_filter
 
 
 ## Lines for the F3 debug overlay.
@@ -254,7 +264,7 @@ func _build_ready() -> void:
 		if chunk == null:
 			chunk = _acquire()
 		chunk.position = chunk_origin(job.coord)
-		chunk.apply(job.data, material, _library)
+		chunk.apply(job.data, material, _library, edible_kinds())
 		chunk.generation = _generation
 		_max_chunk_ms = maxf(_max_chunk_ms, float(Time.get_ticks_usec() - chunk_start) / 1000.0)
 		_loaded[job.coord] = chunk

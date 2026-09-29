@@ -30,6 +30,8 @@ func _original_material(id: StringName, surface: int) -> BaseMaterial3D:
 func test_every_surface_uses_the_foliage_shader() -> void:
 	var library := VegetationLibrary.new(_settings.biomes)
 	for id: StringName in library.ids():
+		if library.drop_ids().has(id):
+			continue  # drops are rigid fruit with a plain material
 		var mesh := library.mesh_for(id)
 		for s in mesh.get_surface_count():
 			var mat := mesh.surface_get_material(s) as ShaderMaterial
