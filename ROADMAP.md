@@ -144,7 +144,7 @@ exactly the expected set for a given position; rebase preserves absolute positio
 - [x] DRINK and COOL_OFF: water edges and shallow water.
 - [x] REST: shaded spots and dens (restores energy, advances time).
 - [x] `sniff` action: highlights nearby resources briefly.
-- [ ] Per-chunk delta storage for depleted resources.
+- [x] Per-chunk delta storage for depleted resources.
 
 **Tests:** interactor picks correct target; effects applied once; regrowth timing; deltas persist across chunk reload.
 **Exit (M2):** a full loop — explore, get thirsty, find water, drink, eat, rest — feels good.

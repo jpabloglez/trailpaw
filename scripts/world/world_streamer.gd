@@ -66,6 +66,7 @@ var _max_chunk_ms: float = 0.0
 var _last_frame_built: int = 0
 var _total_built: int = 0
 var _no_filter: Array[StringName] = []
+var _deltas := ChunkDeltaStore.new()
 
 
 func _ready() -> void:
@@ -159,6 +160,12 @@ func stats() -> Dictionary:
 		"last_frame_built": _last_frame_built,
 		"total_built": _total_built,
 	}
+
+
+## What the player changed in the world (depleted resources), shared by every chunk; saved in
+## Phase 10.
+func deltas() -> ChunkDeltaStore:
+	return _deltas
 
 
 ## Whether the local (scene) [param local_position] lies in a tree's shade (false where no chunk
@@ -327,6 +334,7 @@ func _acquire() -> TerrainChunk:
 	if not _pool.is_empty():
 		return _pool.pop_back()
 	var chunk := chunk_scene.instantiate() as TerrainChunk
+	chunk.delta_store = _deltas
 	add_child(chunk)
 	return chunk
 
