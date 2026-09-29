@@ -266,6 +266,11 @@ auto-recentre behind the animal while moving. Sensitivity and invert-Y in Settin
   idle/walk/trot/run by speed → TimeScale for anti-slide), `jump`, `fall`, `swim` and one-shot
   `eat`/`drink`/`lie_down`/`sniff` that return to locomotion at their end. It follows
   `StateMachine.state_changed`; loops are set on copies of the clips in its own library.
+- Footsteps: at start-up `ClipAnalysis.contact_times()` finds when each paw touches down in the
+  walk and run clips (cached per species model; e.g. the Fox walk is a lateral sequence
+  back-right → front-right → back-left → front-left). `AnimationController` runs a clock per
+  clip with the tree's delta × scale and emits `footstep(paw)` when the audible clip crosses a
+  contact — only in locomotion, on the ground, not swimming, above 0.3 m/s (audio: Phase 9).
 `AnimationTree` with a state machine; locomotion via `BlendSpace1D` (speed) and additive
 head-look. Procedural foot placement using Godot's `SkeletonModifier3D`-based IK is a
 Phase 11 polish item.

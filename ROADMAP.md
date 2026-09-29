@@ -117,7 +117,7 @@ exactly the expected set for a given position; rebase preserves absolute positio
 - [x] `AnimationController`: `AnimationTree` state machine + `BlendSpace1D` locomotion.
 - [x] Ground alignment with front/rear raycasts, smoothed pitch/roll.
 - [x] Swim state when in water (float at surface, slower speed).
-- [ ] Footstep events from animation for later audio.
+- [x] Footstep events from animation for later audio.
 
 **Tests:** alignment angles clamped; swim state enters/exits at water line.
 **Manual check:** no foot sliding at normal speeds; transitions look natural.
