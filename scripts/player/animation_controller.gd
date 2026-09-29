@@ -10,7 +10,13 @@ extends Node
 ## [member AnimalSpecies.max_animation_time_scale]. Loops are set on copies of the clips (the
 ## imported resources are never modified).
 ## [br][br]
-## Budget: two parameter writes per frame; the tree is built once.
+## Also emits [signal footstep] from paw contacts detected in the clips ([ClipAnalysis]).
+## [br][br]
+## Budget: two parameter writes and a few float ops per frame; the tree is built and the clips
+## analysed once (contacts cached per species model).
+
+## A paw touched the ground during locomotion (for footstep audio and effects, Phase 9).
+signal footstep(paw: StringName)
 
 ## Library name holding the looped copies of the model's clips.
 const LIBRARY: StringName = &"trailpaw"
@@ -24,8 +30,13 @@ const STATE_MAP: Dictionary = {
 	&"Fall": &"fall",
 	&"Swim": &"swim",
 }
+## Below this horizontal speed no footsteps are emitted (standing, turning on the spot).
+const FOOTSTEP_MIN_SPEED: float = 0.3
 ## One-shot actions (triggered by gameplay in Phase 7); they return to locomotion when done.
 const ACTIONS: Array[StringName] = [&"eat", &"drink", &"lie_down", &"sniff"]
+
+## Paw contact times per species model path: clip → [[time, paw], …] sorted by time.
+static var _contact_cache: Dictionary = {}
 
 ## Movement providing speed.
 @export var movement: MovementComponent
@@ -38,6 +49,9 @@ var _tree: AnimationTree
 var _playback: AnimationNodeStateMachinePlayback
 var _species: AnimalSpecies
 var _current: StringName = &"locomotion"
+var _contacts: Dictionary = {}
+var _clock: Dictionary = {}
+var _clip_lengths: Dictionary = {}
 
 
 func _ready() -> void:
@@ -53,6 +67,7 @@ func initialize() -> void:
 	var player := (
 		model_root.find_children("*", "AnimationPlayer", true, false)[0] as AnimationPlayer
 	)
+	_contacts = _paw_contacts()
 	_add_looped_library(player)
 	_tree = AnimationTree.new()
 	_tree.name = "AnimationTree"
@@ -67,16 +82,23 @@ func initialize() -> void:
 	set_process(true)
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	var speed := movement.horizontal_speed()
+	var scale := time_scale_for(speed, _species)
 	_tree.set("parameters/locomotion/gait/blend_position", speed)
-	_tree.set("parameters/locomotion/scale/scale", time_scale_for(speed, _species))
+	_tree.set("parameters/locomotion/scale/scale", scale)
+	_advance_footsteps(delta, speed, scale)
 
 
 ## Plays one-shot [param action] (see [constant ACTIONS]); it returns to locomotion when done.
 func play_action(action: StringName) -> void:
 	if ACTIONS.has(action):
 		_travel(action)
+
+
+## Paw contacts of [param clip]: [[time, paw], …] sorted by time (empty if unknown).
+func contacts_for(clip: String) -> Array:
+	return _contacts.get(clip, [])
 
 
 ## Current animation state name.
@@ -185,3 +207,57 @@ func _on_state_changed(_from: StringName, to: StringName) -> void:
 func _travel(state: StringName) -> void:
 	_current = state
 	_playback.travel(state)
+
+
+## Clip whose footfalls are heard at [param speed]: walk below the walk/trot midpoint, else the
+## run clip (trot and run share it).
+func _footstep_clip(speed: float) -> String:
+	if speed < (_species.walk_speed + _species.trot_speed) * 0.5:
+		return _species.animations[&"walk"]
+	return _species.animations[&"run"]
+
+
+## Advances a clock per locomotion clip with the same delta × scale as the tree, emitting
+## [signal footstep] when the audible clip's clock crosses a paw contact.
+func _advance_footsteps(delta: float, speed: float, scale: float) -> void:
+	var audible := _footstep_clip(speed)
+	var emit := (
+		_current == &"locomotion"
+		and speed >= FOOTSTEP_MIN_SPEED
+		and movement.is_grounded()
+		and not movement.swimming
+	)
+	for clip: String in _contacts:
+		var length: float = _clip_lengths[clip]
+		var before: float = _clock.get(clip, 0.0)
+		var after := before + delta * scale
+		_clock[clip] = fmod(after, length)
+		if not emit or clip != audible:
+			continue
+		for contact: Array in _contacts[clip]:
+			var t: float = contact[0]
+			if (before < t and t <= after) or (after >= length and t <= after - length):
+				footstep.emit(contact[1])
+
+
+## Contact instants of the walk and run clips, analysed once per species model.
+func _paw_contacts() -> Dictionary:
+	var key := _species.model_scene.resource_path
+	var player := (
+		model_root.find_children("*", "AnimationPlayer", true, false)[0] as AnimationPlayer
+	)
+	for clip: String in [_species.animations[&"walk"], _species.animations[&"run"]]:
+		_clip_lengths[clip] = player.get_animation(clip).length
+	if _contact_cache.has(key):
+		return _contact_cache[key]
+	var model := model_root.get_child(0) as Node3D
+	var contacts := {}
+	for clip: String in _clip_lengths:
+		var list: Array = []
+		for paw: String in _species.paw_bones:
+			for t in ClipAnalysis.contact_times(model, clip, paw):
+				list.append([t, StringName(paw)])
+		list.sort_custom(func(a: Array, b: Array) -> bool: return a[0] < b[0])
+		contacts[clip] = list
+	_contact_cache[key] = contacts
+	return contacts
