@@ -353,7 +353,8 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
   SOCIAL), prompt text, duration, need effects, cooldown/regrowth time.
 - `Interactor` on the player: shape-casts forward, picks the best target by distance and
   facing angle, shows prompt, runs the interaction (locks movement, plays animation, applies effects).
-- Water: chunks with water planes expose DRINK and COOL_OFF (wading/swimming).
+- Water: chunks with water planes expose DRINK and COOL_OFF (wading/swimming) — implemented
+  as the virtual `WaterAccess` provider (below).
 - Food sources (berries, grass, fallen fruit) deplete and regrow; state stored per chunk
   as a delta so saves stay small.
 - **Implemented (Phase 7):**
@@ -393,6 +394,15 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
       regrowth time (checked once a second only while something is depleted). The state is
       kept while the same chunk is re-applied (LOD refresh); per-chunk deltas that survive
       unloading come with item 6.
+  - **Water:** `WaterAccess` (on the Animal) is a virtual provider (no shapes) registered with
+    the `Interactor` (`add_virtual_provider()`), asked on every probe. DRINK (`drink.tres`,
+    HOLD +12.5 thirst/s, empty → full in 8 s) when the ground 0.8 m ahead of the nose lies
+    ≥ 5 cm under `GameState.water_level` (one reused downward ray on the `world` layer) and
+    the paws are at most 0.6 m above the surface, or while wading; COOL_OFF (`cool_off.tres`,
+    HOLD +20 comfort/s) only while wading (paws 5 cm … `swim_enter_depth` deep). Wading, it
+    offers whichever of thirst and comfort is lower; each target stays available while its own
+    condition holds, so a drink is never cut short. No water targets while swimming; water
+    never runs out.
 
 ## 7. Fauna AI
 

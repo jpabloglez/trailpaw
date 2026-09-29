@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="InteractionDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/interaction/interaction_definition.gd" id="1_idef"]
+
+[resource]
+script = ExtResource("1_idef")
+id = &"cool_off"
+type = 2
+prompt = "Cool off"
+mode = 1
+need_effects = Dictionary[StringName, float]({
+&"temperature": 20.0
+})
+animation = &"lie_down"

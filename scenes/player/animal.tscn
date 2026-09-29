@@ -29,6 +29,10 @@
 [ext_resource type="Resource" path="res://data/interaction/interactor.tres" id="33_isett"]
 [ext_resource type="Script" path="res://scripts/player/states/interact_state.gd" id="34_istate"]
 
+[ext_resource type="Script" path="res://scripts/interaction/water_access.gd" id="35_water"]
+[ext_resource type="Resource" path="res://data/interactions/drink.tres" id="36_drink"]
+[ext_resource type="Resource" path="res://data/interactions/cool_off.tres" id="37_cool"]
+
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ald35"]
 radius = 0.35
 height = 1.3
@@ -143,3 +147,13 @@ settings = ExtResource("33_isett")
 body = NodePath("..")
 movement = NodePath("../MovementComponent")
 state_machine = NodePath("../StateMachine")
+
+[node name="WaterAccess" type="Node" parent="." node_paths=PackedStringArray("body", "movement", "needs", "interactor")]
+unique_name_in_owner = true
+script = ExtResource("35_water")
+drink = ExtResource("36_drink")
+cool_off = ExtResource("37_cool")
+body = NodePath("..")
+movement = NodePath("../MovementComponent")
+needs = NodePath("../NeedsComponent")
+interactor = NodePath("../Interactor")
