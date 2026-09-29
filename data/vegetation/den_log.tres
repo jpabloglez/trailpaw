@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="VegetationType" format=3]
+
+[ext_resource type="PackedScene" path="res://assets/environment/nature/log_large.glb" id="1_log"]
+[ext_resource type="Script" path="res://scripts/world/vegetation_type.gd" id="2_vtype"]
+[ext_resource type="Resource" path="res://data/interactions/den.tres" id="3_den"]
+
+[resource]
+script = ExtResource("2_vtype")
+id = &"den_log"
+scene = ExtResource("1_log")
+scale_min = 1.9
+scale_max = 2.3
+align_to_ground = 0.8
+visibility_range = 120.0
+interaction = ExtResource("3_den")

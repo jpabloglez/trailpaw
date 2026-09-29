@@ -7,7 +7,8 @@ extends Node3D
 ## [code]interaction_target(shape_index) -> InteractionTarget[/code]. Candidates are scored with
 ## [InteractionScoring] and the best available one becomes [method current_target]. A
 ## controller writes intent ([method request_interaction], [member interact_held]); when a
-## request arrives on the ground with a target, the [StateMachine] goes to the Interact state.
+## request arrives on the ground with a target, the [StateMachine] goes to the Interact state
+## (the Rest state for REST targets such as dens).
 ## [br][br]
 ## Budget: one shape cast and ≤ [constant MAX_RESULTS] small target objects every
 ## [constant PROBE_INTERVAL] seconds (and on a request).
@@ -73,7 +74,8 @@ func _physics_process(delta: float) -> void:
 	if requested:
 		_request_frame = -1000
 		if can_start():
-			state_machine.transition_to(INTERACT_STATE)
+			var resting := _target.definition.type == InteractionDefinition.Type.REST
+			state_machine.transition_to(Rester.REST_STATE if resting else INTERACT_STATE)
 
 
 ## Asks to interact with the current target (consumed within [constant REQUEST_FRAMES]).

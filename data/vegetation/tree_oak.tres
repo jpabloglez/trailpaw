@@ -16,7 +16,7 @@ count_max = 3
 placement = 1
 radius_min = 0.08
 radius_max = 0.3
-food = ExtResource("4_apple")
+interaction = ExtResource("4_apple")
 
 [resource]
 script = ExtResource("2_c5edg")
@@ -26,6 +26,7 @@ scale_min = 4.5
 scale_max = 6.0
 visibility_range = 200.0
 sway = 0.25
+shade_radius = 0.35
 collision_radius = 0.08
 collision_height = 1.0
 drop = SubResource("Resource_apples")

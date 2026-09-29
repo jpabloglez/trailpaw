@@ -10,6 +10,7 @@
 [ext_resource type="Resource" path="res://data/vegetation/rock_smallFlatA.tres" id="8_mffns"]
 [ext_resource type="Resource" path="res://data/vegetation/grass_leafs.tres" id="9_0gulg"]
 [ext_resource type="Resource" path="res://data/vegetation/plant_bushSmall.tres" id="10_ankxw"]
+[ext_resource type="Resource" path="res://data/vegetation/den_log.tres" id="51_den"]
 
 [sub_resource type="Resource" id="Resource_106pq"]
 script = ExtResource("2_8dl78")
@@ -83,6 +84,15 @@ min_height = 0.5
 max_height = 120.0
 cluster = 0.5
 
+[sub_resource type="Resource" id="Resource_den_log"]
+script = ExtResource("2_8dl78")
+type = ExtResource("51_den")
+density = 0.02
+max_slope_degrees = 20.0
+min_height = 0.5
+max_height = 60.0
+cluster = 0.3
+
 [resource]
 script = ExtResource("1_muwrv")
 id = &"hills"
@@ -93,6 +103,6 @@ height_offset = 10.0
 continental_scale = 1.8
 detail_scale = 1.0
 ridged_scale = 2.4
-vegetation = Array[ExtResource("2_8dl78")]([SubResource("Resource_106pq"), SubResource("Resource_ymyuc"), SubResource("Resource_uhtki"), SubResource("Resource_807ui"), SubResource("Resource_hyghp"), SubResource("Resource_j23hn"), SubResource("Resource_1o3ts"), SubResource("Resource_n7isi")])
+vegetation = Array[ExtResource("2_8dl78")]([SubResource("Resource_106pq"), SubResource("Resource_ymyuc"), SubResource("Resource_uhtki"), SubResource("Resource_807ui"), SubResource("Resource_hyghp"), SubResource("Resource_j23hn"), SubResource("Resource_1o3ts"), SubResource("Resource_n7isi"), SubResource("Resource_den_log")])
 ground_color_a = Color(0.66, 0.6, 0.34, 1)
 ground_color_b = Color(0.56, 0.42, 0.3, 1)

@@ -8,6 +8,8 @@ extends Node
 @export var movement: MovementComponent
 ## Receives the interact intent (optional).
 @export var interactor: Interactor
+## Receives the rest intent (optional).
+@export var rester: Rester
 
 
 func _ready() -> void:
@@ -23,6 +25,8 @@ func _physics_process(_delta: float) -> void:
 	movement.sprint = Input.is_action_pressed(&"sprint")
 	if Input.is_action_just_pressed(&"jump"):
 		movement.request_jump()
+	if rester != null:
+		rester.rest_held = Input.is_action_pressed(&"rest")
 	if interactor != null:
 		interactor.interact_held = Input.is_action_pressed(&"interact")
 		if Input.is_action_just_pressed(&"interact"):

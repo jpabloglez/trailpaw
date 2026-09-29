@@ -4,10 +4,11 @@ extends Node3D
 ## the main thread from [ChunkData]. Designed to be pooled: [method apply] reuses the same
 ## [ArrayMesh], array container and collision shape every time.
 ##
-## Edible vegetation and drops ([method VegetationLibrary.food_for]) in LOD 0 get one pooled
-## sphere each in a food [Area3D] on the [code]interactable[/code] layer, so the
-## [Interactor] finds them; the chunk is their interaction provider. Eating one hides the
-## instance (zero scale) until it regrows on the game clock.
+## Edible vegetation and drops, and props to rest by
+## ([method VegetationLibrary.interaction_for]), in LOD 0 get one pooled sphere each in a
+## [FoodArea] on the [code]interactable[/code] layer, so the [Interactor] finds them; the chunk
+## is their interaction provider. Eating hides the instance (zero scale) until it regrows on the
+## game clock.
 ##
 ## The chunk's origin is its corner; [code]WorldStreamer[/code] positions it relative to
 ## the floating origin.
@@ -56,6 +57,8 @@ var _buffers: Dictionary[StringName, PackedFloat32Array] = {}
 ## Food id → {instance index → game minute it regrows at}.
 var _depleted: Dictionary[StringName, Dictionary] = {}
 var _since_regrow_check: float = 0.0
+var _shade_buffers: Array[PackedFloat32Array] = []
+var _shade_radii := PackedFloat32Array()
 
 @onready var _mesh_instance: MeshInstance3D = %Mesh
 @onready var _collision: CollisionShape3D = %Collision
@@ -123,6 +126,7 @@ func apply(
 	_apply_vegetation(data, library)
 	_apply_obstacles(data, library)
 	_apply_food(data, library, edible_kinds)
+	_apply_shade(data, library)
 	visible = true
 
 
@@ -160,6 +164,25 @@ func has_collision() -> bool:
 ## Number of active food targets.
 func food_count() -> int:
 	return _food_used
+
+
+## Whether [param local_position] (chunk-local) lies in the shade of a tree: within the tree's
+## shade radius × its scale, horizontally.
+## [br][br]
+## Budget: O(trees in the chunk), a few float ops each; called a few times per second at most.
+func is_shaded(local_position: Vector3) -> bool:
+	var stride := VegetationScatterer.FLOATS_PER_INSTANCE
+	for t in _shade_buffers.size():
+		var buffer := _shade_buffers[t]
+		var radius := _shade_radii[t]
+		for o in range(0, buffer.size(), stride):
+			var scale := Vector3(buffer[o], buffer[o + 4], buffer[o + 8]).length()
+			var dx := local_position.x - buffer[o + 3]
+			var dz := local_position.z - buffer[o + 11]
+			var reach := radius * scale
+			if dx * dx + dz * dz <= reach * reach:
+				return true
+	return false
 
 
 ## Whether instance [param index] of food [param id] is eaten and not yet regrown.
@@ -321,10 +344,11 @@ func _apply_food(
 	remove_child(_food_area)
 	if library != null and data.lod == 0:
 		for id: StringName in data.vegetation:
-			var definition := library.food_for(id)
+			var definition := library.interaction_for(id)
 			if definition == null:
 				continue
-			if not edible_kinds.is_empty() and not edible_kinds.has(definition.food_kind):
+			var food := definition.food_kind
+			if food != &"" and not edible_kinds.is_empty() and not edible_kinds.has(food):
 				continue
 			var slot := _food_slots.size()
 			_food_slots.append(id)
@@ -392,3 +416,15 @@ func _show_instance(id: StringName, index: int, show: bool) -> void:
 		if _food_keys[i] == key:
 			_food_area.shape_owner_set_disabled(_food_owners[i], not show)
 			break
+
+
+func _apply_shade(data: ChunkData, library: VegetationLibrary) -> void:
+	_shade_buffers.clear()
+	_shade_radii.clear()
+	if library == null:
+		return
+	for id: StringName in data.vegetation:
+		var radius := library.shade_for(id)
+		if radius > 0.0:
+			_shade_buffers.append(data.vegetation[id])
+			_shade_radii.append(radius)

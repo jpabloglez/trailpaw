@@ -15,8 +15,9 @@ var _ranges: Dictionary[StringName, float] = {}
 var _shadows: Dictionary[StringName, bool] = {}
 var _collision: Dictionary[StringName, Vector2] = {}
 var _sway: Dictionary[StringName, float] = {}
-var _food: Dictionary[StringName, InteractionDefinition] = {}
+var _interactions: Dictionary[StringName, InteractionDefinition] = {}
 var _drops: Array[StringName] = []
+var _shade: Dictionary[StringName, float] = {}
 
 
 func _init(table: BiomeTable, palette: VegetationPalette = null) -> void:
@@ -40,8 +41,10 @@ func _init(table: BiomeTable, palette: VegetationPalette = null) -> void:
 			_shadows[type.id] = not type.near_only
 			if type.has_collision():
 				_collision[type.id] = Vector2(type.collision_radius, type.collision_height)
-			if type.food != null:
-				_food[type.id] = type.food
+			if type.shade_radius > 0.0:
+				_shade[type.id] = type.shade_radius
+			if type.interaction != null:
+				_interactions[type.id] = type.interaction
 			if type.drop != null:
 				_add_drop(type.drop, type.visibility_range)
 
@@ -71,14 +74,19 @@ func ids() -> Array[StringName]:
 	return _meshes.keys()
 
 
+## Shade radius of type [param id] in model units (0 = none).
+func shade_for(id: StringName) -> float:
+	return _shade.get(id, 0.0)
+
+
 ## Ids of the drops (props derived from other types: plain material, no wind).
 func drop_ids() -> Array[StringName]:
 	return _drops
 
 
-## What eating an instance of type (or drop) [param id] does, or null.
-func food_for(id: StringName) -> InteractionDefinition:
-	return _food.get(id)
+## What interacting with an instance of type (or drop) [param id] does, or null.
+func interaction_for(id: StringName) -> InteractionDefinition:
+	return _interactions.get(id)
 
 
 ## Sway multiplier of type [param id].
@@ -122,8 +130,8 @@ func _add_drop(drop: VegetationDrop, parent_range: float) -> void:
 	_ranges[drop.id] = minf(parent_range, DROP_RANGE)
 	_shadows[drop.id] = false
 	_sway[drop.id] = 0.0
-	if drop.food != null:
-		_food[drop.id] = drop.food
+	if drop.interaction != null:
+		_interactions[drop.id] = drop.interaction
 
 
 ## A code-built mesh ([ProceduralMeshes]) with the foliage shader in the type's colour.

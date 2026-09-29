@@ -3,7 +3,7 @@ extends Resource
 ## Small props derived from each instance of a [VegetationType]: berry clusters on a bush,
 ## apples fallen under an oak. Placed deterministically per parent instance on the worker
 ## ([VegetationScatterer]), in full-detail (LOD 0) chunks only, with a mesh built in code
-## ([VegetationLibrary]). Usually edible ([member food]).
+## ([VegetationLibrary]). Usually edible ([member interaction]).
 ##
 ## Offsets are in the parent's model units (they scale with the parent instance).
 
@@ -34,8 +34,8 @@ enum Shape { BERRY_CLUSTER, FRUIT }
 @export_range(0.0, 10.0, 0.005) var height_min: float = 0.0
 ## Height above the parent's origin for ON_PARENT (model units).
 @export_range(0.0, 10.0, 0.005) var height_max: float = 0.0
-## What eating it does (null = decorative).
-@export var food: InteractionDefinition
+## What interacting with it does, usually eating (null = decorative).
+@export var interaction: InteractionDefinition
 
 
 ## Returns human-readable problems with the data; empty when valid.
@@ -51,8 +51,8 @@ func get_validation_errors() -> PackedStringArray:
 		errors.append("radius_min must be <= radius_max")
 	if placement == Placement.ON_PARENT and height_min > height_max:
 		errors.append("height_min must be <= height_max")
-	if food != null and not food.is_valid():
-		errors.append("food: %s" % ", ".join(food.get_validation_errors()))
+	if interaction != null and not interaction.is_valid():
+		errors.append("interaction: %s" % ", ".join(interaction.get_validation_errors()))
 	return errors
 
 

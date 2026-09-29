@@ -11,5 +11,6 @@ scale_min = 5.0
 scale_max = 7.0
 visibility_range = 200.0
 sway = 0.2
+shade_radius = 0.19
 collision_radius = 0.06
 collision_height = 1.2

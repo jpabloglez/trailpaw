@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="RestSettings" format=3]
+
+[ext_resource type="Script" path="res://scripts/interaction/rest_settings.gd" id="1_rest"]
+
+[resource]
+script = ExtResource("1_rest")
+energy_per_second = 1.67
+shade_multiplier = 2.0
+den_multiplier = 3.0
