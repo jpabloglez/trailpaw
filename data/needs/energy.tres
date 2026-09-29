@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="NeedDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/needs/need_definition.gd" id="1_need"]
+
+[resource]
+script = ExtResource("1_need")
+id = &"energy"
+display_name = "Energy"
+max_value = 100.0
+decay_per_minute = 5.0
+critical_threshold = 25.0
+recover_margin = 10.0
+critical_speed_factor = 0.8
+tired_when_critical = true

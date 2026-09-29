@@ -308,6 +308,12 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
 - Emits `need_changed(id, value)` and `need_critical(id)`. Critical needs slow movement —
   the game is cozy, so there is **no death**; consequences are soft (slower, tired animation).
 - Pure logic lives in a `RefCounted` class (`NeedsModel`) so it is unit-testable without scenes.
+- Data: `NeedDefinition` (`data/needs/{hunger,thirst,temperature,energy}.tres`): value 0…100,
+  starts full, lower = needier (for temperature comfort, lower = hotter). `decay_per_minute` is
+  the base rate while trotting in neutral conditions. User-chosen "moderate" pacing, full →
+  critical at a trot: thirst 8 min, hunger 12 min, energy 15 min, comfort 10 min in a fully
+  warm biome. Critical at ≤ 25, recovered only above 35 (`recover_margin`, no flicker).
+  Effects when critical: speed × 0.85 (energy × 0.8, and only energy looks tired).
 
 ## 6. Interaction system
 
