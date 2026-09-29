@@ -8,7 +8,7 @@ extends Resource
 ## Defaults are deliberately zero: every tunable must come from data, so a fresh
 ## [AnimalSpecies] is invalid until configured (see [method get_validation_errors]).
 
-## Animations every species with a model must provide (ROADMAP Phase 5).
+## Animations every species with a model must provide (ROADMAP Phase 5; tired idle Phase 6).
 const LOGICAL_ANIMATIONS: Array[StringName] = [
 	&"idle",
 	&"walk",
@@ -21,6 +21,7 @@ const LOGICAL_ANIMATIONS: Array[StringName] = [
 	&"lie_down",
 	&"sniff",
 	&"swim",
+	&"tired_idle",
 ]
 
 ## Human-readable species name.

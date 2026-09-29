@@ -32,3 +32,5 @@ activity_heat = Dictionary[StringName, float]({
 &"walk": 0.0
 })
 water_warmth = -1.5
+speed_ease_per_second = 0.1
+tired_ease_per_second = 0.5

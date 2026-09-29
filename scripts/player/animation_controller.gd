@@ -20,6 +20,10 @@ signal footstep(paw: StringName)
 
 ## Library name holding the looped copies of the model's clips.
 const LIBRARY: StringName = &"trailpaw"
+## Suffix of a looped copy of a clip that is also used as a one-shot (e.g. tired idle and sniff).
+const LOOP_SUFFIX: String = "_loop"
+## Blend between the rested and tired idle (driven by [method NeedsComponent.tiredness]).
+const TIRED_PARAM: StringName = &"parameters/locomotion/gait/idle/tired/blend_amount"
 ## Cross-fade between animation states (s).
 const XFADE: float = 0.18
 ## Gameplay state → animation state (see [PlayerState]).
@@ -44,6 +48,8 @@ static var _contact_cache: Dictionary = {}
 @export var state_machine: StateMachine
 ## Node holding the instanced model (its [AnimationPlayer] is used).
 @export var model_root: Node3D
+## Needs providing the tired look (optional).
+@export var needs: NeedsComponent
 
 var _tree: AnimationTree
 var _playback: AnimationNodeStateMachinePlayback
@@ -87,6 +93,7 @@ func _process(delta: float) -> void:
 	var scale := time_scale_for(speed, _species)
 	_tree.set("parameters/locomotion/gait/blend_position", speed)
 	_tree.set("parameters/locomotion/scale/scale", scale)
+	_tree.set(TIRED_PARAM, needs.tiredness() if needs != null else 0.0)
 	_advance_footsteps(delta, speed, scale)
 
 
@@ -132,25 +139,45 @@ static func time_scale_for(speed: float, species: AnimalSpecies) -> float:
 
 func _add_looped_library(player: AnimationPlayer) -> void:
 	var library := AnimationLibrary.new()
-	var added := {}
 	for logical: StringName in _species.animations:
-		var clip: String = _species.animations[logical]
-		if added.has(clip):
+		var name := library_name(logical)
+		if library.has_animation(name):
 			continue
-		var anim := player.get_animation(clip).duplicate() as Animation
-		var loops := false
-		for l: StringName in _species.looping:
-			loops = loops or _species.animations[l] == clip
+		var anim := player.get_animation(_species.animations[logical]).duplicate() as Animation
+		var loops := _species.looping.has(logical)
 		anim.loop_mode = Animation.LOOP_LINEAR if loops else Animation.LOOP_NONE
-		library.add_animation(clip, anim)
-		added[clip] = true
+		library.add_animation(name, anim)
 	player.add_animation_library(LIBRARY, library)
+
+
+## Name of [param logical]'s copy in [constant LIBRARY]: the clip name, plus
+## [constant LOOP_SUFFIX] for a looped use of a clip that is also played once.
+func library_name(logical: StringName) -> String:
+	var clip: String = _species.animations[logical]
+	if not _species.looping.has(logical):
+		return clip
+	for other: StringName in _species.animations:
+		if _species.animations[other] == clip and not _species.looping.has(other):
+			return clip + LOOP_SUFFIX
+	return clip
 
 
 func _clip_node(logical: StringName) -> AnimationNodeAnimation:
 	var node := AnimationNodeAnimation.new()
-	node.animation = "%s/%s" % [LIBRARY, _species.animations[logical]]
+	node.animation = "%s/%s" % [LIBRARY, library_name(logical)]
 	return node
+
+
+## Idle point of the gait blend space: rested idle blended with the tired idle.
+func _idle_node() -> AnimationNodeBlendTree:
+	var idle := AnimationNodeBlendTree.new()
+	idle.add_node(&"rested", _clip_node(&"idle"))
+	idle.add_node(&"tired_clip", _clip_node(&"tired_idle"))
+	idle.add_node(&"tired", AnimationNodeBlend2.new())
+	idle.connect_node(&"tired", 0, &"rested")
+	idle.connect_node(&"tired", 1, &"tired_clip")
+	idle.connect_node(&"output", 0, &"tired")
+	return idle
 
 
 func _build_state_machine() -> AnimationNodeStateMachine:
@@ -158,7 +185,7 @@ func _build_state_machine() -> AnimationNodeStateMachine:
 	var gait := AnimationNodeBlendSpace1D.new()
 	gait.min_space = 0.0
 	gait.max_space = _species.run_speed
-	gait.add_blend_point(_clip_node(&"idle"), 0.0, -1, &"idle")
+	gait.add_blend_point(_idle_node(), 0.0, -1, &"idle")
 	gait.add_blend_point(_clip_node(&"walk"), _species.walk_speed, -1, &"walk")
 	gait.add_blend_point(_clip_node(&"trot"), _species.trot_speed, -1, &"trot")
 	gait.add_blend_point(_clip_node(&"run"), _species.run_speed, -1, &"run")

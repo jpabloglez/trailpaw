@@ -29,6 +29,12 @@ extends Resource
 ## Felt warmth while in water (replaces biome warmth and activity heat).
 @export_range(-5.0, 0.0, 0.05) var water_warmth: float = 0.0
 
+@export_group("Effects")
+## How fast the movement slowdown of critical needs eases in and out (multiplier per second).
+@export_range(0.01, 10.0, 0.01, "suffix:1/s") var speed_ease_per_second: float = 0.1
+## How fast the tired look eases in and out (blend per second).
+@export_range(0.01, 10.0, 0.01, "suffix:1/s") var tired_ease_per_second: float = 0.5
+
 
 ## Rate multiplier of [param need_id] for [param activity] (see [enum NeedsModel.Activity]).
 func multiplier(need_id: StringName, activity: int) -> float:
