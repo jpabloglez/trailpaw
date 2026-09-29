@@ -2,6 +2,7 @@
 
 [ext_resource type="PackedScene" path="res://assets/environment/nature/grass_large.glb" id="1_tgwok"]
 [ext_resource type="Script" path="res://scripts/world/vegetation_type.gd" id="2_lo5ux"]
+[ext_resource type="Resource" path="res://data/interactions/grass.tres" id="9_grass"]
 
 [resource]
 script = ExtResource("2_lo5ux")
@@ -13,3 +14,4 @@ align_to_ground = 0.8
 visibility_range = 40.0
 near_only = true
 sway = 1.0
+food = ExtResource("9_grass")

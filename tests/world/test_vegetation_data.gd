@@ -27,13 +27,23 @@ func _density(biome_id: StringName, prefix: String) -> float:
 	return total
 
 
-func test_every_type_is_valid_and_points_at_a_model() -> void:
+func test_every_type_is_valid_and_points_at_a_model_or_a_procedural_shape() -> void:
 	var files := DirAccess.get_files_at(TYPES_DIR)
 	assert_int(files.size()).is_greater(10)
 	for file in files:
 		var type := load(TYPES_DIR.path_join(file)) as VegetationType
 		assert_array(Array(type.get_validation_errors())).is_empty()
+		if type.procedural_shape != &"":
+			assert_object(type.scene).is_null()
+			continue
 		assert_str(type.scene.resource_path).starts_with("res://assets/environment/nature/")
+
+
+func test_procedural_meshes_stand_on_their_origin_and_are_about_a_metre() -> void:
+	for shape: StringName in ProceduralMeshes.SHAPES:
+		var aabb := ProceduralMeshes.build(shape).get_aabb()
+		assert_float(aabb.position.y).is_between(-0.02, 0.02)
+		assert_float(maxf(aabb.size.x, aabb.size.z)).is_between(0.8, 1.3)
 
 
 func test_every_biome_has_vegetation_and_the_table_stays_valid() -> void:

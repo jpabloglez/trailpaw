@@ -112,9 +112,12 @@ func probe() -> void:
 	_set_target(best)
 
 
-## Whether this animal can use [param target] (available; later also its diet).
+## Whether this animal can use [param target]: available and, for food, in its diet.
 func accepts(target: InteractionTarget) -> bool:
-	return target.definition != null and target.is_available()
+	if target.definition == null or not target.is_available():
+		return false
+	var food := target.definition.food_kind
+	return food == &"" or movement.species.diet.has(food)
 
 
 ## Whether an interaction can start now.

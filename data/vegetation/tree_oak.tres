@@ -2,6 +2,21 @@
 
 [ext_resource type="PackedScene" path="res://assets/environment/nature/tree_oak.glb" id="1_lkt3b"]
 [ext_resource type="Script" path="res://scripts/world/vegetation_type.gd" id="2_c5edg"]
+[ext_resource type="Script" path="res://scripts/world/vegetation_drop.gd" id="3_vdrop"]
+[ext_resource type="Resource" path="res://data/interactions/apple.tres" id="4_apple"]
+
+[sub_resource type="Resource" id="Resource_apples"]
+script = ExtResource("3_vdrop")
+id = &"apple"
+shape = 1
+color = Color(0.8, 0.18, 0.12, 1)
+size = 0.1
+count_min = 0
+count_max = 3
+placement = 1
+radius_min = 0.08
+radius_max = 0.3
+food = ExtResource("4_apple")
 
 [resource]
 script = ExtResource("2_c5edg")
@@ -13,3 +28,4 @@ visibility_range = 200.0
 sway = 0.25
 collision_radius = 0.08
 collision_height = 1.0
+drop = SubResource("Resource_apples")

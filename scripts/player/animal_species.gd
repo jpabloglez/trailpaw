@@ -26,6 +26,8 @@ const LOGICAL_ANIMATIONS: Array[StringName] = [
 
 ## Human-readable species name.
 @export var display_name: String = ""
+## Kinds of food this species eats ([member InteractionDefinition.food_kind]).
+@export var diet: Array[StringName] = []
 
 @export_group("Model")
 ## Rigged, animated model (a [code].glb[/code] with a [Skeleton3D] and an [AnimationPlayer]).

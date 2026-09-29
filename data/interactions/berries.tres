@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="InteractionDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/interaction/interaction_definition.gd" id="1_idef"]
+
+[resource]
+script = ExtResource("1_idef")
+id = &"berries"
+prompt = "Eat berries"
+need_effects = Dictionary[StringName, float]({
+&"hunger": 20.0
+})
+animation = &"eat"
+duration = 2.0
+food_kind = &"berries"
+regrowth_minutes = 180.0

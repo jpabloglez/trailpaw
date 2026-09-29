@@ -140,7 +140,7 @@ exactly the expected set for a given position; rebase preserves absolute positio
 ## Phase 7 — Interactions → **M2**
 
 - [x] `Interactable` component and `Interactor` (shape-cast, target scoring, prompt UI).
-- [ ] EAT: berry bushes, grass patches, fallen fruit with depletion/regrowth.
+- [x] EAT: berry bushes, grass patches, fallen fruit with depletion/regrowth.
 - [ ] DRINK and COOL_OFF: water edges and shallow water.
 - [ ] REST: shaded spots and dens (restores energy, advances time).
 - [ ] `sniff` action: highlights nearby resources briefly.

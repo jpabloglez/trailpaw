@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="VegetationType" format=3]
+
+[ext_resource type="Script" path="res://scripts/world/vegetation_type.gd" id="2_vtype"]
+[ext_resource type="Script" path="res://scripts/world/vegetation_drop.gd" id="3_vdrop"]
+[ext_resource type="Resource" path="res://data/interactions/berries.tres" id="4_berries"]
+
+[sub_resource type="Resource" id="Resource_berries"]
+script = ExtResource("3_vdrop")
+id = &"berries"
+shape = 0
+color = Color(0.72, 0.12, 0.22, 1)
+size = 0.16
+count_min = 4
+count_max = 6
+placement = 0
+radius_min = 0.46
+radius_max = 0.54
+height_min = 0.22
+height_max = 0.5
+food = ExtResource("4_berries")
+
+[resource]
+script = ExtResource("2_vtype")
+id = &"berry_bush"
+procedural_shape = &"bush"
+procedural_color = Color(0.33, 0.5, 0.26, 1)
+scale_min = 1.2
+scale_max = 1.6
+align_to_ground = 0.3
+visibility_range = 90.0
+drop = SubResource("Resource_berries")

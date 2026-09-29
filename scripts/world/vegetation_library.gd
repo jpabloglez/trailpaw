@@ -7,12 +7,16 @@ extends RefCounted
 
 ## Foliage shader used for every vegetation surface.
 const FOLIAGE_SHADER: Shader = preload("res://shaders/foliage.gdshader")
+## Draw distance cap of drops (small props).
+const DROP_RANGE: float = 45.0
 
 var _meshes: Dictionary[StringName, Mesh] = {}
 var _ranges: Dictionary[StringName, float] = {}
 var _shadows: Dictionary[StringName, bool] = {}
 var _collision: Dictionary[StringName, Vector2] = {}
 var _sway: Dictionary[StringName, float] = {}
+var _food: Dictionary[StringName, InteractionDefinition] = {}
+var _drops: Array[StringName] = []
 
 
 func _init(table: BiomeTable, palette: VegetationPalette = null) -> void:
@@ -21,16 +25,25 @@ func _init(table: BiomeTable, palette: VegetationPalette = null) -> void:
 			var type := entry.type
 			if _meshes.has(type.id):
 				continue
-			var root := type.scene.instantiate()
-			var mesh_instance := root.find_children("*", "MeshInstance3D", true, false)[0]
-			_meshes[type.id] = _foliage_mesh((mesh_instance as MeshInstance3D).mesh, type, palette)
+			if type.procedural_shape != &"":
+				_meshes[type.id] = _procedural_foliage(type)
+			else:
+				var root := type.scene.instantiate()
+				var mesh_instance := root.find_children("*", "MeshInstance3D", true, false)[0]
+				_meshes[type.id] = _foliage_mesh(
+					(mesh_instance as MeshInstance3D).mesh, type, palette
+				)
+				root.free()
 			_sway[type.id] = type.sway
-			root.free()
 			_ranges[type.id] = type.visibility_range
 			# Small near-only plants skip shadows: many instances, little visual gain.
 			_shadows[type.id] = not type.near_only
 			if type.has_collision():
 				_collision[type.id] = Vector2(type.collision_radius, type.collision_height)
+			if type.food != null:
+				_food[type.id] = type.food
+			if type.drop != null:
+				_add_drop(type.drop, type.visibility_range)
 
 
 ## Mesh shared by every instance of type [param id].
@@ -58,9 +71,30 @@ func ids() -> Array[StringName]:
 	return _meshes.keys()
 
 
+## Ids of the drops (props derived from other types: plain material, no wind).
+func drop_ids() -> Array[StringName]:
+	return _drops
+
+
+## What eating an instance of type (or drop) [param id] does, or null.
+func food_for(id: StringName) -> InteractionDefinition:
+	return _food.get(id)
+
+
 ## Sway multiplier of type [param id].
 func sway_for(id: StringName) -> float:
 	return _sway.get(id, 0.0)
+
+
+## Mesh for [param drop] ([ProceduralMeshes], 1 m across) with a plain material.
+static func drop_mesh(drop: VegetationDrop) -> ArrayMesh:
+	var shape := &"berry_cluster" if drop.shape == VegetationDrop.Shape.BERRY_CLUSTER else &"fruit"
+	var mesh := ProceduralMeshes.build(shape)
+	var material := StandardMaterial3D.new()
+	material.albedo_color = drop.color
+	material.roughness = 0.55
+	mesh.surface_set_material(0, material)
+	return mesh
 
 
 ## Copy of [param source] whose surfaces use foliage materials.
@@ -79,4 +113,27 @@ static func _foliage_mesh(source: Mesh, type: VegetationType, palette: Vegetatio
 		mat.set_shader_parameter("sway", type.sway)
 		mat.set_shader_parameter("model_height", height)
 		mesh.surface_set_material(s, mat)
+	return mesh
+
+
+func _add_drop(drop: VegetationDrop, parent_range: float) -> void:
+	_meshes[drop.id] = drop_mesh(drop)
+	_drops.append(drop.id)
+	_ranges[drop.id] = minf(parent_range, DROP_RANGE)
+	_shadows[drop.id] = false
+	_sway[drop.id] = 0.0
+	if drop.food != null:
+		_food[drop.id] = drop.food
+
+
+## A code-built mesh ([ProceduralMeshes]) with the foliage shader in the type's colour.
+static func _procedural_foliage(type: VegetationType) -> Mesh:
+	var mesh := ProceduralMeshes.build(type.procedural_shape)
+	var mat := ShaderMaterial.new()
+	mat.shader = FOLIAGE_SHADER
+	mat.resource_name = String(type.procedural_shape)
+	mat.set_shader_parameter("albedo", type.procedural_color)
+	mat.set_shader_parameter("sway", type.sway)
+	mat.set_shader_parameter("model_height", maxf(mesh.get_aabb().end.y, 0.01))
+	mesh.surface_set_material(0, mat)
 	return mesh

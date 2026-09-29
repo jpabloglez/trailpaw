@@ -12,6 +12,7 @@
 [ext_resource type="Resource" path="res://data/vegetation/tree_default.tres" id="10_vd6c8"]
 [ext_resource type="Resource" path="res://data/vegetation/rock_smallA.tres" id="11_21p55"]
 [ext_resource type="Resource" path="res://data/vegetation/mushroom_redGroup.tres" id="12_negk8"]
+[ext_resource type="Resource" path="res://data/vegetation/berry_bush.tres" id="50_berry_bush"]
 
 [sub_resource type="Resource" id="Resource_1sqo5"]
 script = ExtResource("2_1wuxw")
@@ -103,6 +104,15 @@ min_height = 0.5
 max_height = 60.0
 cluster = 0.8
 
+[sub_resource type="Resource" id="Resource_berry_bush"]
+script = ExtResource("2_1wuxw")
+type = ExtResource("50_berry_bush")
+density = 0.25
+max_slope_degrees = 30.0
+min_height = 0.3
+max_height = 60.0
+cluster = 0.6
+
 [resource]
 script = ExtResource("1_fpjyh")
 id = &"meadow"
@@ -113,6 +123,6 @@ height_offset = 3.0
 continental_scale = 0.6
 detail_scale = 0.8
 ridged_scale = 0.2
-vegetation = Array[ExtResource("2_1wuxw")]([SubResource("Resource_1sqo5"), SubResource("Resource_mtkay"), SubResource("Resource_uxamn"), SubResource("Resource_4dffp"), SubResource("Resource_rc247"), SubResource("Resource_7n2aq"), SubResource("Resource_saoou"), SubResource("Resource_p4krg"), SubResource("Resource_8lxc3"), SubResource("Resource_qkras")])
+vegetation = Array[ExtResource("2_1wuxw")]([SubResource("Resource_1sqo5"), SubResource("Resource_mtkay"), SubResource("Resource_uxamn"), SubResource("Resource_4dffp"), SubResource("Resource_rc247"), SubResource("Resource_7n2aq"), SubResource("Resource_saoou"), SubResource("Resource_p4krg"), SubResource("Resource_8lxc3"), SubResource("Resource_qkras"), SubResource("Resource_berry_bush")])
 ground_color_a = Color(0.52, 0.68, 0.34, 1)
 ground_color_b = Color(0.72, 0.73, 0.42, 1)

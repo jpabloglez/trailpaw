@@ -32,7 +32,11 @@ func _make_chunk() -> TerrainChunk:
 
 
 func test_library_knows_every_type_once_with_its_settings() -> void:
-	assert_int(_library.ids().size()).is_equal(_scatterer.type_ids().size())
+	# Every scattered type plus the drops derived from them (berries, apples).
+	assert_int(_library.ids().size()).is_equal(
+		_scatterer.type_ids().size() + _library.drop_ids().size()
+	)
+	assert_array(_library.drop_ids()).contains_exactly_in_any_order([&"berries", &"apple"])
 	assert_object(_library.mesh_for(&"tree_oak")).is_not_null()
 	assert_float(_library.visibility_range(&"grass")).is_less(
 		_library.visibility_range(&"tree_oak")

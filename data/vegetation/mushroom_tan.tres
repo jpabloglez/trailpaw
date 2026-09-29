@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="VegetationType" format=3]
+
+[ext_resource type="PackedScene" path="res://assets/environment/nature/mushroom_tanGroup.glb" id="1_mtan"]
+[ext_resource type="Script" path="res://scripts/world/vegetation_type.gd" id="2_vtype"]
+[ext_resource type="Resource" path="res://data/interactions/mushroom.tres" id="3_food"]
+
+[resource]
+script = ExtResource("2_vtype")
+id = &"mushroom_tan"
+scene = ExtResource("1_mtan")
+scale_min = 1.5
+scale_max = 2.0
+align_to_ground = 0.6
+visibility_range = 30.0
+near_only = true
+food = ExtResource("3_food")
