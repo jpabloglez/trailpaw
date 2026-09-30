@@ -39,5 +39,11 @@ Every third-party asset in `assets/` must be listed here (see CLAUDE.md §1).
 | `alpaca` | `assets/animals/alpaca/alpaca.glb` | Quaternius, Ultimate Animated Animal Pack (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/bCVFD48i2l |
 | `horse` | `assets/animals/horse/horse.glb` | Quaternius, Ultimate Animated Animal Pack (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/qvTrSG9pZF |
 | `donkey` | `assets/animals/donkey/donkey.glb` | Quaternius, Ultimate Animated Animal Pack (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/qmX6nhnvp7 |
+| `forest_birds` | `assets/audio/ambience/forest_birds.wav` | Thimras, *Park ambiences* (birds track; cut to a 40 s mono loop with `tools/ambience_loop.py`) (OpenGameArt) | CC0 1.0 | https://opengameart.org/content/park-ambiences |
+| `river` | `assets/audio/ambience/river.wav` | Thimras, *Park ambiences* (river track; 40 s mono loop, `tools/ambience_loop.py`) (OpenGameArt) | CC0 1.0 | https://opengameart.org/content/park-ambiences |
+| `wind` | `assets/audio/ambience/wind.wav` | Thimras, *Park ambiences* (wind track; 40 s mono loop, `tools/ambience_loop.py`) (OpenGameArt) | CC0 1.0 | https://opengameart.org/content/park-ambiences |
+| `meadow_birds` | `assets/audio/ambience/meadow_birds.ogg` | isaiah658, *Ambient Bird Sounds* (OpenGameArt) | CC0 1.0 | https://opengameart.org/content/ambient-bird-sounds |
+| `night_crickets` | `assets/audio/ambience/night_crickets.mp3` | Wolfgang_, *Crickets Ambient Noise - loopable* (OpenGameArt) | CC0 1.0 | https://opengameart.org/content/crickets-ambient-noise-loopable |
+| `rain` | `assets/audio/ambience/rain.ogg` | Kresiek The Furry, *AMB Rain Loop 1* (OpenGameArt) | CC0 1.0 | https://opengameart.org/content/amb-rain-loop-1 |
 
 The Nature Kit licence text is kept next to the models in `assets/environment/nature/License.txt`. Only a curated subset of the pack's 329 models is committed; add new ones here in the same pull request.

@@ -12,6 +12,8 @@
 [ext_resource type="Script" path="res://scripts/world/weather.gd" id="48_wth"]
 [ext_resource type="Resource" path="res://data/world/weather.tres" id="49_wthset"]
 [ext_resource type="Resource" path="res://data/world/wind.tres" id="50_wind"]
+[ext_resource type="Script" path="res://scripts/audio/ambience_director.gd" id="51_amb"]
+[ext_resource type="Resource" path="res://data/audio/ambience.tres" id="52_ambset"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_grbc7"]
 
@@ -617,3 +619,9 @@ script = ExtResource("48_wth")
 settings = ExtResource("49_wthset")
 day_night = NodePath("../DayNightCycle")
 wind = ExtResource("50_wind")
+
+[node name="AmbienceDirector" type="Node" parent="." node_paths=PackedStringArray("day_night", "weather")]
+script = ExtResource("51_amb")
+settings = ExtResource("52_ambset")
+day_night = NodePath("../DayNightCycle")
+weather = NodePath("../Weather")

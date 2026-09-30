@@ -1,0 +1,77 @@
+[gd_resource type="Resource" script_class="AmbienceSettings" format=3]
+
+[ext_resource type="Script" path="res://scripts/audio/ambience_settings.gd" id="1_amb"]
+[ext_resource type="Script" path="res://scripts/audio/ambience_layer.gd" id="2_layer"]
+[ext_resource type="AudioStream" path="res://assets/audio/ambience/meadow_birds.ogg" id="3_meadow"]
+[ext_resource type="AudioStream" path="res://assets/audio/ambience/forest_birds.wav" id="4_forest"]
+[ext_resource type="AudioStream" path="res://assets/audio/ambience/river.wav" id="5_river"]
+[ext_resource type="AudioStream" path="res://assets/audio/ambience/wind.wav" id="6_wind"]
+[ext_resource type="AudioStream" path="res://assets/audio/ambience/night_crickets.mp3" id="7_crickets"]
+[ext_resource type="AudioStream" path="res://assets/audio/ambience/rain.ogg" id="8_rain"]
+
+[sub_resource type="Resource" id="Resource_meadow"]
+script = ExtResource("2_layer")
+stream = ExtResource("3_meadow")
+day = Dictionary[StringName, float]({
+&"meadow": 0.8,
+&"river_valley": 0.35
+})
+under_rain = 0.2
+
+[sub_resource type="Resource" id="Resource_forest"]
+script = ExtResource("2_layer")
+stream = ExtResource("4_forest")
+day = Dictionary[StringName, float]({
+&"forest": 0.8
+})
+night = Dictionary[StringName, float]({
+&"forest": 0.1
+})
+under_rain = 0.25
+
+[sub_resource type="Resource" id="Resource_river"]
+script = ExtResource("2_layer")
+stream = ExtResource("5_river")
+day = Dictionary[StringName, float]({
+&"river_valley": 0.7
+})
+night = Dictionary[StringName, float]({
+&"river_valley": 0.6
+})
+under_rain = 0.8
+
+[sub_resource type="Resource" id="Resource_wind"]
+script = ExtResource("2_layer")
+stream = ExtResource("6_wind")
+day = Dictionary[StringName, float]({
+&"hills": 0.7,
+&"meadow": 0.15
+})
+night = Dictionary[StringName, float]({
+&"hills": 0.6,
+&"meadow": 0.1
+})
+under_rain = 1.0
+
+[sub_resource type="Resource" id="Resource_crickets"]
+script = ExtResource("2_layer")
+stream = ExtResource("7_crickets")
+night = Dictionary[StringName, float]({
+&"forest": 0.4,
+&"hills": 0.35,
+&"meadow": 0.6,
+&"river_valley": 0.5
+})
+under_rain = 0.1
+
+[sub_resource type="Resource" id="Resource_rain"]
+script = ExtResource("2_layer")
+stream = ExtResource("8_rain")
+is_rain = true
+rain_volume = 0.8
+
+[resource]
+script = ExtResource("1_amb")
+layers = Array[ExtResource("2_layer")]([SubResource("Resource_meadow"), SubResource("Resource_forest"), SubResource("Resource_river"), SubResource("Resource_wind"), SubResource("Resource_crickets"), SubResource("Resource_rain")])
+fade_seconds = 3.0
+bus = &"Ambience"
