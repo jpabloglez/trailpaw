@@ -544,6 +544,9 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
   strengthens the `wind` global in rain, and drives one camera-following `GPUParticles3D`
   (3000 streak drops, `amount_ratio` = rain). F3 shows the weather.
 - Ambient audio layered per biome with cross-fades on biome transitions; footsteps by surface.
+- **Audio buses** (`default_bus_layout.tres`): Master → Music, SFX, Ambience. `Settings.volumes`
+  holds a linear 0…1 volume per bus; `Settings.set_volume(bus, linear)` applies it in dB, mutes
+  at 0 and emits `volume_changed` (the settings menu and persistence arrive in Phase 10).
 
 ## 9. Persistence
 
