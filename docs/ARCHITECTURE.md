@@ -472,7 +472,7 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
     `AnimalSpecies`, temperament, profile, herd size, wander radius, follow time) sets the
     agent's species, brain profile and wander radius (`FaunaAgent.fauna`). Temperament
     profiles in `data/fauna/temperaments/`: **shy** (flees from a fast approach within 14 m or
-    anything within 5 m, until 30 m), **curious** (walks over to look from 5 m; flees only if
+    anything within 1 m — walking up slowly is fine — until 30 m), **curious** (walks over to look from 5 m; flees only if
     rushed at very close), **friendly** (comes to 2.5 m, never flees), **calm** (grazes most,
     flees only if nearly run over). Traits: all can be greeted; curious and friendly play;
     friendly ones follow after playing.
@@ -497,6 +497,18 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
     brain 2 Hz, behaviour every 3rd tick (`FaunaAgent.tick_stride`), no alignment; beyond,
     frozen (`PROCESS_MODE_DISABLED`). Fauna skip footstep analysis and share one looped clip
     library per species.
+  - **Social** (SOCIAL interactions, no need effects — user decision): every agent carries an
+    `Interactable` (`%Social`, layer 3) whose definition names the species ("Greet the deer").
+    The provider protocol gained an optional `begin_target(key)` (`InteractionTarget.begin()`,
+    called by the Interact state), so the animal stops and sniffs back (`Social` state) while
+    the fox greets it (`greet.tres`, 2 s, sniff). Afterwards curious and friendly animals offer
+    **"Play with the …"** (`play.tres`, 1.5 s): they gallop in circles around the fox (`Play`, 5 s)
+    and friendly ones then **follow** for `follow_seconds` (75 s). Calm and shy ones just accept
+    the greeting; greeting again waits 20 s; nobody can be greeted while fleeing, following or
+    playing. A moment with the player (Social, Play, Follow) is never cut short by
+    `FaunaDecision`. Shy animals flee from a fast approach but let a calm one close (startle
+    1 m). `EventBus.animal_greeted` / `animal_played(species_id)` for audio (Phase 9) and a
+    future discoveries journal.
   - **Cost** (WSL, 10 animals at full rate, timed directly): AI ≈ 0.65 ms/frame (behaviour +
     `move_and_slide` 0.48, alignment 0.13, brain 0.05) — under the 1.5 ms budget. The engine's
     per-body/per-skeleton work adds ≈ 1–1.5 ms of physics time on top (noisy under WSL).

@@ -26,6 +26,14 @@ signal biome_entered(biome_id: StringName, display_name: String)
 @warning_ignore("unused_signal")
 signal interaction_performed(interaction_type: int, definition_id: StringName)
 
+## The player greeted a wild animal of species [param species_id].
+@warning_ignore("unused_signal")
+signal animal_greeted(species_id: StringName)
+
+## The player played with a wild animal of species [param species_id].
+@warning_ignore("unused_signal")
+signal animal_played(species_id: StringName)
+
 ## A need of the player reached its critical threshold (soft consequences start, ADR-003).
 @warning_ignore("unused_signal")
 signal need_critical(need_id: StringName)

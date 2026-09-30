@@ -19,6 +19,8 @@ var _elapsed: float = 0.0
 func enter(_previous: StringName) -> void:
 	_target = interactor.begin()
 	_elapsed = 0.0
+	if _target != null:
+		_target.begin()
 	_play()
 
 

@@ -35,6 +35,13 @@ func is_available() -> bool:
 	return is_instance_valid(source) and source.call(&"is_target_available", key)
 
 
+## Tells the provider the interaction starts (optional protocol method
+## [code]begin_target(key)[/code]: e.g. an animal stops to greet).
+func begin() -> void:
+	if is_instance_valid(source) and source.has_method(&"begin_target"):
+		source.call(&"begin_target", key)
+
+
 ## Tells the provider the interaction completed (it may deplete).
 func consume() -> void:
 	if is_instance_valid(source):

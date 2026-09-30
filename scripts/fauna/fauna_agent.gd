@@ -26,6 +26,14 @@ const PROBE_UP: float = 2.0
 const PROBE_DOWN: float = 3.0
 ## The ground must be at least this far above the water surface (m).
 const DRY_MARGIN: float = 0.1
+## Seconds before an animal can be greeted again.
+const GREET_COOLDOWN: float = 20.0
+## Greeting (SOCIAL, once); its prompt names the species.
+const GREET: InteractionDefinition = preload("res://data/interactions/greet.tres")
+## Playing, offered after a greeting to animals that play.
+const PLAY: InteractionDefinition = preload("res://data/interactions/play.tres")
+## Behaviours during which the animal cannot be greeted.
+const BUSY: Array[StringName] = [&"Flee", &"Follow", &"Play"]
 
 ## Wild species (animal, temperament, profile). Set before entering the tree; it provides
 ## [member species], the brain's profile and the wander radius.
@@ -46,12 +54,16 @@ var rng := RandomNumberGenerator.new()
 var _ray := PhysicsRayQueryParameters3D.new()
 var _stride_count: int = 0
 var _stride_delta: float = 0.0
+var _greet: InteractionDefinition
+var _play: InteractionDefinition
+var _greet_cooldown: float = 0.0
 
 @onready var movement: MovementComponent = %MovementComponent
 @onready var state_machine: StateMachine = %StateMachine
 @onready var model_root: Node3D = %Model
 @onready var brain: FaunaBrain = get_node_or_null("%FaunaBrain")
 @onready var animation: AnimationController = %AnimationController
+@onready var social: Interactable = get_node_or_null("%Social")
 
 
 func _enter_tree() -> void:
@@ -78,11 +90,17 @@ func _ready() -> void:
 	_stride_count = decision_seed % 10  # stagger
 	EventBus.origin_shifted.connect(_on_origin_shifted)
 	_fit_capsule(movement.species)
+	if social != null:
+		_setup_social()
 	if Animal.spawn_species_model(movement.species, model_root):
 		(%AnimationController as AnimationController).initialize()
 
 
 func _physics_process(delta: float) -> void:
+	if social != null:
+		_greet_cooldown = maxf(0.0, _greet_cooldown - delta)
+		var busy := BUSY.has(state_machine.current_state_name())
+		social.available = _greet_cooldown <= 0.0 and not busy
 	_stride_delta += delta
 	_stride_count += 1
 	if _stride_count < tick_stride:
@@ -133,6 +151,42 @@ func _fit_capsule(animal: AnimalSpecies) -> void:
 	capsule.height = animal.body_length
 	holder.shape = capsule
 	holder.position.y = animal.body_radius
+
+
+## Greeting ([constant GREET]) or, after one, playing ([constant PLAY]): what the player can do
+## with this animal now.
+func social_definition() -> InteractionDefinition:
+	return social.definition if social != null else null
+
+
+func _setup_social() -> void:
+	var animal_name := fauna.display_name.to_lower() if fauna != null else "animal"
+	_greet = GREET.duplicate() as InteractionDefinition
+	_greet.prompt = "Greet the %s" % animal_name
+	_play = PLAY.duplicate() as InteractionDefinition
+	_play.prompt = "Play with the %s" % animal_name
+	social.definition = _greet
+	social.started.connect(_on_social_started)
+	social.consumed.connect(_on_social_done)
+
+
+func _on_social_started() -> void:
+	state_machine.transition_to(FaunaDecision.SOCIAL)  # stop and face the moment
+
+
+func _on_social_done() -> void:
+	var id := fauna.id if fauna != null else &""
+	if social.definition == _greet:
+		EventBus.animal_greeted.emit(id)
+		if fauna != null and fauna.can_play():
+			social.definition = _play
+		else:
+			_greet_cooldown = GREET_COOLDOWN
+		return
+	EventBus.animal_played.emit(id)
+	social.definition = _greet
+	_greet_cooldown = GREET_COOLDOWN
+	state_machine.transition_to(FaunaDecision.PLAY)
 
 
 func _on_origin_shifted(offset: Vector3) -> void:
