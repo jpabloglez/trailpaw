@@ -34,6 +34,11 @@ signal animal_greeted(species_id: StringName)
 @warning_ignore("unused_signal")
 signal animal_played(species_id: StringName)
 
+## The weather changed to [param weather] ([code]&"clear"[/code], [code]&"cloudy"[/code],
+## [code]&"rain"[/code]).
+@warning_ignore("unused_signal")
+signal weather_changed(weather: StringName)
+
 ## A need of the player reached its critical threshold (soft consequences start, ADR-003).
 @warning_ignore("unused_signal")
 signal need_critical(need_id: StringName)

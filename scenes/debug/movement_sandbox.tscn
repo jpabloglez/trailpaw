@@ -9,6 +9,9 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/interaction_prompt.tscn" id="42_prompt"]
 [ext_resource type="Script" path="res://scripts/world/day_night_cycle.gd" id="46_dn"]
 [ext_resource type="Resource" path="res://data/world/day_night.tres" id="47_dnset"]
+[ext_resource type="Script" path="res://scripts/world/weather.gd" id="48_wth"]
+[ext_resource type="Resource" path="res://data/world/weather.tres" id="49_wthset"]
+[ext_resource type="Resource" path="res://data/world/wind.tres" id="50_wind"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_grbc7"]
 
@@ -608,3 +611,9 @@ script = ExtResource("46_dn")
 settings = ExtResource("47_dnset")
 sun = NodePath("../Sun")
 world_environment = NodePath("../WorldEnvironment")
+
+[node name="Weather" type="Node3D" parent="." node_paths=PackedStringArray("day_night")]
+script = ExtResource("48_wth")
+settings = ExtResource("49_wthset")
+day_night = NodePath("../DayNightCycle")
+wind = ExtResource("50_wind")

@@ -8,6 +8,8 @@ render_mode cull_disabled;
 global uniform vec3 world_origin_offset;
 // xy = world wind direction (unit, XZ plane), z = strength (m), w = speed (rad/s).
 global uniform vec4 wind;
+// Wet leaves after rain are a little darker.
+global uniform float wetness;
 
 uniform vec3 albedo : source_color = vec3(1.0);
 uniform float roughness_value : hint_range(0.0, 1.0) = 0.9;
@@ -29,6 +31,6 @@ void vertex() {
 }
 
 void fragment() {
-	ALBEDO = albedo;
+	ALBEDO = albedo * (1.0 - 0.15 * wetness);
 	ROUGHNESS = roughness_value;
 }

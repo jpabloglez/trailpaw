@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="WeatherSettings" format=3]
+
+[ext_resource type="Script" path="res://scripts/world/weather_settings.gd" id="1_wth"]
+
+[resource]
+script = ExtResource("1_wth")
+slot_minutes = 60.0
+from_clear = Vector3(0.8, 0.2, 0)
+from_cloudy = Vector3(0.25, 0.65, 0.1)
+from_rain = Vector3(0, 0.25, 0.75)
+cloudiness = Vector3(0.15, 0.65, 0.9)
+ease_per_minute = 0.05
+wet_per_minute = 0.05
+dry_per_minute = 0.008
+overcast_sun = 0.45
+rain_wind = 0.8
+rain_drops = 3000

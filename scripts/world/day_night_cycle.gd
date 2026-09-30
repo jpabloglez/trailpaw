@@ -27,6 +27,8 @@ const SUN_MIN_ENERGY: float = 0.02
 
 ## Current cloud cover (0…1) shown in the sky (set by the weather).
 var cloud_cover: float = 0.0
+## Fraction of the sunlight that gets through the clouds (set by the weather; 1 = clear).
+var sunlight_factor: float = 1.0
 
 var _moon: DirectionalLight3D
 var _sky_material: ShaderMaterial
@@ -68,7 +70,7 @@ func apply_hour(hour: float) -> void:
 	var s := settings
 	var keys := s.key_hours
 	var towards_sun := sun_direction(hour)
-	var sun_energy := DayCurve.sample(keys, s.sun_energy, hour)
+	var sun_energy := DayCurve.sample(keys, s.sun_energy, hour) * sunlight_factor
 	_aim(sun, towards_sun)
 	sun.light_energy = sun_energy
 	sun.light_color = DayCurve.sample_color(keys, s.sun_color, hour)
