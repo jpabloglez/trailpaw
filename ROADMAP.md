@@ -223,9 +223,3 @@ discoveries journal · companion system · more biomes (wetlands, coast, snow) �
   meadow has no water and the nearest lake is ≈ 770 m away (seed 12345), so thirst can run out
   before the player finds water. Options on record: longer-range water scent, ponds in every
   biome (would change the height function → new ADR).
-
-- **Map / navigation aid** (from the M2 playtest): e.g. a sniff "compass" towards water and food
-  beyond sight, a map of discovered water. **Known issue to revisit after it:** the spawn
-  meadow has no water and the nearest lake is ≈ 770 m away (seed 12345), so thirst can run out
-  before the player finds water. Options on record: longer-range water scent, ponds in every
-  biome (would change the height function → new ADR).
