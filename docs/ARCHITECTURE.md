@@ -547,6 +547,13 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
 - **Audio buses** (`default_bus_layout.tres`): Master → Music, SFX, Ambience. `Settings.volumes`
   holds a linear 0…1 volume per bus; `Settings.set_volume(bus, linear)` applies it in dB, mutes
   at 0 and emits `volume_changed` (the settings menu and persistence arrive in Phase 10).
+- **Ambience** (`AmbienceDirector` in both sandboxes, `data/audio/ambience.tres`): one looping,
+  non-positional player per `AmbienceLayer` on the Ambience bus — meadow birds, forest birds,
+  river, wind, night crickets and rain (CC0, OpenGameArt; long recordings cut to 40 s mono loops
+  by `tools/ambience_loop.py`). Each layer's volume comes from the biome
+  (`GameState.current_biome`), the daylight (inverse of the sky's stars track) and the rain
+  (`Weather.rain`: birds and crickets drowned out, the rain layer rises), and cross-fades over
+  3 s. Silent layers are stopped.
 
 ## 9. Persistence
 
