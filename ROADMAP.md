@@ -153,7 +153,7 @@ exactly the expected set for a given position; rebase preserves absolute positio
 
 ## Phase 8 — Fauna AI and social interactions
 
-- [ ] `FaunaAgent` scene reusing `StateMachine` and a slimmed `MovementComponent`.
+- [x] `FaunaAgent` scene reusing `StateMachine` and a slimmed `MovementComponent`.
 - [ ] Behaviours: Wander, Graze, Flee, Approach, Follow, Rest; steering on terrain.
 - [ ] Species temperaments (shy/curious/friendly) in data.
 - [ ] `FaunaDirector`: spawn from biome tables per chunk, global cap, AI LOD by distance.

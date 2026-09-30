@@ -33,14 +33,21 @@ func get_debug_info() -> Dictionary:
 ## Instances the species model under [member model_root] and hides the placeholder box. A
 ## species without a model keeps the Phase 1 placeholder.
 func _spawn_model() -> void:
-	var species := movement.species
-	if species == null or species.model_scene == null:
+	if not spawn_species_model(movement.species, model_root):
 		return
+	for placeholder: String in ["Body", "Nose"]:
+		(get_node(placeholder) as Node3D).visible = false
+	(%AnimationController as AnimationController).initialize()
+
+
+## Instances [param species]' model under [param root] (scaled and turned to face −Z).
+## Returns [code]false[/code] when the species has no model. Shared with fauna.
+static func spawn_species_model(species: AnimalSpecies, root: Node3D) -> bool:
+	if species == null or species.model_scene == null:
+		return false
 	var model := species.model_scene.instantiate() as Node3D
 	model.name = "Species"
 	model.scale = Vector3.ONE * species.model_scale
 	model.rotation.y = deg_to_rad(species.model_yaw_degrees)
-	model_root.add_child(model)
-	for placeholder: String in ["Body", "Nose"]:
-		(get_node(placeholder) as Node3D).visible = false
-	(%AnimationController as AnimationController).initialize()
+	root.add_child(model)
+	return true

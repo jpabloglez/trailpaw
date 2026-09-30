@@ -17,6 +17,9 @@ const MAX_BUOYANCY_SPEED: float = 3.0
 
 ## Locomotion tunables. Must be valid (see [method AnimalSpecies.get_validation_errors]).
 @export var species: AnimalSpecies
+## Whether [member move_input] is relative to the active camera (the player) or a world XZ
+## direction ([code](x, z)[/code], for AI-driven animals).
+@export var camera_relative: bool = true
 
 ## Desired movement, as returned by [method Input.get_vector] (y < 0 is forward).
 var move_input: Vector2 = Vector2.ZERO
@@ -158,5 +161,7 @@ func _step_horizontal(delta: float, control: float, speed_factor: float = 1.0) -
 
 
 func _camera_basis() -> Basis:
+	if not camera_relative:
+		return Basis.IDENTITY  # move_input.x → world +X, move_input.y → world +Z
 	var camera := get_viewport().get_camera_3d()
 	return camera.global_basis if camera != null else _body.global_basis

@@ -220,7 +220,8 @@ stays in `data/species/` as an alternative; switching is a one-line change in `a
 - Scene: `scenes/player/animal.tscn` — `Animal` (CharacterBody3D) with `%MovementComponent`,
   `%PlayerInput` and `%StateMachine` (Idle, Locomotion, Jump, Fall). Forward is `-Z`.
 - Physics layers (named in `project.godot`): **1 `world`** (static geometry, terrain),
-  **2 `player`**, **3 `interactable`** (interaction targets, Phase 7). The player collides
+  **2 `player`**, **3 `interactable`** (interaction targets, Phase 7), **4 `fauna`** (Phase 8;
+  collides with `world` only). The player collides
   with `world`; camera collision only checks `world`.
 - `CharacterBody3D` with capsule collider oriented horizontally (or two-sphere approximation).
 - Camera-relative input; smooth acceleration and turning (quadrupeds turn in arcs, not in place).
@@ -440,6 +441,15 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
 - Temperament per species: shy (flees), curious (approaches), friendly (can follow player
   after a SOCIAL interaction). Social interactions: greet/sniff, play, follow.
 - Distant agents degrade to cheaper update rates (AI LOD).
+- **Implemented (Phase 8):**
+  - `FaunaAgent` (`scenes/fauna/fauna_agent.tscn`): a CharacterBody3D on layer 4 with the
+    player's components — `MovementComponent` (`camera_relative` off: `move_input` is a world
+    XZ direction), `AnimationController`, `GroundAligner`, `StateMachine` — and the species
+    model spawned by the shared `Animal.spawn_species_model()`. Behaviour states
+    (`FaunaState`) write intent and run the same `apply_*` / `move` ticks as the player
+    states. Each agent has its own seeded RNG (`decision_seed`) and a `home`; it is
+    floating-origin shiftable (home shifts with `EventBus.origin_shifted`).
+  - Behaviours so far: `Wander` (walk to random points within `radius` of home, pause 2–6 s).
 
 ## 8. Environment and audio
 
