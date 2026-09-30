@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="FaunaSpecies" format=3]
+
+[ext_resource type="Script" path="res://scripts/fauna/fauna_species.gd" id="1_fauna"]
+[ext_resource type="Resource" path="res://data/species/stag.tres" id="2_animal"]
+[ext_resource type="Resource" path="res://data/fauna/temperaments/shy.tres" id="3_profile"]
+
+[resource]
+script = ExtResource("1_fauna")
+id = &"stag"
+display_name = "Stag"
+animal = ExtResource("2_animal")
+temperament = 0
+profile = ExtResource("3_profile")
+herd_size = Vector2i(1, 1)
+wander_radius = 20.0

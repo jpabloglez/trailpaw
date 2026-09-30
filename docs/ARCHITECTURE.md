@@ -476,6 +476,15 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
     rushed at very close), **friendly** (comes to 2.5 m, never flees), **calm** (grazes most,
     flees only if nearly run over). Traits: all can be greeted; curious and friendly play;
     friendly ones follow after playing.
+  - **Species** (Quaternius Ultimate Animated Animal Pack via the Poly Pizza mirror, CC0, same
+    rig and clips as the fox; `assets/animals/<id>/` with LICENSE.md): **deer** and **stag**
+    (shy), **shiba_inu** (friendly), **alpaca** (curious), **horse** and **donkey** (calm).
+    `data/species/<id>.tres` holds the model (scales 0.30–0.48, measured against the fox), clip
+    ground speeds measured with `ClipAnalysis` at that scale (walk speed ≈ walk clip, so hooves
+    do not slide), gaits, and a collision capsule (`AnimalSpecies.body_radius` /
+    `body_length`, fitted by `FaunaAgent`); none swims. `data/fauna/<id>.tres` adds
+    temperament, herd size and wander radius. Hoofed clips differ in name (`Idle_Headlow`,
+    `Jump_toIdle`).
 
 ## 8. Environment and audio
 

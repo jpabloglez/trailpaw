@@ -70,6 +70,7 @@ func _ready() -> void:
 	add_to_group(GROUP)
 	add_to_group(FloatingOrigin.SHIFTABLE_GROUP)
 	EventBus.origin_shifted.connect(_on_origin_shifted)
+	_fit_capsule(movement.species)
 	if Animal.spawn_species_model(movement.species, model_root):
 		(%AnimationController as AnimationController).initialize()
 
@@ -102,6 +103,18 @@ func is_clear(direction: Vector3) -> bool:
 ## Horizontal distance (m) to [param point].
 func horizontal_distance_to(point: Vector3) -> float:
 	return Vector2(point.x - global_position.x, point.z - global_position.z).length()
+
+
+## Resizes the (lying) collision capsule to the species' body, when it gives one.
+func _fit_capsule(animal: AnimalSpecies) -> void:
+	if animal == null or animal.body_length <= 0.0:
+		return
+	var holder := get_node("CollisionShape3D") as CollisionShape3D
+	var capsule := (holder.shape as CapsuleShape3D).duplicate() as CapsuleShape3D
+	capsule.radius = animal.body_radius
+	capsule.height = animal.body_length
+	holder.shape = capsule
+	holder.position.y = animal.body_radius
 
 
 func _on_origin_shifted(offset: Vector3) -> void:

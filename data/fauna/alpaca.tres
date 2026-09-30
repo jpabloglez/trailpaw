@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="FaunaSpecies" format=3]
+
+[ext_resource type="Script" path="res://scripts/fauna/fauna_species.gd" id="1_fauna"]
+[ext_resource type="Resource" path="res://data/species/alpaca.tres" id="2_animal"]
+[ext_resource type="Resource" path="res://data/fauna/temperaments/curious.tres" id="3_profile"]
+
+[resource]
+script = ExtResource("1_fauna")
+id = &"alpaca"
+display_name = "Alpaca"
+animal = ExtResource("2_animal")
+temperament = 1
+profile = ExtResource("3_profile")
+herd_size = Vector2i(2, 3)
+wander_radius = 12.0
