@@ -101,24 +101,32 @@ func refill_all() -> void:
 		_apply(i, _definitions[i].max_value)
 
 
-## Signed rate of [param need_id] per minute (negative = losing) for [param activity] in a biome
-## of [param biome_warmth]; [param in_water] replaces the warmth with the water's.
+## Signed rate of [param need_id] per minute (negative = losing) for [param activity] with a
+## felt warmth of [param warmth] (biome + time of day + weather); [param in_water] replaces the
+## warmth with the water's; [param raining] applies [member NeedModifiers.rain] (less thirst).
 func rate_for(
-	need_id: StringName, activity: Activity, biome_warmth: float, in_water: bool = false
+	need_id: StringName,
+	activity: Activity,
+	warmth: float,
+	in_water: bool = false,
+	raining: bool = false
 ) -> float:
 	var need := definition(need_id)
 	if need_id == _modifiers.warmth_need:
-		var warmth := (
-			_modifiers.water_warmth if in_water else biome_warmth + _modifiers.heat(activity)
-		)
-		return -need.decay_per_minute * warmth
-	return -need.decay_per_minute * _modifiers.multiplier(need_id, activity)
+		var felt := _modifiers.water_warmth if in_water else warmth + _modifiers.heat(activity)
+		return -need.decay_per_minute * felt
+	var rate := -need.decay_per_minute * _modifiers.multiplier(need_id, activity)
+	if raining:
+		rate *= _modifiers.rain.get(need_id, 1.0)
+	return rate
 
 
 ## Advances every need by [param delta] seconds.
-func tick(delta: float, activity: Activity, biome_warmth: float, in_water: bool = false) -> void:
+func tick(
+	delta: float, activity: Activity, warmth: float, in_water: bool = false, raining: bool = false
+) -> void:
 	for i in _definitions.size():
-		var rate := rate_for(_definitions[i].id, activity, biome_warmth, in_water)
+		var rate := rate_for(_definitions[i].id, activity, warmth, in_water, raining)
 		_apply(i, _values[i] + rate * delta / 60.0)
 
 

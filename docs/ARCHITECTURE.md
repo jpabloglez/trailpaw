@@ -331,6 +331,9 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
   the felt warmth instead, `−decay × (biome warmth + activity heat)`: `BiomeDefinition.warmth`
   (hills 1.0, meadow 0.3, forest −0.4, river valley −0.6), running +0.5, idle −0.2; in water
   (wading or swimming) the felt warmth is −1.5, so water always cools off.
+  Since Phase 9 the felt warmth also follows the **time of day** (−0.3 at midnight … +0.2 at
+  noon, cosine) and the **weather** (cloudy −0.1, rain −0.5): `NeedsComponent.felt_warmth()`.
+  While it rains thirst drains ×0.7 (`NeedModifiers.rain`).
 - `NeedsModel` (pure): values, `rate_for()`, `tick()`, clamping and critical state with signals
   `value_changed` / `critical_entered` / `critical_exited`. `NeedsComponent` (on the Animal) ticks
   it at 4 Hz with the activity from `MovementComponent`, the warmth of `GameState.current_biome`
