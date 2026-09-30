@@ -150,3 +150,16 @@ func test_profile_validation() -> void:
 		assert_bool((load("res://data/fauna/default_profile.tres") as FaunaProfile).is_valid())
 		. is_true()
 	)
+
+
+func test_a_moment_with_the_player_is_never_cut_short() -> void:
+	var p := _profile()
+	for moment: StringName in [FaunaDecision.SOCIAL, FaunaDecision.PLAY, FaunaDecision.FOLLOW]:
+		var rushed := _seen(0.5, 8.0)  # would startle anything
+		assert_str(String(FaunaDecision.decide(moment, false, rushed, p, 0.1, 0.9))).is_equal(
+			String(moment)
+		)
+		(
+			assert_str(String(FaunaDecision.decide(moment, true, _seen(30.0), p, 0.1, 0.9)))
+			. is_not_equal(String(moment))
+		)

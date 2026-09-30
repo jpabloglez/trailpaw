@@ -43,9 +43,12 @@ func test_a_player_running_in_from_ten_metres_only_scares_the_shy() -> void:
 	assert_str(_reaction("calm", 10.0, 5.0, 0.99)).is_not_equal("Flee")
 
 
-func test_walking_up_slowly_startles_the_shy_but_not_the_calm() -> void:
-	assert_str(_reaction("shy", 4.0, 1.0, 0.99)).is_equal("Flee")
-	assert_str(_reaction("calm", 4.0, 1.0, 0.99)).is_not_equal("Flee")
+func test_a_slow_approach_lets_you_close_to_the_shy_but_rushing_in_does_not() -> void:
+	# User decision: shy animals flee "if you approach fast"; walking up slowly is fine.
+	assert_str(_reaction("shy", 4.0, 1.0, 0.99)).is_not_equal("Flee")
+	assert_str(_reaction("shy", 4.0, 5.0, 0.99)).is_equal("Flee")
+	assert_str(_reaction("shy", 0.8, 0.0, 0.99)).is_equal("Flee")  # bumped into
+	assert_str(_reaction("calm", 4.0, 5.0, 0.99)).is_not_equal("Flee")
 	assert_str(_reaction("calm", 1.0, 0.5, 0.99)).is_equal("Flee")  # only right on top of it
 
 

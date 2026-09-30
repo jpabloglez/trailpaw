@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="InteractionDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/interaction/interaction_definition.gd" id="1_idef"]
+
+[resource]
+script = ExtResource("1_idef")
+id = &"play"
+type = 4
+prompt = "Play"
+animation = &"sniff"
+duration = 1.5

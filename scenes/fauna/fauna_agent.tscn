@@ -15,6 +15,13 @@
 [ext_resource type="Script" path="res://scripts/fauna/fauna_brain.gd" id="12_brain"]
 [ext_resource type="Resource" path="res://data/fauna/default_profile.tres" id="13_prof"]
 
+[ext_resource type="Script" path="res://scripts/fauna/states/social_state.gd" id="14_social"]
+[ext_resource type="Script" path="res://scripts/fauna/states/play_state.gd" id="15_play"]
+[ext_resource type="Script" path="res://scripts/interaction/interactable.gd" id="16_inter"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_social"]
+radius = 0.7
+
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_fauna"]
 radius = 0.35
 height = 1.3
@@ -63,6 +70,14 @@ movement = NodePath("../../MovementComponent")
 script = ExtResource("11_follow")
 movement = NodePath("../../MovementComponent")
 
+[node name="Social" type="Node" parent="StateMachine" node_paths=PackedStringArray("movement")]
+script = ExtResource("14_social")
+movement = NodePath("../../MovementComponent")
+
+[node name="Play" type="Node" parent="StateMachine" node_paths=PackedStringArray("movement")]
+script = ExtResource("15_play")
+movement = NodePath("../../MovementComponent")
+
 [node name="Model" type="Node3D" parent="."]
 unique_name_in_owner = true
 
@@ -88,3 +103,11 @@ script = ExtResource("12_brain")
 profile = ExtResource("13_prof")
 agent = NodePath("..")
 state_machine = NodePath("../StateMachine")
+
+[node name="Social" type="Area3D" parent="."]
+unique_name_in_owner = true
+script = ExtResource("16_inter")
+
+[node name="SocialShape" type="CollisionShape3D" parent="Social"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("SphereShape3D_social")
