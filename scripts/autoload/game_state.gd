@@ -30,6 +30,9 @@ var current_biome: StringName = &""
 var game_minutes: float = CLOCK.start_minutes
 ## Clock multiplier (1 = normal pace; resting speeds it up).
 var clock_scale: float = 1.0
+## Current weather ([code]&"clear"[/code], [code]&"cloudy"[/code] or [code]&"rain"[/code]; set by
+## the weather node).
+var weather: StringName = &"clear"
 
 
 func _process(delta: float) -> void:

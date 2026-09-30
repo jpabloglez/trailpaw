@@ -11,6 +11,8 @@ shader_type spatial;
 
 global uniform vec3 world_origin_offset;
 global uniform float water_level;
+// Ground wetness from the weather (0 dry … 1 soaked): darker, glossier ground.
+global uniform float wetness;
 
 uniform sampler2D pattern_noise : hint_default_white, filter_linear_mipmap, repeat_enable;
 // Macro pattern mixing palette A and B (1 / wavelength in m).
@@ -61,6 +63,7 @@ void fragment() {
 	albedo = mix(albedo, shore_color, shore * (1.0 - rock));
 	float depth = clamp(-height / underwater_depth, 0.0, 1.0);
 	albedo = mix(albedo, underwater_color, depth);
-	ALBEDO = albedo;
-	ROUGHNESS = roughness_value;
+	float wet = wetness * (1.0 - depth);
+	ALBEDO = albedo * (1.0 - 0.35 * wet);
+	ROUGHNESS = mix(roughness_value, 0.75, wet * (1.0 - rock * 0.5));
 }

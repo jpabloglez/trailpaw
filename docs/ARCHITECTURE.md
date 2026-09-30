@@ -530,6 +530,16 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
   (ambient luminance ≥ 0.2, user choice); fog takes the horizon colour and covers 35 % of the
   sky, so the streaming edge still dissolves.
 - Weather states (clear, cloudy, rain) with GPU particles; rain boosts cooling, reduces thirst.
+- **Implemented (Phase 9):** `WeatherModel` (pure Markov chain, one state per game-hour slot,
+  seeded per (world seed, slot) so the same time brings the same weather; never rain straight
+  from a clear sky) with `data/world/weather.tres`: ≈ 15 % rain in episodes of ~4 real minutes,
+  ~38 % cloudy (user choice). `Weather` (both sandboxes) eases cloud cover and rain per game
+  minute (resting ×10 speeds it), wets the ground in rain and dries it slowly, publishes
+  `GameState.weather` and `EventBus.weather_changed`, sets the `wetness` global uniform (terrain
+  35 % darker and a little glossier, foliage 15 % darker), dims the sun under clouds
+  (`DayNightCycle.sunlight_factor`, down to 45 %) and feeds the sky's `cloud_cover`,
+  strengthens the `wind` global in rain, and drives one camera-following `GPUParticles3D`
+  (3000 streak drops, `amount_ratio` = rain). F3 shows the weather.
 - Ambient audio layered per biome with cross-fades on biome transitions; footsteps by surface.
 
 ## 9. Persistence
