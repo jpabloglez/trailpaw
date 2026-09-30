@@ -158,7 +158,7 @@ exactly the expected set for a given position; rebase preserves absolute positio
 - [x] Species temperaments (shy/curious/friendly) in data.
 - [ ] `FaunaDirector`: spawn from biome tables per chunk, global cap, AI LOD by distance.
 - [ ] SOCIAL interaction: greet/sniff, play; friendly animals may follow for a while.
-- [ ] 3–4 species using CC0 models (birds, deer, ducks, other capybaras…).
+- [x] 3–4 species using CC0 models (birds, deer, ducks, other capybaras…).
 
 **Tests:** FSM transitions; spawn caps; despawn with chunk; follow ends correctly.
 **Perf:** AI ≤ 1.5 ms/frame with max population.

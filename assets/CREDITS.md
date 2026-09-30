@@ -33,5 +33,11 @@ Every third-party asset in `assets/` must be listed here (see CLAUDE.md §1).
 | `log_large` | `assets/environment/nature/log_large.glb` | Kenney (kenney.nl), Nature Kit 2.1 | CC0 1.0 | https://kenney.nl/assets/nature-kit |
 | `husky` | `assets/animals/husky/husky.glb` | Quaternius, Ultimate Animated Animal Pack (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/wcWiuEqwzq |
 | `fox` | `assets/animals/fox/fox.glb` | Quaternius, Ultimate Animated Animal Pack (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/Bc97C66HKi |
+| `deer` | `assets/animals/deer/deer.glb` | Quaternius, Ultimate Animated Animal Pack (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/T6Cs7tmMHJ |
+| `stag` | `assets/animals/stag/stag.glb` | Quaternius, Ultimate Animated Animal Pack (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/tQdzbZ1Cmw |
+| `shiba_inu` | `assets/animals/shiba_inu/shiba_inu.glb` | Quaternius, Ultimate Animated Animal Pack (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/y4wdQpg767 |
+| `alpaca` | `assets/animals/alpaca/alpaca.glb` | Quaternius, Ultimate Animated Animal Pack (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/bCVFD48i2l |
+| `horse` | `assets/animals/horse/horse.glb` | Quaternius, Ultimate Animated Animal Pack (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/qvTrSG9pZF |
+| `donkey` | `assets/animals/donkey/donkey.glb` | Quaternius, Ultimate Animated Animal Pack (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/qmX6nhnvp7 |
 
 The Nature Kit licence text is kept next to the models in `assets/environment/nature/License.txt`. Only a curated subset of the pack's 329 models is committed; add new ones here in the same pull request.

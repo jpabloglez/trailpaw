@@ -56,6 +56,12 @@ const LOGICAL_ANIMATIONS: Array[StringName] = [
 ## Paw bones (front left/right, back left/right) used for ground speed and footsteps.
 @export var paw_bones: PackedStringArray = PackedStringArray()
 
+@export_group("Body")
+## Collision capsule radius (0 = keep the scene's capsule).
+@export_range(0.0, 2.0, 0.01, "suffix:m") var body_radius: float = 0.0
+## Collision capsule length, nose to tail base (0 = keep the scene's capsule).
+@export_range(0.0, 5.0, 0.01, "suffix:m") var body_length: float = 0.0
+
 @export_group("Ground alignment")
 ## Largest pitch/roll the model tilts to follow the ground.
 @export_range(0.0, 60.0, 0.5, "suffix:°") var max_tilt_degrees: float = 0.0
@@ -134,6 +140,11 @@ func get_validation_errors() -> PackedStringArray:
 			errors.append("swim depths must satisfy 0 < swim_exit_depth < swim_enter_depth")
 		if float_depth <= 0.0 or swim_speed_factor <= 0.0 or buoyancy <= 0.0:
 			errors.append("float_depth, swim_speed_factor and buoyancy must be > 0")
+	if (
+		(body_radius > 0.0) != (body_length > 0.0)
+		or (body_length > 0.0 and body_length < 2.0 * body_radius)
+	):
+		errors.append("body_radius and body_length must be both 0 or length >= 2 × radius")
 	if model_scale <= 0.0:
 		errors.append("model_scale must be > 0")
 	if model_scene != null:

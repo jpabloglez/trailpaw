@@ -1,0 +1,57 @@
+[gd_resource type="Resource" script_class="AnimalSpecies" format=3]
+
+[ext_resource type="PackedScene" path="res://assets/animals/stag/stag.glb" id="1_model"]
+[ext_resource type="Script" path="res://scripts/player/animal_species.gd" id="2_species"]
+
+[resource]
+script = ExtResource("2_species")
+display_name = "Stag"
+model_scene = ExtResource("1_model")
+model_scale = 0.42
+model_yaw_degrees = 180.0
+animations = Dictionary[StringName, String]({
+&"drink": "Eating",
+&"eat": "Eating",
+&"fall": "Jump_toIdle",
+&"idle": "Idle",
+&"jump": "Gallop_Jump",
+&"lie_down": "Idle_Headlow",
+&"run": "Gallop",
+&"sniff": "Idle_Headlow",
+&"swim": "Walk",
+&"tired_idle": "Idle_Headlow",
+&"trot": "Gallop",
+&"walk": "Walk"
+})
+looping = Array[StringName]([&"idle", &"walk", &"trot", &"run", &"swim", &"tired_idle"])
+animation_fallbacks = Dictionary[StringName, String]({
+&"drink": "No drinking clip: Eating (head down at the water).",
+&"fall": "No airborne loop: Jump_toIdle (the landing half of a jump).",
+&"lie_down": "No lying clip: Idle_Headlow (resting pose).",
+&"swim": "Does not swim (fauna avoid water); Walk as a placeholder.",
+&"tired_idle": "No tired clip: Idle_Headlow looped.",
+&"trot": "No trot clip: the gallop, played slower (matched to trot speed)."
+})
+clip_ground_speeds = Dictionary[String, float]({
+"Gallop": 4.607,
+"Walk": 1.164
+})
+max_animation_time_scale = 2.5
+paw_bones = PackedStringArray("FF.L", "FF.R", "FFB.L", "FFB.R")
+max_tilt_degrees = 20.0
+tilt_smoothing = 8.0
+paw_half_length = 0.56
+paw_half_width = 0.157
+body_radius = 0.25
+body_length = 1.6
+walk_speed = 1.15
+trot_speed = 3.8
+run_speed = 8.5
+acceleration = 8.0
+deceleration = 10.0
+turn_rate_slow = 4.0
+turn_rate_fast = 1.8
+turn_slowdown = 0.6
+jump_height = 0.8
+air_control = 0.3
+max_slope_degrees = 40.0

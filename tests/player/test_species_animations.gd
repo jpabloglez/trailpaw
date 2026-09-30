@@ -4,6 +4,12 @@ extends GdUnitTestSuite
 const SPECIES_PATHS: Array[String] = [
 	"res://data/species/husky.tres",
 	"res://data/species/fox.tres",
+	"res://data/species/deer.tres",
+	"res://data/species/stag.tres",
+	"res://data/species/shiba_inu.tres",
+	"res://data/species/alpaca.tres",
+	"res://data/species/horse.tres",
+	"res://data/species/donkey.tres",
 ]
 
 var _species: AnimalSpecies
