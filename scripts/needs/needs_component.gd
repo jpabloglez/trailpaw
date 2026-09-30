@@ -71,7 +71,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 ## Advances the needs by [param delta] seconds with the current conditions.
 func tick(delta: float) -> void:
-	model.tick(delta, activity(), biome_warmth(), in_water())
+	model.tick(delta, activity(), felt_warmth(), in_water(), is_raining())
 
 
 ## Current movement speed multiplier from critical needs (eased; 1 = normal).
@@ -110,6 +110,20 @@ func biome_warmth() -> float:
 	return _warmth.get(GameState.current_biome, 0.0)
 
 
+## Warmth the animal feels: its biome's, plus the time of day and the weather.
+func felt_warmth() -> float:
+	return (
+		biome_warmth()
+		+ modifiers.time_warmth(GameState.time_of_day() / 60.0)
+		+ modifiers.weather_warmth_for(GameState.weather)
+	)
+
+
+## Whether it rains (less thirst, see [member NeedModifiers.rain]).
+func is_raining() -> bool:
+	return GameState.weather == &"rain"
+
+
 ## Whether the animal stands or swims in water (it cools off).
 func in_water() -> bool:
 	return movement != null and (movement.swimming or movement.water_depth() > 0.0)
@@ -141,7 +155,9 @@ func get_debug_lines() -> PackedStringArray:
 	for id in model.ids():
 		parts.append("%s %.0f%s" % [id, model.value(id), "!" if model.is_critical(id) else ""])
 	var activity_name := NeedsModel.ACTIVITY_NAMES[activity()]
-	return PackedStringArray(["needs %s  (%s)" % ["  ".join(parts), activity_name]])
+	return PackedStringArray(
+		["needs %s  (%s, feels %+.2f)" % ["  ".join(parts), activity_name, felt_warmth()]]
+	)
 
 
 func _ease_effects(delta: float) -> void:

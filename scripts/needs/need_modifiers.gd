@@ -28,6 +28,16 @@ extends Resource
 @export var activity_heat: Dictionary[StringName, float] = {}
 ## Felt warmth while in water (replaces biome warmth and activity heat).
 @export_range(-5.0, 0.0, 0.05) var water_warmth: float = 0.0
+## Warmth added at midnight (the coolest hour; eased towards [member noon_warmth] with the day).
+@export_range(-2.0, 2.0, 0.05) var night_warmth: float = 0.0
+## Warmth added at noon (the warmest hour).
+@export_range(-2.0, 2.0, 0.05) var noon_warmth: float = 0.0
+## Warmth added by the weather: clear, cloudy, rain.
+@export var weather_warmth: Vector3 = Vector3.ZERO
+
+@export_group("Rain")
+## Need id → rate multiplier while it rains (e.g. less thirst).
+@export var rain: Dictionary[StringName, float] = {}
 
 @export_group("Effects")
 ## How fast the movement slowdown of critical needs eases in and out (multiplier per second).
@@ -48,6 +58,23 @@ func multiplier(need_id: StringName, activity: int) -> float:
 		NeedsModel.Activity.SWIM:
 			return swim.get(need_id, 1.0)
 	return trot.get(need_id, 1.0)
+
+
+## Warmth the time of day adds at [param hour] (0…24): [member night_warmth] at midnight,
+## [member noon_warmth] at noon, eased with a cosine in between.
+func time_warmth(hour: float) -> float:
+	var t := (cos((hour - 12.0) / 24.0 * TAU) + 1.0) * 0.5
+	return lerpf(night_warmth, noon_warmth, t)
+
+
+## Warmth the weather adds ([code]&"clear"[/code], [code]&"cloudy"[/code], [code]&"rain"[/code]).
+func weather_warmth_for(weather: StringName) -> float:
+	match weather:
+		&"cloudy":
+			return weather_warmth.y
+		&"rain":
+			return weather_warmth.z
+	return weather_warmth.x
 
 
 ## Warmth added by [param activity] (see [enum NeedsModel.Activity]).
