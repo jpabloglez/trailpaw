@@ -27,7 +27,10 @@ const PROBE_DOWN: float = 3.0
 ## The ground must be at least this far above the water surface (m).
 const DRY_MARGIN: float = 0.1
 
-## Species (model, gaits, animations). Set before entering the tree.
+## Wild species (animal, temperament, profile). Set before entering the tree; it provides
+## [member species], the brain's profile and the wander radius.
+@export var fauna: FaunaSpecies
+## Species (model, gaits, animations). Set before entering the tree (or via [member fauna]).
 @export var species: AnimalSpecies
 ## Seed of this agent's own decisions (wander targets, pauses).
 @export var decision_seed: int = 0
@@ -47,6 +50,11 @@ var _ray := PhysicsRayQueryParameters3D.new()
 
 
 func _enter_tree() -> void:
+	if fauna != null:
+		species = fauna.animal
+		(get_node("FaunaBrain") as FaunaBrain).profile = fauna.profile
+		var wander := get_node("StateMachine/Wander") as FaunaWanderState
+		wander.radius = fauna.wander_radius
 	if species != null:
 		(get_node("MovementComponent") as MovementComponent).species = species
 

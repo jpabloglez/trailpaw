@@ -468,6 +468,14 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
     1.5 m ahead rejecting drops, water and steep ground. The choice is kept for 0.1 s. The
     brain adds a separation push from agents within 2 m. A wander target that cannot be
     reached is dropped.
+  - **Species and temperaments** (data): `FaunaSpecies` (`data/fauna/`: id, name, the
+    `AnimalSpecies`, temperament, profile, herd size, wander radius, follow time) sets the
+    agent's species, brain profile and wander radius (`FaunaAgent.fauna`). Temperament
+    profiles in `data/fauna/temperaments/`: **shy** (flees from a fast approach within 14 m or
+    anything within 5 m, until 30 m), **curious** (walks over to look from 5 m; flees only if
+    rushed at very close), **friendly** (comes to 2.5 m, never flees), **calm** (grazes most,
+    flees only if nearly run over). Traits: all can be greeted; curious and friendly play;
+    friendly ones follow after playing.
 
 ## 8. Environment and audio
 
