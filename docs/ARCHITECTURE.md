@@ -516,6 +516,19 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
 ## 8. Environment and audio
 
 - Day/night cycle drives sun angle, sky colours and fog; temperature reacts to time of day.
+- **Implemented (Phase 9):** `DayNightCycle` (both sandboxes) reads `GameState.time_of_day()`
+  at 10 Hz — the Phase 7 clock: a 24-minute day, ×10 while resting — and drives:
+  - the sun (`sun_direction()`: rises in the east at 06:00, 62° at midday towards −Z, sets in
+    the west at 18:00, below the horizon at night; hidden and shadowless when its energy drops),
+  - a dim bluish moon (opposite the sun, no shadows),
+  - colour ambient light (the environment switches to `AMBIENT_SOURCE_COLOR`) and fog colour,
+  - `shaders/sky.gdshader` (replaces the environment's sky material): horizon → zenith
+    gradient, sun disk and glow, moon, stars fading in at night, and `cloud_cover` for the
+    weather.
+  Tracks per key hour live in `data/world/day_night.tres` (`DayNightSettings`), sampled with the
+  pure `DayCurve` (linear, seamless across midnight). Nights are moonlit and readable
+  (ambient luminance ≥ 0.2, user choice); fog takes the horizon colour and covers 35 % of the
+  sky, so the streaming edge still dissolves.
 - Weather states (clear, cloudy, rain) with GPU particles; rain boosts cooling, reduces thirst.
 - Ambient audio layered per biome with cross-fades on biome transitions; footsteps by surface.
 

@@ -24,6 +24,8 @@
 [ext_resource type="Script" path="res://scripts/fauna/fauna_director.gd" id="43_fdir"]
 [ext_resource type="Resource" path="res://data/fauna/director.tres" id="44_fset"]
 [ext_resource type="PackedScene" path="res://scenes/fauna/fauna_agent.tscn" id="45_fagent"]
+[ext_resource type="Script" path="res://scripts/world/day_night_cycle.gd" id="46_dn"]
+[ext_resource type="Resource" path="res://data/world/day_night.tres" id="47_dnset"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_k7oal"]
 
@@ -109,3 +111,9 @@ terrain = ExtResource("3_u18in")
 streamer = NodePath("../WorldStreamer")
 agent_scene = ExtResource("45_fagent")
 player = NodePath("../Animal")
+
+[node name="DayNightCycle" type="Node" parent="." node_paths=PackedStringArray("sun", "world_environment")]
+script = ExtResource("46_dn")
+settings = ExtResource("47_dnset")
+sun = NodePath("../Sun")
+world_environment = NodePath("../WorldEnvironment")
