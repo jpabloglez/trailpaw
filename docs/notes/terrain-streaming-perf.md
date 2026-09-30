@@ -98,3 +98,17 @@ out of the tree while they are rebuilt, so the physics server registers them onc
 
 Grass (not in the fox's diet) gets no targets: `WorldStreamer.edible_kinds()` filters by the
 player species' diet.
+
+## Phase 8 — fauna
+
+- 10 km probe with the `FaunaDirector` active: PASS (worst build 2.7 ms, max frame 13.8 ms).
+  Before the warm-up the first herd of each species cost a 15–20 ms frame: clip analysis for
+  footsteps (~10 ms, now skipped for fauna) and per-animal copies of the clip library (now
+  shared per species); `warm_up()` pays the remaining first-instance cost (~5 ms per species) at
+  load. A spawn now costs ≈ 1 ms.
+- AI cost, 10 animals at full rate, timed around the calls: behaviour + `move_and_slide`
+  0.47–0.50 ms, ground alignment 0.13–0.14 ms, brain 0.05 ms → **≈ 0.65 ms/frame** (budget
+  1.5 ms). Disabling AI parts did not lower `TIME_PHYSICS_PROCESS` measurably: ~1–1.5 ms of it
+  is per-body/per-skeleton engine work, and WSL timing noise is ±0.5 ms. Re-check on native
+  Windows.
+

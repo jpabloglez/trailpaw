@@ -34,6 +34,12 @@ extends Resource
 ## What grows in this biome and where (see [VegetationEntry]).
 @export var vegetation: Array[VegetationEntry] = []
 
+@export_group("Fauna")
+## Chance that a full-detail chunk of this biome hosts a herd.
+@export_range(0.0, 1.0, 0.01) var fauna_chance: float = 0.0
+## Species living here and their relative weights.
+@export var fauna: Array[FaunaEntry] = []
+
 @export_group("Ground palette")
 ## First ground colour; the terrain shader varies between A and B across the landscape.
 @export var ground_color_a: Color = Color.BLACK

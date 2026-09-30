@@ -43,6 +43,8 @@ const ACTIONS: Array[StringName] = [&"eat", &"drink", &"lie_down", &"sniff"]
 
 ## Paw contact times per species model path: clip → [[time, paw], …] sorted by time.
 static var _contact_cache: Dictionary = {}
+## Looped clip libraries per species (model path + loop set): shared by every animal of a species.
+static var _library_cache: Dictionary = {}
 
 ## Movement providing speed.
 @export var movement: MovementComponent
@@ -52,6 +54,9 @@ static var _contact_cache: Dictionary = {}
 @export var model_root: Node3D
 ## Needs providing the tired look (optional).
 @export var needs: NeedsComponent
+## Whether to detect paw contacts and emit [signal footstep] (the player; fauna skip it, which
+## saves the one-off clip analysis per species).
+@export var footsteps: bool = true
 
 var _tree: AnimationTree
 var _playback: AnimationNodeStateMachinePlayback
@@ -75,7 +80,8 @@ func initialize() -> void:
 	var player := (
 		model_root.find_children("*", "AnimationPlayer", true, false)[0] as AnimationPlayer
 	)
-	_contacts = _paw_contacts()
+	if footsteps:
+		_contacts = _paw_contacts()
 	_add_looped_library(player)
 	_tree = AnimationTree.new()
 	_tree.name = "AnimationTree"
@@ -140,6 +146,10 @@ static func time_scale_for(speed: float, species: AnimalSpecies) -> float:
 
 
 func _add_looped_library(player: AnimationPlayer) -> void:
+	var key := "%s|%s" % [_species.resource_path, _species.model_scene.resource_path]
+	if _library_cache.has(key):
+		player.add_animation_library(LIBRARY, _library_cache[key])
+		return
 	var library := AnimationLibrary.new()
 	for logical: StringName in _species.animations:
 		var name := library_name(logical)
@@ -149,6 +159,7 @@ func _add_looped_library(player: AnimationPlayer) -> void:
 		var loops := _species.looping.has(logical)
 		anim.loop_mode = Animation.LOOP_LINEAR if loops else Animation.LOOP_NONE
 		library.add_animation(name, anim)
+	_library_cache[key] = library
 	player.add_animation_library(LIBRARY, library)
 
 

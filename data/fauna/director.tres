@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="FaunaSettings" format=3]
+
+[ext_resource type="Script" path="res://scripts/fauna/fauna_settings.gd" id="1_fset"]
+
+[resource]
+script = ExtResource("1_fset")
+max_agents = 10
+min_spawn_distance = 25.0
+despawn_distance = 120.0
+full_radius = 40.0
+mid_radius = 90.0
+herd_spread = 12.0
+max_spawn_slope = 25.0

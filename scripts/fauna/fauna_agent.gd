@@ -34,6 +34,9 @@ const DRY_MARGIN: float = 0.1
 @export var species: AnimalSpecies
 ## Seed of this agent's own decisions (wander targets, pauses).
 @export var decision_seed: int = 0
+## Physics ticks per behaviour tick (1 = every tick; the AI LOD raises it for distant animals,
+## which then move in bigger steps with the accumulated delta).
+@export_range(1, 10) var tick_stride: int = 1
 
 ## Where the agent belongs (wanders around it); set on entering the tree when zero.
 var home: Vector3 = Vector3.ZERO
@@ -41,6 +44,8 @@ var home: Vector3 = Vector3.ZERO
 var rng := RandomNumberGenerator.new()
 
 var _ray := PhysicsRayQueryParameters3D.new()
+var _stride_count: int = 0
+var _stride_delta: float = 0.0
 
 @onready var movement: MovementComponent = %MovementComponent
 @onready var state_machine: StateMachine = %StateMachine
@@ -69,10 +74,23 @@ func _ready() -> void:
 		home = global_position
 	add_to_group(GROUP)
 	add_to_group(FloatingOrigin.SHIFTABLE_GROUP)
+	state_machine.set_physics_process(false)  # driven below, every tick_stride ticks
+	_stride_count = decision_seed % 10  # stagger
 	EventBus.origin_shifted.connect(_on_origin_shifted)
 	_fit_capsule(movement.species)
 	if Animal.spawn_species_model(movement.species, model_root):
 		(%AnimationController as AnimationController).initialize()
+
+
+func _physics_process(delta: float) -> void:
+	_stride_delta += delta
+	_stride_count += 1
+	if _stride_count < tick_stride:
+		return
+	_stride_count = 0
+	if state_machine.current_state != null:
+		state_machine.current_state.physics_update(_stride_delta)
+	_stride_delta = 0.0
 
 
 ## Whether walking along [param direction] (horizontal unit vector) is fine: nothing blocks the

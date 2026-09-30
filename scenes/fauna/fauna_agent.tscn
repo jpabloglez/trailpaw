@@ -72,6 +72,7 @@ script = ExtResource("5_anim")
 movement = NodePath("../MovementComponent")
 state_machine = NodePath("../StateMachine")
 model_root = NodePath("../Model")
+footsteps = false
 
 [node name="GroundAligner" type="Node" parent="." node_paths=PackedStringArray("body", "movement", "pivot")]
 unique_name_in_owner = true
@@ -79,6 +80,7 @@ script = ExtResource("6_align")
 body = NodePath("..")
 movement = NodePath("../MovementComponent")
 pivot = NodePath("../Model")
+probe_interval = 4
 
 [node name="FaunaBrain" type="Node" parent="." node_paths=PackedStringArray("agent", "state_machine")]
 unique_name_in_owner = true
