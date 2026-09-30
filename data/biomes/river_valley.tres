@@ -12,6 +12,11 @@
 [ext_resource type="Resource" path="res://data/vegetation/berry_bush.tres" id="50_berry_bush"]
 [ext_resource type="Resource" path="res://data/vegetation/mushroom_tan.tres" id="50_mushroom_tan"]
 [ext_resource type="Resource" path="res://data/vegetation/den_log.tres" id="51_den"]
+[ext_resource type="Script" path="res://scripts/fauna/fauna_entry.gd" id="60_fentry"]
+[ext_resource type="Resource" path="res://data/fauna/donkey.tres" id="61_donkey"]
+[ext_resource type="Resource" path="res://data/fauna/horse.tres" id="61_horse"]
+[ext_resource type="Resource" path="res://data/fauna/alpaca.tres" id="61_alpaca"]
+[ext_resource type="Resource" path="res://data/fauna/deer.tres" id="61_deer"]
 
 [sub_resource type="Resource" id="Resource_0mnhg"]
 script = ExtResource("2_rewjl")
@@ -101,6 +106,26 @@ min_height = 0.5
 max_height = 60.0
 cluster = 0.3
 
+[sub_resource type="Resource" id="Resource_fauna_donkey"]
+script = ExtResource("60_fentry")
+species = ExtResource("61_donkey")
+weight = 2.0
+
+[sub_resource type="Resource" id="Resource_fauna_horse"]
+script = ExtResource("60_fentry")
+species = ExtResource("61_horse")
+weight = 2.0
+
+[sub_resource type="Resource" id="Resource_fauna_alpaca"]
+script = ExtResource("60_fentry")
+species = ExtResource("61_alpaca")
+weight = 2.0
+
+[sub_resource type="Resource" id="Resource_fauna_deer"]
+script = ExtResource("60_fentry")
+species = ExtResource("61_deer")
+weight = 1.0
+
 [resource]
 script = ExtResource("1_uryr0")
 id = &"river_valley"
@@ -114,3 +139,5 @@ ridged_scale = 0.3
 vegetation = Array[ExtResource("2_rewjl")]([SubResource("Resource_0mnhg"), SubResource("Resource_amnyk"), SubResource("Resource_s0byp"), SubResource("Resource_qexg7"), SubResource("Resource_n1hqp"), SubResource("Resource_fg57t"), SubResource("Resource_qh2nm"), SubResource("Resource_berry_bush"), SubResource("Resource_mushroom_tan"), SubResource("Resource_den_log")])
 ground_color_a = Color(0.4, 0.6, 0.37, 1)
 ground_color_b = Color(0.64, 0.58, 0.42, 1)
+fauna_chance = 0.12
+fauna = Array[ExtResource("60_fentry")]([SubResource("Resource_fauna_donkey"), SubResource("Resource_fauna_horse"), SubResource("Resource_fauna_alpaca"), SubResource("Resource_fauna_deer")])

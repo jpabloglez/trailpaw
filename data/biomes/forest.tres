@@ -17,6 +17,10 @@
 [ext_resource type="Resource" path="res://data/vegetation/berry_bush.tres" id="50_berry_bush"]
 [ext_resource type="Resource" path="res://data/vegetation/mushroom_tan.tres" id="50_mushroom_tan"]
 [ext_resource type="Resource" path="res://data/vegetation/den_log.tres" id="51_den"]
+[ext_resource type="Script" path="res://scripts/fauna/fauna_entry.gd" id="60_fentry"]
+[ext_resource type="Resource" path="res://data/fauna/deer.tres" id="61_deer"]
+[ext_resource type="Resource" path="res://data/fauna/stag.tres" id="61_stag"]
+[ext_resource type="Resource" path="res://data/fauna/shiba_inu.tres" id="61_shiba_inu"]
 
 [sub_resource type="Resource" id="Resource_rgie2"]
 script = ExtResource("2_w3brh")
@@ -153,6 +157,21 @@ min_height = 0.5
 max_height = 60.0
 cluster = 0.3
 
+[sub_resource type="Resource" id="Resource_fauna_deer"]
+script = ExtResource("60_fentry")
+species = ExtResource("61_deer")
+weight = 4.0
+
+[sub_resource type="Resource" id="Resource_fauna_stag"]
+script = ExtResource("60_fentry")
+species = ExtResource("61_stag")
+weight = 3.0
+
+[sub_resource type="Resource" id="Resource_fauna_shiba_inu"]
+script = ExtResource("60_fentry")
+species = ExtResource("61_shiba_inu")
+weight = 2.0
+
 [resource]
 script = ExtResource("1_s8i2t")
 id = &"forest"
@@ -166,3 +185,5 @@ ridged_scale = 0.5
 vegetation = Array[ExtResource("2_w3brh")]([SubResource("Resource_rgie2"), SubResource("Resource_qej8q"), SubResource("Resource_005t4"), SubResource("Resource_eedph"), SubResource("Resource_fuf42"), SubResource("Resource_23ltr"), SubResource("Resource_nbifi"), SubResource("Resource_67o0g"), SubResource("Resource_1knfq"), SubResource("Resource_7mx0i"), SubResource("Resource_y2act"), SubResource("Resource_3t70u"), SubResource("Resource_berry_bush"), SubResource("Resource_mushroom_tan"), SubResource("Resource_den_log")])
 ground_color_a = Color(0.27, 0.44, 0.22, 1)
 ground_color_b = Color(0.4, 0.36, 0.23, 1)
+fauna_chance = 0.15
+fauna = Array[ExtResource("60_fentry")]([SubResource("Resource_fauna_deer"), SubResource("Resource_fauna_stag"), SubResource("Resource_fauna_shiba_inu")])

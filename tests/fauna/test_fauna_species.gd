@@ -102,3 +102,22 @@ func test_each_agent_gets_a_capsule_fitted_to_its_body() -> void:
 		assert_float(capsule.radius).is_equal_approx(fauna.animal.body_radius, 1e-5)
 		assert_float(capsule.height).is_equal_approx(fauna.animal.body_length, 1e-5)
 		assert_int(agent.model_root.get_child_count()).is_greater(0)
+
+
+func test_animals_of_a_species_share_one_clip_library_and_skip_footsteps() -> void:
+	var agents: Array[FaunaAgent] = []
+	for i in 2:
+		var agent: FaunaAgent = auto_free(load("res://scenes/fauna/fauna_agent.tscn").instantiate())
+		agent.fauna = _fauna(&"deer")
+		add_child(agent)
+		agents.append(agent)
+	var libraries: Array[AnimationLibrary] = []
+	for agent in agents:
+		var player: AnimationPlayer = (
+			agent.model_root.find_children("*", "AnimationPlayer", true, false)[0]
+		)
+		libraries.append(player.get_animation_library(AnimationController.LIBRARY))
+		var controller := agent.get_node("%AnimationController") as AnimationController
+		assert_bool(controller.footsteps).is_false()
+		assert_array(controller.contacts_for("Walk")).is_empty()
+	assert_object(libraries[0]).is_same(libraries[1])

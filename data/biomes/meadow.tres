@@ -14,6 +14,11 @@
 [ext_resource type="Resource" path="res://data/vegetation/mushroom_redGroup.tres" id="12_negk8"]
 [ext_resource type="Resource" path="res://data/vegetation/berry_bush.tres" id="50_berry_bush"]
 [ext_resource type="Resource" path="res://data/vegetation/den_log.tres" id="51_den"]
+[ext_resource type="Script" path="res://scripts/fauna/fauna_entry.gd" id="60_fentry"]
+[ext_resource type="Resource" path="res://data/fauna/deer.tres" id="61_deer"]
+[ext_resource type="Resource" path="res://data/fauna/shiba_inu.tres" id="61_shiba_inu"]
+[ext_resource type="Resource" path="res://data/fauna/horse.tres" id="61_horse"]
+[ext_resource type="Resource" path="res://data/fauna/donkey.tres" id="61_donkey"]
 
 [sub_resource type="Resource" id="Resource_1sqo5"]
 script = ExtResource("2_1wuxw")
@@ -123,6 +128,26 @@ min_height = 0.5
 max_height = 60.0
 cluster = 0.3
 
+[sub_resource type="Resource" id="Resource_fauna_deer"]
+script = ExtResource("60_fentry")
+species = ExtResource("61_deer")
+weight = 3.0
+
+[sub_resource type="Resource" id="Resource_fauna_shiba_inu"]
+script = ExtResource("60_fentry")
+species = ExtResource("61_shiba_inu")
+weight = 2.0
+
+[sub_resource type="Resource" id="Resource_fauna_horse"]
+script = ExtResource("60_fentry")
+species = ExtResource("61_horse")
+weight = 2.0
+
+[sub_resource type="Resource" id="Resource_fauna_donkey"]
+script = ExtResource("60_fentry")
+species = ExtResource("61_donkey")
+weight = 2.0
+
 [resource]
 script = ExtResource("1_fpjyh")
 id = &"meadow"
@@ -136,3 +161,5 @@ ridged_scale = 0.2
 vegetation = Array[ExtResource("2_1wuxw")]([SubResource("Resource_1sqo5"), SubResource("Resource_mtkay"), SubResource("Resource_uxamn"), SubResource("Resource_4dffp"), SubResource("Resource_rc247"), SubResource("Resource_7n2aq"), SubResource("Resource_saoou"), SubResource("Resource_p4krg"), SubResource("Resource_8lxc3"), SubResource("Resource_qkras"), SubResource("Resource_berry_bush"), SubResource("Resource_den_log")])
 ground_color_a = Color(0.52, 0.68, 0.34, 1)
 ground_color_b = Color(0.72, 0.73, 0.42, 1)
+fauna_chance = 0.12
+fauna = Array[ExtResource("60_fentry")]([SubResource("Resource_fauna_deer"), SubResource("Resource_fauna_shiba_inu"), SubResource("Resource_fauna_horse"), SubResource("Resource_fauna_donkey")])

@@ -21,6 +21,9 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/needs_vignette.tscn" id="40_vign"]
 [ext_resource type="PackedScene" path="res://scenes/ui/needs_hud.tscn" id="41_hud"]
 [ext_resource type="PackedScene" path="res://scenes/ui/interaction_prompt.tscn" id="42_prompt"]
+[ext_resource type="Script" path="res://scripts/fauna/fauna_director.gd" id="43_fdir"]
+[ext_resource type="Resource" path="res://data/fauna/director.tres" id="44_fset"]
+[ext_resource type="PackedScene" path="res://scenes/fauna/fauna_agent.tscn" id="45_fagent"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_k7oal"]
 
@@ -98,3 +101,11 @@ needs = NodePath("../Animal/NeedsComponent")
 
 [node name="InteractionPrompt" parent="." node_paths=PackedStringArray("interactor") instance=ExtResource("42_prompt")]
 interactor = NodePath("../Animal/Interactor")
+
+[node name="FaunaDirector" type="Node3D" parent="." node_paths=PackedStringArray("streamer", "player")]
+script = ExtResource("43_fdir")
+settings = ExtResource("44_fset")
+terrain = ExtResource("3_u18in")
+streamer = NodePath("../WorldStreamer")
+agent_scene = ExtResource("45_fagent")
+player = NodePath("../Animal")

@@ -485,6 +485,21 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
     `body_length`, fitted by `FaunaAgent`); none swims. `data/fauna/<id>.tres` adds
     temperament, herd size and wander radius. Hoofed clips differ in name (`Idle_Headlow`,
     `Jump_toIdle`).
+  - **Spawning** (`FaunaDirector` in the world scene, `data/fauna/director.tres`): when a chunk
+    becomes full detail (LOD 0, `WorldStreamer.chunks_changed`), the pure `FaunaPlan.roll()`
+    decides — seeded per (world seed, chunk) — whether it hosts a herd (biome `fauna_chance`,
+    12–15 %), of which species (`BiomeDefinition.fauna` weights) and where (within 12 m of the
+    chunk centre). Spawns are queued (1 per frame) and placed by a downward ray on dry ground
+    ≤ 25° and ≥ 25 m from the player. **Cap: 10 animals.** An animal leaves when its chunk
+    stops being full detail (its collision goes) or beyond 120 m; the same chunk brings the
+    same herd back. `warm_up()` instances each species once at load, so herds appear in ≈ 1 ms.
+  - **AI LOD** (4 Hz checks): ≤ 40 m full (brain 5 Hz, ground alignment every 4th tick); ≤ 90 m
+    brain 2 Hz, behaviour every 3rd tick (`FaunaAgent.tick_stride`), no alignment; beyond,
+    frozen (`PROCESS_MODE_DISABLED`). Fauna skip footstep analysis and share one looped clip
+    library per species.
+  - **Cost** (WSL, 10 animals at full rate, timed directly): AI ≈ 0.65 ms/frame (behaviour +
+    `move_and_slide` 0.48, alignment 0.13, brain 0.05) — under the 1.5 ms budget. The engine's
+    per-body/per-skeleton work adds ≈ 1–1.5 ms of physics time on top (noisy under WSL).
 
 ## 8. Environment and audio
 
