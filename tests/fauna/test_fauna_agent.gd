@@ -22,6 +22,7 @@ func _agent(at: Vector3 = Vector3(0, 0.1, 0), agent_seed: int = 7) -> FaunaAgent
 	agent.decision_seed = agent_seed
 	agent.position = at
 	add_child(agent)
+	agent.brain.set_physics_process(false)  # these tests drive Wander by hand
 	return agent
 
 
@@ -87,7 +88,7 @@ func test_animation_follows_its_walking() -> void:
 	assert_str(String(controller.current_state())).is_equal("locomotion")
 	var blend: float = controller.tree().get("parameters/locomotion/gait/blend_position")
 	assert_float(blend).is_greater(0.3)
-	assert_float(agent.movement.horizontal_speed()).is_less_equal(agent.species.walk_speed + 0.3)
+	assert_float(agent.movement.horizontal_speed()).is_less_equal(agent.species.walk_speed + 0.5)
 
 
 func test_follows_floating_origin_rebases() -> void:

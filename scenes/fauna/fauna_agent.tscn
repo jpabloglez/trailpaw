@@ -7,6 +7,14 @@
 [ext_resource type="Script" path="res://scripts/player/animation_controller.gd" id="5_anim"]
 [ext_resource type="Script" path="res://scripts/player/ground_aligner.gd" id="6_align"]
 
+[ext_resource type="Script" path="res://scripts/fauna/states/graze_state.gd" id="7_graze"]
+[ext_resource type="Script" path="res://scripts/fauna/states/rest_state.gd" id="8_rest"]
+[ext_resource type="Script" path="res://scripts/fauna/states/flee_state.gd" id="9_flee"]
+[ext_resource type="Script" path="res://scripts/fauna/states/approach_state.gd" id="10_appr"]
+[ext_resource type="Script" path="res://scripts/fauna/states/follow_state.gd" id="11_follow"]
+[ext_resource type="Script" path="res://scripts/fauna/fauna_brain.gd" id="12_brain"]
+[ext_resource type="Resource" path="res://data/fauna/default_profile.tres" id="13_prof"]
+
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_fauna"]
 radius = 0.35
 height = 1.3
@@ -35,6 +43,26 @@ initial_state = NodePath("Wander")
 script = ExtResource("4_wander")
 movement = NodePath("../../MovementComponent")
 
+[node name="Graze" type="Node" parent="StateMachine" node_paths=PackedStringArray("movement")]
+script = ExtResource("7_graze")
+movement = NodePath("../../MovementComponent")
+
+[node name="Rest" type="Node" parent="StateMachine" node_paths=PackedStringArray("movement")]
+script = ExtResource("8_rest")
+movement = NodePath("../../MovementComponent")
+
+[node name="Flee" type="Node" parent="StateMachine" node_paths=PackedStringArray("movement")]
+script = ExtResource("9_flee")
+movement = NodePath("../../MovementComponent")
+
+[node name="Approach" type="Node" parent="StateMachine" node_paths=PackedStringArray("movement")]
+script = ExtResource("10_appr")
+movement = NodePath("../../MovementComponent")
+
+[node name="Follow" type="Node" parent="StateMachine" node_paths=PackedStringArray("movement")]
+script = ExtResource("11_follow")
+movement = NodePath("../../MovementComponent")
+
 [node name="Model" type="Node3D" parent="."]
 unique_name_in_owner = true
 
@@ -51,3 +79,10 @@ script = ExtResource("6_align")
 body = NodePath("..")
 movement = NodePath("../MovementComponent")
 pivot = NodePath("../Model")
+
+[node name="FaunaBrain" type="Node" parent="." node_paths=PackedStringArray("agent", "state_machine")]
+unique_name_in_owner = true
+script = ExtResource("12_brain")
+profile = ExtResource("13_prof")
+agent = NodePath("..")
+state_machine = NodePath("../StateMachine")

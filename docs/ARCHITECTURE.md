@@ -449,7 +449,25 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
     (`FaunaState`) write intent and run the same `apply_*` / `move` ticks as the player
     states. Each agent has its own seeded RNG (`decision_seed`) and a `home`; it is
     floating-origin shiftable (home shifts with `EventBus.origin_shifted`).
-  - Behaviours so far: `Wander` (walk to random points within `radius` of home, pause 2–6 s).
+  - **Behaviours** (states named as `FaunaDecision` constants): Wander (random points within
+    `radius` of home, 2–6 s pauses, `wander_steps` per bout), Graze (stand, eat animation),
+    Rest (lying pose via the controller's `Rest` mapping), Flee (sprint away from the player),
+    Approach (walk to `approach_stop_distance`, watch `watch_time`), Follow (keep
+    `follow_distance`, trot to catch up, for `duration`; started by `FaunaBrain.start_follow`).
+    Each reports `is_done()` when its bout ends.
+  - **`FaunaBrain`** perceives the player (group `player`: distance, closing speed, direction)
+    at 5 Hz, staggered per agent, and asks the pure **`FaunaDecision.decide()`**: an unfinished
+    Follow first; then fleeing (inside `flee_radius` when the player closes faster than
+    `flee_trigger_speed`, or inside `startle_radius`; kept until `safe_distance`); an
+    unfinished Approach; a new Approach by `approach_chance` inside `approach_radius`; the
+    current bout while not done; else wander / graze / rest by `idle_weights`. Tunables:
+    `FaunaProfile` (`data/fauna/`).
+  - **Steering on terrain** (no navmesh): `FaunaSteering.clear_direction()` tries the desired
+    direction, then ±30°…±135°, against `FaunaAgent.is_clear()` — an obstacle feeler (0.4 m
+    high, 1.2 m) that rejects surfaces steeper than the species' walk limit, and a ground probe
+    1.5 m ahead rejecting drops, water and steep ground. The choice is kept for 0.1 s. The
+    brain adds a separation push from agents within 2 m. A wander target that cannot be
+    reached is dropped.
 
 ## 8. Environment and audio
 

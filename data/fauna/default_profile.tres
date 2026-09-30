@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="FaunaProfile" format=3]
+
+[ext_resource type="Script" path="res://scripts/fauna/fauna_profile.gd" id="1_prof"]
+
+[resource]
+script = ExtResource("1_prof")
+flee_radius = 8.0
+flee_trigger_speed = 3.0
+startle_radius = 2.0
+safe_distance = 20.0

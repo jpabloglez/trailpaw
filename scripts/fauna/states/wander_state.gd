@@ -13,10 +13,17 @@ extends FaunaState
 
 var _target: Vector3
 var _pause_left: float = 0.0
+var _steps_left: int = 0
 
 
 func enter(_previous: StringName) -> void:
+	var brain := agent().brain
+	_steps_left = brain.profile.wander_steps if brain != null else 1
 	pick_target()
+
+
+func is_done() -> bool:
+	return _steps_left <= 0
 
 
 func physics_update(delta: float) -> void:
@@ -27,9 +34,13 @@ func physics_update(delta: float) -> void:
 			pick_target()
 	elif agent().horizontal_distance_to(_target) < arrive_distance:
 		movement.move_input = Vector2.ZERO
+		_steps_left -= 1
 		_pause_left = agent().rng.randf_range(pause_range.x, pause_range.y)
 	else:
 		steer_towards(_target, pace)
+		if movement.move_input == Vector2.ZERO:  # blocked (water, cliff): give up this target
+			_steps_left -= 1
+			pick_target()
 	ground_tick(delta)
 
 
