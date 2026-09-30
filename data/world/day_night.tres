@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="DayNightSettings" format=3]
+
+[ext_resource type="Script" path="res://scripts/world/day_night_settings.gd" id="1_dn"]
+
+[resource]
+script = ExtResource("1_dn")
+sunrise_hour = 6.0
+sunset_hour = 18.0
+max_elevation = 62.0
+key_hours = PackedFloat32Array(0, 4.5, 6, 7.5, 12, 16.5, 18, 19.5)
+sun_energy = PackedFloat32Array(0, 0, 0.45, 0.9, 1.0, 0.9, 0.45, 0)
+sun_color = PackedColorArray(0.6, 0.7, 1, 1, 0.8, 0.7, 0.8, 1, 1, 0.7, 0.45, 1, 1, 0.94, 0.85, 1, 1, 0.98, 0.94, 1, 1, 0.93, 0.82, 1, 1, 0.62, 0.4, 1, 0.8, 0.6, 0.7, 1)
+moon_energy = PackedFloat32Array(0.35, 0.3, 0.1, 0, 0, 0, 0.1, 0.3)
+moon_color = Color(0.6, 0.7, 1, 1)
+ambient_energy = PackedFloat32Array(0.6, 0.6, 0.55, 0.5, 0.5, 0.5, 0.55, 0.6)
+ambient_color = PackedColorArray(0.36, 0.43, 0.66, 1, 0.4, 0.42, 0.6, 1, 0.8, 0.66, 0.6, 1, 0.76, 0.78, 0.8, 1, 0.8, 0.82, 0.85, 1, 0.8, 0.8, 0.8, 1, 0.85, 0.63, 0.55, 1, 0.45, 0.43, 0.62, 1)
+sky_top = PackedColorArray(0.05, 0.08, 0.2, 1, 0.1, 0.12, 0.28, 1, 0.35, 0.45, 0.7, 1, 0.35, 0.55, 0.85, 1, 0.3, 0.52, 0.88, 1, 0.33, 0.55, 0.86, 1, 0.3, 0.35, 0.6, 1, 0.1, 0.12, 0.28, 1)
+sky_horizon = PackedColorArray(0.12, 0.16, 0.3, 1, 0.25, 0.25, 0.4, 1, 0.95, 0.65, 0.45, 1, 0.75, 0.82, 0.9, 1, 0.72, 0.8, 0.88, 1, 0.78, 0.8, 0.85, 1, 0.95, 0.55, 0.35, 1, 0.3, 0.25, 0.4, 1)
+fog_color = PackedColorArray(0.12, 0.16, 0.3, 1, 0.25, 0.25, 0.4, 1, 0.95, 0.65, 0.45, 1, 0.75, 0.82, 0.9, 1, 0.72, 0.8, 0.88, 1, 0.78, 0.8, 0.85, 1, 0.95, 0.55, 0.35, 1, 0.3, 0.25, 0.4, 1)
+stars = PackedFloat32Array(1, 1, 0.25, 0, 0, 0, 0.25, 1)
+min_ambient_luminance = 0.2
+fog_sky_affect = 0.35

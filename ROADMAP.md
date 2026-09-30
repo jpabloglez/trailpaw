@@ -168,7 +168,7 @@ exactly the expected set for a given position; rebase preserves absolute positio
 
 ## Phase 9 — Day/night, weather and audio
 
-- [ ] Day/night cycle (sun, sky, fog colours, ambient light).
+- [x] Day/night cycle (sun, sky, fog colours, ambient light).
 - [ ] Weather state machine: clear, cloudy, rain (GPU particles, wet ground tint).
 - [ ] Temperature affected by time and weather.
 - [ ] Biome ambience with cross-fades, footsteps by surface, animal sounds, UI sounds.

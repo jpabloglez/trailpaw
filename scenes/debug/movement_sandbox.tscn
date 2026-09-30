@@ -7,6 +7,8 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/needs_vignette.tscn" id="40_vign"]
 [ext_resource type="PackedScene" path="res://scenes/ui/needs_hud.tscn" id="41_hud"]
 [ext_resource type="PackedScene" path="res://scenes/ui/interaction_prompt.tscn" id="42_prompt"]
+[ext_resource type="Script" path="res://scripts/world/day_night_cycle.gd" id="46_dn"]
+[ext_resource type="Resource" path="res://data/world/day_night.tres" id="47_dnset"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_grbc7"]
 
@@ -600,3 +602,9 @@ needs = NodePath("../Animal/NeedsComponent")
 
 [node name="InteractionPrompt" parent="." node_paths=PackedStringArray("interactor") instance=ExtResource("42_prompt")]
 interactor = NodePath("../Animal/Interactor")
+
+[node name="DayNightCycle" type="Node" parent="." node_paths=PackedStringArray("sun", "world_environment")]
+script = ExtResource("46_dn")
+settings = ExtResource("47_dnset")
+sun = NodePath("../Sun")
+world_environment = NodePath("../WorldEnvironment")
