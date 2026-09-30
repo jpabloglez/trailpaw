@@ -223,3 +223,6 @@ discoveries journal · companion system · more biomes (wetlands, coast, snow) �
   meadow has no water and the nearest lake is ≈ 770 m away (seed 12345), so thirst can run out
   before the player finds water. Options on record: longer-range water scent, ponds in every
   biome (would change the height function → new ADR).
+- **Fauna tuning** (from the Phase 8 playtest): animals felt skittish and at most 2 were seen
+  together. Levers on record (data only): shy `flee_trigger_speed` above trot (only running
+  scares them) and a smaller `flee_radius`; bigger `herd_size`; higher biome `fauna_chance`.
