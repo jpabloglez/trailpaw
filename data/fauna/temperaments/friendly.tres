@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="FaunaProfile" format=3]
+
+[ext_resource type="Script" path="res://scripts/fauna/fauna_profile.gd" id="1_prof"]
+
+[resource]
+script = ExtResource("1_prof")
+approach_radius = 20.0
+approach_stop_distance = 2.5
+approach_chance = 0.6
+watch_time = 6.0
+follow_distance = 2.5

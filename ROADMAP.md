@@ -155,7 +155,7 @@ exactly the expected set for a given position; rebase preserves absolute positio
 
 - [x] `FaunaAgent` scene reusing `StateMachine` and a slimmed `MovementComponent`.
 - [x] Behaviours: Wander, Graze, Flee, Approach, Follow, Rest; steering on terrain.
-- [ ] Species temperaments (shy/curious/friendly) in data.
+- [x] Species temperaments (shy/curious/friendly) in data.
 - [ ] `FaunaDirector`: spawn from biome tables per chunk, global cap, AI LOD by distance.
 - [ ] SOCIAL interaction: greet/sniff, play; friendly animals may follow for a while.
 - [ ] 3–4 species using CC0 models (birds, deer, ducks, other capybaras…).
