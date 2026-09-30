@@ -142,6 +142,10 @@ Scene-tree mutations happen only on the main thread; worker threads produce plai
   meadow has none (0 of 52 sampled chunks; forest 8/54, valley 21/48, hills 1/46) and the
   nearest lake is ≈ 770 m from the spawn. Deferred until the map/navigation aid (ROADMAP
   backlog), then revisited.
+  **Known issue (M2 playtest):** water only forms under the global sea level, so the spawn
+  meadow has none (0 of 52 sampled chunks; forest 8/54, valley 21/48, hills 1/46) and the
+  nearest lake is ≈ 770 m from the spawn. Deferred until the map/navigation aid (ROADMAP
+  backlog), then revisited.
 - Events: `BiomeTracker` samples the focus node's absolute position at 4 Hz and announces a
   new biome only once its weight reaches 0.6 (hysteresis; the first sample announces the
   start biome): it sets `GameState.current_biome` and emits
