@@ -52,6 +52,13 @@ func reset() -> void:
 	_sync_shader_origin()
 
 
+## Starts a session with the local origin at chunk [param chunk] (a loaded game far from the
+## spawn): no node is shifted — call before placing anything.
+func start_at(chunk: Vector2i) -> void:
+	GameState.origin_chunk = chunk
+	_sync_shader_origin()
+
+
 ## Shifts the world so the target is back near the origin. Returns the applied offset
 ## (zero when the target is already within half a chunk of the origin).
 func rebase_now() -> Vector3:

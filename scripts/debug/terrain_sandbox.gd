@@ -15,8 +15,6 @@ const SPIKE_MS: float = 4.0
 const PROBE_ALTITUDE: float = 3.0
 ## Default probe speed (m/s): four times the placeholder animal's run speed.
 const DEFAULT_PROBE_SPEED: float = 30.0
-## Height above the terrain the animal is dropped from when it is released.
-const SPAWN_CLEARANCE: float = 0.5
 
 ## World seed for this session.
 @export var world_seed: int = 12345
@@ -30,8 +28,9 @@ const SPAWN_CLEARANCE: float = 0.5
 @export var free_fly: FreeFlyCamera
 ## Announces biome changes for whichever node has focus.
 @export var biome_tracker: BiomeTracker
+## Parks the animal until the ground is ready (and while free-flying).
+@export var spawner: AnimalSpawner
 
-var _animal_frozen: bool = true
 var _sampler: HeightSampler
 var _probe: Dictionary = {}
 # Packed arrays are value types: keep frame times in a member, not inside the dictionary.
@@ -45,7 +44,7 @@ func _ready() -> void:
 	FloatingOrigin.reset()
 	FloatingOrigin.configure(streamer.terrain.chunk_size, streamer.streaming.rebase_distance)
 	_sampler = HeightSampler.new(streamer.terrain, world_seed)
-	_freeze_animal(true)
+	spawner.park()
 	_use_free_fly(false)
 	var distance := _user_arg_float("--auto-travel=", 0.0)
 	if distance > 0.0:
@@ -63,8 +62,6 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _process(delta: float) -> void:
-	if _animal_frozen and not free_fly.active and streamer.is_ready_at(animal.position):
-		_release_animal()
 	if not _probe.is_empty():
 		_probe_step(delta)
 
@@ -76,7 +73,7 @@ func toggle_free_fly() -> void:
 
 ## Whether the animal is waiting for terrain collision (or parked during free-fly).
 func is_animal_frozen() -> bool:
-	return _animal_frozen
+	return spawner.is_parked()
 
 
 ## Lines for the F3 overlay.
@@ -98,27 +95,15 @@ func get_debug_lines() -> PackedStringArray:
 func _use_free_fly(enabled: bool) -> void:
 	if enabled:
 		free_fly.take_transform(camera_rig.camera.global_transform)
-		_freeze_animal(true)
+		spawner.park()
 	free_fly.active = enabled
+	spawner.auto_release = not enabled
 	camera_rig.camera.current = not enabled
 	var focus: Node3D = free_fly if enabled else animal
 	streamer.target = focus
 	FloatingOrigin.track(focus)
 	if biome_tracker != null:
 		biome_tracker.target = focus
-
-
-func _freeze_animal(frozen: bool) -> void:
-	_animal_frozen = frozen
-	animal.process_mode = Node.PROCESS_MODE_DISABLED if frozen else Node.PROCESS_MODE_INHERIT
-
-
-func _release_animal() -> void:
-	var absolute: Vector3 = GameState.absolute_position(animal.position)
-	animal.position.y = _sampler.height_at(absolute.x, absolute.z) + SPAWN_CLEARANCE
-	animal.velocity = Vector3.ZERO
-	animal.reset_physics_interpolation()
-	_freeze_animal(false)
 
 
 # --- automated probe ------------------------------------------------------------------

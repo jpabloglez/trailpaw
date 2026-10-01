@@ -1,6 +1,5 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://scripts/debug/terrain_sandbox.gd" id="1_q6pur"]
 [ext_resource type="Script" path="res://scripts/world/world_streamer.gd" id="2_o3dhc"]
 [ext_resource type="Resource" path="res://data/world/terrain_settings.tres" id="3_u18in"]
 [ext_resource type="Resource" path="res://data/world/streaming_settings.tres" id="4_nu80k"]
@@ -8,9 +7,6 @@
 [ext_resource type="Material" path="res://data/world/terrain_material.tres" id="6_elxu1"]
 [ext_resource type="PackedScene" path="res://scenes/player/animal.tscn" id="7_u3weh"]
 [ext_resource type="PackedScene" path="res://scenes/player/camera_rig.tscn" id="8_ql1ge"]
-[ext_resource type="Script" path="res://scripts/debug/free_fly_camera.gd" id="9_gsmrj"]
-[ext_resource type="Resource" path="res://data/debug/free_fly_camera.tres" id="10_fpa07"]
-[ext_resource type="Script" path="res://scripts/debug/chunk_border_gizmo.gd" id="11_63snc"]
 [ext_resource type="PackedScene" path="res://scenes/ui/debug_overlay.tscn" id="12_h55wb"]
 
 [ext_resource type="Script" path="res://scripts/world/biome_tracker.gd" id="20_btrk"]
@@ -34,6 +30,8 @@
 [ext_resource type="Script" path="res://scripts/audio/ui_sounds.gd" id="53_ui"]
 [ext_resource type="Resource" path="res://data/audio/ui_sounds.tres" id="54_uiset"]
 [ext_resource type="Script" path="res://scripts/world/animal_spawner.gd" id="55_spawn"]
+[ext_resource type="Script" path="res://scripts/main/world_controller.gd" id="56_world"]
+[ext_resource type="Resource" path="res://data/save/autosave.tres" id="57_auto"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_k7oal"]
 
@@ -53,24 +51,23 @@ fog_depth_curve = 1.6
 fog_depth_begin = 90.0
 fog_depth_end = 200.0
 
-[node name="TerrainSandbox" type="Node3D" unique_id=2936388 node_paths=PackedStringArray("streamer", "animal", "camera_rig", "free_fly", "biome_tracker", "spawner")]
-script = ExtResource("1_q6pur")
+[node name="World" type="Node3D" node_paths=PackedStringArray("streamer", "animal", "spawner", "biome_tracker")]
+script = ExtResource("56_world")
+autosave = ExtResource("57_auto")
 streamer = NodePath("WorldStreamer")
 animal = NodePath("Animal")
-camera_rig = NodePath("CameraRig")
-free_fly = NodePath("FreeFlyCamera")
-biome_tracker = NodePath("BiomeTracker")
 spawner = NodePath("AnimalSpawner")
+biome_tracker = NodePath("BiomeTracker")
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=663329616]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_atku0")
 
-[node name="Sun" type="DirectionalLight3D" parent="." unique_id=1456101742]
+[node name="Sun" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.8660254, 0.38302222, -0.32139382, 0, 0.64278764, 0.76604444, 0.5, -0.66341394, 0.5566704, 0, 0, 0)
 shadow_enabled = true
 directional_shadow_max_distance = 120.0
 
-[node name="WorldStreamer" type="Node3D" parent="." unique_id=1159292779 node_paths=PackedStringArray("target")]
+[node name="WorldStreamer" type="Node3D" parent="." node_paths=PackedStringArray("target")]
 script = ExtResource("2_o3dhc")
 terrain = ExtResource("3_u18in")
 streaming = ExtResource("4_nu80k")
@@ -80,22 +77,13 @@ material = ExtResource("6_elxu1")
 wind = ExtResource("22_wind")
 vegetation_palette = ExtResource("23_palette")
 
-[node name="Animal" parent="." unique_id=858224225 instance=ExtResource("7_u3weh")]
+[node name="Animal" parent="." instance=ExtResource("7_u3weh")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 30, 32)
 
-[node name="CameraRig" parent="." unique_id=1364750976 node_paths=PackedStringArray("target") instance=ExtResource("8_ql1ge")]
+[node name="CameraRig" parent="." node_paths=PackedStringArray("target") instance=ExtResource("8_ql1ge")]
 target = NodePath("../Animal")
 
-[node name="FreeFlyCamera" type="Camera3D" parent="." unique_id=1228331704]
-far = 2000.0
-script = ExtResource("9_gsmrj")
-settings = ExtResource("10_fpa07")
-
-[node name="ChunkBorderGizmo" type="MeshInstance3D" parent="." unique_id=1465677942 node_paths=PackedStringArray("streamer")]
-script = ExtResource("11_63snc")
-streamer = NodePath("../WorldStreamer")
-
-[node name="DebugOverlay" parent="." unique_id=650706242 instance=ExtResource("12_h55wb")]
+[node name="DebugOverlay" parent="." instance=ExtResource("12_h55wb")]
 
 [node name="BiomeTracker" type="Node" parent="." node_paths=PackedStringArray("target")]
 script = ExtResource("20_btrk")

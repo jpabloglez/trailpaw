@@ -181,7 +181,7 @@ exactly the expected set for a given position; rebase preserves absolute positio
 ## Phase 10 — Save/load, settings and menus → **M3**
 
 - [x] `SaveData` resource with schema version and migrations (JSON, see ARCHITECTURE §9).
-- [ ] Autosave (biome change + interval) and manual save.
+- [x] Autosave (biome change + interval) and manual save.
 - [ ] Main menu (new game with seed, continue, settings, quit), pause menu.
 - [ ] Settings: quality presets, resolution/render scale, V-Sync, FOV, mouse sensitivity, invert Y, volumes, key remapping.
 

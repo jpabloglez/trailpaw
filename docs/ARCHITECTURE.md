@@ -584,6 +584,17 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
   `user://saves/save.json`: `write()` is atomic (temp file, then replace; a temp left by a
   crash is still read), `read()` returns null with `last_error` for missing or corrupt files,
   `erase()`, `exists()`, signal `saved`. Fauna is not saved (herds are deterministic per chunk).
+- **World scene** (`scenes/main/world.tscn`, root `WorldController`): the sandbox's gameplay nodes
+  without the debug free-fly camera and chunk gizmo. A new game seeds the world and starts at the
+  spawn meadow; a saved game (`pending_save`, set before adding the scene) restores seed, game
+  time, eaten food and needs, and places the local origin at the player's chunk
+  (`FloatingOrigin.start_at()`) so a game saved kilometres away resumes near the local origin.
+  `AnimalSpawner` (shared with the terrain sandbox) parks the animal until the ground under it
+  has collision and drops it onto the terrain (a floating animal keeps its height on water).
+  **Autosave** (`data/save/autosave.tres`): on `biome_entered` if the last save is ≥ 30 s old,
+  and every 300 s; `save_now()` for the pause menu; never while parked or when
+  `saving_enabled` is off (the attract world behind the menu). Positions are saved absolute, so
+  rebases do not matter.
 
 ## 10. Quality presets
 

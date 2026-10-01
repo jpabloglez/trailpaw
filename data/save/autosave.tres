@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="AutosaveSettings" format=3]
+
+[ext_resource type="Script" path="res://scripts/save/autosave_settings.gd" id="1_auto"]
+
+[resource]
+script = ExtResource("1_auto")
+interval_seconds = 300.0
+biome_min_gap_seconds = 30.0
