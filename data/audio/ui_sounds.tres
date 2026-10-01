@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="UiSoundSettings" format=3]
+
+[ext_resource type="Script" path="res://scripts/audio/ui_sound_settings.gd" id="1_ui"]
+[ext_resource type="AudioStream" path="res://assets/audio/ui/pluck_002.ogg" id="2_prompt"]
+[ext_resource type="AudioStream" path="res://assets/audio/ui/glass_002.ogg" id="3_chime"]
+[ext_resource type="AudioStream" path="res://assets/audio/ui/drop_002.ogg" id="4_sniff"]
+
+[resource]
+script = ExtResource("1_ui")
+prompt = ExtResource("2_prompt")
+need_critical = ExtResource("3_chime")
+sniff = ExtResource("4_sniff")
+volume_db = -12.0
+bus = &"SFX"

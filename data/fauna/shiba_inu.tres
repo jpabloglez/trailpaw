@@ -13,3 +13,5 @@ temperament = 2
 profile = ExtResource("3_profile")
 herd_size = Vector2i(1, 1)
 wander_radius = 10.0
+voice_synth = &"yip"
+call_interval = Vector2(25, 60)

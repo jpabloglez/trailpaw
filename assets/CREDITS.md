@@ -45,5 +45,24 @@ Every third-party asset in `assets/` must be listed here (see CLAUDE.md §1).
 | `meadow_birds` | `assets/audio/ambience/meadow_birds.ogg` | isaiah658, *Ambient Bird Sounds* (OpenGameArt) | CC0 1.0 | https://opengameart.org/content/ambient-bird-sounds |
 | `night_crickets` | `assets/audio/ambience/night_crickets.mp3` | Wolfgang_, *Crickets Ambient Noise - loopable* (OpenGameArt) | CC0 1.0 | https://opengameart.org/content/crickets-ambient-noise-loopable |
 | `rain` | `assets/audio/ambience/rain.ogg` | Kresiek The Furry, *AMB Rain Loop 1* (OpenGameArt) | CC0 1.0 | https://opengameart.org/content/amb-rain-loop-1 |
+| `grass_0` | `assets/audio/footsteps/grass_0.ogg` | Kenney (kenney.nl), Impact Sounds (`footstep_grass_000`) | CC0 1.0 | https://kenney.nl/assets/impact-sounds |
+| `grass_1` | `assets/audio/footsteps/grass_1.ogg` | Kenney (kenney.nl), Impact Sounds (`footstep_grass_001`) | CC0 1.0 | https://kenney.nl/assets/impact-sounds |
+| `grass_2` | `assets/audio/footsteps/grass_2.ogg` | Kenney (kenney.nl), Impact Sounds (`footstep_grass_002`) | CC0 1.0 | https://kenney.nl/assets/impact-sounds |
+| `grass_3` | `assets/audio/footsteps/grass_3.ogg` | Kenney (kenney.nl), Impact Sounds (`footstep_grass_003`) | CC0 1.0 | https://kenney.nl/assets/impact-sounds |
+| `grass_4` | `assets/audio/footsteps/grass_4.ogg` | Kenney (kenney.nl), Impact Sounds (`footstep_grass_004`) | CC0 1.0 | https://kenney.nl/assets/impact-sounds |
+| `ground_0` | `assets/audio/footsteps/ground_0.ogg` | Kenney (kenney.nl), Impact Sounds (`footstep_concrete_000`) | CC0 1.0 | https://kenney.nl/assets/impact-sounds |
+| `ground_1` | `assets/audio/footsteps/ground_1.ogg` | Kenney (kenney.nl), Impact Sounds (`footstep_concrete_001`) | CC0 1.0 | https://kenney.nl/assets/impact-sounds |
+| `ground_2` | `assets/audio/footsteps/ground_2.ogg` | Kenney (kenney.nl), Impact Sounds (`footstep_concrete_002`) | CC0 1.0 | https://kenney.nl/assets/impact-sounds |
+| `ground_3` | `assets/audio/footsteps/ground_3.ogg` | Kenney (kenney.nl), Impact Sounds (`footstep_concrete_003`) | CC0 1.0 | https://kenney.nl/assets/impact-sounds |
+| `ground_4` | `assets/audio/footsteps/ground_4.ogg` | Kenney (kenney.nl), Impact Sounds (`footstep_concrete_004`) | CC0 1.0 | https://kenney.nl/assets/impact-sounds |
+| `water_0` | `assets/audio/footsteps/water_0.ogg` | rubberduck, *40 CC0 water / splash / slime SFX* (`splash_01`, OpenGameArt) | CC0 1.0 | https://opengameart.org/content/40-cc0-water-splash-slime-sfx |
+| `water_1` | `assets/audio/footsteps/water_1.ogg` | rubberduck, *40 CC0 water / splash / slime SFX* (`splash_02`, OpenGameArt) | CC0 1.0 | https://opengameart.org/content/40-cc0-water-splash-slime-sfx |
+| `water_2` | `assets/audio/footsteps/water_2.ogg` | rubberduck, *40 CC0 water / splash / slime SFX* (`splash_03`, OpenGameArt) | CC0 1.0 | https://opengameart.org/content/40-cc0-water-splash-slime-sfx |
+| `water_3` | `assets/audio/footsteps/water_3.ogg` | rubberduck, *40 CC0 water / splash / slime SFX* (`splash_04`, OpenGameArt) | CC0 1.0 | https://opengameart.org/content/40-cc0-water-splash-slime-sfx |
+| `water_4` | `assets/audio/footsteps/water_4.ogg` | rubberduck, *40 CC0 water / splash / slime SFX* (`splash_05`, OpenGameArt) | CC0 1.0 | https://opengameart.org/content/40-cc0-water-splash-slime-sfx |
+| `donkey_bray` | `assets/audio/animals/donkey_bray.ogg` | StarNinjas, *Donkey Bray* (OpenGameArt) | CC0 1.0 | https://opengameart.org/content/donkey-bray |
+| `pluck_002` | `assets/audio/ui/pluck_002.ogg` | Kenney (kenney.nl), Interface Sounds | CC0 1.0 | https://kenney.nl/assets/interface-sounds |
+| `glass_002` | `assets/audio/ui/glass_002.ogg` | Kenney (kenney.nl), Interface Sounds | CC0 1.0 | https://kenney.nl/assets/interface-sounds |
+| `drop_002` | `assets/audio/ui/drop_002.ogg` | Kenney (kenney.nl), Interface Sounds | CC0 1.0 | https://kenney.nl/assets/interface-sounds |
 
 The Nature Kit licence text is kept next to the models in `assets/environment/nature/License.txt`. Only a curated subset of the pack's 329 models is committed; add new ones here in the same pull request.

@@ -136,6 +136,9 @@ func tier_for(distance: float) -> Tier:
 
 ## Puts [param agent] in [param tier].
 func set_tier(agent: FaunaAgent, tier: Tier) -> void:
+	var voice := agent.get_node_or_null("%Voice") as AnimalVoice
+	if voice != null:
+		voice.enabled = tier == Tier.FULL  # only nearby animals call
 	if tier == Tier.FROZEN:
 		agent.process_mode = Node.PROCESS_MODE_DISABLED
 		return

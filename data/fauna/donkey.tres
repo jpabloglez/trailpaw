@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://scripts/fauna/fauna_species.gd" id="1_fauna"]
 [ext_resource type="Resource" path="res://data/species/donkey.tres" id="2_animal"]
 [ext_resource type="Resource" path="res://data/fauna/temperaments/calm.tres" id="3_profile"]
+[ext_resource type="AudioStream" path="res://assets/audio/animals/donkey_bray.ogg" id="4_voice"]
 
 [resource]
 script = ExtResource("1_fauna")
@@ -13,3 +14,5 @@ temperament = 3
 profile = ExtResource("3_profile")
 herd_size = Vector2i(1, 2)
 wander_radius = 12.0
+voice = ExtResource("4_voice")
+call_interval = Vector2(40, 90)

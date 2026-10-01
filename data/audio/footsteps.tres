@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="FootstepSettings" format=3]
+
+[ext_resource type="Script" path="res://scripts/audio/footstep_settings.gd" id="1_fs"]
+[ext_resource type="AudioStream" path="res://assets/audio/footsteps/grass_0.ogg" id="2_grass0"]
+[ext_resource type="AudioStream" path="res://assets/audio/footsteps/grass_1.ogg" id="3_grass1"]
+[ext_resource type="AudioStream" path="res://assets/audio/footsteps/grass_2.ogg" id="4_grass2"]
+[ext_resource type="AudioStream" path="res://assets/audio/footsteps/grass_3.ogg" id="5_grass3"]
+[ext_resource type="AudioStream" path="res://assets/audio/footsteps/grass_4.ogg" id="6_grass4"]
+[ext_resource type="AudioStream" path="res://assets/audio/footsteps/ground_0.ogg" id="7_ground0"]
+[ext_resource type="AudioStream" path="res://assets/audio/footsteps/ground_1.ogg" id="8_ground1"]
+[ext_resource type="AudioStream" path="res://assets/audio/footsteps/ground_2.ogg" id="9_ground2"]
+[ext_resource type="AudioStream" path="res://assets/audio/footsteps/ground_3.ogg" id="10_ground3"]
+[ext_resource type="AudioStream" path="res://assets/audio/footsteps/ground_4.ogg" id="11_ground4"]
+[ext_resource type="AudioStream" path="res://assets/audio/footsteps/water_0.ogg" id="12_water0"]
+[ext_resource type="AudioStream" path="res://assets/audio/footsteps/water_1.ogg" id="13_water1"]
+[ext_resource type="AudioStream" path="res://assets/audio/footsteps/water_2.ogg" id="14_water2"]
+[ext_resource type="AudioStream" path="res://assets/audio/footsteps/water_3.ogg" id="15_water3"]
+[ext_resource type="AudioStream" path="res://assets/audio/footsteps/water_4.ogg" id="16_water4"]
+
+[resource]
+script = ExtResource("1_fs")
+grass = Array[AudioStream]([ExtResource("2_grass0"), ExtResource("3_grass1"), ExtResource("4_grass2"), ExtResource("5_grass3"), ExtResource("6_grass4")])
+ground = Array[AudioStream]([ExtResource("7_ground0"), ExtResource("8_ground1"), ExtResource("9_ground2"), ExtResource("10_ground3"), ExtResource("11_ground4")])
+water = Array[AudioStream]([ExtResource("12_water0"), ExtResource("13_water1"), ExtResource("14_water2"), ExtResource("15_water3"), ExtResource("16_water4")])
+ground_biomes = Array[StringName]([&"hills"])
+wading_depth = 0.02
+pitch = Vector2(1.25, 1.55)
+volume_db = Vector3(-16, -14, -18)
+min_interval = 0.08
+bus = &"SFX"
