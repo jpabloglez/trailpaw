@@ -573,6 +573,17 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
   time of day, species, discovered biomes, per-chunk deltas (depleted food, befriended fauna).
 - Autosave on biome change and every N minutes; manual save from pause menu.
 - Migration functions keyed by schema version.
+- **Implemented (Phase 10):** saves are **JSON, not resources** (loading a `.tres` can run
+  embedded scripts and save files are user-editable). `SaveData` (RefCounted, `VERSION` 2):
+  world seed, **absolute** player position and yaw, need values, `game_minutes` (time — and so
+  the deterministic weather), `ChunkDeltaStore.to_dict()`, biome, species path and save time;
+  `to_dict()` / `from_dict()` coerce JSON numbers. `SaveMigrations.migrate()` upgrades step by
+  step (v1 → v2: seed/pos renamed, game time 08:00, empty deltas, the fox) and rejects files
+  without a version or from a newer game; the v1 format is kept as
+  `tests/fixtures/save_v1.json`. `SaveSystem` keeps the one game (user decision) in
+  `user://saves/save.json`: `write()` is atomic (temp file, then replace; a temp left by a
+  crash is still read), `read()` returns null with `last_error` for missing or corrupt files,
+  `erase()`, `exists()`, signal `saved`. Fauna is not saved (herds are deterministic per chunk).
 
 ## 10. Quality presets
 
