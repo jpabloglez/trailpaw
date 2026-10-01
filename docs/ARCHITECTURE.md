@@ -554,6 +554,18 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
   (`GameState.current_biome`), the daylight (inverse of the sky's stars track) and the rain
   (`Weather.rain`: birds and crickets drowned out, the rain layer rises), and cross-fades over
   3 s. Silent layers are stopped.
+- **Footsteps** (`FootstepAudio` on the Animal, `data/audio/footsteps.tres`): each
+  `AnimationController.footstep` plays a random clip of the surface — water when wading
+  (> 2 cm), bare ground in the hills, grass elsewhere — at a higher pitch (small paws) from a pool
+  of 3 positional players on the SFX bus; steps closer than 80 ms of game time are skipped.
+- **Animal calls** (`AnimalVoice` on each fauna agent, `FaunaSpecies.voice` / `voice_synth` /
+  `call_interval`): donkeys bray (CC0 recording), the Shiba Inu yips (`SynthSounds.yip()`, made
+  in code — no fitting CC0 recording), deer/stags/horses/alpacas are quiet. An animal calls back
+  when greeted, and now and then on its own only in the full-detail AI tier (the director sets
+  `enabled`).
+- **Interface sounds** (`UiSounds` in the sandboxes, `data/audio/ui_sounds.tres`, Kenney CC0): a
+  soft pluck when a prompt appears (once per appearance), a gentle chime when a need turns
+  critical and a whoosh when sniffing.
 
 ## 9. Persistence
 

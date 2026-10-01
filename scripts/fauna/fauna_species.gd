@@ -24,6 +24,23 @@ enum Temperament { SHY, CURIOUS, FRIENDLY, CALM }
 ## Seconds a friendly animal follows after playing.
 @export_range(0.0, 600.0, 1.0, "suffix:s") var follow_seconds: float = 75.0
 
+@export_group("Voice")
+## Call (a recorded clip), or none.
+@export var voice: AudioStream
+## A synthesised call when there is no recording ([code]&"yip"[/code], see [SynthSounds]).
+@export var voice_synth: StringName = &""
+## Seconds between idle calls, uniform in [x, y] (0 = only calls when greeted).
+@export var call_interval: Vector2 = Vector2.ZERO
+
+
+## The call to play, or null for a quiet species.
+func call_stream() -> AudioStream:
+	if voice != null:
+		return voice
+	if voice_synth == &"yip":
+		return SynthSounds.yip()
+	return null
+
 
 ## Whether it can be greeted (all can, unless the temperament keeps it away: shy animals only
 ## while they are not fleeing, which the social interaction checks).

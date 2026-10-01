@@ -171,7 +171,7 @@ exactly the expected set for a given position; rebase preserves absolute positio
 - [x] Day/night cycle (sun, sky, fog colours, ambient light).
 - [x] Weather state machine: clear, cloudy, rain (GPU particles, wet ground tint).
 - [x] Temperature affected by time and weather.
-- [ ] Biome ambience with cross-fades, footsteps by surface, animal sounds, UI sounds.
+- [x] Biome ambience with cross-fades, footsteps by surface, animal sounds, UI sounds.
 - [x] Audio buses: Master, Music, SFX, Ambience.
 
 **Exit:** a full in-game day is atmospheric and varied.

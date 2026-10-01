@@ -19,6 +19,8 @@
 [ext_resource type="Script" path="res://scripts/fauna/states/play_state.gd" id="15_play"]
 [ext_resource type="Script" path="res://scripts/interaction/interactable.gd" id="16_inter"]
 
+[ext_resource type="Script" path="res://scripts/audio/animal_voice.gd" id="17_voice"]
+
 [sub_resource type="SphereShape3D" id="SphereShape3D_social"]
 radius = 0.7
 
@@ -111,3 +113,8 @@ script = ExtResource("16_inter")
 [node name="SocialShape" type="CollisionShape3D" parent="Social"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 shape = SubResource("SphereShape3D_social")
+
+[node name="Voice" type="AudioStreamPlayer3D" parent="."]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+script = ExtResource("17_voice")
