@@ -199,7 +199,7 @@ Added after the M2 and Phase 8 playtests: the spawn meadow has no water (the nea
 - [x] Long-range water scent: sniffing points a trail of sparkles towards water up to 1.5 km away.
 - [x] Explored area remembered in the save (SaveData v3, fog of war).
 - [x] Map screen (M): explored terrain, water, the player and scented water.
-- [ ] Fauna tuning: only running scares shy animals; bigger herds; more animals per biome.
+- [x] Fauna tuning: only running scares shy animals; bigger herds; more animals per biome.
 
 **Tests:** scent finds the spawn lake; migration from v2 fixture; map fog; shy animals ignore a trot.
 **Exit:** you can find water from the start without knowing the map, and get back to places you

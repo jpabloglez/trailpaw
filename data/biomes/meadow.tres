@@ -161,5 +161,5 @@ ridged_scale = 0.2
 vegetation = Array[ExtResource("2_1wuxw")]([SubResource("Resource_1sqo5"), SubResource("Resource_mtkay"), SubResource("Resource_uxamn"), SubResource("Resource_4dffp"), SubResource("Resource_rc247"), SubResource("Resource_7n2aq"), SubResource("Resource_saoou"), SubResource("Resource_p4krg"), SubResource("Resource_8lxc3"), SubResource("Resource_qkras"), SubResource("Resource_berry_bush"), SubResource("Resource_den_log")])
 ground_color_a = Color(0.52, 0.68, 0.34, 1)
 ground_color_b = Color(0.72, 0.73, 0.42, 1)
-fauna_chance = 0.12
+fauna_chance = 0.18
 fauna = Array[ExtResource("60_fentry")]([SubResource("Resource_fauna_deer"), SubResource("Resource_fauna_shiba_inu"), SubResource("Resource_fauna_horse"), SubResource("Resource_fauna_donkey")])
