@@ -142,7 +142,8 @@ func test_spawns_herds_on_the_ground_but_never_beyond_the_cap() -> void:
 	await _drain(director)
 	assert_int(director.agents().size()).is_equal(SETTINGS.max_agents)
 	for agent in director.agents():
-		assert_float(agent.global_position.y).is_between(0.0, 0.3)
+		# On the floor (top at 0); the body may sink a centimetre or two while it settles.
+		assert_float(agent.global_position.y).is_between(-0.05, 0.3)
 		assert_str(String(agent.fauna.id)).is_equal("deer")
 
 

@@ -438,6 +438,16 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
     growing with distance beyond 8 m so far ones stay legible), plus one blue sparkle at the
     nearest water (16 directions × 6 rings of downward rays). Sparkles last 4 s, fading over the
     last 1.2 s; 2 s cooldown. Sparkles are floating-origin shiftable.
+  - **Water scent (Phase 10b):** when no water is within 25 m, the `Sniffer` scents it from up
+    to 1.5 km away. `WaterScent` searches the height function, not loaded chunks: water is
+    wherever the terrain is ≥ 0.3 m under `sea_level`. It walks rings every 16 m outwards with
+    ~16 m of arc between samples, then pulls the first hit back along its ray to the near shore
+    (1 m steps). It runs as one `WorkerThreadPool` task with the sniffer's own `HeightSampler`
+    (≤ ~28 k samples with no water, ≈ 130 ms on a worker in WSL; nothing on the main thread
+    but polling). The result is shown as a trail of 6 blue sparkles, 3 m apart on the ground
+    towards the water, fading in 0.2 s after one another. `water_scented(absolute)` is emitted
+    for the map. With seed 12345 the spawn's nearest lake is ≈ 761 m away, about 3 min at a
+    trot.
 
 ## 7. Fauna AI
 

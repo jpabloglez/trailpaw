@@ -17,8 +17,9 @@ Claude Code; one sprint = 2 weeks.
 | 8 | Fauna AI and social interactions | 2 | 27 w |
 | 9 | Day/night, weather, audio | 1.5 | 30 w |
 | 10 | Save/load, settings, menus | 1 | 32 w |
-| 11 | Performance and polish | 2 | 36 w |
-| 12 | Vertical slice release | 1 | 38 w |
+| 10b | Map and navigation (+ fauna tuning) | 1 | 34 w |
+| 11 | Performance and polish | 2 | 38 w |
+| 12 | Vertical slice release | 1 | 40 w |
 
 Milestones: **M1 "Walk the world"** (end of Phase 3), **M2 "A day in the life"**
 (end of Phase 7), **M3 "Living world"** (end of Phase 10), **M4 Vertical slice** (Phase 12).
@@ -190,6 +191,22 @@ exactly the expected set for a given position; rebase preserves absolute positio
 
 ---
 
+## Phase 10b — Map and navigation (+ fauna tuning)
+
+Added after the M2 and Phase 8 playtests: the spawn meadow has no water (the nearest lake is
+≈ 770 m away with seed 12345), and the animals felt skittish and sparse.
+
+- [x] Long-range water scent: sniffing points a trail of sparkles towards water up to 1.5 km away.
+- [ ] Explored area remembered in the save (SaveData v3, fog of war).
+- [ ] Map screen (M): explored terrain, water, the player and scented water.
+- [ ] Fauna tuning: only running scares shy animals; bigger herds; more animals per biome.
+
+**Tests:** scent finds the spawn lake; migration from v2 fixture; map fog; shy animals ignore a trot.
+**Exit:** you can find water from the start without knowing the map, and get back to places you
+have seen.
+
+---
+
 ## Phase 11 — Performance and polish
 
 - [ ] `tools/perf_probe`: scripted path through all biomes, logs frame times; Python report (p50/p95/p99).
@@ -218,11 +235,3 @@ exactly the expected set for a given position; rebase preserves absolute positio
 Gamepad support · more species selectable at start · seasons · photo mode · collectible
 discoveries journal · companion system · more biomes (wetlands, coast, snow) · Steam Deck profile.
 
-- **Map / navigation aid** (from the M2 playtest): e.g. a sniff "compass" towards water and food
-  beyond sight, a map of discovered water. **Known issue to revisit after it:** the spawn
-  meadow has no water and the nearest lake is ≈ 770 m away (seed 12345), so thirst can run out
-  before the player finds water. Options on record: longer-range water scent, ponds in every
-  biome (would change the height function → new ADR).
-- **Fauna tuning** (from the Phase 8 playtest): animals felt skittish and at most 2 were seen
-  together. Levers on record (data only): shy `flee_trigger_speed` above trot (only running
-  scares them) and a smaller `flee_radius`; bigger `herd_size`; higher biome `fauna_chance`.
