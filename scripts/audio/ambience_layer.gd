@@ -15,6 +15,11 @@ extends Resource
 @export var is_rain: bool = false
 ## Volume of the rain layer at full rain.
 @export_range(0.0, 1.0, 0.01) var rain_volume: float = 0.0
+## Intermittent layers (birdsong): seconds each spell is heard (min, max). Zero plays it
+## continuously.
+@export var spells: Vector2 = Vector2.ZERO
+## Seconds of silence between spells (min, max).
+@export var pauses: Vector2 = Vector2.ZERO
 
 
 ## Target volume in [param biome] with [param daylight] (0 night … 1 day) and [param rain]
@@ -24,3 +29,8 @@ func volume_for(biome: StringName, daylight: float, rain: float) -> float:
 		return rain_volume * rain
 	var base := lerpf(night.get(biome, 0.0), day.get(biome, 0.0), daylight)
 	return base * lerpf(1.0, under_rain, rain)
+
+
+## Whether the layer comes and goes in spells instead of playing continuously.
+func is_intermittent() -> bool:
+	return spells.y > 0.0

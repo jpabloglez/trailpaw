@@ -558,7 +558,11 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
   by `tools/ambience_loop.py`). Each layer's volume comes from the biome
   (`GameState.current_biome`), the daylight (inverse of the sky's stars track) and the rain
   (`Weather.rain`: birds and crickets drowned out, the rain layer rises), and cross-fades over
-  3 s. Silent layers are stopped.
+  3 s. Silent layers are stopped. The birdsong is soft and **intermittent**
+  (`AmbienceLayer.spells` / `pauses`): it comes in spells of 6–20 s separated by 15–70 s of
+  quiet, gated by an RNG seeded from the world seed, each spell starting at a random point of
+  its loop. A low continuous wind bed sits under every biome, so the pauses are never dead
+  silence. There are no visible birds yet, which is why the birdsong stays sparse.
 - **Footsteps** (`FootstepAudio` on the Animal, `data/audio/footsteps.tres`): each
   `AnimationController.footstep` plays a random clip of the surface — water when wading
   (> 2 cm), bare ground in the hills, grass elsewhere — at a higher pitch (small paws) from a pool
