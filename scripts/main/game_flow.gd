@@ -1,9 +1,9 @@
 class_name GameFlow
 extends Node
 ## The game's entry point ([code]main.tscn[/code]): the main menu over an attract-mode world,
-## then the game itself, with the pause menu on top. It saves when going back to the menu,
-## when quitting and when the window is closed, so a game can be left anywhere and continued
-## exactly there.
+## then the game itself, with the pause menu and the map on top. It saves when going back to
+## the menu, when quitting and when the window is closed, so a game can be left anywhere and
+## continued exactly there.
 ##
 ## Switching worlds happens deferred and frees the old one before adding the new one, so the
 ## old world's clean-up (floating origin) never undoes the new one's set-up.
@@ -21,6 +21,7 @@ var _world: WorldController
 var _menu: MainMenu
 var _pause: PauseMenu
 var _settings: SettingsMenu
+var _map: MapScreen
 var _playing: bool = false
 
 
@@ -37,6 +38,10 @@ func _ready() -> void:
 	add_child(_settings)
 	_pause.settings_requested.connect(_open_settings)
 	_settings.closed.connect(_on_settings_closed)
+	_map = MapScreen.new()
+	_map.name = "MapScreen"
+	add_child(_map)
+	_pause.map_requested.connect(_open_map)
 	show_menu()
 
 
@@ -50,6 +55,9 @@ func show_menu() -> void:
 	_playing = false
 	_pause.enabled = false
 	_pause.close()
+	_map.enabled = false
+	_map.close()
+	_map.world = null
 	var saved := SaveSystem.read() if SaveSystem.exists() else null
 	var world := world_scene.instantiate() as WorldController
 	world.attract_mode = true
@@ -114,6 +122,11 @@ func settings_menu() -> SettingsMenu:
 	return _settings
 
 
+## The map screen.
+func map_screen() -> MapScreen:
+	return _map
+
+
 ## Whether a game is being played (not the menu).
 func is_playing() -> bool:
 	return _playing
@@ -141,6 +154,8 @@ func _play(world: WorldController) -> void:
 	_replace_world(world)
 	_playing = true
 	_pause.enabled = true
+	_map.world = world
+	_map.enabled = true
 
 
 func _replace_world(world: WorldController) -> void:
@@ -158,6 +173,11 @@ func _replace_world(world: WorldController) -> void:
 func _on_save_requested() -> void:
 	if _world != null and _world.save_now():
 		_pause.show_saved()
+
+
+func _open_map() -> void:
+	_pause.close()
+	_map.open()
 
 
 func _open_settings() -> void:
