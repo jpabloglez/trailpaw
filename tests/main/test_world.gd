@@ -5,6 +5,7 @@ extends GdUnitTestSuite
 const WORLD_SCENE: String = "res://scenes/main/world.tscn"
 const TEST_DIR: String = "user://test_world_saves"
 const MAX_FRAMES: int = 1500
+const EXPLORATION: ExplorationSettings = preload("res://data/world/exploration.tres")
 
 var _saved_dir: String
 var _saved_minutes: float
@@ -64,6 +65,9 @@ func test_a_saved_game_continues_exactly_where_it_was() -> void:
 	var deltas := ChunkDeltaStore.new()
 	deltas.deplete(Vector2i(82, -39), &"berries", 2, save.game_minutes + 100.0)
 	save.chunk_deltas = deltas.to_dict()
+	var seen := ExploredMap.new(EXPLORATION)
+	seen.reveal(Vector3(100, 0, 100), 96.0)  # somewhere visited long ago
+	save.explored = seen.to_dict()
 	var world := _world(save)
 	assert_int(GameState.world_seed).is_equal(777)
 	assert_float(GameState.game_minutes).is_equal(save.game_minutes)
@@ -79,6 +83,12 @@ func test_a_saved_game_continues_exactly_where_it_was() -> void:
 	var restored := ChunkDeltaStore.new()
 	restored.from_dict(back.chunk_deltas)
 	assert_bool(restored.is_depleted(Vector2i(82, -39), &"berries", 2, save.game_minutes)).is_true()
+	# The map remembers the old place and adds where the animal stands now.
+	world.exploration.reveal_now()
+	var map := ExploredMap.new(EXPLORATION)
+	map.from_dict(world.collect_save().explored)
+	assert_bool(map.is_explored(100, 100)).is_true()
+	assert_bool(map.is_explored(save.player_position.x, save.player_position.z)).is_true()
 
 
 func test_positions_are_saved_absolute_across_a_rebase() -> void:
@@ -122,3 +132,11 @@ func test_the_attract_world_never_saves() -> void:
 	assert_bool(await _landed(world)).is_true()
 	assert_bool(world.save_now()).is_false()
 	assert_bool(SaveSystem.exists()).is_false()
+
+
+func test_the_attract_world_explores_nothing() -> void:
+	var world: WorldController = auto_free(load(WORLD_SCENE).instantiate())
+	world.attract_mode = true
+	add_child(world)
+	await get_tree().process_frame
+	assert_int(world.exploration.process_mode).is_equal(Node.PROCESS_MODE_DISABLED)

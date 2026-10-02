@@ -593,7 +593,7 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
 - Autosave on biome change and every N minutes; manual save from pause menu.
 - Migration functions keyed by schema version.
 - **Implemented (Phase 10):** saves are **JSON, not resources** (loading a `.tres` can run
-  embedded scripts and save files are user-editable). `SaveData` (RefCounted, `VERSION` 2):
+  embedded scripts and save files are user-editable). `SaveData` (RefCounted, `VERSION` 2, now 3):
   world seed, **absolute** player position and yaw, need values, `game_minutes` (time — and so
   the deterministic weather), `ChunkDeltaStore.to_dict()`, biome, species path and save time;
   `to_dict()` / `from_dict()` coerce JSON numbers. `SaveMigrations.migrate()` upgrades step by
@@ -603,6 +603,18 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
   `user://saves/save.json`: `write()` is atomic (temp file, then replace; a temp left by a
   crash is still read), `read()` returns null with `last_error` for missing or corrupt files,
   `erase()`, `exists()`, signal `saved`. Fauna is not saved (herds are deterministic per chunk).
+- **Explored area (Phase 10b, SaveData v3):** `ExploredMap` is the fog of war for the map.
+  - It holds a set of 32 m cells in absolute coordinates (`data/world/exploration.tres`), plus
+    up to 64 scented-water marks (a new mark within 60 m replaces an old one).
+  - `reveal(absolute, radius)` adds the cells whose centre is within the radius (a disc;
+    49 checks for 96 m) and bumps `revision` when something is new.
+  - JSON is `{version, cell_size, cells: [x0, z0, …], water: [[x, y, z], …]}`; cells saved with
+    another cell size are dropped.
+  - `ExplorationTracker` (in `world.tscn`) reveals 96 m around the Animal every 0.5 s and turns
+    `Sniffer.water_scented` into marks. It is disabled in the attract world.
+  - `WorldController` saves the map in `SaveData.explored` and restores it.
+  - `SaveMigrations.v2_to_v3` adds a blank map (fixture `tests/fixtures/save_v2.json`).
+  - `migrate()` rejects a step that does not raise the version instead of looping.
 - **World scene** (`scenes/main/world.tscn`, root `WorldController`): the sandbox's gameplay nodes
   without the debug free-fly camera and chunk gizmo. A new game seeds the world and starts at the
   spawn meadow; a saved game (`pending_save`, set before adding the scene) restores seed, game

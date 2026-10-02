@@ -1,8 +1,10 @@
-## Tests for saved games: SaveData round-trips, migrations from the v1 fixture, the atomic
-## JSON SaveSystem and its error handling.
+## Tests for saved games: SaveData round-trips, migrations from the v1 and v2 fixtures, the
+## atomic JSON SaveSystem and its error handling.
 extends GdUnitTestSuite
 
 const FIXTURE_V1: String = "res://tests/fixtures/save_v1.json"
+const FIXTURE_V2: String = "res://tests/fixtures/save_v2.json"
+const EXPLORATION: ExplorationSettings = preload("res://data/world/exploration.tres")
 const TEST_DIR: String = "user://test_saves"
 
 var _saved_dir: String
@@ -31,6 +33,10 @@ func _sample() -> SaveData:
 	save.chunk_deltas = store.to_dict()
 	save.biome = &"forest"
 	save.species = "res://data/species/fox.tres"
+	var map := ExploredMap.new(EXPLORATION)
+	map.reveal(Vector3(12345.678, 0, -4321.5), EXPLORATION.reveal_radius)
+	map.add_water_mark(Vector3(12000.0, -6.0, -4000.0))
+	save.explored = map.to_dict()
 	return save
 
 
@@ -45,6 +51,13 @@ func _assert_same(a: SaveData, b: SaveData) -> void:
 	var restored := ChunkDeltaStore.new()
 	restored.from_dict(b.chunk_deltas)
 	assert_bool(restored.is_depleted(Vector2i(192, -67), &"berries", 4, 4000.0)).is_true()
+	var map := ExploredMap.new(EXPLORATION)
+	map.from_dict(b.explored)
+	var original := ExploredMap.new(EXPLORATION)
+	original.from_dict(a.explored)
+	assert_int(map.cell_count()).is_equal(original.cell_count()).is_greater(0)
+	assert_bool(map.is_explored(12345.678, -4321.5)).is_true()
+	assert_int(map.water_marks().size()).is_equal(1)
 
 
 # --- data and migrations ------------------------------------------------------------------
@@ -68,6 +81,24 @@ func test_migrates_the_v1_fixture() -> void:
 	assert_float(save.game_minutes).is_equal(480.0)  # added by v1 → v2: 08:00, first day
 	assert_str(save.species).is_equal("res://data/species/fox.tres")
 	assert_bool(ResourceLoader.exists(save.species)).is_true()
+	assert_dict(save.explored).is_empty()  # added by v2 → v3: a blank map
+
+
+func test_migrates_the_v2_fixture() -> void:
+	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(FIXTURE_V2))
+	assert_int(int(data["version"])).is_equal(2)
+	var migrated := SaveMigrations.migrate(data)
+	assert_int(int(migrated["version"])).is_equal(SaveData.VERSION)
+	var save := SaveData.from_dict(migrated)
+	assert_int(save.world_seed).is_equal(12345)
+	assert_vector(save.player_position).is_equal(Vector3(804.5, -2.25, -611.75))
+	assert_float(save.needs[&"thirst"]).is_equal(18.5)
+	assert_float(save.game_minutes).is_equal(2075.5)
+	assert_str(String(save.biome)).is_equal("meadow")
+	assert_dict(save.explored).is_empty()
+	var map := ExploredMap.new(EXPLORATION)
+	map.from_dict(save.explored)
+	assert_int(map.cell_count()).is_equal(0)
 
 
 func test_migration_does_not_touch_its_input() -> void:
