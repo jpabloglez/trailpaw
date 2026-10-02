@@ -197,7 +197,7 @@ Added after the M2 and Phase 8 playtests: the spawn meadow has no water (the nea
 ≈ 770 m away with seed 12345), and the animals felt skittish and sparse.
 
 - [x] Long-range water scent: sniffing points a trail of sparkles towards water up to 1.5 km away.
-- [ ] Explored area remembered in the save (SaveData v3, fog of war).
+- [x] Explored area remembered in the save (SaveData v3, fog of war).
 - [ ] Map screen (M): explored terrain, water, the player and scented water.
 - [ ] Fauna tuning: only running scares shy animals; bigger herds; more animals per biome.
 

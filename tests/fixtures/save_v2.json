@@ -1,0 +1,11 @@
+{
+	"version": 2,
+	"world_seed": 12345,
+	"player": {"position": [804.5, -2.25, -611.75], "yaw": 2.5},
+	"needs": {"hunger": 70.0, "thirst": 18.5, "temperature": 95.0, "energy": 64.0},
+	"game_minutes": 2075.5,
+	"chunk_deltas": {"version": 1, "chunks": []},
+	"biome": "meadow",
+	"species": "res://data/species/fox.tres",
+	"saved_at": 1790000000
+}

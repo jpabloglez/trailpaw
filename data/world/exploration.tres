@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ExplorationSettings" format=3]
+
+[ext_resource type="Script" path="res://scripts/world/exploration_settings.gd" id="1_expl"]
+
+[resource]
+script = ExtResource("1_expl")
+cell_size = 32.0
+reveal_radius = 96.0
+interval = 0.5
+max_water_marks = 64
+water_mark_merge = 60.0

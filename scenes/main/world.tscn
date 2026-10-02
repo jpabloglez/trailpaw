@@ -32,6 +32,8 @@
 [ext_resource type="Script" path="res://scripts/world/animal_spawner.gd" id="55_spawn"]
 [ext_resource type="Script" path="res://scripts/main/world_controller.gd" id="56_world"]
 [ext_resource type="Resource" path="res://data/save/autosave.tres" id="57_auto"]
+[ext_resource type="Script" path="res://scripts/world/exploration_tracker.gd" id="58_expl"]
+[ext_resource type="Resource" path="res://data/world/exploration.tres" id="59_explset"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_k7oal"]
 
@@ -51,13 +53,14 @@ fog_depth_curve = 1.6
 fog_depth_begin = 90.0
 fog_depth_end = 200.0
 
-[node name="World" type="Node3D" node_paths=PackedStringArray("streamer", "animal", "spawner", "biome_tracker")]
+[node name="World" type="Node3D" node_paths=PackedStringArray("streamer", "animal", "spawner", "biome_tracker", "exploration")]
 script = ExtResource("56_world")
 autosave = ExtResource("57_auto")
 streamer = NodePath("WorldStreamer")
 animal = NodePath("Animal")
 spawner = NodePath("AnimalSpawner")
 biome_tracker = NodePath("BiomeTracker")
+exploration = NodePath("ExplorationTracker")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_atku0")
@@ -137,3 +140,9 @@ sniffer = NodePath("../Animal/Sniffer")
 script = ExtResource("55_spawn")
 animal = NodePath("../Animal")
 streamer = NodePath("../WorldStreamer")
+
+[node name="ExplorationTracker" type="Node" parent="." node_paths=PackedStringArray("target", "sniffer")]
+script = ExtResource("58_expl")
+settings = ExtResource("59_explset")
+target = NodePath("../Animal")
+sniffer = NodePath("../Animal/Sniffer")

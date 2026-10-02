@@ -2,14 +2,15 @@ class_name SaveData
 extends RefCounted
 ## Everything needed to continue a game exactly where it was left: the world seed, where the
 ## player stands (absolute, so floating-origin rebases do not matter), its needs, the game time
-## (which also fixes the weather) and what the player changed in the world (eaten food).
+## (which also fixes the weather), what the player changed in the world (eaten food) and the
+## area explored so far (for the map).
 ##
 ## Saved as plain JSON through [method to_dict] / [method from_dict] — never as a resource,
 ## because loading a resource can run scripts and a save file is user-editable. Older files are
 ## upgraded by [SaveMigrations] first.
 
 ## Current schema version (see [SaveMigrations] for the history).
-const VERSION: int = 2
+const VERSION: int = 3
 
 ## World seed.
 var world_seed: int = 0
@@ -29,6 +30,8 @@ var biome: StringName = &""
 var species: String = ""
 ## When it was saved (Unix time, s).
 var saved_at: int = 0
+## Explored area and scented water ([method ExploredMap.to_dict]).
+var explored: Dictionary = {}
 
 
 ## Plain, JSON-friendly copy (current [constant VERSION]).
@@ -50,6 +53,7 @@ func to_dict() -> Dictionary:
 		"biome": String(biome),
 		"species": species,
 		"saved_at": saved_at,
+		"explored": explored,
 	}
 
 
@@ -71,4 +75,5 @@ static func from_dict(data: Dictionary) -> SaveData:
 	save.biome = StringName(str(data.get("biome", "")))
 	save.species = str(data.get("species", ""))
 	save.saved_at = int(data.get("saved_at", 0))
+	save.explored = data.get("explored", {})
 	return save

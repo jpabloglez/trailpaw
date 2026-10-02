@@ -8,6 +8,7 @@ extends RefCounted
 ##   [code]needs[/code].
 ## [br]- [b]v2[/b]: [code]world_seed[/code], [code]player[/code] {position, yaw}, needs, game
 ##   time, chunk deltas, biome, species, save time.
+## [br]- [b]v3[/b] (Phase 10b): [code]explored[/code] — the explored area and scented water.
 
 
 ## [param data] upgraded to the current version, or an empty dictionary when it cannot be
@@ -28,7 +29,13 @@ static func migrate(data: Dictionary, error: Array[String] = []) -> Dictionary:
 		match version:
 			1:
 				current = v1_to_v2(current)
-		version = int(current["version"])
+			2:
+				current = v2_to_v3(current)
+		var next := int(current.get("version", version))
+		if next <= version:
+			error.append("no migration from save version %d" % version)
+			return {}
+		version = next
 	return current
 
 
@@ -47,3 +54,11 @@ static func v1_to_v2(data: Dictionary) -> Dictionary:
 		"species": "res://data/species/fox.tres",
 		"saved_at": 0,
 	}
+
+
+## v2 → v3: adds an empty explored area (the map starts blank).
+static func v2_to_v3(data: Dictionary) -> Dictionary:
+	var current := data.duplicate(true)
+	current["version"] = 3
+	current["explored"] = {}
+	return current
