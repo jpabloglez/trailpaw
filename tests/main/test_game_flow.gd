@@ -71,6 +71,9 @@ func test_starts_at_the_menu_over_a_world_that_never_saves() -> void:
 	for child in flow.world().get_children():
 		assert_bool(child is CanvasLayer).override_failure_message(child.name).is_false()
 	assert_bool(flow.world().attract_camera().current).is_true()
+	assert_int(flow.world().attract_camera().physics_interpolation_mode).is_equal(
+		Node.PHYSICS_INTERPOLATION_MODE_OFF
+	)
 	assert_bool(flow.menu().button("Continue").visible).is_false()  # nothing saved yet
 	await _frames(5)
 	assert_bool(flow.world().save_now()).is_false()
