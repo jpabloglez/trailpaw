@@ -4,6 +4,7 @@ extends GdUnitTestSuite
 
 const DIR: String = "res://data/fauna/temperaments/"
 const FOX: String = "res://data/species/fox.tres"
+const BIOMES: Array[String] = ["meadow", "forest", "hills", "river_valley"]
 
 
 func _profile(temperament: String) -> FaunaProfile:
@@ -36,20 +37,61 @@ func test_every_temperament_profile_is_valid() -> void:
 		assert_array(Array(_profile(t).get_validation_errors())).is_empty()
 
 
-func test_a_player_running_in_from_ten_metres_only_scares_the_shy() -> void:
-	assert_str(_reaction("shy", 10.0, 5.0, 0.99)).is_equal("Flee")
-	assert_str(_reaction("curious", 10.0, 5.0, 0.99)).is_not_equal("Flee")
-	assert_str(_reaction("friendly", 10.0, 5.0, 0.99)).is_not_equal("Flee")
-	assert_str(_reaction("calm", 10.0, 5.0, 0.99)).is_not_equal("Flee")
+func _fox() -> AnimalSpecies:
+	return load(FOX) as AnimalSpecies
+
+
+func test_a_player_running_in_from_seven_metres_only_scares_the_shy() -> void:
+	var run := _fox().run_speed
+	assert_str(_reaction("shy", 7.0, run, 0.99)).is_equal("Flee")
+	assert_str(_reaction("curious", 7.0, run, 0.99)).is_not_equal("Flee")
+	assert_str(_reaction("friendly", 7.0, run, 0.99)).is_not_equal("Flee")
+	assert_str(_reaction("calm", 7.0, run, 0.99)).is_not_equal("Flee")
 
 
 func test_a_slow_approach_lets_you_close_to_the_shy_but_rushing_in_does_not() -> void:
 	# User decision: shy animals flee "if you approach fast"; walking up slowly is fine.
 	assert_str(_reaction("shy", 4.0, 1.0, 0.99)).is_not_equal("Flee")
-	assert_str(_reaction("shy", 4.0, 5.0, 0.99)).is_equal("Flee")
+	assert_str(_reaction("shy", 4.0, _fox().run_speed, 0.99)).is_equal("Flee")
 	assert_str(_reaction("shy", 0.8, 0.0, 0.99)).is_equal("Flee")  # bumped into
-	assert_str(_reaction("calm", 4.0, 5.0, 0.99)).is_not_equal("Flee")
+	assert_str(_reaction("calm", 4.0, _fox().run_speed, 0.99)).is_not_equal("Flee")
 	assert_str(_reaction("calm", 1.0, 0.5, 0.99)).is_equal("Flee")  # only right on top of it
+
+
+func test_trotting_up_scares_nobody() -> void:
+	# Phase 8 playtest: animals felt skittish. Only running (not trotting) makes the shy flee.
+	var trot := _fox().trot_speed
+	for t: String in ["shy", "curious", "friendly", "calm"]:
+		for distance: float in [2.0, 5.0, 10.0]:
+			var reaction := _reaction(t, distance, trot, 0.99)
+			(
+				assert_str(reaction)
+				. override_failure_message("%s at %s m" % [t, distance])
+				. is_not_equal("Flee")
+			)
+
+
+func test_herds_are_big_enough_to_be_seen_together() -> void:
+	assert_int((load("res://data/fauna/deer.tres") as FaunaSpecies).herd_size.x).is_greater_equal(3)
+	assert_int((load("res://data/fauna/horse.tres") as FaunaSpecies).herd_size.x).is_greater_equal(
+		2
+	)
+	assert_int((load("res://data/fauna/alpaca.tres") as FaunaSpecies).herd_size.x).is_greater_equal(
+		2
+	)
+
+
+func test_every_biome_hosts_enough_animals() -> void:
+	# Expected animals per chunk: chance × weighted mean herd size (Phase 8 playtest: sparse).
+	for id in BIOMES:
+		var biome := load("res://data/biomes/%s.tres" % id) as BiomeDefinition
+		var total_weight := 0.0
+		var herd := 0.0
+		for entry in biome.fauna:
+			total_weight += entry.weight
+			herd += entry.weight * (entry.species.herd_size.x + entry.species.herd_size.y) * 0.5
+		var density := biome.fauna_chance * herd / total_weight
+		assert_float(density).override_failure_message(id).is_greater_equal(0.4)
 
 
 func test_only_curious_and_friendly_animals_come_to_look() -> void:

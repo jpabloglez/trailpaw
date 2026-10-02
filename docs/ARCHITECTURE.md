@@ -490,8 +490,10 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
   - **Species and temperaments** (data): `FaunaSpecies` (`data/fauna/`: id, name, the
     `AnimalSpecies`, temperament, profile, herd size, wander radius, follow time) sets the
     agent's species, brain profile and wander radius (`FaunaAgent.fauna`). Temperament
-    profiles in `data/fauna/temperaments/`: **shy** (flees from a fast approach within 14 m or
-    anything within 1 m — walking up slowly is fine — until 30 m), **curious** (walks over to look from 5 m; flees only if
+    profiles in `data/fauna/temperaments/`: **shy** (flees from a running approach — closing
+    faster than 5 m/s, above the fox's 4 m/s trot — within 8 m, or anything within 1 m, until
+    20 m away; tuned in Phase 10b after the Phase 8 playtest found animals skittish), **curious**
+    (walks over to look from 5 m; flees only if
     rushed at very close), **friendly** (comes to 2.5 m, never flees), **calm** (grazes most,
     flees only if nearly run over). Traits: all can be greeted; curious and friendly play;
     friendly ones follow after playing.
@@ -507,7 +509,8 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
   - **Spawning** (`FaunaDirector` in the world scene, `data/fauna/director.tres`): when a chunk
     becomes full detail (LOD 0, `WorldStreamer.chunks_changed`), the pure `FaunaPlan.roll()`
     decides — seeded per (world seed, chunk) — whether it hosts a herd (biome `fauna_chance`,
-    12–15 %), of which species (`BiomeDefinition.fauna` weights) and where (within 12 m of the
+    18–22 % since Phase 10b, so 0.4–0.5 animals per chunk on average with the larger herds:
+    deer 3–5, horse 2–4, alpaca 2–4, donkey 1–3), of which species (`BiomeDefinition.fauna` weights) and where (within 12 m of the
     chunk centre). Spawns are queued (1 per frame) and placed by a downward ray on dry ground
     ≤ 25° and ≥ 25 m from the player. **Cap: 10 animals.** An animal leaves when its chunk
     stops being full detail (its collision goes) or beyond 120 m; the same chunk brings the

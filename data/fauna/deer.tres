@@ -11,5 +11,5 @@ display_name = "Deer"
 animal = ExtResource("2_animal")
 temperament = 0
 profile = ExtResource("3_profile")
-herd_size = Vector2i(2, 4)
+herd_size = Vector2i(3, 5)
 wander_radius = 18.0
