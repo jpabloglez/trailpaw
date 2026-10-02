@@ -2,7 +2,8 @@ class_name CameraRigSettings
 extends Resource
 ## Tunables for [CameraRig]. Lives under [code]data/camera/[/code].
 ##
-## Sensitivity and invert-Y move to the [code]Settings[/code] autoload in Phase 10.
+## The player's sensitivity multiplier, invert-Y and field of view live in the
+## [code]Settings[/code] autoload (Phase 10); these are the tuned defaults.
 ## Defaults are deliberately neutral: values come from data (see
 ## [method get_validation_errors]).
 

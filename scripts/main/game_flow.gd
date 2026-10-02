@@ -20,6 +20,7 @@ var suppress_quit: bool = false
 var _world: WorldController
 var _menu: MainMenu
 var _pause: PauseMenu
+var _settings: SettingsMenu
 var _playing: bool = false
 
 
@@ -31,7 +32,11 @@ func _ready() -> void:
 	_pause.save_requested.connect(_on_save_requested)
 	_pause.main_menu_requested.connect(func() -> void: _go.call_deferred(&"menu"))
 	_pause.quit_requested.connect(quit_game)
-	_pause.button("Settings").visible = false  # the settings menu arrives with item 4
+	_settings = SettingsMenu.new()
+	_settings.name = "SettingsMenu"
+	add_child(_settings)
+	_pause.settings_requested.connect(_open_settings)
+	_settings.closed.connect(_on_settings_closed)
 	show_menu()
 
 
@@ -56,7 +61,7 @@ func show_menu() -> void:
 	_menu.continue_requested.connect(func() -> void: _go.call_deferred(&"continue"))
 	_menu.new_game_requested.connect(func(s: int) -> void: _go.call_deferred(&"new", s))
 	_menu.quit_requested.connect(quit_game)
-	_menu.button("Settings").visible = false  # the settings menu arrives with item 4
+	_menu.settings_requested.connect(_open_settings)
 
 
 ## Starts a new game with [param world_seed], replacing any saved game.
@@ -104,6 +109,11 @@ func pause_menu() -> PauseMenu:
 	return _pause
 
 
+## The settings menu.
+func settings_menu() -> SettingsMenu:
+	return _settings
+
+
 ## Whether a game is being played (not the menu).
 func is_playing() -> bool:
 	return _playing
@@ -148,3 +158,17 @@ func _replace_world(world: WorldController) -> void:
 func _on_save_requested() -> void:
 	if _world != null and _world.save_now():
 		_pause.show_saved()
+
+
+func _open_settings() -> void:
+	_pause.visible = false
+	if _menu != null:
+		_menu.visible = false
+	_settings.open()
+
+
+func _on_settings_closed() -> void:
+	if _menu != null:
+		_menu.visible = true
+	elif _playing and get_tree().paused:
+		_pause.visible = true
