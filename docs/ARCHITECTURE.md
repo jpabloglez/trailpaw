@@ -36,6 +36,11 @@ Main (scene)
 Autoloads: EventBus · GameState · Settings · SaveSystem · FloatingOrigin
 ```
 
+As built (Phase 10): `main.tscn` is a `GameFlow` that shows the `MainMenu` over an
+attract-mode `World` (`scenes/main/world.tscn`, root `WorldController`), then the playable
+`World` with the `PauseMenu` on top. The world's UI layers (HUD, prompt, vignette, toasts, F3)
+are CanvasLayers inside `world.tscn`.
+
 ### Autoloads (singletons)
 
 | Autoload | Responsibility |
@@ -595,6 +600,16 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
   and every 300 s; `save_now()` for the pause menu; never while parked or when
   `saving_enabled` is off (the attract world behind the menu). Positions are saved absolute, so
   rebases do not matter.
+- **Menus and flow** (`GameFlow`, the main scene): the **main menu** (`MainMenu`, built in code)
+  sits over an **attract-mode world** — the saved game's seed or a random one, no player, its UI
+  layers freed, an `AttractCamera` gliding along +X 14 m above the terrain (user choice) —
+  with Continue (only when a game is saved), **New game** (a random seed, editable, digits only;
+  "Start over? Your current game will be replaced." before replacing a saved game), Settings
+  and Quit. In game, **Esc** opens the `PauseMenu` (`get_tree().paused`; the menu keeps running):
+  Resume, Save ("Saved" note), Settings, Main menu, Quit, and the world seed. The game saves when
+  going back to the menu, when quitting and on `NOTIFICATION_WM_CLOSE_REQUEST`
+  (`auto_accept_quit` off). World switches are deferred and free the old world before adding
+  the new one, so its floating-origin clean-up never undoes the new set-up.
 
 ## 10. Quality presets
 

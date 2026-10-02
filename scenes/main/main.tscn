@@ -1,7 +1,8 @@
 [gd_scene format=3]
 
-[node name="Main" type="Node" unique_id=1744658914]
+[ext_resource type="Script" path="res://scripts/main/game_flow.gd" id="1_flow"]
+[ext_resource type="PackedScene" path="res://scenes/main/world.tscn" id="2_world"]
 
-[node name="World" type="Node3D" parent="." unique_id=1403656864]
-
-[node name="UI" type="CanvasLayer" parent="." unique_id=751265821]
+[node name="Main" type="Node"]
+script = ExtResource("1_flow")
+world_scene = ExtResource("2_world")

@@ -31,6 +31,9 @@ const NEW_GAME_POSITION: Vector3 = Vector3(32.0, 30.0, 32.0)
 var pending_save: SaveData
 ## Whether saving is allowed (off for the attract-mode world behind the menu).
 var saving_enabled: bool = true
+## The world behind the main menu: no player, no HUD, no saving, a gliding camera (set before
+## adding the scene).
+var attract_mode: bool = false
 
 var _since_save: float = 0.0
 var _needs: NeedsComponent
@@ -44,9 +47,13 @@ func _ready() -> void:
 		apply_save(pending_save)
 	else:
 		GameState.world_seed = world_seed
+		if not attract_mode:
+			GameState.game_minutes = GameState.CLOCK.start_minutes
 		_place_animal(NEW_GAME_POSITION, 0.0)
 	FloatingOrigin.track(animal)
 	spawner.park()
+	if attract_mode:
+		_enter_attract_mode()
 	EventBus.biome_entered.connect(_on_biome_entered)
 	add_to_group(WorldStreamer.DEBUG_LINES_GROUP)
 
@@ -101,6 +108,11 @@ func apply_save(save: SaveData) -> void:
 	_place_animal(save.player_position, save.player_yaw)
 
 
+## The camera of the attract mode, or null.
+func attract_camera() -> AttractCamera:
+	return get_node_or_null("AttractCamera") as AttractCamera
+
+
 ## Lines for the F3 overlay.
 func get_debug_lines() -> PackedStringArray:
 	var left := autosave.interval_seconds - _since_save
@@ -114,6 +126,26 @@ func _place_animal(absolute: Vector3, yaw: float) -> void:
 	animal.position = GameState.local_position(absolute)
 	animal.rotation.y = yaw
 	animal.reset_physics_interpolation()
+
+
+func _enter_attract_mode() -> void:
+	saving_enabled = false
+	spawner.auto_release = false
+	animal.visible = false
+	for child in get_children():
+		if child is CanvasLayer:
+			child.queue_free()  # HUD, prompt, toasts: some show themselves on events
+		elif child is CameraRig:
+			(child as CameraRig).process_mode = Node.PROCESS_MODE_DISABLED
+	var camera := AttractCamera.new()
+	camera.name = "AttractCamera"
+	camera.far = 2000.0
+	add_child(camera)
+	camera.begin(animal.position, streamer.terrain)
+	streamer.target = camera
+	FloatingOrigin.track(camera)
+	if biome_tracker != null:
+		biome_tracker.target = camera
 
 
 func _on_biome_entered(_id: StringName, _name: String) -> void:
