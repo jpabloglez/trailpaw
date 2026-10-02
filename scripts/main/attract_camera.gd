@@ -17,6 +17,8 @@ var _sampler: HeightSampler
 
 ## Starts gliding from the local [param at] over [param terrain] (absolute heights).
 func begin(at: Vector3, terrain: TerrainSettings) -> void:
+	# It moves in _process (every rendered frame), so physics interpolation would only warn.
+	physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 	_sampler = HeightSampler.new(terrain, GameState.world_seed)
 	global_position = at
 	_follow_ground(0.0)
