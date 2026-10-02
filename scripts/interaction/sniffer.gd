@@ -7,13 +7,19 @@ extends Node3D
 ##
 ## Food is found with one sphere query on the [code]interactable[/code] layer through the same
 ## provider protocol as the [Interactor]; water by sampling ground heights on rings around the
-## animal with downward rays.
+## animal with downward rays. When no water is that close, it is [b]scented[/b] from far away
+## ([WaterScent], up to [member SniffSettings.scent_radius], on a worker thread): a trail of
+## blue sparkles appears one after another from the animal towards it.
 ## [br][br]
-## Budget: only on a sniff — one shape query (≤ [constant MAX_QUERY] results) and
-## directions × rings rays (96 by default); sparkles are pooled and just fade per frame.
+## Budget: only on a sniff — one shape query (≤ [constant MAX_QUERY] results),
+## directions × rings rays (96 by default) and, for a scent, one worker task plus
+## [member SniffSettings.trail_count] rays when it completes; sparkles are pooled and just fade
+## per frame.
 
 ## A sniff happened; [param count] food highlights (water not included).
 signal sniffed(count: int)
+## Water was scented far away, at [param absolute] (absolute position, Y = the water surface).
+signal water_scented(absolute: Vector3)
 
 ## Shape query results considered.
 const MAX_QUERY: int = 128
@@ -34,12 +40,18 @@ const MARKER_SHADER: Shader = preload("res://shaders/sniff_marker.gdshader")
 @export var interactor: Interactor
 ## Plays the sniff animation (optional).
 @export var animation: AnimationController
+## Terrain the water is scented from (optional; no long-range scent without it).
+@export var terrain: TerrainSettings
 
 var _markers: Array[MeshInstance3D] = []
 var _shown: int = 0
 var _time_left: float = 0.0
 var _cooldown_left: float = 0.0
 var _water_hint: Vector3 = Vector3.INF
+var _delays := PackedFloat32Array()
+var _scent: WaterScent
+var _sampler: HeightSampler
+var _sampler_seed: int = 0
 var _query := PhysicsShapeQueryParameters3D.new()
 var _ray := PhysicsRayQueryParameters3D.new()
 
@@ -57,16 +69,27 @@ func _ready() -> void:
 	set_process(false)
 
 
+func _exit_tree() -> void:
+	if _scent != null:
+		WorkerThreadPool.wait_for_task_completion(_scent.task_id)
+		_scent = null
+
+
 func _process(delta: float) -> void:
 	_cooldown_left = maxf(0.0, _cooldown_left - delta)
+	if _scent != null and WorkerThreadPool.is_task_completed(_scent.task_id):
+		_finish_scent()
 	if _time_left <= 0.0:
-		if _cooldown_left <= 0.0:
+		if _cooldown_left <= 0.0 and _scent == null:
 			set_process(false)
 		return
 	_time_left = maxf(0.0, _time_left - delta)
-	var alpha := clampf(_time_left / settings.fade, 0.0, 1.0) if settings.fade > 0.0 else 1.0
+	var fade := clampf(_time_left / settings.fade, 0.0, 1.0) if settings.fade > 0.0 else 1.0
+	var elapsed := settings.duration - _time_left
 	for i in _shown:
-		(_markers[i].material_override as ShaderMaterial).set_shader_parameter(&"alpha", alpha)
+		var appear := clampf((elapsed - _delays[i]) / maxf(settings.trail_stagger, 0.001), 0.0, 1.0)
+		var material := _markers[i].material_override as ShaderMaterial
+		material.set_shader_parameter(&"alpha", fade * appear)
 	if _time_left <= 0.0:
 		_hide_markers()
 
@@ -92,6 +115,8 @@ func sniff_now() -> void:
 		_show_marker(target.position, settings.food_color)
 	if _water_hint != Vector3.INF:
 		_show_marker(_water_hint, settings.water_color)
+	else:
+		_start_scent()
 	set_process(true)
 	sniffed.emit(food.size())
 
@@ -147,6 +172,17 @@ func find_water() -> Vector3:
 	return Vector3.INF
 
 
+## Whether a long-range water scent is still being worked out.
+func is_scenting() -> bool:
+	return _scent != null
+
+
+## Waits for the scent in progress (if any) and shows its trail now (tests and tools).
+func finish_scent_now() -> void:
+	if _scent != null:
+		_finish_scent()
+
+
 ## Positions of the sparkles showing now (food first, then the water hint if any).
 func highlights() -> PackedVector3Array:
 	var out := PackedVector3Array()
@@ -165,7 +201,63 @@ func cooldown_left() -> float:
 	return _cooldown_left
 
 
-func _show_marker(at: Vector3, color: Color) -> void:
+func _start_scent() -> void:
+	if terrain == null or settings.scent_radius <= settings.radius or _scent != null:
+		return
+	if is_inf(GameState.water_level):
+		return
+	if _sampler == null or _sampler_seed != GameState.world_seed:
+		_sampler = HeightSampler.new(terrain, GameState.world_seed)
+		_sampler_seed = GameState.world_seed
+	var at := GameState.absolute_position(body.global_position)
+	_scent = WaterScent.new(
+		_sampler,
+		Vector2(at.x, at.z),
+		settings.scent_radius,
+		settings.scent_step,
+		GameState.water_level,
+		settings.scent_min_depth
+	)
+	_scent.task_id = WorkerThreadPool.add_task(_scent.run, false, "Water scent")
+
+
+func _finish_scent() -> void:
+	WorkerThreadPool.wait_for_task_completion(_scent.task_id)
+	var found := _scent.result
+	_scent = null
+	if found == Vector3.INF:
+		return
+	_water_hint = GameState.local_position(found)
+	_show_trail(_water_hint)
+	water_scented.emit(found)
+
+
+# Sparkles every trail_spacing metres from the animal towards [param target] (not past it), on
+# the ground, appearing one after another; the sniff's fade restarts for them.
+func _show_trail(target: Vector3) -> void:
+	var origin := body.global_position
+	var flat := Vector3(target.x - origin.x, 0.0, target.z - origin.z)
+	var distance := flat.length()
+	if distance < 0.01:
+		return
+	var direction := flat / distance
+	_time_left = settings.duration + settings.trail_stagger * settings.trail_count
+	var start := settings.duration - _time_left
+	var space := body.get_world_3d().direct_space_state
+	for k in settings.trail_count:
+		var along := minf(settings.trail_spacing * (k + 1), distance)
+		var point := origin + direction * along
+		_ray.from = point + Vector3.UP * 20.0
+		_ray.to = point + Vector3.DOWN * 40.0
+		var hit := space.intersect_ray(_ray)
+		if not hit.is_empty():
+			point.y = (hit.position as Vector3).y
+		_show_marker(point, settings.water_color, start + settings.trail_stagger * k)
+		if along >= distance:
+			break
+
+
+func _show_marker(at: Vector3, color: Color, delay: float = -INF) -> void:
 	if _shown >= _markers.size():
 		var marker := MeshInstance3D.new()
 		var quad := QuadMesh.new()
@@ -182,11 +274,14 @@ func _show_marker(at: Vector3, color: Color) -> void:
 	var node := _markers[_shown]
 	var material := node.material_override as ShaderMaterial
 	material.set_shader_parameter(&"color", color)
-	material.set_shader_parameter(&"alpha", 1.0)
+	material.set_shader_parameter(&"alpha", 1.0 if is_inf(delay) else 0.0)  # trail: fades in
 	node.global_position = at + Vector3.UP * settings.lift
 	var distance := body.global_position.distance_to(at)
 	node.scale = Vector3.ONE * maxf(1.0, distance / settings.grow_distance)
 	node.visible = true
+	if _delays.size() <= _shown:
+		_delays.resize(_shown + 1)
+	_delays[_shown] = delay
 	_shown += 1
 
 

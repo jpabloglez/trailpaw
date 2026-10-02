@@ -1,5 +1,5 @@
-## Tests for sniffing ([Sniffer]): which food lights up, the cap, expiry, cooldown and the water
-## hint.
+## Tests for sniffing ([Sniffer]): which food lights up, the cap, expiry, cooldown, the water
+## hint and the trail towards water scented far away.
 extends GdUnitTestSuite
 
 const ANIMAL_SCENE: String = "res://scenes/player/animal.tscn"
@@ -9,15 +9,18 @@ const GRASS: InteractionDefinition = preload("res://data/interactions/grass.tres
 const DEN: InteractionDefinition = preload("res://data/interactions/den.tres")
 
 var _saved_water: float
+var _saved_seed: int
 
 
 func before_test() -> void:
 	_saved_water = GameState.water_level
+	_saved_seed = GameState.world_seed
 	GameState.water_level = -INF
 
 
 func after_test() -> void:
 	GameState.water_level = _saved_water
+	GameState.world_seed = _saved_seed
 
 
 func _slab(center_z: float, depth: float, top: float) -> void:
@@ -146,3 +149,68 @@ func test_no_water_hint_on_dry_land() -> void:
 	var sniffer := _sniffer(animal)
 	sniffer.sniff_now()
 	assert_bool(sniffer.water_hint() == Vector3.INF).is_true()
+
+
+func _alpha(sniffer: Sniffer, index: int) -> float:
+	var markers := sniffer.get_children().filter(func(n: Node) -> bool: return n is MeshInstance3D)
+	var material := (markers[index] as MeshInstance3D).material_override as ShaderMaterial
+	return material.get_shader_parameter(&"alpha")
+
+
+func test_far_water_is_scented_and_shown_as_a_trail() -> void:
+	_slab(0.0, 120.0, 0.0)  # dry land here; the real terrain has a lake ≈ 770 m away
+	GameState.world_seed = 12345
+	GameState.water_level = -6.0
+	var animal := _animal()
+	await _frames(10)
+	var sniffer := _sniffer(animal)
+	var scented: Array[Vector3] = []
+	sniffer.water_scented.connect(func(at: Vector3) -> void: scented.append(at))
+	sniffer.sniff_now()
+	assert_bool(sniffer.is_scenting()).is_true()  # on a worker, not blocking the sniff
+	sniffer.finish_scent_now()
+	assert_bool(sniffer.is_scenting()).is_false()
+	var hint := sniffer.water_hint()
+	var to_water := Vector2(hint.x, hint.z)
+	assert_float(to_water.length()).is_greater(SETTINGS.scent_radius * 0.3)
+	assert_int(scented.size()).is_equal(1)
+	assert_that(GameState.local_position(scented[0])).is_equal(hint)
+	var trail := sniffer.highlights()
+	assert_int(trail.size()).is_equal(SETTINGS.trail_count)
+	for k in trail.size():
+		var flat := Vector2(trail[k].x, trail[k].z)
+		assert_float(flat.length()).is_equal_approx(SETTINGS.trail_spacing * (k + 1), 0.01)
+		assert_float(flat.normalized().dot(to_water.normalized())).is_greater(0.999)
+		assert_float(trail[k].y).is_equal_approx(SETTINGS.lift, 0.01)  # on the ground
+	# The sparkles appear one after another, then fade out together.
+	sniffer._process(SETTINGS.trail_stagger * 1.5)
+	assert_float(_alpha(sniffer, 0)).is_equal(1.0)
+	assert_float(_alpha(sniffer, SETTINGS.trail_count - 1)).is_equal(0.0)
+	sniffer._process(SETTINGS.trail_stagger * SETTINGS.trail_count)
+	assert_float(_alpha(sniffer, SETTINGS.trail_count - 1)).is_equal(1.0)
+	sniffer._process(SETTINGS.duration)
+	assert_int(sniffer.highlights().size()).is_equal(0)
+
+
+func test_water_nearby_needs_no_scent() -> void:
+	_slab(20.0, 40.0, 0.0)
+	_slab(-20.0, 40.0, -1.0)
+	GameState.water_level = -0.1
+	var animal := _animal(Vector3(0, 0.05, 5))
+	await _frames(20)
+	var sniffer := _sniffer(animal)
+	sniffer.sniff_now()
+	assert_bool(sniffer.is_scenting()).is_false()
+
+
+func test_no_scent_without_terrain_or_water() -> void:
+	_slab(0.0, 120.0, 0.0)
+	var animal := _animal()
+	await _frames(10)
+	var sniffer := _sniffer(animal)
+	sniffer.sniff_now()  # GameState.water_level is -INF: a world without water
+	assert_bool(sniffer.is_scenting()).is_false()
+	GameState.water_level = -6.0
+	sniffer.terrain = null
+	sniffer.sniff_now()
+	assert_bool(sniffer.is_scenting()).is_false()

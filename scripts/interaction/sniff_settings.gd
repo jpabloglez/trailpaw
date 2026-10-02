@@ -26,3 +26,16 @@ extends Resource
 @export_range(4, 64) var water_directions: int = 4
 ## Rings (evenly spaced up to [member radius]) sampled per direction.
 @export_range(1, 32) var water_rings: int = 1
+@export_group("Water scent")
+## Beyond [member radius], water is scented this far away and shown as a trail ([WaterScent]).
+@export_range(0.0, 5000.0, 10.0, "suffix:m") var scent_radius: float = 0.0
+## Distance between scent rings and samples.
+@export_range(1.0, 100.0, 1.0, "suffix:m") var scent_step: float = 16.0
+## Minimum depth of scented water (no puddles).
+@export_range(0.0, 5.0, 0.05, "suffix:m") var scent_min_depth: float = 0.3
+## Sparkles in the trail towards scented water.
+@export_range(1, 16) var trail_count: int = 1
+## Metres between trail sparkles.
+@export_range(0.5, 20.0, 0.5, "suffix:m") var trail_spacing: float = 3.0
+## Seconds between one trail sparkle appearing and the next.
+@export_range(0.0, 2.0, 0.05, "suffix:s") var trail_stagger: float = 0.0
