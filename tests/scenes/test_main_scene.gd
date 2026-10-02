@@ -1,4 +1,5 @@
-## Verifies the main scene is configured and has the root layout from ARCHITECTURE §2.
+## Verifies the main scene is configured: the game flow (menus) over the world scene
+## (ARCHITECTURE §2).
 extends GdUnitTestSuite
 
 const MAIN_SCENE_PATH: String = "res://scenes/main/main.tscn"
@@ -12,5 +13,6 @@ func test_main_scene_is_project_entry_point() -> void:
 func test_main_scene_root_layout() -> void:
 	var main: Node = auto_free(load(MAIN_SCENE_PATH).instantiate())
 	assert_str(main.name).is_equal("Main")
-	assert_object(main.get_node_or_null("World")).is_instanceof(Node3D)
-	assert_object(main.get_node_or_null("UI")).is_instanceof(CanvasLayer)
+	assert_object(main).is_instanceof(GameFlow)
+	var world_scene: PackedScene = (main as GameFlow).world_scene
+	assert_str(world_scene.resource_path).is_equal("res://scenes/main/world.tscn")
