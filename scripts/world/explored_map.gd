@@ -59,6 +59,11 @@ func cell_of(x: float, z: float) -> Vector2i:
 	return Vector2i(floori(x / cell_size), floori(z / cell_size))
 
 
+## A copy of the explored cells (for a worker thread to read while the game goes on).
+func cells_snapshot() -> Dictionary[Vector2i, bool]:
+	return _cells.duplicate()
+
+
 ## Number of explored cells.
 func cell_count() -> int:
 	return _cells.size()

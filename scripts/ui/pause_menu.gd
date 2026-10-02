@@ -2,10 +2,12 @@ class_name PauseMenu
 extends CanvasLayer
 ## In-game pause (the [code]pause[/code] action, Esc): the world stops
 ## ([code]get_tree().paused[/code]) and this menu — which keeps running — offers Resume, Save,
-## Settings, Main menu and Quit, and shows the world seed so it can be shared. Built in code.
+## Map, Settings, Main menu and Quit, and shows the world seed so it can be shared. Built in code.
 
 ## Save now (the menu shows "Saved" when [method show_saved] is called).
 signal save_requested
+## Open the map.
+signal map_requested
 ## Open the settings.
 signal settings_requested
 ## Save and go back to the main menu.
@@ -37,6 +39,7 @@ func _ready() -> void:
 	for entry: Array in [
 		["Resume", "Resume", close],
 		["Save", "Save", save_requested.emit],
+		["Map", "Map", map_requested.emit],
 		["Settings", "Settings", settings_requested.emit],
 		["Main menu", "MainMenu", main_menu_requested.emit],
 		["Quit", "Quit", quit_requested.emit],

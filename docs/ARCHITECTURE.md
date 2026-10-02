@@ -300,6 +300,7 @@ Phase 11 polish item.
 | `sniff` (highlight nearby resources) | Q |
 | `rest` | R (hold) |
 | `camera_zoom_in` / `camera_zoom_out` | Mouse wheel up / down |
+| `map` (Phase 10b) | M |
 | `pause` | Esc |
 | `toggle_debug_overlay` (debug) | F3 |
 | `toggle_free_fly` (debug) | F4 |
@@ -615,6 +616,23 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
   - `WorldController` saves the map in `SaveData.explored` and restores it.
   - `SaveMigrations.v2_to_v3` adds a blank map (fixture `tests/fixtures/save_v2.json`).
   - `migrate()` rejects a step that does not raise the version instead of looping.
+- **Map screen (Phase 10b):** `MapScreen` (built in code by `GameFlow`, layer 55, values in
+  `data/ui/map.tres`) opens with the `map` action (M, remappable) or the pause menu's Map
+  button, and pauses the world.
+  - It closes with M or Esc (Esc does not then open the pause menu). The camera zoom inputs
+    switch between 1, 2 and 4 km across.
+  - `MapRenderer` draws a 256 px image centred on the player (north, −Z, up) on a
+    `WorkerThreadPool` task. It uses its own `HeightSampler` and a snapshot of the explored
+    cells.
+    - Explored land: the biome's ground colours with a north-west hillshade from neighbouring
+      heights.
+    - Water: shaded by depth.
+    - Unexplored cells: fog, never sampled.
+    - Budget: ≤ (size + 1)² samples, on the worker only.
+  - The image is kept while the explored revision, the zoom and the player's position (within
+    2 px) are unchanged.
+  - Markers drawn on top: the player arrow (from its yaw), the start point and the
+    scented-water marks.
 - **World scene** (`scenes/main/world.tscn`, root `WorldController`): the sandbox's gameplay nodes
   without the debug free-fly camera and chunk gizmo. A new game seeds the world and starts at the
   spawn meadow; a saved game (`pending_save`, set before adding the scene) restores seed, game

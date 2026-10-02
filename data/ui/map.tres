@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="MapSettings" format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/map_settings.gd" id="1_map"]
+
+[resource]
+script = ExtResource("1_map")
+image_size = 256
+display_size = 640.0
+spans = PackedFloat32Array(1000, 2000, 4000)
+fog_color = Color(0.86, 0.8, 0.66, 1)
+shallow_color = Color(0.45, 0.7, 0.85, 1)
+deep_color = Color(0.13, 0.3, 0.52, 1)
+deep_depth = 6.0
+shade = 1.5
+player_color = Color(1, 0.45, 0.2, 1)
+start_color = Color(1, 0.95, 0.75, 1)
+water_mark_color = Color(0.45, 0.8, 1, 1)
+marker_size = 20.0
