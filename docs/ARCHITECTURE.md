@@ -611,6 +611,21 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
   (`auto_accept_quit` off). World switches are deferred and free the old world before adding
   the new one, so its floating-origin clean-up never undoes the new set-up.
 
+### Settings (Phase 10)
+`Settings` (autoload) persists to `user://settings.cfg` (`ConfigFile`; `save_settings()` when the
+settings menu closes, `load_settings()` on start; missing or broken values keep their defaults):
+quality preset, fullscreen, window size (1280×720 … 2560×1440), render scale (0.5–1,
+`scaling_3d_scale`), V-Sync, field of view (50–100°), mouse sensitivity multiplier (0.2–3) and
+invert Y (the `CameraRig` multiplies its tuned sensitivity and follows FOV through
+`Settings.changed`), volumes per bus, and **key bindings** for the gameplay actions in
+`Settings.REMAPPABLE` (debug keys stay fixed): stored by physical key or mouse button;
+`rebind()` refuses an input already used by another action and replaces all of the action's
+bindings; `restore_default_bindings()` reads the project InputMap. Window and V-Sync are skipped
+headless. The `SettingsMenu` (Graphics / Audio / Controls tabs, built in code) opens from the
+main menu and the pause menu; changes apply at once; to rebind, click the action and press a key
+or mouse button (Esc cancels). Note: tests share the project's `user://` folder, so a
+`settings.cfg` saved by playing in the same environment is loaded when the tests start.
+
 ## 10. Quality presets
 
 | Setting | Low | Medium | High |

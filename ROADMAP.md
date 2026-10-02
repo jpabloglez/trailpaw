@@ -183,7 +183,7 @@ exactly the expected set for a given position; rebase preserves absolute positio
 - [x] `SaveData` resource with schema version and migrations (JSON, see ARCHITECTURE §9).
 - [x] Autosave (biome change + interval) and manual save.
 - [x] Main menu (new game with seed, continue, settings, quit), pause menu.
-- [ ] Settings: quality presets, resolution/render scale, V-Sync, FOV, mouse sensitivity, invert Y, volumes, key remapping.
+- [x] Settings: quality presets, resolution/render scale, V-Sync, FOV, mouse sensitivity, invert Y, volumes, key remapping.
 
 **Tests:** round-trip save/load equality; migration from v1 fixture; settings persist.
 **Exit (M3):** you can quit anywhere and continue exactly where you were.

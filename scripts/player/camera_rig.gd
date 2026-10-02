@@ -44,6 +44,8 @@ func _ready() -> void:
 	_zoom_target = settings.zoom_default
 	_arm.spring_length = settings.zoom_default
 	_pitch.rotation.x = deg_to_rad(settings.default_pitch_degrees)
+	camera.fov = Settings.fov
+	Settings.changed.connect(_on_settings_changed)
 	if target != null:
 		_previous_goal = _goal_position()
 		global_position = _previous_goal
@@ -92,11 +94,12 @@ func _process(delta: float) -> void:
 
 ## Orbits by a mouse motion delta (pixels). Resets the auto-recentre timer.
 func apply_look(relative: Vector2) -> void:
-	var vertical := relative.y * (-1.0 if settings.invert_y else 1.0)
-	_yaw.rotation.y = wrapf(_yaw.rotation.y - relative.x * settings.mouse_sensitivity, -PI, PI)
-	_pitch.rotation.x = clamp_pitch(
-		_pitch.rotation.x - vertical * settings.mouse_sensitivity, settings
-	)
+	# The player's Settings scale the tuned sensitivity and may invert the vertical look.
+	var inverted := settings.invert_y != Settings.invert_y
+	var vertical := relative.y * (-1.0 if inverted else 1.0)
+	var speed := settings.mouse_sensitivity * Settings.mouse_sensitivity
+	_yaw.rotation.y = wrapf(_yaw.rotation.y - relative.x * speed, -PI, PI)
+	_pitch.rotation.x = clamp_pitch(_pitch.rotation.x - vertical * speed, settings)
 	_time_since_look = 0.0
 
 
@@ -151,3 +154,7 @@ func _goal_position() -> Vector3:
 
 func _is_mouse_captured() -> bool:
 	return Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
+
+
+func _on_settings_changed(_key: StringName) -> void:
+	camera.fov = Settings.fov
