@@ -205,7 +205,7 @@ func _finish_probe(absolute: Vector3) -> void:
 				% [_probe["holes"], _probe["collision_gaps"]]
 			),
 			(
-				"[probe] frame ms p50 %.2f  p95 %.2f  p99 %.2f  max %.2f"
+				"[probe] frame ms (delta; not meaningful headless) p50 %.2f  p95 %.2f  p99 %.2f  max %.2f"
 				% [
 					_percentile(frames, 0.5),
 					_percentile(frames, 0.95),

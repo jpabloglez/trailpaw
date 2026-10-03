@@ -690,7 +690,7 @@ or mouse button (Esc cancels). Note: tests share the project's `user://` folder,
 | Unit | NeedsModel, BiomeResolver, noise determinism, chunk math, save migration | gdUnit4 |
 | Scene | Player spawns and moves on flat ground, interactor picks targets, streamer loads ring | gdUnit4 scene runner |
 | Determinism | Same seed → identical chunk hash | gdUnit4 |
-| Performance | Terrain streaming probe: `terrain_sandbox.tscn -- --auto-travel=<m>` (spikes, holes, frame percentiles; results in `docs/notes/terrain-streaming-perf.md`); full `tools/perf_probe` in Phase 11 | Godot (+ Python report later) |
+| Performance | **Streaming** probe (headless OK): `terrain_sandbox.tscn -- --auto-travel=<m>` — build spikes > 4 ms, holes, collision gaps (`docs/notes/terrain-streaming-perf.md`). **Frame-time** probe (needs the real GPU, Phase 11): `perf_probe.tscn` flies the real `world.tscn` (attract mode, seed 12345, noon with the clock frozen, V-Sync off) 3.6 km along +X through every biome and writes one CSV row per frame (real frame time, viewport render CPU/GPU ms, draw calls, primitives, chunks built, build ms, fauna, biome) after a `# {json}` header (GPU, driver, renderer, preset, resolution); `python -m tools.perf_report run.csv` → p50/p95/p99 overall and per biome, worst frames, PASS when p95 ≤ 16.6 ms (`docs/notes/perf/`) | Godot + Python |
 | Manual | Game feel, camera, visuals | Checklist in each ROADMAP phase |
 
 ## 12. Architecture Decision Records
