@@ -9,12 +9,15 @@ const MAX_FRAMES: int = 3000
 var _saved_quality: QualityPreset
 var _saved_vsync: bool
 var _saved_dir: String
+var _saved_biome: StringName
 
 
 func before_test() -> void:
 	_saved_quality = Settings.quality
 	_saved_vsync = Settings.vsync
 	_saved_dir = SaveSystem.save_dir
+	_saved_biome = GameState.current_biome
+	GameState.current_biome = &""  # as on a fresh start (CI): nothing announced yet
 	DirAccess.remove_absolute(OUT)
 
 
@@ -22,6 +25,7 @@ func after_test() -> void:
 	Settings.set_quality(_saved_quality)
 	Settings.set_vsync(_saved_vsync)
 	SaveSystem.save_dir = _saved_dir
+	GameState.current_biome = _saved_biome
 	GameState.clock_scale = 1.0
 	FloatingOrigin.reset()
 	DirAccess.remove_absolute(OUT)
@@ -55,6 +59,6 @@ func test_a_short_flight_writes_a_readable_csv() -> void:
 	for row in lines.slice(2):
 		var cells := row.split(",")
 		assert_int(cells.size()).is_equal(PerfProbe.COLUMNS.size())
-		assert_str(cells[cells.size() - 1]).is_not_empty()  # the biome
+		assert_str(cells[cells.size() - 1]).is_equal("meadow")  # the spawn meadow
 		times[cells[2]] = true
 	assert_int(times.size()).is_greater(1)  # real frame times, not a constant delta

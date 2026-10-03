@@ -54,6 +54,7 @@ const ALTITUDE: float = 4.0
 var _world: WorldController
 var _camera: AttractCamera
 var _fauna: FaunaDirector
+var _resolver: BiomeResolver
 var _started: bool = false
 var _start_x: float = 0.0
 var _start_us: int = 0
@@ -90,6 +91,9 @@ func _ready() -> void:
 	_camera.speed = 0.0  # still until the first area has loaded
 	_camera.altitude = ALTITUDE
 	_fauna = _world.get_node_or_null("FaunaDirector") as FaunaDirector
+	# The biome under the camera, worked out here: the attract world's tracker may not have
+	# announced one yet.
+	_resolver = BiomeResolver.new(_world.streamer.terrain.biomes, SEED)
 	RenderingServer.viewport_set_measure_render_time(get_viewport().get_viewport_rid(), true)
 	print("[perf] %.0f m at %.1f m/s, preset %s, seed %d" % [distance, speed, preset, SEED])
 
@@ -140,7 +144,8 @@ func _record(now: int) -> void:
 	_chunks_built.append(built)
 	_build_ms.append(stats["last_build_ms"] if built > 0 else 0.0)
 	_fauna_count.append(_fauna.agents().size() if _fauna != null else 0)
-	var biome := GameState.current_biome
+	var at := GameState.absolute_position(_camera.global_position)
+	var biome := _resolver.dominant_at(at.x, at.z).id
 	var index := _biomes.find(biome)
 	if index < 0:
 		_biomes.append(biome)
