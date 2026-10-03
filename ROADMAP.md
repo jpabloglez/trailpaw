@@ -209,7 +209,7 @@ have seen.
 
 ## Phase 11 — Performance and polish
 
-- [ ] `tools/perf_probe`: scripted path through all biomes, logs frame times; Python report (p50/p95/p99).
+- [x] `tools/perf_probe`: scripted path through all biomes, logs frame times; Python report (p50/p95/p99).
 - [ ] Profile with Godot's profiler; fix top offenders; consider GDExtension (C++) for chunk generation only if it is still the bottleneck.
 - [ ] Procedural foot IK, head-look at interesting objects.
 - [ ] Juice: dust puffs, water splashes, camera shake on landing (subtle), UI transitions.
