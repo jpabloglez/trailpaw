@@ -240,7 +240,7 @@ them playfully; nothing is hunted.
 - [x] Herd cohesion: herds spawn whole, wander around their centre and flee together.
 - [x] Critter layer (light simulation + MultiMesh) and rabbits.
 - [x] Birds: flocks that perch, fly and scatter; birdsong follows the birds nearby.
-- [ ] Ducks on lakes and rivers.
+- [x] Ducks on lakes and rivers.
 - [ ] Butterflies by day, fireflies at night.
 
 **Tests:** herds stay within their leash; critters deterministic per chunk, on the ground or

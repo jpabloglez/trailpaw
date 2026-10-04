@@ -108,6 +108,19 @@ static func critter(shape: StringName) -> ArrayMesh:
 					],
 				]
 			)
+		&"duck":
+			var eye := Color(0.05, 0.05, 0.05)
+			return ellipsoids(
+				[
+					[Vector3(0, 0.05, 0.02), Vector3(0.085, 0.055, 0.14), Color(0.56, 0.5, 0.42)],
+					[Vector3(0, 0.08, 0.15), Vector3(0.04, 0.03, 0.05), Color(0.3, 0.27, 0.24)],
+					[Vector3(0, 0.11, -0.08), Vector3(0.036, 0.02, 0.036), Color(0.95, 0.95, 0.92)],
+					[Vector3(0, 0.15, -0.1), Vector3(0.045, 0.045, 0.05), Color(0.12, 0.38, 0.22)],
+					[Vector3(0, 0.145, -0.155), Vector3(0.022, 0.01, 0.03), Color(0.92, 0.7, 0.2)],
+					[Vector3(-0.034, 0.165, -0.12), Vector3(0.009, 0.009, 0.009), eye],
+					[Vector3(0.034, 0.165, -0.12), Vector3(0.009, 0.009, 0.009), eye],
+				]
+			)
 	return ellipsoids([[Vector3(0, 0.1, 0), Vector3(0.1, 0.1, 0.1), Color.WHITE]])
 
 

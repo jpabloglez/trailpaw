@@ -9,7 +9,9 @@ extends Node3D
 ## fox comes running (closer than [member CritterKind.flee_radius], moving faster than
 ## [member CritterKind.flee_trigger_speed]) or bumps into them they flee in long zig-zag hops,
 ## then calm down where they are. Ground heights come from the [HeightSampler] (no rays, no
-## physics bodies); hops never land in water or on steep ground.
+## physics bodies); hops never land in water or on steep ground. Swimmers (ducks) live on the
+## water surface instead: they glide, bob, and flee across the water with a splash, never
+## leaving it.
 ## [br][br]
 ## Budget: decisions at [member CritterSettings.sim_hz] (critters beyond
 ## [member CritterSettings.far_distance] every 3rd tick), ≤ 2 height samples per hop; each frame
@@ -29,6 +31,9 @@ enum State { IDLE, HOP, FLEE }
 @export var streamer: WorldStreamer
 ## The player (fleeing); defaults to the [code]player[/code] group.
 @export var player: Node3D
+
+## Splashes made so far (tests and tools).
+var splashes: int = 0
 
 var _sampler: HeightSampler
 var _sampler_seed: int = -1
@@ -55,6 +60,9 @@ var _yaw := PackedFloat32Array()
 var _scale := PackedFloat32Array()
 var _zig := PackedFloat32Array()
 var _meshes: Array[MultiMeshInstance3D] = []
+var _splashes: Array[GPUParticles3D] = []
+var _next_splash: int = 0
+var _time: float = 0.0
 
 
 func _ready() -> void:
@@ -75,6 +83,12 @@ func _ready() -> void:
 		add_child(node)
 		_meshes.append(node)
 	_counts.resize(kinds.size())
+	if kinds.any(func(kind: CritterKind) -> bool: return kind.behaviour == &"swimmer"):
+		for i in 3:
+			var splash := MotionEffects.make_emitter(12, 0.8)
+			splash.top_level = true
+			add_child(splash)
+			_splashes.append(splash)
 	EventBus.origin_shifted.connect(_on_origin_shifted)
 	if streamer != null:
 		streamer.chunks_changed.connect(sync_from_streamer)
@@ -90,6 +104,7 @@ func _physics_process(delta: float) -> void:
 
 
 func _process(delta: float) -> void:
+	_time += delta
 	advance_hops(delta)
 	draw()
 
@@ -122,9 +137,13 @@ func sync(lod0_coords: Array[Vector2i]) -> void:
 		_rolled[coord] = true
 		var biome := _biome_at(coord)
 		for k in kinds.size():
-			for xz in CritterPlan.roll(
-				coord, terrain.chunk_size, biome, kinds[k], GameState.world_seed
-			):
+			var accept := Callable()
+			if kinds[k].behaviour == &"swimmer":
+				accept = _deep_water.bind(kinds[k])
+			var spots := CritterPlan.roll(
+				coord, terrain.chunk_size, biome, kinds[k], GameState.world_seed, accept
+			)
+			for xz in spots:
 				if _kind.size() >= settings.max_total:
 					return
 				_spawn(k, coord, xz)
@@ -151,6 +170,8 @@ func tick(elapsed: float) -> void:
 				_state[i] = State.FLEE
 				_timer[i] = kind.calm_seconds
 				_zig[i] = 1.0 if _rng.randf() < 0.5 else -1.0
+				if kind.behaviour == &"swimmer":
+					_splash(here)
 		if _state[i] == State.FLEE:
 			if _timer[i] <= 0.0 and distance > kind.flee_radius:
 				_state[i] = State.IDLE
@@ -179,7 +200,10 @@ func draw() -> void:
 	for i in _kind.size():
 		var k := _kind[i]
 		var basis := Basis(Vector3.UP, _yaw[i]).scaled(Vector3.ONE * _scale[i])
-		_meshes[k].multimesh.set_instance_transform(_counts[k], Transform3D(basis, _position(i)))
+		var at := _position(i)
+		if kinds[k].behaviour == &"swimmer":
+			at.y += sin(_time * 1.8 + _scale[i] * 40.0) * 0.012  # bobbing on the water
+		_meshes[k].multimesh.set_instance_transform(_counts[k], Transform3D(basis, at))
 		_counts[k] += 1
 	for k in kinds.size():
 		_meshes[k].multimesh.visible_instance_count = _counts[k]
@@ -229,8 +253,8 @@ func _position(i: int) -> Vector3:
 
 func _spawn(k: int, coord: Vector2i, xz: Vector2) -> void:
 	var local := GameState.local_position(Vector3(xz.x, 0.0, xz.y))
-	local.y = _ground(local)
-	if not _dry_and_gentle(local, kinds[k]):
+	local.y = _surface(local, kinds[k])
+	if not _valid_spot(local, kinds[k]):
 		return
 	_kind.append(k)
 	_chunk.append(coord)
@@ -312,8 +336,8 @@ func _flee_hop(i: int, kind: CritterKind, threat: Vector3) -> void:
 # Starts a hop from [param from] to [param to] (heights from the ground); false when the
 # landing is wet or too steep.
 func _hop(i: int, from: Vector3, to: Vector3, hop: Vector3, kind: CritterKind) -> bool:
-	to.y = _ground(to)
-	if not _dry_and_gentle(to, kind):
+	to.y = _surface(to, kind)
+	if not _valid_spot(to, kind):
 		return false
 	_from[i] = from
 	_to[i] = to
@@ -322,6 +346,40 @@ func _hop(i: int, from: Vector3, to: Vector3, hop: Vector3, kind: CritterKind) -
 	_hop_height[i] = hop.y
 	_yaw[i] = atan2(-(to.x - from.x), -(to.z - from.z))
 	return true
+
+
+# Where a critter of [param kind] at [param local] sits: the ground, or the water surface.
+func _surface(local: Vector3, kind: CritterKind) -> float:
+	if kind.behaviour == &"swimmer":
+		return GameState.water_level
+	return _ground(local)
+
+
+func _valid_spot(local: Vector3, kind: CritterKind) -> bool:
+	if kind.behaviour == &"swimmer":
+		return (
+			not is_inf(GameState.water_level)
+			and (_ground(local) <= GameState.water_level - kind.min_depth)
+		)
+	return _dry_and_gentle(local, kind)
+
+
+# Whether absolute X/Z [param xz] is water deep enough for [param kind] (group centres).
+func _deep_water(xz: Vector2, kind: CritterKind) -> bool:
+	var local := GameState.local_position(Vector3(xz.x, 0.0, xz.y))
+	return _valid_spot(local, kind)
+
+
+func _splash(at: Vector3) -> void:
+	splashes += 1
+	if _splashes.is_empty() or (Settings.quality != null and not Settings.quality.motion_effects):
+		return
+	var emitter := _splashes[_next_splash]
+	_next_splash = (_next_splash + 1) % _splashes.size()
+	emitter.global_position = at + Vector3.UP * 0.05
+	(emitter.process_material as ParticleProcessMaterial).color = Color(0.85, 0.93, 1.0, 0.7)
+	emitter.restart()
+	emitter.emitting = true
 
 
 func _dry_and_gentle(local: Vector3, kind: CritterKind) -> bool:

@@ -7,6 +7,11 @@ extends Resource
 @export var id: StringName = &""
 ## Mesh built in code ([method ProceduralMeshes.critter]).
 @export var shape: StringName = &""
+## How it moves: [code]&"hopper"[/code] (on dry ground, in hops) or [code]&"swimmer"[/code] (on
+## the water surface, gliding; never leaves the water).
+@export var behaviour: StringName = &"hopper"
+## Swimmers only use water at least this deep (m).
+@export_range(0.0, 5.0, 0.05, "suffix:m") var min_depth: float = 0.4
 ## Biome id → how many in a chunk that hosts them (min, max).
 @export var biome_counts: Dictionary[StringName, Vector2i] = {}
 ## Chance that a full-detail chunk hosts some.

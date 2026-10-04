@@ -115,14 +115,23 @@ func _dust_color() -> Color:
 
 
 func _emitter() -> GPUParticles3D:
+	var most := maxi(settings.step_amount, maxi(settings.landing_amount, settings.splash_amount))
+	var emitter := make_emitter(most, settings.lifetime)
+	add_child(emitter)
+	return emitter
+
+
+## A one-shot puff emitter (soft round sprites that fade out) with room for [param amount]
+## particles living [param lifetime] seconds; set its colour on
+## [code](process_material as ParticleProcessMaterial).color[/code]. Shared with the critters'
+## splashes.
+static func make_emitter(amount: int, lifetime: float) -> GPUParticles3D:
 	var emitter := GPUParticles3D.new()
 	emitter.one_shot = true
-	emitter.amount = maxi(
-		settings.step_amount, maxi(settings.landing_amount, settings.splash_amount)
-	)
+	emitter.amount = amount
 	emitter.emitting = false
 	emitter.explosiveness = 0.9
-	emitter.lifetime = settings.lifetime
+	emitter.lifetime = lifetime
 	emitter.local_coords = false
 	emitter.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	var process := ParticleProcessMaterial.new()
@@ -152,7 +161,6 @@ func _emitter() -> GPUParticles3D:
 	material.albedo_texture = _soft_dot()
 	quad.material = material
 	emitter.draw_pass_1 = quad
-	add_child(emitter)
 	return emitter
 
 
