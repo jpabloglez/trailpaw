@@ -612,6 +612,15 @@ no AnimationTree.
   - Hops never land in water or on slopes steeper than 35°.
 - **Budget (measured, 120 critters):** decisions + hops ≈ 0.11 ms (p95 0.19), drawing
   ≈ 0.07 ms per frame.
+- **Ducks** are `CritterKind.behaviour = &"swimmer"` (`data/critters/duck.tres`): meadow,
+  forest and river valley, 2–5 in 80 % of chunks **that have water**.
+  - The group's centre is the first of 12 deterministic candidates in the chunk that is water
+    ≥ 0.4 m deep (`CritterPlan.roll(…, accept)`).
+  - They sit at the water surface, bob (drawing only), and glide on 1.5 m paddles every
+    2–6 s around home.
+  - **A running fox makes them flee** across the water (3 m in 1 s, zig-zag 20°) with a
+    splash: `MotionEffects.make_emitter()`, a pool of 3, off on Low.
+  - Every move must land on water deep enough, so they never leave it.
 
 ### 7.y Birds (Phase 13)
 `BirdFlocks` (in `world.tscn` and the terrain sandbox; `data/critters/birds.tres`) works like

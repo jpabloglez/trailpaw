@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="CritterKind" format=3]
+
+[ext_resource type="Script" path="res://scripts/critters/critter_kind.gd" id="1_ck"]
+
+[resource]
+script = ExtResource("1_ck")
+id = &"duck"
+shape = &"duck"
+behaviour = &"swimmer"
+min_depth = 0.4
+biome_counts = Dictionary[StringName, Vector2i]({
+&"forest": Vector2i(2, 3),
+&"meadow": Vector2i(2, 4),
+&"river_valley": Vector2i(2, 5)
+})
+chance = 0.8
+scale_range = Vector2(0.9, 1.1)
+group_spread = 4.0
+home_radius = 6.0
+idle_seconds = Vector2(2, 6)
+graze_hop = Vector3(1.5, 0, 3.5)
+flee_hop = Vector3(3, 0, 1)
+zigzag = 20.0
+max_slope = 89.0
+flee_radius = 8.0
+flee_trigger_speed = 2.0
+startle_radius = 2.0
+calm_seconds = 5.0
