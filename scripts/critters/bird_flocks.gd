@@ -307,7 +307,7 @@ func _perch_near(wanted: Vector3) -> Vector3:
 				var size := terrain.chunk_size
 				var close := Rect2(Vector2(origin.x, origin.z), Vector2(size, size)).grow(15.0)
 				if close.has_point(Vector2(wanted.x, wanted.z)):
-					chunk.tree_tops(_tops)
+					chunk.spots(&"tree_top", _tops)
 	var best := Vector3.INF
 	var best_d := 15.0 * 15.0
 	for top in _tops:

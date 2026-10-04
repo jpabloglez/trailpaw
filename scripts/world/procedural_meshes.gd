@@ -163,3 +163,33 @@ static func bird() -> ArrayMesh:
 			tool.add_vertex(corner)
 	tool.generate_normals()
 	return tool.commit()
+
+
+## A butterfly ≈ 9 cm across, facing −Z, centred on its origin: a slim body and two pairs of
+## wings whose vertices carry their distance from the body in [code]UV.x[/code] like the bird's,
+## so the same shader flaps them (faster). Tinted by the instance colour.
+static func butterfly() -> ArrayMesh:
+	var tool := SurfaceTool.new()
+	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var sphere := SphereMesh.new()
+	sphere.radial_segments = 5
+	sphere.rings = 3
+	var source := sphere.get_mesh_arrays()
+	var unit_vertices: PackedVector3Array = source[Mesh.ARRAY_VERTEX]
+	tool.set_uv(Vector2.ZERO)
+	tool.set_color(Color(0.25, 0.22, 0.2))
+	for index: int in source[Mesh.ARRAY_INDEX]:
+		tool.add_vertex(unit_vertices[index] * 2.0 * Vector3(0.005, 0.005, 0.028))
+	tool.set_color(Color.WHITE)
+	for side: float in [-1.0, 1.0]:
+		var wings := [
+			[Vector3(0.004, 0, -0.018), Vector3(0.05, 0, -0.03), Vector3(0.042, 0, 0.004)],
+			[Vector3(0.004, 0, -0.002), Vector3(0.036, 0, 0.012), Vector3(0.006, 0, 0.026)],
+		]
+		for wing: Array in wings:
+			for corner: Vector3 in wing:
+				var point := Vector3(corner.x * side, corner.y, corner.z)
+				tool.set_uv(Vector2(absf(point.x) * side, 0.0))
+				tool.add_vertex(point)
+	tool.generate_normals()
+	return tool.commit()

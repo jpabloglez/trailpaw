@@ -158,14 +158,15 @@ static func make_emitter(amount: int, lifetime: float) -> GPUParticles3D:
 	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	material.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
 	material.vertex_color_use_as_albedo = true
-	material.albedo_texture = _soft_dot()
+	material.albedo_texture = soft_dot()
 	quad.material = material
 	emitter.draw_pass_1 = quad
 	return emitter
 
 
-# A soft round sprite (white centre fading to transparent), shared by every emitter.
-static func _soft_dot() -> GradientTexture2D:
+## A soft round sprite (white centre fading to transparent), shared by every emitter and the
+## fireflies.
+static func soft_dot() -> GradientTexture2D:
 	var falloff := Gradient.new()
 	falloff.set_color(0, Color(1, 1, 1, 1))
 	falloff.set_color(1, Color(1, 1, 1, 0))
