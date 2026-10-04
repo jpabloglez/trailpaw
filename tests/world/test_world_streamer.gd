@@ -199,3 +199,11 @@ func test_emits_chunks_changed_and_debug_lines() -> void:
 	var lines := _streamer.get_debug_lines()
 	assert_str(lines[0]).contains("%d loaded" % _streamer.loaded_coords().size())
 	assert_float(_streamer.stats()["max_chunk_ms"]).is_greater(0.0)
+
+
+func test_generation_never_takes_the_main_and_render_cores() -> void:
+	# Phase 11: 4 tasks on a 4-core CPU made the OS preempt the main thread (4–6 ms build spikes).
+	assert_int(WorldStreamer.task_limit(4, 4)).is_equal(2)
+	assert_int(WorldStreamer.task_limit(4, 8)).is_equal(4)  # the setting is still the ceiling
+	assert_int(WorldStreamer.task_limit(4, 2)).is_equal(1)  # always at least one
+	assert_int(WorldStreamer.task_limit(0, 16)).is_equal(1)

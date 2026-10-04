@@ -11,7 +11,7 @@ extends Node3D
 ## discarded when they arrive.
 ## [br][br]
 ## Budget (main thread, per frame): re-planning only when the target changes chunk
-## (O(load_radius²)); polling at most [member StreamingSettings.max_tasks_in_flight] tasks;
+## (O(load_radius²)); polling at most [method task_limit] tasks;
 ## building for at most [member StreamingSettings.build_budget_ms] (at least one chunk).
 ## No per-frame allocations in the steady state.
 
@@ -139,6 +139,14 @@ func get_chunk(coord: Vector2i) -> TerrainChunk:
 func is_ready_at(local_position: Vector3) -> bool:
 	var chunk: TerrainChunk = _loaded.get(_chunk_for_local(local_position))
 	return chunk != null and chunk.has_collision()
+
+
+## Generation tasks allowed at once: [member StreamingSettings.max_tasks_in_flight], but never
+## more than the CPU cores minus two (one for the main thread, one for rendering). With more
+## tasks than that the OS preempts the main thread for a whole time slice (≈ 4–6 ms), which the
+## streaming probe saw as build spikes in steps that cost microseconds.
+static func task_limit(settings_max: int, cores: int) -> int:
+	return clampi(cores - 2, 1, maxi(settings_max, 1))
 
 
 ## Whether nothing is queued, generating or waiting to be built.
@@ -295,7 +303,8 @@ func _build_ready() -> void:
 
 
 func _submit_tasks() -> void:
-	while _in_flight.size() < streaming.max_tasks_in_flight and not _queue.is_empty():
+	var limit := task_limit(streaming.max_tasks_in_flight, OS.get_processor_count())
+	while _in_flight.size() < limit and not _queue.is_empty():
 		var coord: Vector2i = _queue.pop_front()
 		if not _desired.has(coord) or _has_lod(coord, _desired[coord]):
 			continue
@@ -336,6 +345,8 @@ func _acquire() -> TerrainChunk:
 	var chunk := chunk_scene.instantiate() as TerrainChunk
 	chunk.delta_store = _deltas
 	add_child(chunk)
+	# ≈ 0.5 ms now, instead of up to several ms the first time it becomes full detail.
+	chunk.reserve(streaming.food_shape_reserve, streaming.obstacle_reserve)
 	return chunk
 
 

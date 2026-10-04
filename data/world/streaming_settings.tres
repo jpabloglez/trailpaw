@@ -10,3 +10,5 @@ lod0_radius = 1.5
 build_budget_ms = 2.0
 max_tasks_in_flight = 4
 rebase_distance = 2000.0
+food_shape_reserve = 192
+obstacle_reserve = 64

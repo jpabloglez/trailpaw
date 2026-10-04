@@ -7,6 +7,7 @@ const MATERIAL_PATH: String = "res://data/world/terrain_material.tres"
 const ANIMAL_SCENE: String = "res://scenes/player/animal.tscn"
 const SEED: int = 12345
 const FOREST := Vector2i(17, 2)
+const STREAMING: StreamingSettings = preload("res://data/world/streaming_settings.tres")
 
 var _settings: TerrainSettings
 var _scatterer: VegetationScatterer
@@ -137,3 +138,52 @@ func test_animal_cannot_walk_through_a_tree() -> void:
 	assert_float(closest).is_greater(radius * 0.9)
 	assert_float(animal.global_position.z).is_greater(tree.origin.z)  # never got past it
 	assert_object(chunk).is_not_null()
+
+
+# --- reserved capacity (Phase 11: no physics objects created on a cold chunk's first apply) ---
+
+
+func test_a_reserved_chunk_creates_no_shapes_when_applied() -> void:
+	var streaming := STREAMING
+	var chunk: TerrainChunk = auto_free(load(CHUNK_SCENE).instantiate())
+	add_child(chunk)
+	assert_bool(chunk.reserve(streaming.food_shape_reserve, streaming.obstacle_reserve)).is_true()
+	var reserved := chunk.reserved()
+	assert_that(reserved).is_equal(
+		Vector2i(streaming.food_shape_reserve, streaming.obstacle_reserve)
+	)
+	var data := _gen(FOREST)
+	chunk.apply(data, load(MATERIAL_PATH), _library)
+	assert_that(chunk.reserved()).is_equal(reserved)  # nothing new was created
+	assert_int(chunk.obstacle_count()).is_equal(_collidable_count(data))
+	# The body went back into the physics space: trunks and ground still collide.
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	var tree := _instances(data, &"tree_detailed")[0]
+	var hit := _ray(chunk, tree.origin.x, tree.origin.z)
+	assert_float((hit["position"] as Vector3).y).is_greater(tree.origin.y + 0.5)
+	assert_bool(_ray(chunk, 1.0, 1.0).is_empty()).is_false()
+
+
+func test_the_reserve_can_be_spread_over_calls() -> void:
+	var chunk: TerrainChunk = auto_free(load(CHUNK_SCENE).instantiate())
+	add_child(chunk)
+	assert_bool(chunk.reserve(10, 5, 6)).is_false()
+	assert_that(chunk.reserved()).is_equal(Vector2i(6, 0))
+	assert_bool(chunk.reserve(10, 5, 6)).is_false()
+	assert_that(chunk.reserved()).is_equal(Vector2i(10, 2))
+	assert_bool(chunk.reserve(10, 5, 6)).is_true()
+	assert_that(chunk.reserved()).is_equal(Vector2i(10, 5))
+	assert_bool(chunk.reserve(10, 5, 6)).is_true()  # complete: nothing more
+
+
+func test_the_reserve_covers_wooded_chunks() -> void:
+	var streaming := STREAMING
+	var most := Vector2i.ZERO
+	for i in 24:
+		var coord := Vector2i(10 + i, (i % 3) - 1)  # through the forest band along +X
+		var chunk := _chunk(_gen(coord))
+		most = Vector2i(maxi(most.x, chunk.food_count()), maxi(most.y, chunk.obstacle_count()))
+	assert_int(most.x).is_less_equal(streaming.food_shape_reserve)
+	assert_int(most.y).is_less_equal(streaming.obstacle_reserve)
+	assert_int(most.y).is_greater(10)  # the sample really is wooded
