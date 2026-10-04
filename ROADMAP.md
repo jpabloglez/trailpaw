@@ -221,7 +221,7 @@ have seen.
 
 ## Phase 12 — Vertical slice release → **M4**
 
-- [ ] Export presets for Windows and Linux; CI export job producing artifacts.
+- [x] Export presets for Windows and Linux; CI export job producing artifacts.
 - [ ] Onboarding: first 5 minutes teach movement, sniff, drink and eat without text walls.
 - [ ] Playtest with 3–5 people; collect feedback in `docs/playtests/`.
 - [ ] README with build instructions, credits and licences.

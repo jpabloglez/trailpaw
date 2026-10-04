@@ -35,6 +35,13 @@ func _ready() -> void:
 	title.position.y = 70
 	title.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	_root.add_child(title)
+	var version := MenuStyle.label("v" + version_text(), 16, "Version")
+	version.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+	version.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	version.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	version.position -= Vector2(16, 12)
+	version.modulate.a = 0.7
+	_root.add_child(version)
 	_build_main()
 	_build_new_game()
 	_build_confirm()
@@ -82,6 +89,12 @@ func seed_field() -> LineEdit:
 ## The button named [param node_name] on any page (tests and tools).
 func button(node_name: String) -> Button:
 	return _root.find_child(node_name, true, false) as Button
+
+
+## The game's version ([code]application/config/version[/code]), shown in a corner so playtest
+## reports say which build they are about.
+static func version_text() -> String:
+	return str(ProjectSettings.get_setting("application/config/version", "dev"))
 
 
 ## Which page shows: [code]"main"[/code], [code]"new_game"[/code] or [code]"confirm"[/code].
