@@ -47,6 +47,17 @@ extends Resource
 ## Target speed required before auto-recentring kicks in.
 @export_range(0.0, 10.0, 0.1, "suffix:m/s") var recentre_min_speed: float = 0.0
 
+@export_group("Landing shake")
+## Falls slower than this do not shake the camera (m/s).
+@export_range(0.0, 50.0, 0.5, "suffix:m/s") var shake_min_fall: float = 6.0
+## Falls this fast or faster shake it fully (m/s).
+@export_range(0.0, 50.0, 0.5, "suffix:m/s") var shake_max_fall: float = 14.0
+## Largest camera offset (m) and roll (degrees) of a full shake.
+@export_range(0.0, 1.0, 0.005, "suffix:m") var shake_offset: float = 0.08
+@export_range(0.0, 10.0, 0.1, "suffix:°") var shake_roll: float = 1.5
+## Seconds a shake takes to die out.
+@export_range(0.05, 3.0, 0.05, "suffix:s") var shake_duration: float = 0.3
+
 
 ## Returns human-readable problems with the tunables; empty when valid.
 func get_validation_errors() -> PackedStringArray:

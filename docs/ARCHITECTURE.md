@@ -263,6 +263,13 @@ stays in `data/species/` as an alternative; switching is a one-line change in `a
 ### 4.3 Camera
 `SpringArm3D` third-person rig with mouse orbit, collision, zoom (wheel), slight lag and
 auto-recentre behind the animal while moving. Sensitivity and invert-Y in Settings.
+**Landing shake (Phase 11):**
+- `MovementComponent.landed(fall_speed)` fires when `move()` takes the body from the air to
+  the floor; `MotionEffects` uses it too.
+- `CameraRig.on_landed()` adds trauma above 6 m/s of fall (full at 14 m/s).
+- The camera's `h_offset`/`v_offset` and roll shake by ≤ 0.08 m and ≤ 1.5° × trauma², and the
+  shake decays over 0.3 s (`CameraRigSettings`).
+- Off with Settings → Controls → Camera shake (`Settings.camera_shake`, persisted).
 
 - Scene `scenes/player/camera_rig.tscn`: `CameraRig` (top-level) → `%Yaw` → `%Pitch` →
   `%SpringArm3D` (mask `world`, sphere probe) → `%Camera3D`. Tunables in
@@ -694,6 +701,14 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
   going back to the menu, when quitting and on `NOTIFICATION_WM_CLOSE_REQUEST`
   (`auto_accept_quit` off). World switches are deferred and free the old world before adding
   the new one, so its floating-origin clean-up never undoes the new set-up.
+
+### Transitions (Phase 11)
+- Menu pages (main menu pages, pause, settings, map) fade in over 0.15 s with
+  `MenuStyle.fade_in()`. It is a `TWEEN_PAUSE_PROCESS` tween, so it also runs while paused.
+  Closing stays instant, so flows never wait on a fade.
+- `ScreenFade` (layer 100 in `GameFlow`) fades to near-black over 0.3 s before a menu-driven
+  world switch (new game, continue, back to the menu). The world is swapped while fully
+  covered, then the fade reveals the new one.
 
 ### Settings (Phase 10)
 `Settings` (autoload) persists to `user://settings.cfg` (`ConfigFile`; `save_settings()` when the

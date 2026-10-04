@@ -212,7 +212,7 @@ have seen.
 - [x] `tools/perf_probe`: scripted path through all biomes, logs frame times; Python report (p50/p95/p99).
 - [ ] Profile with Godot's profiler; fix top offenders; consider GDExtension (C++) for chunk generation only if it is still the bottleneck.
 - [x] Procedural foot IK, head-look at interesting objects.
-- [ ] Juice: dust puffs, water splashes, camera shake on landing (subtle), UI transitions.
+- [x] Juice: dust puffs, water splashes, camera shake on landing (subtle), UI transitions.
 - [ ] Accessibility: text size, colour-blind-safe meters, hold-vs-toggle options.
 
 **Exit:** p95 frame time ≤ 16.6 ms on Medium on the target PC.

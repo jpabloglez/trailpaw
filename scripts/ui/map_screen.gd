@@ -96,6 +96,7 @@ func open() -> void:
 	if world == null:
 		return
 	visible = true
+	MenuStyle.fade_in(_root)
 	get_tree().paused = true
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	set_process(true)

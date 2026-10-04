@@ -79,6 +79,7 @@ func open() -> void:
 	_refresh()
 	_status.text = ""
 	visible = true
+	MenuStyle.fade_in(_root)
 
 
 ## Saves the settings and hides the menu.
@@ -139,6 +140,7 @@ func _refresh() -> void:
 		(control("Volume" + String(bus)) as HSlider).set_value_no_signal(Settings.volume(bus))
 	(control("Sensitivity") as HSlider).set_value_no_signal(Settings.mouse_sensitivity)
 	(control("InvertY") as CheckBox).set_pressed_no_signal(Settings.invert_y)
+	(control("CameraShake") as CheckBox).set_pressed_no_signal(Settings.camera_shake)
 	for action: StringName in _binding_buttons:
 		_binding_buttons[action].text = Settings.binding_text(action)
 
@@ -199,6 +201,10 @@ func _controls_tab() -> Control:
 	invert.name = "InvertY"
 	invert.toggled.connect(Settings.set_invert_y)
 	_row(grid, "Invert Y", invert)
+	var shake := CheckBox.new()
+	shake.name = "CameraShake"
+	shake.toggled.connect(Settings.set_camera_shake)
+	_row(grid, "Camera shake", shake)
 	for action: StringName in ACTION_NAMES:
 		var b := Button.new()
 		b.name = "Bind_" + String(action)

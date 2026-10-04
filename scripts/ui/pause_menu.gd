@@ -74,6 +74,7 @@ func _process(delta: float) -> void:
 func open() -> void:
 	_seed.text = "World seed %d" % GameState.world_seed
 	visible = true
+	MenuStyle.fade_in(_root)
 	get_tree().paused = true
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 

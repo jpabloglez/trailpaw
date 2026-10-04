@@ -596,8 +596,9 @@ font_size = 72
 [node name="Animal" parent="." unique_id=858224225 instance=ExtResource("2_8hp75")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 5)
 
-[node name="CameraRig" parent="." unique_id=1364750976 node_paths=PackedStringArray("target") instance=ExtResource("3_1wrq4")]
+[node name="CameraRig" parent="." unique_id=1364750976 node_paths=PackedStringArray("target", "movement") instance=ExtResource("3_1wrq4")]
 target = NodePath("../Animal")
+movement = NodePath("../Animal/MovementComponent")
 
 [node name="DebugOverlay" parent="." instance=ExtResource("4_dbgov")]
 

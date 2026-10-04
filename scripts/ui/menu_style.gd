@@ -6,6 +6,8 @@ extends RefCounted
 const PANEL: Color = Color(0.1, 0.12, 0.1, 0.62)
 ## Text colour.
 const TEXT: Color = Color(1.0, 0.98, 0.92)
+## Seconds a menu page takes to fade in.
+const FADE_SECONDS: float = 0.15
 
 
 ## A button labelled [param text] named [param node_name].
@@ -49,3 +51,12 @@ static func centred_box(parent: Control, node_name: String) -> VBoxContainer:
 	box.add_theme_constant_override(&"separation", 14)
 	panel.add_child(box)
 	return box
+
+
+## Fades [param control] in from transparent (also while the game is paused).
+static func fade_in(control: Control) -> Tween:
+	control.modulate.a = 0.0
+	var tween := control.create_tween()
+	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	tween.tween_property(control, ^"modulate:a", 1.0, FADE_SECONDS)
+	return tween
