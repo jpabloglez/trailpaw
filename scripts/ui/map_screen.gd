@@ -98,6 +98,7 @@ func open() -> void:
 	visible = true
 	MenuStyle.fade_in(_root)
 	get_tree().paused = true
+	EventBus.map_opened.emit()
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	set_process(true)
 	_request_render()

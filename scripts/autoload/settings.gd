@@ -81,6 +81,8 @@ var sprint_toggle: bool = false
 var rest_toggle: bool = false
 ## Interface and text scale (1 … 1.5; menus, HUD, prompts and map).
 var ui_scale: float = 1.0
+## Onboarding hints: on or off, and which ones the player has already learnt.
+var hints := HintProgress.new()
 ## Where [method save_settings] and [method load_settings] work.
 var config_path: String = DEFAULT_PATH
 
@@ -260,6 +262,7 @@ func save_settings() -> Error:
 	config.set_value("controls", "sprint_toggle", sprint_toggle)
 	config.set_value("controls", "rest_toggle", rest_toggle)
 	config.set_value("interface", "ui_scale", ui_scale)
+	hints.write(config)
 	for action in REMAPPABLE:
 		config.set_value("bindings", String(action), _serialise(action))
 	return config.save(config_path)
@@ -294,6 +297,7 @@ func load_settings() -> void:
 	ui_scale = snappedf(
 		clampf(float(config.get_value("interface", "ui_scale", 1.0)), 1.0, 1.5), 0.1
 	)
+	hints.read(config)
 	for action in REMAPPABLE:
 		var stored: Array = config.get_value("bindings", String(action), [])
 		if not stored.is_empty():
