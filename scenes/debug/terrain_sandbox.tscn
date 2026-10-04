@@ -38,6 +38,8 @@
 [ext_resource type="Script" path="res://scripts/critters/critter_kind.gd" id="71_critkind"]
 [ext_resource type="Resource" path="res://data/critters/rabbit.tres" id="72_rabbit"]
 [ext_resource type="Resource" path="res://data/critters/system.tres" id="73_critset"]
+[ext_resource type="Script" path="res://scripts/critters/bird_flocks.gd" id="74_birds"]
+[ext_resource type="Resource" path="res://data/critters/birds.tres" id="75_birdset"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_k7oal"]
 
@@ -138,11 +140,12 @@ settings = ExtResource("49_wthset")
 day_night = NodePath("../DayNightCycle")
 wind = ExtResource("50_wind")
 
-[node name="AmbienceDirector" type="Node" parent="." node_paths=PackedStringArray("day_night", "weather")]
+[node name="AmbienceDirector" type="Node" parent="." node_paths=PackedStringArray("day_night", "weather", "birds")]
 script = ExtResource("51_amb")
 settings = ExtResource("52_ambset")
 day_night = NodePath("../DayNightCycle")
 weather = NodePath("../Weather")
+birds = NodePath("../BirdFlocks")
 
 [node name="UiSounds" type="Node" parent="." node_paths=PackedStringArray("interactor", "sniffer")]
 script = ExtResource("53_ui")
@@ -162,3 +165,11 @@ settings = ExtResource("73_critset")
 terrain = ExtResource("3_u18in")
 streamer = NodePath("../WorldStreamer")
 player = NodePath("../Animal")
+
+[node name="BirdFlocks" type="Node3D" parent="." node_paths=PackedStringArray("streamer", "player", "day_night")]
+script = ExtResource("74_birds")
+settings = ExtResource("75_birdset")
+terrain = ExtResource("3_u18in")
+streamer = NodePath("../WorldStreamer")
+player = NodePath("../Animal")
+day_night = NodePath("../DayNightCycle")

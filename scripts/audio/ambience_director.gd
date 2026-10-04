@@ -18,6 +18,8 @@ const SILENT: float = 0.001
 @export var day_night: DayNightCycle
 ## Rain source (optional; dry without it).
 @export var weather: Weather
+## Birds: layers that [member AmbienceLayer.follows_birds] sing only near them (optional).
+@export var birds: BirdFlocks
 
 var _players: Array[AudioStreamPlayer] = []
 var _volumes := PackedFloat32Array()
@@ -56,6 +58,8 @@ func advance(delta: float) -> void:
 		var target := layer.volume_for(biome, light, rain)
 		if layer.is_intermittent():
 			target *= _advance_gate(i, layer, delta)
+		if layer.follows_birds and birds != null:
+			target *= birds.presence(_listener())
 		_volumes[i] = move_toward(_volumes[i], target, step)
 		var player := _players[i]
 		player.volume_db = linear_to_db(maxf(_volumes[i], SILENT))
@@ -111,3 +115,12 @@ static func _looping(stream: AudioStream) -> AudioStream:
 		wav.loop_begin = 0
 		wav.loop_end = int(wav.get_length() * wav.mix_rate)
 	return copy
+
+
+# Where the ambience is heard from: the player, else the camera.
+func _listener() -> Vector3:
+	var focus := get_tree().get_first_node_in_group(Animal.PLAYER_GROUP) as Node3D
+	if focus != null:
+		return focus.global_position
+	var camera := get_viewport().get_camera_3d()
+	return camera.global_position if camera != null else Vector3.ZERO

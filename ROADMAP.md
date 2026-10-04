@@ -239,7 +239,7 @@ them playfully; nothing is hunted.
 
 - [x] Herd cohesion: herds spawn whole, wander around their centre and flee together.
 - [x] Critter layer (light simulation + MultiMesh) and rabbits.
-- [ ] Birds: flocks that perch, fly and scatter; birdsong follows the birds nearby.
+- [x] Birds: flocks that perch, fly and scatter; birdsong follows the birds nearby.
 - [ ] Ducks on lakes and rivers.
 - [ ] Butterflies by day, fireflies at night.
 
