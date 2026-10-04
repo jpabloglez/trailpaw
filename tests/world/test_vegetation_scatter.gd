@@ -72,12 +72,15 @@ func _wet_chunks(count: int) -> Array[ChunkData]:
 	return found
 
 
-func test_nothing_grows_underwater() -> void:
+func test_dry_land_plants_never_grow_underwater() -> void:
 	var wet := _wet_chunks(3)
 	assert_int(wet.size()).is_equal(3)  # the test must see real water, not pass vacuously
 	var near_water := 0
+	var aquatic := _aquatic_ids()
 	for data in wet:
 		for id: StringName in data.vegetation:
+			if aquatic.has(id):
+				continue  # reeds and water lilies belong in the water (Phase 14)
 			var buffer: PackedFloat32Array = data.vegetation[id]
 			for i in data.vegetation_count(id):
 				var y := _origin(buffer, i).y
@@ -196,3 +199,69 @@ func test_density_scale_reduces_instances() -> void:
 	)
 	var ratio := float(half.vegetation_count(&"grass")) / full.vegetation_count(&"grass")
 	assert_float(ratio).is_between(0.35, 0.65)
+
+
+# Types some biome lets grow under the water (an entry with min_height < 0).
+func _aquatic_ids() -> Array[StringName]:
+	var out: Array[StringName] = []
+	for biome in _settings.biomes.biomes:
+		for entry in biome.vegetation:
+			if entry.min_height < 0.0 and not out.has(entry.type.id):
+				out.append(entry.type.id)
+	return out
+
+
+func _wetland_chunks(count: int) -> Array[ChunkData]:
+	var resolver := BiomeResolver.new(_settings.biomes, SEED)
+	var out: Array[ChunkData] = []
+	for cx in range(38, 50):
+		for cz in range(-3, 4):
+			var centre := (Vector2(cx, cz) + Vector2(0.5, 0.5)) * _settings.chunk_size
+			if resolver.dominant_at(centre.x, centre.y).id != &"wetland":
+				continue
+			var data := _gen(Vector2i(cx, cz))
+			if data.has_water():
+				out.append(data)
+				if out.size() >= count:
+					return out
+	return out
+
+
+func test_water_lilies_float_on_the_water_where_it_is_deep_enough() -> void:
+	var lilies := 0
+	for data in _wetland_chunks(3):
+		for id: StringName in [&"water_lily", &"water_lily_flower"]:
+			var buffer: PackedFloat32Array = data.vegetation.get(id, PackedFloat32Array())
+			for i in buffer.size() / VegetationScatterer.FLOATS_PER_INSTANCE:
+				var p := _origin(buffer, i)
+				assert_float(p.y).is_equal_approx(_settings.sea_level, 1e-4)  # at the surface
+				var ground: float = VegetationScatterer.surface_at(data, p.x, p.z)[0]
+				var depth := _settings.sea_level - ground
+				assert_float(depth).is_between(0.29, 1.61)  # over the depths the entry allows
+				lilies += 1
+	assert_int(lilies).is_greater(10)
+
+
+func test_reeds_stand_on_the_banks_and_in_the_shallows_only() -> void:
+	var reeds := 0
+	var in_water := 0
+	for data in _wetland_chunks(3):
+		var buffer: PackedFloat32Array = data.vegetation.get(&"reeds", PackedFloat32Array())
+		for i in buffer.size() / VegetationScatterer.FLOATS_PER_INSTANCE:
+			var p := _origin(buffer, i)
+			var height := p.y - _settings.sea_level
+			assert_float(height).is_between(-0.36, 0.51)
+			in_water += int(height < 0.0)
+			reeds += 1
+	assert_int(reeds).is_greater(50)
+	assert_int(in_water).is_greater(0)  # some really stand in the water
+
+
+func test_aquatic_plants_are_deterministic() -> void:
+	var chunks := _wetland_chunks(1)
+	assert_int(chunks.size()).is_equal(1)
+	var again := _gen(chunks[0].coord)
+	assert_that(again.vegetation.get(&"water_lily")).is_equal(
+		chunks[0].vegetation.get(&"water_lily")
+	)
+	assert_that(again.vegetation.get(&"reeds")).is_equal(chunks[0].vegetation.get(&"reeds"))

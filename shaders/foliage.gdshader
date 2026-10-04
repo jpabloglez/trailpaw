@@ -17,6 +17,8 @@ uniform float roughness_value : hint_range(0.0, 1.0) = 0.9;
 uniform float sway = 0.0;
 // Model height (model units) the sway is normalised by.
 uniform float model_height = 1.0;
+// Multiply by the mesh's vertex colours (meshes built in code with several colours).
+uniform bool vertex_colors = false;
 
 void vertex() {
 	if (sway > 0.0) {
@@ -31,6 +33,7 @@ void vertex() {
 }
 
 void fragment() {
-	ALBEDO = albedo * (1.0 - 0.15 * wetness);
+	vec3 base = vertex_colors ? albedo * COLOR.rgb : albedo;
+	ALBEDO = base * (1.0 - 0.15 * wetness);
 	ROUGHNESS = roughness_value;
 }

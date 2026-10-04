@@ -15,6 +15,10 @@
 [ext_resource type="Script" path="res://scripts/fauna/fauna_entry.gd" id="60_fentry"]
 [ext_resource type="Resource" path="res://data/fauna/donkey.tres" id="61_donkey"]
 [ext_resource type="Resource" path="res://data/fauna/deer.tres" id="61_deer"]
+[ext_resource type="Resource" path="res://data/vegetation/reeds.tres" id="90_reeds"]
+[ext_resource type="Resource" path="res://data/vegetation/cattails.tres" id="90_cattails"]
+[ext_resource type="Resource" path="res://data/vegetation/water_lily.tres" id="90_water_lily"]
+[ext_resource type="Resource" path="res://data/vegetation/water_lily_flower.tres" id="90_water_lily_flower"]
 
 [sub_resource type="Resource" id="Resource_0mnhg"]
 script = ExtResource("2_rewjl")
@@ -114,6 +118,42 @@ script = ExtResource("60_fentry")
 species = ExtResource("61_deer")
 weight = 1.0
 
+[sub_resource type="Resource" id="Resource_reeds"]
+script = ExtResource("2_rewjl")
+type = ExtResource("90_reeds")
+density = 11.0
+max_slope_degrees = 25.0
+min_height = -0.35
+max_height = 0.5
+cluster = 0.6
+
+[sub_resource type="Resource" id="Resource_cattails"]
+script = ExtResource("2_rewjl")
+type = ExtResource("90_cattails")
+density = 4.0
+max_slope_degrees = 20.0
+min_height = -0.3
+max_height = 0.25
+cluster = 0.5
+
+[sub_resource type="Resource" id="Resource_water_lily"]
+script = ExtResource("2_rewjl")
+type = ExtResource("90_water_lily")
+density = 5.5
+max_slope_degrees = 89.0
+min_height = -1.6
+max_height = -0.3
+cluster = 0.7
+
+[sub_resource type="Resource" id="Resource_water_lily_flower"]
+script = ExtResource("2_rewjl")
+type = ExtResource("90_water_lily_flower")
+density = 1.0
+max_slope_degrees = 89.0
+min_height = -1.4
+max_height = -0.35
+cluster = 0.7
+
 [resource]
 script = ExtResource("1_uryr0")
 id = &"wetland"
@@ -124,7 +164,7 @@ height_offset = -5.8
 continental_scale = 0.12
 detail_scale = 1.3
 ridged_scale = 0.03
-vegetation = Array[ExtResource("2_rewjl")]([SubResource("Resource_0mnhg"), SubResource("Resource_amnyk"), SubResource("Resource_s0byp"), SubResource("Resource_qexg7"), SubResource("Resource_n1hqp"), SubResource("Resource_fg57t"), SubResource("Resource_qh2nm"), SubResource("Resource_berry_bush"), SubResource("Resource_mushroom_tan"), SubResource("Resource_den_log")])
+vegetation = Array[ExtResource("2_rewjl")]([SubResource("Resource_0mnhg"), SubResource("Resource_amnyk"), SubResource("Resource_s0byp"), SubResource("Resource_qexg7"), SubResource("Resource_n1hqp"), SubResource("Resource_fg57t"), SubResource("Resource_qh2nm"), SubResource("Resource_berry_bush"), SubResource("Resource_mushroom_tan"), SubResource("Resource_den_log"), SubResource("Resource_reeds"), SubResource("Resource_cattails"), SubResource("Resource_water_lily"), SubResource("Resource_water_lily_flower")])
 ground_color_a = Color(0.38, 0.5, 0.3, 1)
 ground_color_b = Color(0.5, 0.44, 0.32, 1)
 fauna_chance = 0.18

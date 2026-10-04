@@ -143,5 +143,6 @@ static func _procedural_foliage(type: VegetationType) -> Mesh:
 	mat.set_shader_parameter("albedo", type.procedural_color)
 	mat.set_shader_parameter("sway", type.sway)
 	mat.set_shader_parameter("model_height", maxf(mesh.get_aabb().end.y, 0.01))
+	mat.set_shader_parameter("vertex_colors", ProceduralMeshes.COLOURED.has(type.procedural_shape))
 	mesh.surface_set_material(0, mat)
 	return mesh

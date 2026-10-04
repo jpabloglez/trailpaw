@@ -25,6 +25,9 @@ extends Resource
 @export_range(5.0, 1000.0, 1.0, "suffix:m") var visibility_range: float = 0.0
 ## Small plants only near the player: scattered in full-detail (LOD 0) chunks only.
 @export var near_only: bool = false
+## Floats on the water (water lilies): placed at the water surface, upright, over ground that
+## its entries keep under the water (negative heights).
+@export var float_on_water: bool = false
 ## Wind sway strength (0 = rigid).
 @export_range(0.0, 2.0, 0.05) var sway: float = 0.0
 ## Collision cylinder radius in model units (0 = no collision).

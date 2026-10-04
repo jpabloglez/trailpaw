@@ -34,6 +34,7 @@ var _scale_min := PackedFloat32Array()
 var _scale_max := PackedFloat32Array()
 var _align := PackedFloat32Array()
 var _near_only: Array[bool] = []
+var _floats: Array[bool] = []
 var _max_density := PackedFloat32Array()
 ## Per biome (index), per type (index): entry parameters (density 0 = does not grow there).
 var _density: Array[PackedFloat32Array] = []
@@ -60,6 +61,7 @@ func _init(table: BiomeTable) -> void:
 				_scale_max.append(entry.type.scale_max)
 				_align.append(entry.type.align_to_ground)
 				_near_only.append(entry.type.near_only)
+				_floats.append(entry.type.float_on_water)
 				_max_density.append(0.0)
 				_snapshot_drop(entry.type.drop)
 	var n := _type_ids.size()
@@ -144,7 +146,10 @@ func scatter(
 				if roll >= chance:
 					continue
 				var s := lerpf(_scale_min[t], _scale_max[t], scale_roll)
-				_append_transform(out, Vector3(lx, surface[0], lz), normal, _align[t], yaw, s)
+				if _floats[t]:  # at the water surface, upright
+					_append_transform(out, Vector3(lx, water_level, lz), Vector3.UP, 0.0, yaw, s)
+				else:
+					_append_transform(out, Vector3(lx, surface[0], lz), normal, _align[t], yaw, s)
 		if not out.is_empty():
 			data.vegetation[_type_ids[t]] = out
 			if data.lod == 0 and _drop_ids[t] != &"":
