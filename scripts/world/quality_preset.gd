@@ -9,6 +9,8 @@ extends Resource
 @export var display_name: String = ""
 ## Multiplier for every vegetation density.
 @export_range(0.0, 2.0, 0.05) var vegetation_density: float = 0.0
+## Dust puffs and water splashes ([MotionEffects]).
+@export var motion_effects: bool = true
 
 
 ## Returns human-readable problems with the data; empty when valid.

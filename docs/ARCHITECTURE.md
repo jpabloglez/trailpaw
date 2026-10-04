@@ -315,6 +315,17 @@ Phase 11 polish item.
   - Modifier results only exist during the skeleton update: read posed bones in
     `Skeleton3D.skeleton_updated`.
 
+- **Movement effects (Phase 11):** `MotionEffects` (on the Animal, `data/fx/motion_effects.tres`)
+  owns a pool of 4 one-shot `GPUParticles3D`: soft round billboard sprites with a radial
+  gradient texture, fading out. Their buffer is sized once to the largest effect and set per
+  effect with `amount_ratio`, so nothing is reallocated.
+  - Footsteps (`AnimationController.footstep`) raise dust tinted by the current biome's ground
+    colours when at ≥ 0.9 × trot speed, nothing at a walk, and splashes when the surface is
+    water. The surface comes from `FootstepAudio.surface()`, so sound and effect agree.
+  - A landing from a fall of ≥ 3 m/s raises a bigger puff, or a splash in water.
+  - Wading into water splashes.
+  - `QualityPreset.motion_effects` turns them off (Low).
+
 ### 4.5 Default input map
 
 | Action | Default |

@@ -7,3 +7,4 @@ script = ExtResource("1_yg3s4")
 id = &"low"
 display_name = "Low"
 vegetation_density = 0.4
+motion_effects = false

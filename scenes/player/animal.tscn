@@ -47,6 +47,9 @@
 [ext_resource type="Resource" path="res://data/player/foot_plant.tres" id="47_feetset"]
 [ext_resource type="Script" path="res://scripts/player/head_look.gd" id="48_look"]
 [ext_resource type="Resource" path="res://data/player/head_look.tres" id="49_lookset"]
+[ext_resource type="Script" path="res://scripts/fx/motion_effects.gd" id="50_fx"]
+[ext_resource type="Resource" path="res://data/fx/motion_effects.tres" id="51_fxset"]
+[ext_resource type="Resource" path="res://data/biomes/biome_table.tres" id="52_biomes"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ald35"]
 radius = 0.35
@@ -224,3 +227,13 @@ body = NodePath("..")
 movement = NodePath("../MovementComponent")
 model_root = NodePath("../Model")
 interactor = NodePath("../Interactor")
+
+[node name="MotionEffects" type="Node3D" parent="." node_paths=PackedStringArray("body", "movement", "animation", "footsteps")]
+unique_name_in_owner = true
+script = ExtResource("50_fx")
+settings = ExtResource("51_fxset")
+body = NodePath("..")
+movement = NodePath("../MovementComponent")
+animation = NodePath("../AnimationController")
+footsteps = NodePath("../FootstepAudio")
+biomes = ExtResource("52_biomes")
