@@ -140,3 +140,17 @@ func test_the_attract_world_explores_nothing() -> void:
 	add_child(world)
 	await get_tree().process_frame
 	assert_int(world.exploration.process_mode).is_equal(Node.PROCESS_MODE_DISABLED)
+
+
+func test_a_game_saved_where_the_wetland_now_is_lands_safely() -> void:
+	# ADR-006: the wetland band moved everything beyond the river valley. An old save from
+	# there (x ≈ 2750 m, hills before) must still land on the ground or float on the water.
+	var save := SaveData.new()
+	save.world_seed = 12345
+	save.player_position = Vector3(2780.0, 40.0, 30.0)
+	var world := _world(save)
+	assert_bool(await _landed(world)).is_true()
+	var sampler := HeightSampler.new(world.streamer.terrain, 12345)
+	var at := GameState.absolute_position(world.animal.global_position)
+	var floor_height := maxf(sampler.height_at(at.x, at.z), GameState.water_level)
+	assert_float(at.y).is_between(floor_height - 0.5, floor_height + 1.5)

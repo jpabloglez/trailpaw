@@ -8,7 +8,8 @@ biome_chance = Dictionary[StringName, float]({
 &"forest": 0.55,
 &"hills": 0.15,
 &"meadow": 0.35,
-&"river_valley": 0.3
+&"river_valley": 0.3,
+&"wetland": 0.4
 })
 flock_size = Vector2i(4, 9)
 max_birds = 60

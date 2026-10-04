@@ -4,7 +4,7 @@ extends GdUnitTestSuite
 
 const DIR: String = "res://data/fauna/temperaments/"
 const FOX: String = "res://data/species/fox.tres"
-const BIOMES: Array[String] = ["meadow", "forest", "hills", "river_valley"]
+const BIOMES: Array[String] = ["meadow", "forest", "hills", "river_valley", "wetland"]
 
 
 func _profile(temperament: String) -> FaunaProfile:

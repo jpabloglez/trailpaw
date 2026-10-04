@@ -2,7 +2,9 @@
 extends GdUnitTestSuite
 
 const TABLE_PATH: String = "res://data/biomes/biome_table.tres"
-const EXPECTED_ORDER: Array[StringName] = [&"meadow", &"forest", &"river_valley", &"hills"]
+const EXPECTED_ORDER: Array[StringName] = [
+	&"meadow", &"forest", &"river_valley", &"wetland", &"hills"
+]
 
 var _table: BiomeTable
 
@@ -32,7 +34,8 @@ func test_every_biome_is_valid_with_a_display_name() -> void:
 func test_bands_are_about_800_m_wide() -> void:
 	for biome in _table.biomes:
 		assert_float(biome.band_width).is_between(600.0, 1000.0)
-	assert_float(_table.sequence_length()).is_equal_approx(3200.0, 400.0)
+	# Five 800 m bands since the wetland (ADR-006): a 4 km cycle.
+	assert_float(_table.sequence_length()).is_equal_approx(4000.0, 400.0)
 
 
 func test_blend_fits_inside_the_narrowest_band() -> void:

@@ -14,7 +14,8 @@ script = ExtResource("2_layer")
 stream = ExtResource("3_meadow")
 day = Dictionary[StringName, float]({
 &"meadow": 0.3,
-&"river_valley": 0.15
+&"river_valley": 0.15,
+&"wetland": 0.25
 })
 under_rain = 0.2
 spells = Vector2(6, 15)
@@ -39,10 +40,12 @@ follows_birds = true
 script = ExtResource("2_layer")
 stream = ExtResource("5_river")
 day = Dictionary[StringName, float]({
-&"river_valley": 0.5
+&"river_valley": 0.5,
+&"wetland": 0.3
 })
 night = Dictionary[StringName, float]({
-&"river_valley": 0.45
+&"river_valley": 0.45,
+&"wetland": 0.25
 })
 under_rain = 0.8
 
@@ -53,13 +56,15 @@ day = Dictionary[StringName, float]({
 &"forest": 0.12,
 &"hills": 0.55,
 &"meadow": 0.25,
-&"river_valley": 0.12
+&"river_valley": 0.12,
+&"wetland": 0.12
 })
 night = Dictionary[StringName, float]({
 &"forest": 0.1,
 &"hills": 0.45,
 &"meadow": 0.2,
-&"river_valley": 0.1
+&"river_valley": 0.1,
+&"wetland": 0.1
 })
 under_rain = 1.0
 
@@ -70,7 +75,8 @@ night = Dictionary[StringName, float]({
 &"forest": 0.3,
 &"hills": 0.25,
 &"meadow": 0.4,
-&"river_valley": 0.35
+&"river_valley": 0.35,
+&"wetland": 0.4
 })
 under_rain = 0.1
 

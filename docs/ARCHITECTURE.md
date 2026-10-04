@@ -111,10 +111,14 @@ generation. Revisit if the design moves to a finite, hand-crafted map.
 Scene-tree mutations happen only on the main thread; worker threads produce plain data.
 
 ### 3.4 Distance-driven biomes
-- Data: `BiomeDefinition` (`data/biomes/{meadow,forest,river_valley,hills}.tres`: id, display
-  name, band width, height offset/scales, two-colour ground palette) ordered by `BiomeTable`
-  (`data/biomes/biome_table.tres`): 800 m bands that **repeat in a cycle**, 150 m blend,
-  ±110 m boundary noise, measured from the spawn point.
+- Data: `BiomeDefinition` (`data/biomes/{meadow,forest,river_valley,wetland,hills}.tres`: id,
+  display name, band width, height offset/scales, two-colour ground palette) ordered by
+  `BiomeTable` (`data/biomes/biome_table.tres`): 800 m bands that **repeat in a cycle**
+  (5 bands = 4 km since the wetland, ADR-006), 150 m blend, ±110 m boundary noise, measured
+  from the spawn point.
+- **Wetland (Phase 14, ADR-006):** after the river valley. Its height offset of −5.8 m with
+  little relief puts it just under the water level: ≈ 43 % water, 93 % of it shallower than
+  1.2 m (pools, channels and islets to wade). Muddy ground, cool.
 - `BiomeDefinition` (Resource): name, height params, ground palette, vegetation table,
   fauna table, ambient audio, temperature (`warmth`, Phase 6), water frequency.
 - `BiomeResolver` (pure, seeded, one per worker task): noisy distance
@@ -888,5 +892,6 @@ Stored in `docs/adr/NNN-title.md`. Initial set:
 - [ADR-003](adr/003-no-death-soft-consequences.md) No death mechanic; soft consequences for critical needs.
 - [ADR-004](adr/004-floating-origin.md) Floating origin instead of a double-precision engine build.
 - [ADR-005](adr/005-biome-blended-terrain.md) Biome-blended terrain height function.
+- [ADR-006](adr/006-wetland-band.md) A wetland band after the river valley.
 
 New ADRs start from [`000-template.md`](adr/000-template.md).
