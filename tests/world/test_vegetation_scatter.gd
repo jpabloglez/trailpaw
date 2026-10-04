@@ -6,7 +6,7 @@ const SETTINGS_PATH: String = "res://data/world/terrain_settings.tres"
 const SEED: int = 12345
 const MEADOW := Vector2i(3, 3)
 const FOREST := Vector2i(17, 2)
-const HILLS := Vector2i(43, 0)
+const HILLS := Vector2i(56, 0)  # hills since the wetland band (ADR-006)
 const VALLEY := Vector2i(29, -3)
 
 var _settings: TerrainSettings
@@ -109,7 +109,10 @@ func test_instances_sit_on_the_rendered_surface() -> void:
 	# Independent check: intersect a vertical ray with the two triangles of the grid cell.
 	var data := _gen(HILLS)
 	var res := data.resolution
+	var drops := VegetationLibrary.new(_settings.biomes).drop_ids()
 	for id: StringName in data.vegetation:
+		if drops.has(id):
+			continue  # derived props (berries, fallen apples) sit on their parent plant, not the ground
 		var buffer: PackedFloat32Array = data.vegetation[id]
 		for i in mini(data.vegetation_count(id), 40):
 			var p := _origin(buffer, i)

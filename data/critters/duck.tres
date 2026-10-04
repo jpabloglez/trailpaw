@@ -11,7 +11,8 @@ min_depth = 0.4
 biome_counts = Dictionary[StringName, Vector2i]({
 &"forest": Vector2i(2, 3),
 &"meadow": Vector2i(2, 4),
-&"river_valley": Vector2i(2, 5)
+&"river_valley": Vector2i(2, 5),
+&"wetland": Vector2i(3, 5)
 })
 chance = 0.8
 scale_range = Vector2(0.9, 1.1)

@@ -76,13 +76,13 @@ func test_terrain_is_varied() -> void:
 
 ## Golden values: fail loudly if an engine upgrade or code change alters the world a
 ## given seed produces (that would silently break saves). Update deliberately, with an ADR
-## (last change: ADR-005, biome-blended terrain).
+## (last change: ADR-006, the wetland band after the river valley).
 func test_golden_heights_for_reference_seed() -> void:
 	var sampler := HeightSampler.new(_settings, SEED)
 	assert_int(HeightSampler.layer_seed(SEED, HeightSampler.LAYER_SALT[0])).is_equal(1883851918)
 	assert_float(sampler.height_at(0.0, 0.0)).is_equal_approx(4.4, 1e-4)
 	assert_float(sampler.height_at(1234.5, -678.25)).is_equal_approx(5.594238, 1e-4)
-	assert_float(sampler.height_at(-9000.0, 4200.0)).is_equal_approx(10.088988, 1e-4)
+	assert_float(sampler.height_at(-9000.0, 4200.0)).is_equal_approx(3.591054, 1e-4)
 
 
 func test_terrain_is_walkable_in_every_biome() -> void:

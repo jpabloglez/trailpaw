@@ -21,6 +21,7 @@ Claude Code; one sprint = 2 weeks.
 | 11 | Performance and polish | 2 | 38 w |
 | 12 | Vertical slice release | 1 | 40 w |
 | 13 | Biodiversity | 2 | 44 w |
+| 14 | Wetlands | 2 | 48 w |
 
 Milestones: **M1 "Walk the world"** (end of Phase 3), **M2 "A day in the life"**
 (end of Phase 7), **M3 "Living world"** (end of Phase 10), **M4 Vertical slice** (Phase 12).
@@ -246,6 +247,22 @@ them playfully; nothing is hunted.
 **Tests:** herds stay within their leash; critters deterministic per chunk, on the ground or
 the water, flee from a running fox; birdsong silent with no birds; critter simulation ≤ 1 ms.
 **Exit:** the world feels alive: you see the animals you hear, and chasing them is fun.
+
+---
+
+## Phase 14 — Wetlands
+
+A water biome (user decision: wetlands, after the river valley; ADR-006).
+
+- [x] The wetland band: shallow pools, channels and islets; every biome list knows it.
+- [ ] Reeds, cattails and water lilies (aquatic placement).
+- [ ] Frogs (banks, diving in) and the frog chorus at night (CC0 audio).
+- [ ] Herons and dragonflies.
+- [ ] Morning mist over the wetland.
+
+**Tests:** wetland water coverage and depth; band order with five biomes; old saves land
+safely; aquatic plants only at their depths; frogs dive and return; mist only at dawn there.
+**Exit:** the wetland feels like its own place, and the most alive one for water.
 
 ---
 

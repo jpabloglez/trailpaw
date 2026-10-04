@@ -1,0 +1,131 @@
+[gd_resource type="Resource" script_class="BiomeDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/world/biome_definition.gd" id="1_uryr0"]
+[ext_resource type="Script" path="res://scripts/world/vegetation_entry.gd" id="2_rewjl"]
+[ext_resource type="Resource" path="res://data/vegetation/grass.tres" id="3_fyn2g"]
+[ext_resource type="Resource" path="res://data/vegetation/grass_leafs.tres" id="4_cpuug"]
+[ext_resource type="Resource" path="res://data/vegetation/grass_leafsLarge.tres" id="5_qbbbt"]
+[ext_resource type="Resource" path="res://data/vegetation/plant_bush.tres" id="6_aha2c"]
+[ext_resource type="Resource" path="res://data/vegetation/tree_default.tres" id="7_tv1bm"]
+[ext_resource type="Resource" path="res://data/vegetation/flower_purpleA.tres" id="8_hvirr"]
+[ext_resource type="Resource" path="res://data/vegetation/rock_smallFlatA.tres" id="9_brrgx"]
+[ext_resource type="Resource" path="res://data/vegetation/berry_bush.tres" id="50_berry_bush"]
+[ext_resource type="Resource" path="res://data/vegetation/mushroom_tan.tres" id="50_mushroom_tan"]
+[ext_resource type="Resource" path="res://data/vegetation/den_log.tres" id="51_den"]
+[ext_resource type="Script" path="res://scripts/fauna/fauna_entry.gd" id="60_fentry"]
+[ext_resource type="Resource" path="res://data/fauna/donkey.tres" id="61_donkey"]
+[ext_resource type="Resource" path="res://data/fauna/deer.tres" id="61_deer"]
+
+[sub_resource type="Resource" id="Resource_0mnhg"]
+script = ExtResource("2_rewjl")
+type = ExtResource("3_fyn2g")
+density = 12.0
+max_slope_degrees = 35.0
+min_height = 0.12
+max_height = 40.0
+cluster = 0.3
+
+[sub_resource type="Resource" id="Resource_amnyk"]
+script = ExtResource("2_rewjl")
+type = ExtResource("4_cpuug")
+density = 8.0
+max_slope_degrees = 35.0
+min_height = 0.08
+max_height = 40.0
+cluster = 0.4
+
+[sub_resource type="Resource" id="Resource_s0byp"]
+script = ExtResource("2_rewjl")
+type = ExtResource("5_qbbbt")
+density = 14.0
+max_slope_degrees = 30.0
+max_height = 1.2
+cluster = 0.3
+
+[sub_resource type="Resource" id="Resource_qexg7"]
+script = ExtResource("2_rewjl")
+type = ExtResource("6_aha2c")
+density = 1.0
+max_slope_degrees = 30.0
+min_height = 0.25
+max_height = 40.0
+cluster = 0.5
+
+[sub_resource type="Resource" id="Resource_n1hqp"]
+script = ExtResource("2_rewjl")
+type = ExtResource("7_tv1bm")
+density = 0.12
+max_slope_degrees = 25.0
+min_height = 0.35
+max_height = 40.0
+cluster = 0.6
+
+[sub_resource type="Resource" id="Resource_fg57t"]
+script = ExtResource("2_rewjl")
+type = ExtResource("8_hvirr")
+density = 1.0
+max_slope_degrees = 30.0
+min_height = 0.2
+max_height = 40.0
+cluster = 0.7
+
+[sub_resource type="Resource" id="Resource_qh2nm"]
+script = ExtResource("2_rewjl")
+type = ExtResource("9_brrgx")
+density = 0.3
+max_slope_degrees = 35.0
+max_height = 40.0
+cluster = 0.4
+
+[sub_resource type="Resource" id="Resource_berry_bush"]
+script = ExtResource("2_rewjl")
+type = ExtResource("50_berry_bush")
+density = 0.3
+max_slope_degrees = 30.0
+min_height = 0.2
+max_height = 60.0
+cluster = 0.6
+
+[sub_resource type="Resource" id="Resource_mushroom_tan"]
+script = ExtResource("2_rewjl")
+type = ExtResource("50_mushroom_tan")
+density = 0.1
+max_slope_degrees = 30.0
+min_height = 0.2
+max_height = 60.0
+cluster = 0.6
+
+[sub_resource type="Resource" id="Resource_den_log"]
+script = ExtResource("2_rewjl")
+type = ExtResource("51_den")
+density = 0.015
+max_slope_degrees = 20.0
+min_height = 0.25
+max_height = 60.0
+cluster = 0.3
+
+[sub_resource type="Resource" id="Resource_fauna_donkey"]
+script = ExtResource("60_fentry")
+species = ExtResource("61_donkey")
+weight = 2.0
+
+[sub_resource type="Resource" id="Resource_fauna_deer"]
+script = ExtResource("60_fentry")
+species = ExtResource("61_deer")
+weight = 1.0
+
+[resource]
+script = ExtResource("1_uryr0")
+id = &"wetland"
+display_name = "Wetland"
+band_width = 800.0
+warmth = -0.2
+height_offset = -5.8
+continental_scale = 0.12
+detail_scale = 1.3
+ridged_scale = 0.03
+vegetation = Array[ExtResource("2_rewjl")]([SubResource("Resource_0mnhg"), SubResource("Resource_amnyk"), SubResource("Resource_s0byp"), SubResource("Resource_qexg7"), SubResource("Resource_n1hqp"), SubResource("Resource_fg57t"), SubResource("Resource_qh2nm"), SubResource("Resource_berry_bush"), SubResource("Resource_mushroom_tan"), SubResource("Resource_den_log")])
+ground_color_a = Color(0.38, 0.5, 0.3, 1)
+ground_color_b = Color(0.5, 0.44, 0.32, 1)
+fauna_chance = 0.18
+fauna = Array[ExtResource("60_fentry")]([SubResource("Resource_fauna_donkey"), SubResource("Resource_fauna_deer")])
