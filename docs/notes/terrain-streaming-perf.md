@@ -112,3 +112,42 @@ player species' diet.
   is per-body/per-skeleton engine work, and WSL timing noise is ±0.5 ms. Re-check on native
   Windows.
 
+## Phase 11: intermittent headless spikes (2026-10-04)
+
+Symptom: from Phase 10 on, the headless 10 km probe failed intermittently, on `main` too, with
+2–28 build frames over 4 ms (one chunk up to 16 ms). In Phase 4 it had been ≤ 2 ms.
+
+**Investigation:**
+- A split-timing benchmark of `TerrainChunk.apply` over 480 real LOD 0 chunks, with pooled
+  nodes, found the steady state cheap: p50 ≈ 0.8 ms per chunk.
+- Two real costs showed up:
+  - the first full-detail apply of a cold node creates food and obstacle shapes
+  - moving ~50 obstacle cylinders inside the physics space took 2–5 ms
+- Temporary instrumentation inside the probe printed, for every spike, which step took the
+  time. The 4–6 ms always landed on a random step, often ones that cost microseconds
+  (`visible = true` 5.8 ms, shade 4.1 ms, obstacles 5.7 ms on a LOD 1 chunk with none). So the
+  main thread was being **descheduled**, not working.
+- With 4 generation tasks on this 4-core machine, plus the main and render threads, the CPU
+  is oversubscribed. With 2 tasks the spikes dropped from 4–28 per run to 0–3. Other processes
+  on the machine (a pytest at 96 % CPU, Java, Postgres) add more of the same.
+
+**Changes:**
+- `WorldStreamer.task_limit()` = clamp(cores − 2, 1, `max_tasks_in_flight`): 2 on 4 cores,
+  still 4 on 6+.
+- `TerrainChunk.reserve()`: 192 food + 64 obstacle shapes on new nodes (≈ 0.5 ms).
+- Obstacles applied with the body out of the physics space.
+- **Probe criterion:**
+  - spikes over 4 ms may be at most 0.5 % of build frames
+  - no chunk may ever exceed 20 ms
+  - still 0 holes and 0 collision gaps
+
+  A real per-chunk cost repeats on hundreds of chunks and still fails it; a scheduler stall
+  doesn't. The real frame-time gate is now the GPU perf probe on the target PC
+  (`docs/notes/perf/`).
+
+| Run (headless, 10 km) | Spikes > 4 ms | Max build ms | Holes / gaps |
+|---|---|---|---|
+| Before (4 tasks), 3 runs | 7 / 28 / ~10 | 9.8 / 18.9 / 6.7 | 0 / 0 |
+| Task cap only, 3 runs | 3 / 2 / 0 of ≈ 1450 | 5.6 / 4.9 / 2.5 | 0 / 0 |
+| **Final** (cap + reserve + body out of space), 3 runs | 0 / 2 / 1 of ≈ 1450 | 3.6 / 5.0 / 4.1 | 0 / 0 — **PASS ×3** (the old zero-spike rule: 1 of 3) |
+
