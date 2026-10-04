@@ -222,7 +222,7 @@ func test_treetops_are_real_trees() -> void:
 	add_child(chunk)
 	chunk.apply(data, load("res://data/world/terrain_material.tres"), library)
 	var tops := PackedVector3Array()
-	chunk.tree_tops(tops)
+	chunk.spots(&"tree_top", tops)
 	assert_int(tops.size()).is_greater(5)
 	var origins := {}
 	for id: StringName in data.vegetation:

@@ -65,6 +65,7 @@ var _hidden: Dictionary[StringName, Dictionary] = {}
 var _shade_buffers: Array[PackedFloat32Array] = []
 var _shade_radii := PackedFloat32Array()
 var _shade_heights := PackedFloat32Array()
+var _flower_buffers: Array[PackedFloat32Array] = []
 
 @onready var _mesh_instance: MeshInstance3D = %Mesh
 @onready var _collision: CollisionShape3D = %Collision
@@ -189,12 +190,19 @@ func is_shaded(local_position: Vector3) -> bool:
 	return false
 
 
-## Appends the top of every tree's crown in this chunk (global positions) to [param out]; birds
-## perch there.
+## Appends spots of [param kind] in this chunk (global positions) to [param out]:
+## [code]&"tree_top"[/code], the top of every tree's crown (birds perch there), or
+## [code]&"flower"[/code], every flower (butterflies visit them).
 ## [br][br]
-## Budget: O(trees in the chunk), called when a flock picks a perch.
-func tree_tops(out: PackedVector3Array) -> void:
+## Budget: O(trees or flowers in the chunk); called when a flock picks a perch, or a couple of
+## times per second for flowers.
+func spots(kind: StringName, out: PackedVector3Array) -> void:
 	var stride := VegetationScatterer.FLOATS_PER_INSTANCE
+	if kind == &"flower":
+		for buffer in _flower_buffers:
+			for o in range(0, buffer.size(), stride):
+				out.append(to_global(Vector3(buffer[o + 3], buffer[o + 7], buffer[o + 11])))
+		return
 	for t in _shade_buffers.size():
 		var buffer := _shade_buffers[t]
 		for o in range(0, buffer.size(), stride):
@@ -305,6 +313,7 @@ func reset() -> void:
 
 ## One reused MultiMeshInstance3D per type: the buffer is copied as-is from the worker.
 func _apply_vegetation(data: ChunkData, library: VegetationLibrary) -> void:
+	_flower_buffers.clear()
 	for node: MultiMeshInstance3D in _vegetation.values():
 		node.visible = false
 	if library == null:
@@ -330,6 +339,8 @@ func _apply_vegetation(data: ChunkData, library: VegetationLibrary) -> void:
 			)
 			add_child(node)
 			_vegetation[id] = node
+		if String(id).begins_with("flower"):
+			_flower_buffers.append(buffer)  # a reference, not a copy
 		var count := buffer.size() / VegetationScatterer.FLOATS_PER_INSTANCE
 		if node.multimesh.instance_count != count:
 			node.multimesh.instance_count = count

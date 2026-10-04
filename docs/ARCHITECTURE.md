@@ -628,7 +628,7 @@ the critter layer (packed arrays, one MultiMesh, chunk-driven, origin-shifted), 
 - **Rolls:** a full-detail chunk rolls one flock of 4–9 (`BirdFlocks.roll()`, deterministic):
   forest 55 %, meadow 35 %, valley 30 %, hills 15 %, with one plumage colour per flock from a
   palette. At most 60 birds.
-- **Perches:** the nearest treetop within 15 m (`TerrainChunk.tree_tops()`: crown top from
+- **Perches:** the nearest treetop within 15 m (`TerrainChunk.spots(&"tree_top")`: crown top from
   the tree mesh's AABB × scale, birds spread over 0.8 m of crown), else a patch of dry ground
   (2.5 m).
 - **By day** a flock moves on every 12–35 s, 15–40 m away. Each bird flies an eased arc
@@ -644,6 +644,24 @@ the critter layer (packed arrays, one MultiMesh, chunk-driven, origin-shifted), 
   of the player / 6, 0 at night. There is no birdsong without birds; the intermittent spells
   stay.
 - **Budget:** decisions at 15 Hz; per frame one transform, custom data and colour per bird.
+
+### 7.z Butterflies and fireflies (Phase 13)
+Values in `data/critters/small_life.tres` (`SmallLifeSettings`).
+- **`Butterflies`** (by day, in the meadow, valley and hills): up to 14 around the player, one
+  per 6 flowers within 22 m.
+  - Flowers come from the full-detail chunks (`TerrainChunk.spots(&"flower")`; the chunk
+    keeps references to its flower buffers, not copies) twice a second.
+  - Each flits in a wobbly loop ≈ 0.75 m above its flower and moves on to a nearby one every
+    ~20 s.
+  - The fox moving faster than 2.5 m/s within 2.5 m scatters them up and away for 1.5 s.
+  - Drawing: `ProceduralMeshes.butterfly()` (≈ 9 cm, drawn at 1.6×; wings marked in `UV.x`)
+    with the bird shader at a faster beat; colour per butterfly from a palette.
+- **`Fireflies`** (a `GPUParticles3D` following the player): at night in the forest and the
+  river valley.
+  - 60 additive soft dots drift on turbulence in a 28 × 2 × 28 m box, with a pulsing alpha.
+  - `amount_ratio` follows the darkness (the sky's stars).
+  - No CPU work beyond positioning the box.
+- Both are off on the Low preset (`QualityPreset.motion_effects`).
 
 ## 8. Environment and audio
 

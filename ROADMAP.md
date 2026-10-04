@@ -241,7 +241,7 @@ them playfully; nothing is hunted.
 - [x] Critter layer (light simulation + MultiMesh) and rabbits.
 - [x] Birds: flocks that perch, fly and scatter; birdsong follows the birds nearby.
 - [x] Ducks on lakes and rivers.
-- [ ] Butterflies by day, fireflies at night.
+- [x] Butterflies by day, fireflies at night.
 
 **Tests:** herds stay within their leash; critters deterministic per chunk, on the ground or
 the water, flee from a running fox; birdsong silent with no birds; critter simulation ≤ 1 ms.
