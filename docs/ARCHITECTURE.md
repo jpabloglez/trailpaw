@@ -168,6 +168,25 @@ Scene-tree mutations happen only on the main thread; worker threads produce plai
 - Distance is computed in **absolute world coordinates** (tracked by `FloatingOrigin`),
   never from the rebased local position.
 
+- **Aquatic plants (Phase 14):**
+  - `VegetationEntry.min_height` / `max_height` (relative to the water) may be **negative**:
+    the plant grows over ground that far under the water. Only reeds, cattails and water
+    lilies do; a data test enforces it.
+  - `VegetationType.float_on_water` places the instance **at the water surface**, upright
+    (its entries must keep `max_height < 0`).
+  - Meshes are built in code (`ProceduralMeshes`):
+    - reeds: a tuft of 9 slender blades, swaying
+    - cattails: blades plus brown heads
+    - water lily: a notched 0.5 m pad, sometimes with a pink-white flower
+  - Their colours are vertex colours: the foliage shader's `vertex_colors`, on for
+    `ProceduralMeshes.COLOURED`.
+  - Wetland: reeds 11, cattails 4, lilies 5.5 + 1 flowering per 100 m², over
+    −0.35…0.5 m / −1.6…−0.3 m. The valley has a few.
+  - All four are `near_only` (full-detail chunks only; they are visible to 60–70 m anyway).
+    With reeds on every chunk, wetland generation went to 22 ms p50 per chunk and the
+    probe's build frames up 19 %. Now low-detail wetland chunks generate in ≈ 1 ms and
+    full-detail ones in ≈ 16 ms, like other biomes.
+
 ### 3.5 Floating origin
 32-bit floats lose precision several kilometres from the origin (jittery animation and
 physics). When the tracked target is further than `rebase_distance` (2 km, in

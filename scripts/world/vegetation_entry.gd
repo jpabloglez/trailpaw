@@ -10,10 +10,11 @@ extends Resource
 @export_range(0.0, 200.0, 0.01) var density: float = 0.0
 ## Steepest ground it grows on.
 @export_range(0.0, 89.0, 0.5, "suffix:°") var max_slope_degrees: float = 0.0
-## Lowest ground height relative to the water level (>= 0: never underwater).
-@export_range(0.0, 100.0, 0.1, "suffix:m") var min_height: float = 0.0
+## Lowest ground height relative to the water level (negative: under water, for reeds standing
+## in the shallows and water lilies; >= 0: never underwater).
+@export_range(-20.0, 100.0, 0.05, "suffix:m") var min_height: float = 0.0
 ## Highest ground height relative to the water level.
-@export_range(0.0, 200.0, 0.1, "suffix:m") var max_height: float = 0.0
+@export_range(-20.0, 200.0, 0.05, "suffix:m") var max_height: float = 0.0
 ## Clumping (0 = even spread, 1 = strong patches with bare ground between).
 @export_range(0.0, 1.0, 0.05) var cluster: float = 0.0
 
@@ -30,8 +31,8 @@ func get_validation_errors() -> PackedStringArray:
 		errors.append("density must be > 0")
 	if max_slope_degrees <= 0.0:
 		errors.append("max_slope_degrees must be > 0")
-	if min_height < 0.0:
-		errors.append("min_height must be >= 0 (vegetation never grows underwater)")
+	if type != null and type.float_on_water and max_height >= 0.0:
+		errors.append("a floating plant needs max_height < 0 (only over water)")
 	if max_height <= min_height:
 		errors.append("max_height must be > min_height")
 	return errors

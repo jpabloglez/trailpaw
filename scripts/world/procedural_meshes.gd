@@ -5,12 +5,24 @@ extends RefCounted
 ## 1 m across (scaled per instance).
 
 ## Known shapes (see [member VegetationType.procedural_shape]).
-const SHAPES: Array[StringName] = [&"bush", &"berry_cluster", &"fruit"]
+const SHAPES: Array[StringName] = [
+	&"bush", &"berry_cluster", &"fruit", &"reeds", &"cattails", &"water_lily", &"water_lily_flower"
+]
+## Shapes whose colours are in the vertex colours (the foliage material multiplies them in).
+const COLOURED: Array[StringName] = [&"cattails", &"water_lily", &"water_lily_flower"]
 
 
 ## Mesh for [param shape] (no material).
 static func build(shape: StringName) -> ArrayMesh:
 	match shape:
+		&"reeds":
+			return _tuft(9, Vector2(0.8, 1.3), 0.035, 0.22, Color.WHITE, false)
+		&"cattails":
+			return _tuft(6, Vector2(0.9, 1.4), 0.03, 0.16, Color(0.42, 0.55, 0.3), true)
+		&"water_lily":
+			return _lily_pad(false)
+		&"water_lily_flower":
+			return _lily_pad(true)
 		&"bush":
 			return spheres(
 				[
@@ -191,5 +203,83 @@ static func butterfly() -> ArrayMesh:
 				var point := Vector3(corner.x * side, corner.y, corner.z)
 				tool.set_uv(Vector2(absf(point.x) * side, 0.0))
 				tool.add_vertex(point)
+	tool.generate_normals()
+	return tool.commit()
+
+
+# A tuft of [param count] slender blades (thin vertical triangles leaning outwards), heights
+# in [param heights] (m); with [param heads], a few stems carry a brown cattail head.
+# Deterministic: angles and lengths come from the blade index.
+static func _tuft(
+	count: int, heights: Vector2, width: float, lean: float, colour: Color, heads: bool
+) -> ArrayMesh:
+	var tool := SurfaceTool.new()
+	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+	tool.set_color(colour)
+	for i in count:
+		var angle := float(i) * 2.399963  # golden angle: an even spread
+		var out := Vector3(cos(angle), 0.0, sin(angle))
+		var side := Vector3(-out.z, 0.0, out.x) * width
+		var height := lerpf(heights.x, heights.y, fmod(float(i) * 0.618034, 1.0))
+		var base := out * 0.03
+		var tip := out * lean * height + Vector3.UP * height
+		tool.add_vertex(base - side)
+		tool.add_vertex(base + side)
+		tool.add_vertex(tip)
+	if heads:
+		var head := Color(0.4, 0.27, 0.16)
+		for i in 3:
+			var angle := float(i) * 2.1 + 0.4
+			var out := Vector3(cos(angle), 0.0, sin(angle)) * 0.05
+			var top := heights.y * (0.92 - 0.08 * i)
+			tool.set_color(colour)
+			tool.add_vertex(out + Vector3(-0.008, 0.0, 0.0))
+			tool.add_vertex(out + Vector3(0.008, 0.0, 0.0))
+			tool.add_vertex(out + Vector3(0.0, top, 0.0))
+			tool.set_color(head)
+			var sphere := SphereMesh.new()
+			sphere.radial_segments = 5
+			sphere.rings = 3
+			var source := sphere.get_mesh_arrays()
+			var unit: PackedVector3Array = source[Mesh.ARRAY_VERTEX]
+			for index: int in source[Mesh.ARRAY_INDEX]:
+				tool.add_vertex(
+					(
+						out
+						+ Vector3(0.0, top - 0.12, 0.0)
+						+ unit[index] * 2.0 * Vector3(0.02, 0.07, 0.02)
+					)
+				)
+	tool.generate_normals()
+	return tool.commit()
+
+
+# A floating lily pad (a flat disc with a notch, ≈ 0.5 m), optionally with a flower.
+static func _lily_pad(flower: bool) -> ArrayMesh:
+	var tool := SurfaceTool.new()
+	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+	tool.set_color(Color(0.28, 0.5, 0.24))
+	var steps := 14
+	var notch := 0.5  # radians left open
+	for i in steps:
+		var a0 := notch * 0.5 + (TAU - notch) * float(i) / steps
+		var a1 := notch * 0.5 + (TAU - notch) * float(i + 1) / steps
+		tool.add_vertex(Vector3(0.0, 0.012, 0.0))
+		tool.add_vertex(Vector3(cos(a1), 0.0, sin(a1)) * 0.25 + Vector3.UP * 0.012)
+		tool.add_vertex(Vector3(cos(a0), 0.0, sin(a0)) * 0.25 + Vector3.UP * 0.012)
+	if flower:
+		var petal := Color(0.98, 0.88, 0.92)
+		for i in 6:
+			var angle := float(i) * TAU / 6.0
+			var out := Vector3(cos(angle), 0.0, sin(angle))
+			var side := Vector3(-out.z, 0.0, out.x) * 0.025
+			tool.set_color(petal)
+			tool.add_vertex(Vector3(0.0, 0.03, 0.0) - side)
+			tool.add_vertex(Vector3(0.0, 0.03, 0.0) + side)
+			tool.add_vertex(out * 0.07 + Vector3.UP * 0.07)
+		tool.set_color(Color(0.98, 0.82, 0.3))
+		tool.add_vertex(Vector3(-0.015, 0.05, 0.0))
+		tool.add_vertex(Vector3(0.015, 0.05, 0.0))
+		tool.add_vertex(Vector3(0.0, 0.065, 0.015))
 	tool.generate_normals()
 	return tool.commit()

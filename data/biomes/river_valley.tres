@@ -17,6 +17,9 @@
 [ext_resource type="Resource" path="res://data/fauna/horse.tres" id="61_horse"]
 [ext_resource type="Resource" path="res://data/fauna/alpaca.tres" id="61_alpaca"]
 [ext_resource type="Resource" path="res://data/fauna/deer.tres" id="61_deer"]
+[ext_resource type="Resource" path="res://data/vegetation/reeds.tres" id="90_reeds"]
+[ext_resource type="Resource" path="res://data/vegetation/water_lily.tres" id="90_water_lily"]
+[ext_resource type="Resource" path="res://data/vegetation/water_lily_flower.tres" id="90_water_lily_flower"]
 
 [sub_resource type="Resource" id="Resource_0mnhg"]
 script = ExtResource("2_rewjl")
@@ -126,6 +129,33 @@ script = ExtResource("60_fentry")
 species = ExtResource("61_deer")
 weight = 1.0
 
+[sub_resource type="Resource" id="Resource_reeds"]
+script = ExtResource("2_rewjl")
+type = ExtResource("90_reeds")
+density = 4.0
+max_slope_degrees = 25.0
+min_height = -0.25
+max_height = 0.4
+cluster = 0.6
+
+[sub_resource type="Resource" id="Resource_water_lily"]
+script = ExtResource("2_rewjl")
+type = ExtResource("90_water_lily")
+density = 2.5
+max_slope_degrees = 89.0
+min_height = -1.5
+max_height = -0.4
+cluster = 0.7
+
+[sub_resource type="Resource" id="Resource_water_lily_flower"]
+script = ExtResource("2_rewjl")
+type = ExtResource("90_water_lily_flower")
+density = 0.4
+max_slope_degrees = 89.0
+min_height = -1.4
+max_height = -0.45
+cluster = 0.7
+
 [resource]
 script = ExtResource("1_uryr0")
 id = &"river_valley"
@@ -136,7 +166,7 @@ height_offset = -4.0
 continental_scale = 0.6
 detail_scale = 2.5
 ridged_scale = 0.3
-vegetation = Array[ExtResource("2_rewjl")]([SubResource("Resource_0mnhg"), SubResource("Resource_amnyk"), SubResource("Resource_s0byp"), SubResource("Resource_qexg7"), SubResource("Resource_n1hqp"), SubResource("Resource_fg57t"), SubResource("Resource_qh2nm"), SubResource("Resource_berry_bush"), SubResource("Resource_mushroom_tan"), SubResource("Resource_den_log")])
+vegetation = Array[ExtResource("2_rewjl")]([SubResource("Resource_0mnhg"), SubResource("Resource_amnyk"), SubResource("Resource_s0byp"), SubResource("Resource_qexg7"), SubResource("Resource_n1hqp"), SubResource("Resource_fg57t"), SubResource("Resource_qh2nm"), SubResource("Resource_berry_bush"), SubResource("Resource_mushroom_tan"), SubResource("Resource_den_log"), SubResource("Resource_reeds"), SubResource("Resource_water_lily"), SubResource("Resource_water_lily_flower")])
 ground_color_a = Color(0.4, 0.6, 0.37, 1)
 ground_color_b = Color(0.64, 0.58, 0.42, 1)
 fauna_chance = 0.18
