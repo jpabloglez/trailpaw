@@ -1,8 +1,8 @@
 class_name SettingsMenu
 extends CanvasLayer
-## Settings with three tabs — Graphics, Audio, Controls — shared by the main menu and the pause
-## menu. Every change applies at once through the [code]Settings[/code] autoload; closing saves
-## them. Controls lists every remappable action: click its button, then press a key or mouse
+## Settings with four tabs — Graphics, Audio, Controls, Interface — shared by the main menu and the
+## pause menu. Every change applies at once through the [code]Settings[/code] autoload; closing
+## saves them. Controls lists every remappable action: click its button, then press a key or mouse
 ## button (Esc cancels); a key used by another action is refused with a note. Built in code.
 
 ## The menu was closed (settings saved).
@@ -26,6 +26,8 @@ const ACTION_NAMES: Dictionary[StringName, String] = {
 }
 ## Quality preset ids in menu order.
 const QUALITY_IDS: Array[StringName] = [&"low", &"medium", &"high"]
+## Text sizes offered (interface scale).
+const UI_SCALES: Array[float] = [1.0, 1.1, 1.2, 1.3, 1.4, 1.5]
 
 var _root: Control
 var _status: Label
@@ -49,6 +51,7 @@ func _ready() -> void:
 	tabs.add_child(_graphics_tab())
 	tabs.add_child(_audio_tab())
 	tabs.add_child(_controls_tab())
+	tabs.add_child(_interface_tab())
 	_status = MenuStyle.label("", 18, "Status")
 	box.add_child(_status)
 	var done := MenuStyle.button("Done", "Done")
@@ -141,6 +144,11 @@ func _refresh() -> void:
 	(control("Sensitivity") as HSlider).set_value_no_signal(Settings.mouse_sensitivity)
 	(control("InvertY") as CheckBox).set_pressed_no_signal(Settings.invert_y)
 	(control("CameraShake") as CheckBox).set_pressed_no_signal(Settings.camera_shake)
+	(control("SprintMode") as OptionButton).select(1 if Settings.sprint_toggle else 0)
+	(control("RestMode") as OptionButton).select(1 if Settings.rest_toggle else 0)
+	(control("TextSize") as OptionButton).select(
+		maxi(0, UI_SCALES.find(snappedf(Settings.ui_scale, 0.1)))
+	)
 	for action: StringName in _binding_buttons:
 		_binding_buttons[action].text = Settings.binding_text(action)
 
@@ -205,6 +213,8 @@ func _controls_tab() -> Control:
 	shake.name = "CameraShake"
 	shake.toggled.connect(Settings.set_camera_shake)
 	_row(grid, "Camera shake", shake)
+	_row(grid, "Run", _hold_or_toggle("SprintMode", Settings.set_sprint_toggle))
+	_row(grid, "Rest", _hold_or_toggle("RestMode", Settings.set_rest_toggle))
 	for action: StringName in ACTION_NAMES:
 		var b := Button.new()
 		b.name = "Bind_" + String(action)
@@ -222,6 +232,26 @@ func _controls_tab() -> Control:
 	)
 	_row(grid, "", restore)
 	return grid.get_parent()
+
+
+func _interface_tab() -> Control:
+	var grid := _tab("Interface")
+	var size := OptionButton.new()
+	size.name = "TextSize"
+	for scale in UI_SCALES:
+		size.add_item("%d %%" % roundi(scale * 100.0))
+	size.item_selected.connect(func(i: int) -> void: Settings.set_ui_scale(UI_SCALES[i]))
+	_row(grid, "Text size", size)
+	return grid.get_parent()
+
+
+func _hold_or_toggle(node_name: String, on_change: Callable) -> OptionButton:
+	var choice := OptionButton.new()
+	choice.name = node_name
+	choice.add_item("Hold")
+	choice.add_item("Toggle")
+	choice.item_selected.connect(func(i: int) -> void: on_change.call(i == 1))
+	return choice
 
 
 func _tab(title: String) -> GridContainer:

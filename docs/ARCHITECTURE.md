@@ -725,6 +725,17 @@ main menu and the pause menu; changes apply at once; to rebind, click the action
 or mouse button (Esc cancels). Note: tests share the project's `user://` folder, so a
 `settings.cfg` saved by playing in the same environment is loaded when the tests start.
 
+- **Accessibility (Phase 11):**
+  - **Text size:** 100–150 % in 10 % steps (Settings → Interface). It sets
+    `get_tree().root.content_scale_factor` (the project uses `canvas_items` stretch), so menus,
+    HUD, prompts, toasts and the map all scale.
+  - **Sprint and rest:** "Hold" (default) or "Toggle" (Settings → Controls).
+    `PlayerInput.sprint_intent()` / `rest_intent()` take the key state. In toggle mode a press
+    flips the action (`PlayerInput.toggle_step`); stopping turns sprint off and moving gets up
+    from rest.
+  - **Camera shake** on/off.
+  - All persisted in `settings.cfg` (`[controls]`, `[interface]`).
+
 ## 10. Quality presets
 
 | Setting | Low | Medium | High |

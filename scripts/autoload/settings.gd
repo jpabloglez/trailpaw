@@ -75,6 +75,12 @@ var mouse_sensitivity: float = 1.0
 var invert_y: bool = false
 ## A subtle camera shake on hard landings.
 var camera_shake: bool = true
+## Sprint: press once to run, again (or stop) to walk — instead of holding the key.
+var sprint_toggle: bool = false
+## Rest: press once to lie down, again (or move) to get up — instead of holding the key.
+var rest_toggle: bool = false
+## Interface and text scale (1 … 1.5; menus, HUD, prompts and map).
+var ui_scale: float = 1.0
 ## Where [method save_settings] and [method load_settings] work.
 var config_path: String = DEFAULT_PATH
 
@@ -157,6 +163,25 @@ func set_invert_y(value: bool) -> void:
 	changed.emit(&"invert_y")
 
 
+## Sprint by toggling instead of holding.
+func set_sprint_toggle(value: bool) -> void:
+	sprint_toggle = value
+	changed.emit(&"sprint_toggle")
+
+
+## Rest by toggling instead of holding.
+func set_rest_toggle(value: bool) -> void:
+	rest_toggle = value
+	changed.emit(&"rest_toggle")
+
+
+## Interface scale (clamped to 1…1.5 in steps of 0.1) and applies it.
+func set_ui_scale(value: float) -> void:
+	ui_scale = snappedf(clampf(value, 1.0, 1.5), 0.1)
+	_apply_ui_scale()
+	changed.emit(&"ui_scale")
+
+
 ## Camera shake on hard landings on or off.
 func set_camera_shake(value: bool) -> void:
 	camera_shake = value
@@ -232,6 +257,9 @@ func save_settings() -> Error:
 	config.set_value("controls", "mouse_sensitivity", mouse_sensitivity)
 	config.set_value("controls", "invert_y", invert_y)
 	config.set_value("controls", "camera_shake", camera_shake)
+	config.set_value("controls", "sprint_toggle", sprint_toggle)
+	config.set_value("controls", "rest_toggle", rest_toggle)
+	config.set_value("interface", "ui_scale", ui_scale)
 	for action in REMAPPABLE:
 		config.set_value("bindings", String(action), _serialise(action))
 	return config.save(config_path)
@@ -261,6 +289,11 @@ func load_settings() -> void:
 	)
 	invert_y = bool(config.get_value("controls", "invert_y", false))
 	camera_shake = bool(config.get_value("controls", "camera_shake", true))
+	sprint_toggle = bool(config.get_value("controls", "sprint_toggle", false))
+	rest_toggle = bool(config.get_value("controls", "rest_toggle", false))
+	ui_scale = snappedf(
+		clampf(float(config.get_value("interface", "ui_scale", 1.0)), 1.0, 1.5), 0.1
+	)
 	for action in REMAPPABLE:
 		var stored: Array = config.get_value("bindings", String(action), [])
 		if not stored.is_empty():
@@ -274,6 +307,7 @@ func _apply_all() -> void:
 	_apply_window()
 	_apply_render_scale()
 	_apply_vsync()
+	_apply_ui_scale()
 	quality_changed.emit(quality)
 	changed.emit(&"all")
 
@@ -295,6 +329,11 @@ func _apply_window() -> void:
 func _apply_render_scale() -> void:
 	if is_inside_tree():
 		get_viewport().scaling_3d_scale = render_scale
+
+
+func _apply_ui_scale() -> void:
+	if is_inside_tree():
+		get_tree().root.content_scale_factor = ui_scale
 
 
 func _apply_vsync() -> void:
