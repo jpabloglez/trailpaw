@@ -22,6 +22,9 @@ func after_test() -> void:
 	Settings.set_render_scale(1.0)
 	Settings.set_volume(&"Ambience", 1.0)
 	Settings.set_camera_shake(true)
+	Settings.set_sprint_toggle(false)
+	Settings.set_rest_toggle(false)
+	Settings.set_ui_scale(1.0)
 	Settings.config_path = _saved_path
 	if FileAccess.file_exists(TEST_PATH):
 		DirAccess.remove_absolute(TEST_PATH)
@@ -42,6 +45,9 @@ func test_settings_persist_across_a_save_and_a_load() -> void:
 	Settings.set_render_scale(0.75)
 	Settings.set_volume(&"Ambience", 0.3)
 	Settings.set_camera_shake(false)
+	Settings.set_sprint_toggle(true)
+	Settings.set_rest_toggle(true)
+	Settings.set_ui_scale(1.3)
 	assert_str(String(Settings.rebind(&"jump", _key(KEY_J)))).is_empty()
 	assert_int(Settings.save_settings()).is_equal(OK)
 	# Forget everything, then read it back.
@@ -52,6 +58,9 @@ func test_settings_persist_across_a_save_and_a_load() -> void:
 	Settings.set_render_scale(1.0)
 	Settings.set_volume(&"Ambience", 1.0)
 	Settings.set_camera_shake(true)
+	Settings.set_sprint_toggle(false)
+	Settings.set_rest_toggle(false)
+	Settings.set_ui_scale(1.0)
 	Settings.restore_default_bindings()
 	Settings.load_settings()
 	assert_str(String(Settings.quality.id)).is_equal("low")
@@ -61,6 +70,10 @@ func test_settings_persist_across_a_save_and_a_load() -> void:
 	assert_float(Settings.render_scale).is_equal(0.75)
 	assert_float(Settings.volume(&"Ambience")).is_equal_approx(0.3, 1e-4)
 	assert_bool(Settings.camera_shake).is_false()
+	assert_bool(Settings.sprint_toggle).is_true()
+	assert_bool(Settings.rest_toggle).is_true()
+	assert_float(Settings.ui_scale).is_equal_approx(1.3, 1e-4)
+	assert_float(get_tree().root.content_scale_factor).is_equal_approx(1.3, 1e-4)
 	assert_bool(InputMap.action_has_event(&"jump", _key(KEY_J))).is_true()
 	assert_bool(InputMap.action_has_event(&"jump", _key(KEY_SPACE))).is_false()
 
@@ -122,3 +135,27 @@ func test_the_camera_follows_fov_sensitivity_and_invert_y() -> void:
 	p0 = pitch.rotation.x
 	rig.apply_look(Vector2(0, 5))
 	assert_float(signf(pitch.rotation.x - p0)).is_equal(-signf(down))
+
+
+func test_text_size_scales_the_whole_interface_within_limits() -> void:
+	Settings.set_ui_scale(1.2)
+	assert_float(get_tree().root.content_scale_factor).is_equal_approx(1.2, 1e-4)
+	Settings.set_ui_scale(3.0)
+	assert_float(Settings.ui_scale).is_equal_approx(1.5, 1e-4)
+	Settings.set_ui_scale(1.23)
+	assert_float(Settings.ui_scale).is_equal_approx(1.2, 1e-4)  # steps of 10 %
+
+
+func test_the_interface_tab_and_hold_or_toggle_choices() -> void:
+	var menu: SettingsMenu = auto_free(SettingsMenu.new())
+	add_child(menu)
+	menu.open()
+	var size := menu.control("TextSize") as OptionButton
+	size.select(3)
+	size.item_selected.emit(3)
+	assert_float(Settings.ui_scale).is_equal_approx(1.3, 1e-4)
+	var sprint := menu.control("SprintMode") as OptionButton
+	sprint.select(1)
+	sprint.item_selected.emit(1)
+	assert_bool(Settings.sprint_toggle).is_true()
+	menu.visible = false
