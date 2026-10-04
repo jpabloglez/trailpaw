@@ -46,3 +46,7 @@ signal need_critical(need_id: StringName)
 ## A critical need of the player recovered above its threshold + recover margin.
 @warning_ignore("unused_signal")
 signal need_recovered(need_id: StringName)
+
+## The player opened the map (Phase 12: onboarding).
+@warning_ignore("unused_signal")
+signal map_opened

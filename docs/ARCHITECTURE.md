@@ -756,6 +756,27 @@ or mouse button (Esc cancels). Note: tests share the project's `user://` folder,
 | Performance | **Streaming** probe (headless OK): `terrain_sandbox.tscn -- --auto-travel=<m>` — build spikes > 4 ms, holes, collision gaps (`docs/notes/terrain-streaming-perf.md`). **Frame-time** probe (needs the real GPU, Phase 11): `perf_probe.tscn` flies the real `world.tscn` (attract mode, seed 12345, noon with the clock frozen, V-Sync off) 3.6 km along +X through every biome and writes one CSV row per frame (real frame time, viewport render CPU/GPU ms, draw calls, primitives, chunks built, build ms, fauna, biome) after a `# {json}` header (GPU, driver, renderer, preset, resolution); `python -m tools.perf_report run.csv` → p50/p95/p99 overall and per biome, worst frames, PASS when p95 ≤ 16.6 ms (`docs/notes/perf/`) | Godot + Python |
 | Manual | Game feel, camera, visuals | Checklist in each ROADMAP phase |
 
+### Onboarding (Phase 12)
+`HintDirector` (a CanvasLayer in `world.tscn`, so the attract world drops it) teaches the first
+minutes with **one short hint at a time** at the bottom centre. Texts and triggers live in
+`data/ui/hints.tres`. Each hint uses the player's own keys (`Settings.binding_text`) and says
+"Hold" or "Press" following the hold-or-toggle settings. The rules are checked 4× a second; a
+hint fades in while useful and is gone for good once learnt.
+
+| Hint | Shows when | Learnt when |
+|---|---|---|
+| move | 1.5 s after landing | 6 m walked |
+| run | move learnt | 1.5 s above trot speed |
+| sniff | thirst or hunger < 75, or after 90 s | `Sniffer.sniffed` |
+| water | water scented | a DRINK interaction |
+| eat | sniff learnt and hunger < 70 | an EAT interaction |
+| map | water scented, or after 4 min | `EventBus.map_opened` (new) |
+| rest | energy < 50 | the Rest state |
+
+Learnt hints live in `Settings.hints` (a `HintProgress`, `[onboarding]` in `settings.cfg`), so
+a new game does not teach them again. Settings → Interface → "Show hints" turns them off, and
+"Teach me again" resets them.
+
 ### Builds (Phase 12)
 - `export_presets.cfg` has "Windows Desktop" (`export/windows/Trailpaw.exe`) and "Linux"
   (`export/linux/Trailpaw.x86_64`).

@@ -146,6 +146,7 @@ func _refresh() -> void:
 	(control("CameraShake") as CheckBox).set_pressed_no_signal(Settings.camera_shake)
 	(control("SprintMode") as OptionButton).select(1 if Settings.sprint_toggle else 0)
 	(control("RestMode") as OptionButton).select(1 if Settings.rest_toggle else 0)
+	(control("ShowHints") as CheckBox).set_pressed_no_signal(Settings.hints.enabled)
 	(control("TextSize") as OptionButton).select(
 		maxi(0, UI_SCALES.find(snappedf(Settings.ui_scale, 0.1)))
 	)
@@ -242,6 +243,19 @@ func _interface_tab() -> Control:
 		size.add_item("%d %%" % roundi(scale * 100.0))
 	size.item_selected.connect(func(i: int) -> void: Settings.set_ui_scale(UI_SCALES[i]))
 	_row(grid, "Text size", size)
+	var hints := CheckBox.new()
+	hints.name = "ShowHints"
+	hints.toggled.connect(func(on: bool) -> void: Settings.hints.enabled = on)
+	_row(grid, "Show hints", hints)
+	var again := Button.new()
+	again.name = "TeachAgain"
+	again.text = "Teach me again"
+	again.pressed.connect(
+		func() -> void:
+			Settings.hints.reset()
+			_status.text = "Hints will show again"
+	)
+	_row(grid, "", again)
 	return grid.get_parent()
 
 

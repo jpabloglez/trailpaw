@@ -34,6 +34,8 @@
 [ext_resource type="Resource" path="res://data/save/autosave.tres" id="57_auto"]
 [ext_resource type="Script" path="res://scripts/world/exploration_tracker.gd" id="58_expl"]
 [ext_resource type="Resource" path="res://data/world/exploration.tres" id="59_explset"]
+[ext_resource type="Script" path="res://scripts/ui/hint_director.gd" id="60_hints"]
+[ext_resource type="Resource" path="res://data/ui/hints.tres" id="61_hintset"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_k7oal"]
 
@@ -147,3 +149,13 @@ script = ExtResource("58_expl")
 settings = ExtResource("59_explset")
 target = NodePath("../Animal")
 sniffer = NodePath("../Animal/Sniffer")
+
+[node name="HintDirector" type="CanvasLayer" parent="." node_paths=PackedStringArray("body", "movement", "needs", "sniffer", "state_machine", "spawner")]
+script = ExtResource("60_hints")
+settings = ExtResource("61_hintset")
+body = NodePath("../Animal")
+movement = NodePath("../Animal/MovementComponent")
+needs = NodePath("../Animal/NeedsComponent")
+sniffer = NodePath("../Animal/Sniffer")
+state_machine = NodePath("../Animal/StateMachine")
+spawner = NodePath("../AnimalSpawner")
