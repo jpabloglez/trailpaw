@@ -8,6 +8,9 @@ extends Node
 ## [br][br]
 ## Budget: one [method CharacterBody3D.move_and_slide] per tick; no per-frame allocations.
 
+## The body touched the ground after being in the air, falling at [param fall_speed] m/s.
+signal landed(fall_speed: float)
+
 ## Squared input length below which there is no move intent.
 const INPUT_DEADZONE_SQ: float = 0.01
 ## A jump request stays valid for this many physics frames (covers node update order).
@@ -137,7 +140,11 @@ func perform_jump() -> void:
 
 ## Moves the body and keeps the tracked speed honest after collisions (walls stop you).
 func move() -> void:
+	var was_on_floor := _body.is_on_floor()
+	var fall_speed := -_body.velocity.y
 	_body.move_and_slide()
+	if not was_on_floor and _body.is_on_floor():
+		landed.emit(maxf(fall_speed, 0.0))
 	var real_speed := Vector2(_body.velocity.x, _body.velocity.z).length()
 	_speed = minf(_speed, real_speed)
 

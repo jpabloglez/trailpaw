@@ -83,8 +83,9 @@ vegetation_palette = ExtResource("23_palette")
 [node name="Animal" parent="." instance=ExtResource("7_u3weh")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 30, 32)
 
-[node name="CameraRig" parent="." node_paths=PackedStringArray("target") instance=ExtResource("8_ql1ge")]
+[node name="CameraRig" parent="." node_paths=PackedStringArray("target", "movement") instance=ExtResource("8_ql1ge")]
 target = NodePath("../Animal")
+movement = NodePath("../Animal/MovementComponent")
 
 [node name="DebugOverlay" parent="." instance=ExtResource("12_h55wb")]
 

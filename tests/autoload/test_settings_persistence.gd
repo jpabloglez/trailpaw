@@ -21,6 +21,7 @@ func after_test() -> void:
 	Settings.set_invert_y(false)
 	Settings.set_render_scale(1.0)
 	Settings.set_volume(&"Ambience", 1.0)
+	Settings.set_camera_shake(true)
 	Settings.config_path = _saved_path
 	if FileAccess.file_exists(TEST_PATH):
 		DirAccess.remove_absolute(TEST_PATH)
@@ -40,6 +41,7 @@ func test_settings_persist_across_a_save_and_a_load() -> void:
 	Settings.set_invert_y(true)
 	Settings.set_render_scale(0.75)
 	Settings.set_volume(&"Ambience", 0.3)
+	Settings.set_camera_shake(false)
 	assert_str(String(Settings.rebind(&"jump", _key(KEY_J)))).is_empty()
 	assert_int(Settings.save_settings()).is_equal(OK)
 	# Forget everything, then read it back.
@@ -49,6 +51,7 @@ func test_settings_persist_across_a_save_and_a_load() -> void:
 	Settings.set_invert_y(false)
 	Settings.set_render_scale(1.0)
 	Settings.set_volume(&"Ambience", 1.0)
+	Settings.set_camera_shake(true)
 	Settings.restore_default_bindings()
 	Settings.load_settings()
 	assert_str(String(Settings.quality.id)).is_equal("low")
@@ -57,6 +60,7 @@ func test_settings_persist_across_a_save_and_a_load() -> void:
 	assert_bool(Settings.invert_y).is_true()
 	assert_float(Settings.render_scale).is_equal(0.75)
 	assert_float(Settings.volume(&"Ambience")).is_equal_approx(0.3, 1e-4)
+	assert_bool(Settings.camera_shake).is_false()
 	assert_bool(InputMap.action_has_event(&"jump", _key(KEY_J))).is_true()
 	assert_bool(InputMap.action_has_event(&"jump", _key(KEY_SPACE))).is_false()
 

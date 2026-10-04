@@ -38,6 +38,12 @@ func _frames(n: int) -> void:
 		await get_tree().process_frame
 
 
+# Waits for a menu-driven switch: fade to black, swap the world, a couple of frames.
+func _settle() -> void:
+	await get_tree().create_timer(ScreenFade.SECONDS + 0.1).timeout
+	await _frames(2)
+
+
 func _until(condition: Callable) -> bool:
 	for i in MAX_FRAMES:
 		await get_tree().process_frame
@@ -92,7 +98,7 @@ func test_a_new_game_uses_the_typed_seed() -> void:
 	assert_int(flow.menu().seed_value()).is_greater_equal(0)  # a random seed is offered
 	flow.menu().seed_field().text = "4242"
 	flow.menu().button("Start").pressed.emit()
-	await _frames(2)
+	await _settle()
 	assert_bool(flow.is_playing()).is_true()
 	assert_object(flow.menu()).is_null()
 	assert_int(GameState.world_seed).is_equal(4242)
@@ -109,7 +115,7 @@ func test_the_seed_field_keeps_digits_only_and_rejects_nonsense() -> void:
 	field.text = ""
 	assert_int(flow.menu().seed_value()).is_equal(-1)
 	flow.menu().start_new_game()
-	await _frames(2)
+	await _settle()
 	assert_bool(flow.is_playing()).is_false()
 
 
@@ -119,7 +125,7 @@ func test_a_new_game_asks_before_replacing_the_saved_one() -> void:
 	flow.menu().show_new_game()
 	flow.menu().seed_field().text = "99"
 	flow.menu().button("Start").pressed.emit()
-	await _frames(2)
+	await _settle()
 	assert_str(flow.menu().page()).is_equal("confirm")
 	assert_bool(flow.is_playing()).is_false()
 	flow.menu().button("Keep").pressed.emit()
@@ -129,7 +135,7 @@ func test_a_new_game_asks_before_replacing_the_saved_one() -> void:
 	flow.menu().seed_field().text = "99"
 	flow.menu().start_new_game()
 	flow.menu().button("Replace").pressed.emit()
-	await _frames(2)
+	await _settle()
 	assert_bool(flow.is_playing()).is_true()
 	assert_int(GameState.world_seed).is_equal(99)
 	assert_bool(SaveSystem.exists()).is_false()  # the old game is gone
@@ -139,7 +145,7 @@ func test_continue_resumes_the_saved_game() -> void:
 	_save_with_seed(2024)
 	var flow := _start()
 	flow.menu().button("Continue").pressed.emit()
-	await _frames(2)
+	await _settle()
 	assert_bool(flow.is_playing()).is_true()
 	assert_int(GameState.world_seed).is_equal(2024)
 	assert_float(GameState.game_minutes).is_between(1000.0, 1001.0)
@@ -156,7 +162,7 @@ func test_the_pause_menu_stops_the_world_and_shows_the_seed() -> void:
 	press.action = &"pause"
 	press.pressed = true
 	Input.parse_input_event(press)
-	await _frames(2)
+	await _settle()
 	assert_bool(pause.visible).is_true()
 	assert_bool(get_tree().paused).is_true()
 	assert_str(pause.seed_text()).contains("808")
@@ -183,12 +189,12 @@ func test_going_back_to_the_menu_saves_then_continue_returns_there() -> void:
 	var where: Vector3 = GameState.absolute_position(flow.world().animal.global_position)
 	flow.pause_menu().open()
 	flow.pause_menu().button("MainMenu").pressed.emit()
-	await _frames(2)
+	await _settle()
 	assert_object(flow.menu()).is_not_null()
 	assert_bool(get_tree().paused).is_false()
 	assert_bool(SaveSystem.exists()).is_true()
 	flow.menu().button("Continue").pressed.emit()
-	await _frames(2)
+	await _settle()
 	var back: Vector3 = GameState.absolute_position(flow.world().animal.global_position)
 	assert_float(back.x).is_equal_approx(where.x, 0.5)
 	assert_float(back.z).is_equal_approx(where.z, 0.5)
@@ -210,3 +216,23 @@ func test_quitting_from_the_menu_does_not_save() -> void:
 	var flow := _start()
 	flow.menu().button("Quit").pressed.emit()
 	assert_bool(SaveSystem.exists()).is_false()
+
+
+func test_the_world_is_swapped_behind_a_black_screen() -> void:
+	var flow := _start()
+	var covered_when_added: Array[float] = []
+	flow.child_entered_tree.connect(
+		func(node: Node) -> void:
+			if node is WorldController:
+				covered_when_added.append(flow.screen_fade().opacity())
+	)
+	flow.menu().show_new_game()
+	flow.menu().button("Start").pressed.emit()
+	await _frames(1)
+	assert_float(flow.screen_fade().opacity()).is_less(1.0)  # still fading out
+	await _settle()
+	assert_array(covered_when_added).has_size(1)
+	assert_float(covered_when_added[0]).is_equal_approx(1.0, 0.01)
+	assert_bool(flow.is_playing()).is_true()
+	await get_tree().create_timer(ScreenFade.SECONDS + 0.1).timeout
+	assert_float(flow.screen_fade().opacity()).is_equal_approx(0.0, 0.01)  # and back

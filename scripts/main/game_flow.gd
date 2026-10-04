@@ -22,6 +22,7 @@ var _menu: MainMenu
 var _pause: PauseMenu
 var _settings: SettingsMenu
 var _map: MapScreen
+var _fade: ScreenFade
 var _playing: bool = false
 
 
@@ -42,6 +43,9 @@ func _ready() -> void:
 	_map.name = "MapScreen"
 	add_child(_map)
 	_pause.map_requested.connect(_open_map)
+	_fade = ScreenFade.new()
+	_fade.name = "ScreenFade"
+	add_child(_fade)
 	show_menu()
 
 
@@ -127,12 +131,24 @@ func map_screen() -> MapScreen:
 	return _map
 
 
+## The fade that hides world switches.
+func screen_fade() -> ScreenFade:
+	return _fade
+
+
 ## Whether a game is being played (not the menu).
 func is_playing() -> bool:
 	return _playing
 
 
 func _go(where: StringName, world_seed: int = 0) -> void:
+	# Fade to black, switch while covered, fade back in.
+	await _fade.cover().finished
+	_switch(where, world_seed)
+	_fade.reveal()
+
+
+func _switch(where: StringName, world_seed: int) -> void:
 	match where:
 		&"menu":
 			if _playing and _world != null:

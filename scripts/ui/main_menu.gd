@@ -139,6 +139,7 @@ func _build_confirm() -> void:
 func _show(box: VBoxContainer) -> void:
 	for page_box in [_main, _new_game, _confirm]:
 		(page_box.get_parent().get_parent() as Control).visible = page_box == box
+	MenuStyle.fade_in(box.get_parent().get_parent() as Control)
 
 
 func _keep_digits(text: String) -> void:

@@ -83,8 +83,9 @@ vegetation_palette = ExtResource("23_palette")
 [node name="Animal" parent="." unique_id=858224225 instance=ExtResource("7_u3weh")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 30, 32)
 
-[node name="CameraRig" parent="." unique_id=1364750976 node_paths=PackedStringArray("target") instance=ExtResource("8_ql1ge")]
+[node name="CameraRig" parent="." unique_id=1364750976 node_paths=PackedStringArray("target", "movement") instance=ExtResource("8_ql1ge")]
 target = NodePath("../Animal")
+movement = NodePath("../Animal/MovementComponent")
 
 [node name="FreeFlyCamera" type="Camera3D" parent="." unique_id=1228331704]
 far = 2000.0

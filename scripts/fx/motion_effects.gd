@@ -7,7 +7,7 @@ extends Node3D
 ## quality preset turns [member QualityPreset.motion_effects] off.
 ## [br][br]
 ## Budget: a pool of [member MotionEffectsSettings.pool_size] one-shot [GPUParticles3D] (built
-## once); per physics tick two comparisons; per effect one emitter restart.
+## once); per physics tick one surface check; per effect one emitter restart.
 
 ## The effect last started ([code]&"dust"[/code], [code]&"landing"[/code],
 ## [code]&"splash"[/code]); for tests and tools.
@@ -28,9 +28,7 @@ signal effect_started(kind: StringName, at: Vector3)
 
 var _pool: Array[GPUParticles3D] = []
 var _next: int = 0
-var _was_grounded: bool = true
 var _was_wading: bool = false
-var _fall_speed: float = 0.0
 
 
 func _ready() -> void:
@@ -40,26 +38,27 @@ func _ready() -> void:
 		_pool.append(_emitter())
 	if animation != null:
 		animation.footstep.connect(func(_paw: StringName) -> void: on_footstep())
+	if movement != null:
+		movement.landed.connect(on_landed)
 
 
 func _physics_process(_delta: float) -> void:
 	if movement == null:
 		return
-	var grounded := movement.is_grounded()
-	var wading := footsteps != null and footsteps.surface() == FootstepAudio.Surface.WATER
-	if not grounded:
-		_fall_speed = maxf(_fall_speed, -body.velocity.y)
-	elif not _was_grounded:
-		if _fall_speed >= settings.landing_speed:
-			if wading:
-				_start(&"splash", settings.splash_amount, settings.splash_color)
-			else:
-				_start(&"landing", settings.landing_amount, _dust_color())
-		_fall_speed = 0.0
-	if wading and not _was_wading and grounded:
+	var wading := _wading()
+	if wading and not _was_wading and movement.is_grounded():
 		_start(&"splash", settings.splash_amount, settings.splash_color)
-	_was_grounded = grounded
 	_was_wading = wading
+
+
+## A landing ([signal MovementComponent.landed]): a puff, or a splash in water, when hard enough.
+func on_landed(fall_speed: float) -> void:
+	if fall_speed < settings.landing_speed:
+		return
+	if _wading():
+		_start(&"splash", settings.splash_amount, settings.splash_color)
+	else:
+		_start(&"landing", settings.landing_amount, _dust_color())
 
 
 ## Whether effects are on (the quality preset allows them).
@@ -77,6 +76,10 @@ func on_footstep() -> void:
 		return
 	if movement.horizontal_speed() >= species.trot_speed * settings.dust_speed_factor:
 		_start(&"dust", settings.step_amount, _dust_color())
+
+
+func _wading() -> bool:
+	return footsteps != null and footsteps.surface() == FootstepAudio.Surface.WATER
 
 
 ## Emitters currently playing.

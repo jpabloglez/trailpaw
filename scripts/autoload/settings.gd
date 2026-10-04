@@ -73,6 +73,8 @@ var fov: float = 70.0
 var mouse_sensitivity: float = 1.0
 ## Invert vertical mouse look.
 var invert_y: bool = false
+## A subtle camera shake on hard landings.
+var camera_shake: bool = true
 ## Where [method save_settings] and [method load_settings] work.
 var config_path: String = DEFAULT_PATH
 
@@ -155,6 +157,12 @@ func set_invert_y(value: bool) -> void:
 	changed.emit(&"invert_y")
 
 
+## Camera shake on hard landings on or off.
+func set_camera_shake(value: bool) -> void:
+	camera_shake = value
+	changed.emit(&"camera_shake")
+
+
 ## Binds [param action] to [param event] (a key, by physical keycode, or a mouse button) in
 ## place of its current bindings. Returns the action that already uses it (and changes nothing),
 ## or an empty name on success.
@@ -223,6 +231,7 @@ func save_settings() -> Error:
 		config.set_value("audio", String(bus), volume(bus))
 	config.set_value("controls", "mouse_sensitivity", mouse_sensitivity)
 	config.set_value("controls", "invert_y", invert_y)
+	config.set_value("controls", "camera_shake", camera_shake)
 	for action in REMAPPABLE:
 		config.set_value("bindings", String(action), _serialise(action))
 	return config.save(config_path)
@@ -251,6 +260,7 @@ func load_settings() -> void:
 		float(config.get_value("controls", "mouse_sensitivity", 1.0)), 0.2, 3.0
 	)
 	invert_y = bool(config.get_value("controls", "invert_y", false))
+	camera_shake = bool(config.get_value("controls", "camera_shake", true))
 	for action in REMAPPABLE:
 		var stored: Array = config.get_value("bindings", String(action), [])
 		if not stored.is_empty():
