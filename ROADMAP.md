@@ -20,6 +20,7 @@ Claude Code; one sprint = 2 weeks.
 | 10b | Map and navigation (+ fauna tuning) | 1 | 34 w |
 | 11 | Performance and polish | 2 | 38 w |
 | 12 | Vertical slice release | 1 | 40 w |
+| 13 | Biodiversity | 2 | 44 w |
 
 Milestones: **M1 "Walk the world"** (end of Phase 3), **M2 "A day in the life"**
 (end of Phase 7), **M3 "Living world"** (end of Phase 10), **M4 Vertical slice** (Phase 12).
@@ -227,6 +228,24 @@ have seen.
 - [x] README with build instructions, credits and licences.
 
 **Exit:** a stranger can download, play 30 minutes and want to keep going.
+
+---
+
+## Phase 13 — Biodiversity
+
+Post-slice, from the playtests: birdsong with no birds in sight, and herds seen as 1–2 isolated
+animals. Small animals are made in code (low-poly, procedural animation) and the fox can chase
+them playfully; nothing is hunted.
+
+- [x] Herd cohesion: herds spawn whole, wander around their centre and flee together.
+- [ ] Critter layer (light simulation + MultiMesh) and rabbits.
+- [ ] Birds: flocks that perch, fly and scatter; birdsong follows the birds nearby.
+- [ ] Ducks on lakes and rivers.
+- [ ] Butterflies by day, fireflies at night.
+
+**Tests:** herds stay within their leash; critters deterministic per chunk, on the ground or
+the water, flee from a running fox; birdsong silent with no birds; critter simulation ≤ 1 ms.
+**Exit:** the world feels alive: you see the animals you hear, and chasing them is fun.
 
 ---
 

@@ -32,6 +32,9 @@ func physics_update(delta: float) -> void:
 		movement.move_input = Vector2.ZERO
 		if _pause_left <= 0.0:
 			pick_target()
+	elif agent().strayed() and agent().horizontal_distance_to(_target) > radius * 0.5:
+		_target = agent().wander_centre()  # back to the herd
+		steer_towards(_target, pace)
 	elif agent().horizontal_distance_to(_target) < arrive_distance:
 		movement.move_input = Vector2.ZERO
 		_steps_left -= 1
@@ -44,11 +47,11 @@ func physics_update(delta: float) -> void:
 	ground_tick(delta)
 
 
-## Chooses the next target around home.
+## Chooses the next target around the herd's centre (or home, alone).
 func pick_target() -> void:
 	var angle := agent().rng.randf() * TAU
 	var distance := sqrt(agent().rng.randf()) * radius
-	_target = agent().home + Vector3(cos(angle), 0.0, sin(angle)) * distance
+	_target = agent().wander_centre() + Vector3(cos(angle), 0.0, sin(angle)) * distance
 
 
 ## Sets the target directly (tests and scripted scenes).

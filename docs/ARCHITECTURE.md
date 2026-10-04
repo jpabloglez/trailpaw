@@ -558,7 +558,16 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
     chunk centre). Spawns are queued (1 per frame) and placed by a downward ray on dry ground
     ≤ 25° and ≥ 25 m from the player. **Cap: 10 animals.** An animal leaves when its chunk
     stops being full detail (its collision goes) or beyond 120 m; the same chunk brings the
-    same herd back. `warm_up()` instances each species once at load, so herds appear in ≈ 1 ms.
+    same herd back.
+  - **Herds (Phase 13):** a chunk's spawns form one `FaunaHerd` and spawn **whole or not at
+    all**, so the cap never splits a herd.
+    - Members wander around the herd's **current centroid** (`FaunaAgent.wander_centre()`),
+      not their own spawn points.
+    - A member beyond `herd_leash` (10 m) heads back (`strayed()`).
+    - When one starts to flee, the others within `alarm_radius` (15 m) are alarmed for
+      `alarm_seconds` (3 s) and flee too. `FaunaBrain` applies that after the pure
+      `FaunaDecision`, and never interrupts a moment with the player.
+    - Values in `data/fauna/director.tres`. `warm_up()` instances each species once at load, so herds appear in ≈ 1 ms.
   - **AI LOD** (4 Hz checks): ≤ 40 m full (brain 5 Hz, ground alignment every 4th tick); ≤ 90 m
     brain 2 Hz, behaviour every 3rd tick (`FaunaAgent.tick_stride`), no alignment; beyond,
     frozen (`PROCESS_MODE_DISABLED`). Fauna skip footstep analysis and share one looped clip
