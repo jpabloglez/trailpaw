@@ -11,6 +11,12 @@ extends Node
 ## Emitted right before the game quits (after saving).
 signal quitting
 
+## Command-line flag (after [code]--[/code]) that opens the frame-time probe instead of the menu,
+## so release builds can be measured: [code]Trailpaw.exe -- --perf-probe[/code].
+const PERF_PROBE_FLAG: String = "--perf-probe"
+## The probe scene.
+const PERF_PROBE_SCENE: String = "res://scenes/debug/perf_probe.tscn"
+
 ## The playable world.
 @export var world_scene: PackedScene
 
@@ -27,6 +33,9 @@ var _playing: bool = false
 
 
 func _ready() -> void:
+	if wants_perf_probe(OS.get_cmdline_user_args()):
+		get_tree().change_scene_to_file.call_deferred(PERF_PROBE_SCENE)
+		return
 	get_tree().auto_accept_quit = false
 	_pause = PauseMenu.new()
 	_pause.name = "PauseMenu"
@@ -52,6 +61,11 @@ func _ready() -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
 		quit_game()
+
+
+## Whether the command-line user arguments [param args] ask for the perf probe.
+static func wants_perf_probe(args: PackedStringArray) -> bool:
+	return args.has(PERF_PROBE_FLAG)
 
 
 ## Shows the main menu over an attract-mode world (the saved game's seed, or a random one).
