@@ -48,6 +48,8 @@ const BUSY: Array[StringName] = [&"Flee", &"Follow", &"Play"]
 
 ## Where the agent belongs (wanders around it); set on entering the tree when zero.
 var home: Vector3 = Vector3.ZERO
+## The group it lives with (null for a loner, e.g. in tests).
+var herd: FaunaHerd
 ## Random numbers for this agent's decisions (seeded with [member decision_seed]).
 var rng := RandomNumberGenerator.new()
 
@@ -94,6 +96,27 @@ func _ready() -> void:
 		_setup_social()
 	if Animal.spawn_species_model(movement.species, model_root):
 		(%AnimationController as AnimationController).initialize()
+
+
+func _exit_tree() -> void:
+	if herd != null:
+		herd.remove(self)
+
+
+## Where it wanders around: its herd's centre when it has company, else its home.
+func wander_centre() -> Vector3:
+	if herd != null and herd.size() > 1:
+		var centre := herd.centroid()
+		if centre != Vector3.INF:
+			return centre
+	return home
+
+
+## Whether it has strayed beyond its herd's leash.
+func strayed() -> bool:
+	if herd == null or herd.size() < 2:
+		return false
+	return horizontal_distance_to(herd.centroid()) > herd.leash
 
 
 func _physics_process(delta: float) -> void:

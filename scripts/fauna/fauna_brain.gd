@@ -32,6 +32,7 @@ var separation: Vector3 = Vector3.ZERO
 var _since: float = 0.0
 var _previous_distance: float = INF
 var _neighbours := PackedVector3Array()
+var _alarm_left: float = 0.0
 
 
 func _ready() -> void:
@@ -60,10 +61,26 @@ func tick(elapsed: float) -> void:
 	var next := FaunaDecision.decide(
 		current, done, perception, profile, agent.rng.randf(), agent.rng.randf()
 	)
+	_alarm_left = maxf(0.0, _alarm_left - elapsed)
+	var moment := current in [FaunaDecision.SOCIAL, FaunaDecision.PLAY, FaunaDecision.FOLLOW]
+	if _alarm_left > 0.0 and not (moment and not done):
+		next = FaunaDecision.FLEE  # a herd mate bolted
+	if next == FaunaDecision.FLEE and current != FaunaDecision.FLEE and agent.herd != null:
+		agent.herd.alarm(agent)
 	if next != current:
 		state_machine.transition_to(next)
 	elif done and state != null:
 		state.restart()
+
+
+## Makes it flee for at least [param seconds] (a herd mate bolted).
+func alarm(seconds: float) -> void:
+	_alarm_left = maxf(_alarm_left, seconds)
+
+
+## Whether it is alarmed by its herd now.
+func is_alarmed() -> bool:
+	return _alarm_left > 0.0
 
 
 ## Updates [member perception] from the player's position.

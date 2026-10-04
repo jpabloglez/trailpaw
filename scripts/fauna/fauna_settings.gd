@@ -26,6 +26,12 @@ extends Resource
 @export_range(1.0, 89.0, 0.5, "suffix:°") var max_spawn_slope: float = 0.0
 ## Spawns started per frame at most (each instances a model).
 @export_range(1, 8) var spawns_per_frame: int = 1
+## Herd members drift back when they stray this far from the herd's centre (m).
+@export_range(1.0, 100.0, 0.5, "suffix:m") var herd_leash: float = 10.0
+## When one member flees, the others within this distance flee too (m)…
+@export_range(0.0, 100.0, 0.5, "suffix:m") var alarm_radius: float = 15.0
+## …for at least this long (s).
+@export_range(0.0, 30.0, 0.1, "suffix:s") var alarm_seconds: float = 3.0
 
 
 ## Returns human-readable problems with the data; empty when valid.

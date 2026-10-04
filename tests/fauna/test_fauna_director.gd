@@ -140,8 +140,12 @@ func test_spawns_herds_on_the_ground_but_never_beyond_the_cap() -> void:
 	var director := _director(_busy_biome("deer"), Vector3(544, 0, 544))  # centre of chunk (8, 8)
 	director.sync(_coords_around(Vector2i(8, 8), 1))  # 9 chunks, each with a herd of 2–4
 	await _drain(director)
-	assert_int(director.agents().size()).is_equal(SETTINGS.max_agents)
+	# Whole herds only: the cap is never passed, and only a herd that would not fit is left out.
+	var deer: FaunaSpecies = load("res://data/fauna/deer.tres")
+	assert_int(director.agents().size()).is_less_equal(SETTINGS.max_agents)
+	assert_int(director.agents().size()).is_greater(SETTINGS.max_agents - deer.herd_size.y)
 	for agent in director.agents():
+		assert_int(agent.herd.size()).is_greater_equal(deer.herd_size.x)  # never a partial herd
 		# On the floor (top at 0); the body may sink a centimetre or two while it settles.
 		assert_float(agent.global_position.y).is_between(-0.05, 0.3)
 		assert_str(String(agent.fauna.id)).is_equal("deer")

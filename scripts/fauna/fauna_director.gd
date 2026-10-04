@@ -3,14 +3,15 @@ extends Node3D
 ## Brings the world to life around the player: each full-detail (LOD 0) chunk rolls its herd
 ## with [FaunaPlan] when it loads, agents appear on the ground (dry, not too steep, never right
 ## next to the player), and leave when their chunk stops being full detail or they fall beyond
-## [member FaunaSettings.despawn_distance]. At most [member FaunaSettings.max_agents] live at once.
+## [member FaunaSettings.despawn_distance]. At most [member FaunaSettings.max_agents] live at once,
+## and a herd spawns whole or not at all (as one [FaunaHerd], so it stays together).
 ##
 ## AI LOD by distance to the player: full rate within [member FaunaSettings.full_radius], a
 ## slower brain, movement every [member FaunaSettings.mid_stride] ticks and no ground alignment up
 ## to [member FaunaSettings.mid_radius], frozen (no
 ## physics, no animation) beyond.
 ## [br][br]
-## Budget: spawns are queued and started ≤ [member FaunaSettings.spawns_per_frame] per frame
+## Budget: herds are queued and started ≤ [member FaunaSettings.spawns_per_frame] per frame
 ## (≈ 1 ms each: a model instance and an animation tree over a shared clip library, after
 ## [method warm_up]); LOD and despawn checks run at 4 Hz over ≤ 10 agents. The AI itself costs
 ## ≈ 0.65 ms/frame for 10 animals at full rate (measured, WSL).
@@ -36,6 +37,7 @@ var _agents: Array[FaunaAgent] = []
 var _agent_chunk: Dictionary[FaunaAgent, Vector2i] = {}
 var _rolled: Dictionary[Vector2i, bool] = {}
 var _queue: Array = []
+var _members: Array = []  # [spawn, coord, herd] of the herd being spawned, one per frame
 var _resolver: BiomeResolver
 var _since_check: float = 0.0
 var _ray := PhysicsRayQueryParameters3D.new()
@@ -72,9 +74,15 @@ func warm_up() -> void:
 
 func _process(delta: float) -> void:
 	for i in settings.spawns_per_frame:
-		if _queue.is_empty():
-			break
-		_spawn(_queue.pop_front())
+		if _members.is_empty():
+			if _queue.is_empty():
+				break
+			_start_herd(_queue.pop_front())
+		if not _members.is_empty():
+			var member: Array = _members.pop_front()
+			var agent := _spawn(member[0], member[1])
+			if agent != null:
+				(member[2] as FaunaHerd).add(agent)
 	_since_check += delta
 	if _since_check >= 1.0 / CHECK_HZ:
 		_since_check = 0.0
@@ -101,15 +109,17 @@ func sync(lod0_coords: Array[Vector2i]) -> void:
 	for coord: Vector2i in _rolled.keys():
 		if not available.has(coord):
 			_rolled.erase(coord)  # rolls again (identically) when it comes back
-	_queue = _queue.filter(func(spawn: Array) -> bool: return available.has(spawn[3]))
+	_queue = _queue.filter(func(herd: Array) -> bool: return available.has(herd[1]))
+	_members = _members.filter(func(member: Array) -> bool: return available.has(member[1]))
 	for coord in lod0_coords:
 		if _rolled.has(coord):
 			continue
 		_rolled[coord] = true
-		for spawn: Array in FaunaPlan.roll(
+		var spawns := FaunaPlan.roll(
 			coord, terrain.chunk_size, _biome_at(coord), GameState.world_seed, settings.herd_spread
-		):
-			_queue.append([spawn[0], spawn[1], spawn[2], coord])
+		)
+		if not spawns.is_empty():
+			_queue.append([spawns, coord])
 
 
 ## Applies the AI LOD and removes animals that wandered too far from the player.
@@ -156,9 +166,9 @@ func agents() -> Array[FaunaAgent]:
 	return _agents
 
 
-## Spawns still waiting (tests and tools).
+## Herds and herd members still waiting to spawn (tests and tools).
 func pending() -> int:
-	return _queue.size()
+	return _queue.size() + _members.size()
 
 
 ## Lines for the F3 overlay.
@@ -185,9 +195,22 @@ func get_debug_lines() -> PackedStringArray:
 	)
 
 
-func _spawn(spawn: Array) -> void:
-	if _agents.size() >= settings.max_agents:
+# Starts spawning the herd [param entry] ([spawns, chunk]) — its members then appear one per
+# frame — or skips it when it would not fit under the cap whole (it rolls again, identically,
+# when its chunk comes back).
+func _start_herd(entry: Array) -> void:
+	var spawns: Array = entry[0]
+	if _agents.size() + spawns.size() > settings.max_agents:
 		return
+	var herd := FaunaHerd.new()
+	herd.leash = settings.herd_leash
+	herd.alarm_radius = settings.alarm_radius
+	herd.alarm_seconds = settings.alarm_seconds
+	for spawn: Array in spawns:
+		_members.append([spawn, entry[1], herd])
+
+
+func _spawn(spawn: Array, coord: Vector2i) -> FaunaAgent:
 	var species: FaunaSpecies = spawn[0]
 	var absolute_xz: Vector2 = spawn[1]
 	var local := GameState.local_position(Vector3(absolute_xz.x, 0.0, absolute_xz.y))
@@ -195,10 +218,10 @@ func _spawn(spawn: Array) -> void:
 	if focus != null:
 		var d := Vector2(local.x - focus.global_position.x, local.z - focus.global_position.z)
 		if d.length() < settings.min_spawn_distance:
-			return
+			return null
 	var ground := _ground_at(local)
 	if ground == Vector3.INF:
-		return
+		return null
 	var agent := agent_scene.instantiate() as FaunaAgent
 	agent.fauna = species
 	agent.decision_seed = spawn[2]
@@ -206,7 +229,8 @@ func _spawn(spawn: Array) -> void:
 	agent.rotation.y = float(spawn[2] % 628) / 100.0
 	add_child(agent)
 	_agents.append(agent)
-	_agent_chunk[agent] = spawn[3]
+	_agent_chunk[agent] = coord
+	return agent
 
 
 func _despawn(agent: FaunaAgent) -> void:
