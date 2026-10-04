@@ -43,6 +43,10 @@
 [ext_resource type="Script" path="res://scripts/audio/footstep_audio.gd" id="43_steps"]
 [ext_resource type="Resource" path="res://data/audio/footsteps.tres" id="44_stepset"]
 [ext_resource type="Resource" path="res://data/world/terrain_settings.tres" id="45_terrain"]
+[ext_resource type="Script" path="res://scripts/player/foot_planter.gd" id="46_feet"]
+[ext_resource type="Resource" path="res://data/player/foot_plant.tres" id="47_feetset"]
+[ext_resource type="Script" path="res://scripts/player/head_look.gd" id="48_look"]
+[ext_resource type="Resource" path="res://data/player/head_look.tres" id="49_lookset"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ald35"]
 radius = 0.35
@@ -203,3 +207,20 @@ script = ExtResource("43_steps")
 settings = ExtResource("44_stepset")
 animation = NodePath("../AnimationController")
 movement = NodePath("../MovementComponent")
+
+[node name="FootPlanter" type="Node" parent="." node_paths=PackedStringArray("body", "movement", "model_root")]
+unique_name_in_owner = true
+script = ExtResource("46_feet")
+settings = ExtResource("47_feetset")
+body = NodePath("..")
+movement = NodePath("../MovementComponent")
+model_root = NodePath("../Model")
+
+[node name="HeadLook" type="Node3D" parent="." node_paths=PackedStringArray("body", "movement", "model_root", "interactor")]
+unique_name_in_owner = true
+script = ExtResource("48_look")
+settings = ExtResource("49_lookset")
+body = NodePath("..")
+movement = NodePath("../MovementComponent")
+model_root = NodePath("../Model")
+interactor = NodePath("../Interactor")

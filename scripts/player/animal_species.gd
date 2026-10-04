@@ -55,6 +55,10 @@ const LOGICAL_ANIMATIONS: Array[StringName] = [
 @export_range(1.0, 5.0, 0.05) var max_animation_time_scale: float = 1.0
 ## Paw bones (front left/right, back left/right) used for ground speed and footsteps.
 @export var paw_bones: PackedStringArray = PackedStringArray()
+## Legs for foot planting ([FootPlanter]), as "upper>lower>paw" bone names; empty turns it off.
+@export var leg_chains: PackedStringArray = PackedStringArray()
+## Bone that turns to look at things ([HeadLook]); empty turns it off.
+@export var head_bone: String = ""
 
 @export_group("Body")
 ## Collision capsule radius (0 = keep the scene's capsule).
