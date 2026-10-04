@@ -1,0 +1,38 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and publish
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          lfs: true
+
+      - uses: ./.github/actions/setup-godot
+
+      - uses: ./.github/actions/export-builds
+
+      - name: Package
+        run: |
+          set -euo pipefail
+          tag="${GITHUB_REF_NAME}"
+          cp LICENSE README.md export/windows/
+          cp LICENSE README.md export/linux/
+          (cd export/windows && zip -q -r "../../Trailpaw-${tag}-windows.zip" .)
+          (cd export/linux && zip -q -r "../../Trailpaw-${tag}-linux.zip" .)
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            "Trailpaw-${GITHUB_REF_NAME}-windows.zip" "Trailpaw-${GITHUB_REF_NAME}-linux.zip" \
+            --title "Trailpaw ${GITHUB_REF_NAME}" --generate-notes

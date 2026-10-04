@@ -224,7 +224,7 @@ have seen.
 - [x] Export presets for Windows and Linux; CI export job producing artifacts.
 - [x] Onboarding: first 5 minutes teach movement, sniff, drink and eat without text walls.
 - [ ] Playtest with 3–5 people; collect feedback in `docs/playtests/`.
-- [ ] README with build instructions, credits and licences.
+- [x] README with build instructions, credits and licences.
 
 **Exit:** a stranger can download, play 30 minutes and want to keep going.
 

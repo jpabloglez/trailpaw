@@ -791,6 +791,10 @@ a new game does not teach them again. Settings → Interface → "Show hints" tu
   4. Uploads `trailpaw-windows` and `trailpaw-linux` as artifacts (14 days).
 - `application/config/version` (0.12.0) is shown in a corner of the main menu, so playtest
   reports name their build.
+- The export steps live in a composite action (`.github/actions/export-builds`), shared by CI
+  and by **`release.yml`**. Pushing a `v*` tag builds both platforms, zips each with the
+  README and LICENSE, and publishes them as a GitHub Release.
+- Playtests follow `docs/playtests/README.md` (protocol) and `TEMPLATE.md` (notes).
 
 ## 12. Architecture Decision Records
 
