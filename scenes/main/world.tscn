@@ -36,6 +36,10 @@
 [ext_resource type="Resource" path="res://data/world/exploration.tres" id="59_explset"]
 [ext_resource type="Script" path="res://scripts/ui/hint_director.gd" id="60_hints"]
 [ext_resource type="Resource" path="res://data/ui/hints.tres" id="61_hintset"]
+[ext_resource type="Script" path="res://scripts/critters/critter_system.gd" id="70_crit"]
+[ext_resource type="Script" path="res://scripts/critters/critter_kind.gd" id="71_critkind"]
+[ext_resource type="Resource" path="res://data/critters/rabbit.tres" id="72_rabbit"]
+[ext_resource type="Resource" path="res://data/critters/system.tres" id="73_critset"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_k7oal"]
 
@@ -159,3 +163,11 @@ needs = NodePath("../Animal/NeedsComponent")
 sniffer = NodePath("../Animal/Sniffer")
 state_machine = NodePath("../Animal/StateMachine")
 spawner = NodePath("../AnimalSpawner")
+
+[node name="CritterSystem" type="Node3D" parent="." node_paths=PackedStringArray("streamer", "player")]
+script = ExtResource("70_crit")
+kinds = Array[ExtResource("71_critkind")]([ExtResource("72_rabbit")])
+settings = ExtResource("73_critset")
+terrain = ExtResource("3_u18in")
+streamer = NodePath("../WorldStreamer")
+player = NodePath("../Animal")

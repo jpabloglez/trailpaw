@@ -59,3 +59,53 @@ static func spheres(
 			tool.add_vertex(centre + unit_vertices[index] * 2.0 * part.w * squash)
 	tool.generate_normals()  # unindexed: flat shading
 	return tool.commit()
+
+
+## One vertex-coloured surface of ellipsoids, flat shaded (low-poly critters). Each part is
+## [code][centre: Vector3, radii: Vector3, colour: Color][/code].
+static func ellipsoids(parts: Array, radial_segments: int = 7, rings: int = 5) -> ArrayMesh:
+	var sphere := SphereMesh.new()
+	sphere.radial_segments = radial_segments
+	sphere.rings = rings
+	var source := sphere.get_mesh_arrays()
+	var unit_vertices: PackedVector3Array = source[Mesh.ARRAY_VERTEX]
+	var unit_indices: PackedInt32Array = source[Mesh.ARRAY_INDEX]
+	var tool := SurfaceTool.new()
+	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for part: Array in parts:
+		var centre: Vector3 = part[0]
+		var radii: Vector3 = part[1]
+		tool.set_color(part[2])
+		for index in unit_indices:
+			tool.add_vertex(centre + unit_vertices[index] * 2.0 * radii)  # unit radius 0.5
+	tool.generate_normals()
+	return tool.commit()
+
+
+## A small animal facing −Z, standing on its origin (≈ its real size in metres).
+static func critter(shape: StringName) -> ArrayMesh:
+	match shape:
+		&"rabbit":
+			var fur := Color(0.56, 0.47, 0.38)
+			var dark := Color(0.42, 0.34, 0.27)
+			return ellipsoids(
+				[
+					[Vector3(0, 0.12, 0.03), Vector3(0.09, 0.085, 0.13), fur],
+					[Vector3(0, 0.1, 0.1), Vector3(0.1, 0.09, 0.08), fur],
+					[Vector3(0, 0.2, -0.1), Vector3(0.062, 0.062, 0.075), fur],
+					[Vector3(-0.03, 0.3, -0.08), Vector3(0.017, 0.075, 0.03), dark],
+					[Vector3(0.03, 0.3, -0.08), Vector3(0.017, 0.075, 0.03), dark],
+					[Vector3(0, 0.15, 0.18), Vector3(0.035, 0.035, 0.035), Color(0.95, 0.94, 0.9)],
+					[
+						Vector3(-0.042, 0.22, -0.15),
+						Vector3(0.011, 0.011, 0.011),
+						Color(0.08, 0.06, 0.05)
+					],
+					[
+						Vector3(0.042, 0.22, -0.15),
+						Vector3(0.011, 0.011, 0.011),
+						Color(0.08, 0.06, 0.05)
+					],
+				]
+			)
+	return ellipsoids([[Vector3(0, 0.1, 0), Vector3(0.1, 0.1, 0.1), Color.WHITE]])
