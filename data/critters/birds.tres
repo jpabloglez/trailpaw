@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="BirdSettings" format=3]
+
+[ext_resource type="Script" path="res://scripts/critters/bird_settings.gd" id="1_bs"]
+
+[resource]
+script = ExtResource("1_bs")
+biome_chance = Dictionary[StringName, float]({
+&"forest": 0.55,
+&"hills": 0.15,
+&"meadow": 0.35,
+&"river_valley": 0.3
+})
+flock_size = Vector2i(4, 9)
+max_birds = 60
+palette = Array[Color]([Color(0.55, 0.42, 0.3, 1), Color(0.45, 0.5, 0.62, 1), Color(0.62, 0.36, 0.26, 1), Color(0.22, 0.22, 0.24, 1), Color(0.7, 0.62, 0.3, 1)])
+perch_seconds = Vector2(12, 35)
+move_distance = Vector2(15, 40)
+flee_distance = Vector2(30, 50)
+flight_speed = 7.0
+arc_height = 6.0
+crown_spread = 0.8
+ground_spread = 2.5
+scare_radius = 7.0
+scare_speed = 2.5
+song_radius = 40.0
+song_full_count = 6

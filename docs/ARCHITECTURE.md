@@ -613,6 +613,29 @@ no AnimationTree.
 - **Budget (measured, 120 critters):** decisions + hops ≈ 0.11 ms (p95 0.19), drawing
   ≈ 0.07 ms per frame.
 
+### 7.y Birds (Phase 13)
+`BirdFlocks` (in `world.tscn` and the terrain sandbox; `data/critters/birds.tres`) works like
+the critter layer (packed arrays, one MultiMesh, chunk-driven, origin-shifted), but for flocks.
+- **Rolls:** a full-detail chunk rolls one flock of 4–9 (`BirdFlocks.roll()`, deterministic):
+  forest 55 %, meadow 35 %, valley 30 %, hills 15 %, with one plumage colour per flock from a
+  palette. At most 60 birds.
+- **Perches:** the nearest treetop within 15 m (`TerrainChunk.tree_tops()`: crown top from
+  the tree mesh's AABB × scale, birds spread over 0.8 m of crown), else a patch of dry ground
+  (2.5 m).
+- **By day** a flock moves on every 12–35 s, 15–40 m away. Each bird flies an eased arc
+  (≈ 6 m up, scaled by distance) with its own speed.
+- **The fox running (> 2.5 m/s) or jumping within 7 m** scatters the whole flock 30–50 m
+  away from it.
+- **At night** they roost: no calm moves and no song.
+- **Drawing:** `ProceduralMeshes.bird()` (≈ 20 cm; the wing vertices carry their distance from
+  the body in `UV.x`) and `shaders/bird.gdshader`. Per-instance custom data flaps the wings
+  in flight and tucks them flat when perched; the instance colour is the plumage. No shadows.
+- **Birdsong follows the birds.** `AmbienceLayer.follows_birds` (the meadow and forest bird
+  layers) multiplies the level by `BirdFlocks.presence(listener)`: perched birds within 40 m
+  of the player / 6, 0 at night. There is no birdsong without birds; the intermittent spells
+  stay.
+- **Budget:** decisions at 15 Hz; per frame one transform, custom data and colour per bird.
+
 ## 8. Environment and audio
 
 - Day/night cycle drives sun angle, sky colours and fog; temperature reacts to time of day.

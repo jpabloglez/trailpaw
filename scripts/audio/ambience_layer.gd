@@ -20,6 +20,9 @@ extends Resource
 @export var spells: Vector2 = Vector2.ZERO
 ## Seconds of silence between spells (min, max).
 @export var pauses: Vector2 = Vector2.ZERO
+## Birdsong: the level follows the birds perched near the listener ([method BirdFlocks.presence]);
+## silent with no birds around.
+@export var follows_birds: bool = false
 
 
 ## Target volume in [param biome] with [param daylight] (0 night … 1 day) and [param rain]

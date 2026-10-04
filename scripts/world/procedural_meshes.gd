@@ -109,3 +109,44 @@ static func critter(shape: StringName) -> ArrayMesh:
 				]
 			)
 	return ellipsoids([[Vector3(0, 0.1, 0), Vector3(0.1, 0.1, 0.1), Color.WHITE]])
+
+
+## A small songbird facing −Z, ≈ 20 cm long and 30 cm across the wings, standing on its origin.
+## The two wings are flat triangles whose vertices carry their distance from the body in
+## [code]UV.x[/code] (negative on the left, 0 on the body), so a shader can flap them
+## ([code]shaders/bird.gdshader[/code]).
+static func bird() -> ArrayMesh:
+	var plumage := Color(1, 1, 1)  # tinted per flock (instance colour)
+	var belly := Color(0.92, 0.88, 0.8)
+	var parts := [
+		[Vector3(0, 0.07, 0.0), Vector3(0.035, 0.035, 0.07), plumage],
+		[Vector3(0, 0.06, -0.01), Vector3(0.03, 0.028, 0.05), belly],
+		[Vector3(0, 0.1, -0.06), Vector3(0.026, 0.026, 0.028), plumage],
+		[Vector3(0, 0.098, -0.092), Vector3(0.007, 0.007, 0.014), Color(0.85, 0.65, 0.2)],
+		[Vector3(0, 0.08, 0.085), Vector3(0.02, 0.006, 0.04), plumage],
+	]
+	var sphere := SphereMesh.new()
+	sphere.radial_segments = 6
+	sphere.rings = 4
+	var source := sphere.get_mesh_arrays()
+	var unit_vertices: PackedVector3Array = source[Mesh.ARRAY_VERTEX]
+	var unit_indices: PackedInt32Array = source[Mesh.ARRAY_INDEX]
+	var tool := SurfaceTool.new()
+	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+	tool.set_uv(Vector2.ZERO)
+	for part: Array in parts:
+		tool.set_color(part[2])
+		for index in unit_indices:
+			tool.add_vertex(
+				(part[0] as Vector3) + unit_vertices[index] * 2.0 * (part[1] as Vector3)
+			)
+	tool.set_color(plumage)
+	for side: float in [-1.0, 1.0]:
+		var root_front := Vector3(0.025 * side, 0.08, -0.025)
+		var root_back := Vector3(0.025 * side, 0.08, 0.035)
+		var tip := Vector3(0.16 * side, 0.08, 0.03)
+		for corner in [root_front, tip, root_back]:
+			tool.set_uv(Vector2(absf(corner.x) * side, 0.0))
+			tool.add_vertex(corner)
+	tool.generate_normals()
+	return tool.commit()

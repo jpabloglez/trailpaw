@@ -19,6 +19,7 @@ day = Dictionary[StringName, float]({
 under_rain = 0.2
 spells = Vector2(6, 15)
 pauses = Vector2(25, 70)
+follows_birds = true
 
 [sub_resource type="Resource" id="Resource_forest"]
 script = ExtResource("2_layer")
@@ -32,6 +33,7 @@ night = Dictionary[StringName, float]({
 under_rain = 0.25
 spells = Vector2(8, 20)
 pauses = Vector2(15, 45)
+follows_birds = true
 
 [sub_resource type="Resource" id="Resource_river"]
 script = ExtResource("2_layer")

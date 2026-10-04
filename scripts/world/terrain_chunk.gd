@@ -64,6 +64,7 @@ var _since_regrow_check: float = 0.0
 var _hidden: Dictionary[StringName, Dictionary] = {}
 var _shade_buffers: Array[PackedFloat32Array] = []
 var _shade_radii := PackedFloat32Array()
+var _shade_heights := PackedFloat32Array()
 
 @onready var _mesh_instance: MeshInstance3D = %Mesh
 @onready var _collision: CollisionShape3D = %Collision
@@ -186,6 +187,22 @@ func is_shaded(local_position: Vector3) -> bool:
 			if dx * dx + dz * dz <= reach * reach:
 				return true
 	return false
+
+
+## Appends the top of every tree's crown in this chunk (global positions) to [param out]; birds
+## perch there.
+## [br][br]
+## Budget: O(trees in the chunk), called when a flock picks a perch.
+func tree_tops(out: PackedVector3Array) -> void:
+	var stride := VegetationScatterer.FLOATS_PER_INSTANCE
+	for t in _shade_buffers.size():
+		var buffer := _shade_buffers[t]
+		for o in range(0, buffer.size(), stride):
+			var scale := Vector3(buffer[o + 1], buffer[o + 5], buffer[o + 9]).length()
+			var top := Vector3(
+				buffer[o + 3], buffer[o + 7] + _shade_heights[t] * scale * 0.92, buffer[o + 11]
+			)
+			out.append(to_global(top))
 
 
 ## Whether instance [param index] of food [param id] is drawn hidden (eaten) right now.
@@ -478,6 +495,7 @@ func _show_instance(id: StringName, index: int, show: bool) -> void:
 func _apply_shade(data: ChunkData, library: VegetationLibrary) -> void:
 	_shade_buffers.clear()
 	_shade_radii.clear()
+	_shade_heights.clear()
 	if library == null:
 		return
 	for id: StringName in data.vegetation:
@@ -485,3 +503,5 @@ func _apply_shade(data: ChunkData, library: VegetationLibrary) -> void:
 		if radius > 0.0:
 			_shade_buffers.append(data.vegetation[id])
 			_shade_radii.append(radius)
+			var mesh := library.mesh_for(id)
+			_shade_heights.append(mesh.get_aabb().end.y if mesh != null else 3.0)
