@@ -39,6 +39,8 @@ clip_ground_speeds = Dictionary[String, float]({
 })
 max_animation_time_scale = 2.5
 paw_bones = PackedStringArray("FF.L", "FF.R", "FFB.L", "FFB.R")
+leg_chains = PackedStringArray("FrontUpperLeg.L>FrontLowerLeg.L>FF.L", "FrontUpperLeg.R>FrontLowerLeg.R>FF.R", "BackUpperLeg.L>BackLowerLeg.L>FFB.L", "BackUpperLeg.R>BackLowerLeg.R>FFB.R")
+head_bone = "Head"
 walk_speed = 1.2
 trot_speed = 4.0
 run_speed = 7.5

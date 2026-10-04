@@ -298,6 +298,23 @@ auto-recentre behind the animal while moving. Sensitivity and invert-Y in Settin
 head-look. Procedural foot placement using Godot's `SkeletonModifier3D`-based IK is a
 Phase 11 polish item.
 
+- **Foot planting and head-look (Phase 11)**, player only:
+  - `LegIK` is a custom `SkeletonModifier3D` doing analytical two-bone IK per leg (thigh,
+    lower leg, paw tip). The tip's place along the lower bone comes from the paw bone's rest
+    pose (`AnimalSpecies.leg_chains`, "upper>lower>paw"). It keeps the animated bend plane.
+  - `FootPlanter` (`data/player/foot_plant.tres`) casts one ray per leg per physics tick under
+    the animated tip. It moves each paw by the gap between that ground and the model's tilted
+    ground plane through the body, clamped to ±12 cm and smoothed. On flat ground or an even
+    slope the gap is 0, so the clip is untouched.
+  - `HeadLook` (`data/player/head_look.tres`) drives a `LookAtModifier3D` on
+    `AnimalSpecies.head_bone`. The forward and up axes are found from the rest pose (+Y and +Z
+    on the fox). Limits are ±60° yaw and ±30° pitch. It looks at the `Interactor`'s target,
+    else the nearest `fauna` within 8 m, else 4 m ahead, smoothing a top-level target node.
+  - Both fade their influence to 0 in the air, swimming and above trot speed.
+  - Godot 4.7's `TwoBoneIK3D` had no visible effect on this rig in tests, hence `LegIK`.
+  - Modifier results only exist during the skeleton update: read posed bones in
+    `Skeleton3D.skeleton_updated`.
+
 ### 4.5 Default input map
 
 | Action | Default |
