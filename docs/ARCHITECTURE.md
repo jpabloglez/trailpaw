@@ -63,10 +63,19 @@ singleton. Access them by their autoload name (`EventBus.some_signal`).
   loaded around the player and unloads beyond `R_UNLOAD` (hysteresis avoids thrashing).
 - Load order: nearest first, prioritised by camera direction.
 - Implementation: `WorldStreamer` (node) + `StreamingPlan` (pure decisions) +
-  `data/world/streaming_settings.tres` (load 4 / unload 5 chunks, 2 ms build budget, 4
-  worker tasks). Each `ChunkJob` owns a settings copy; the main thread reads its result only
-  after `WorkerThreadPool.wait_for_task_completion`. Stale results are discarded, chunk
+  `data/world/streaming_settings.tres` (load 4 / unload 5 chunks, 2 ms build budget, up to
+  4 worker tasks). Each `ChunkJob` owns a settings copy; the main thread reads its result
+  only after `WorkerThreadPool.wait_for_task_completion`. Stale results are discarded, chunk
   nodes are pooled, and `_exit_tree` waits for every pending task.
+- **Phase 11 tuning** (see `docs/notes/terrain-streaming-perf.md`):
+  - Tasks in flight are capped by `WorldStreamer.task_limit()` at **CPU cores − 2**, keeping
+    one core for the main thread and one for rendering. With 4 tasks on 4 cores, the OS
+    preempted the main thread for whole 4–6 ms time slices.
+  - New chunk nodes **reserve** 192 food shapes and 64 obstacle shapes (≈ 0.5 ms), so a cold
+    node's first full-detail apply creates no physics objects.
+  - Obstacles are moved with the chunk body **out of the physics space**
+    (`PhysicsServer3D.body_set_space`), as food already did with its area: worst case
+    5.5 → 0.6 ms.
 
 ### 3.2 Terrain choice (ADR-001)
 **Decision:** custom procedural chunked terrain (`ArrayMesh` built from a height function)

@@ -24,6 +24,12 @@ const MIN_LOD0_RADIUS: float = 1.5
 ## Horizontal distance from the local origin that triggers a floating-origin rebase.
 @export_range(100.0, 20000.0, 50.0, "suffix:m") var rebase_distance: float = 0.0
 
+## Food target shapes pre-created on every new chunk node (a wooded LOD 0 chunk has up to ~190),
+## so a cold node's first full-detail apply creates no physics objects.
+@export_range(0, 1024) var food_shape_reserve: int = 0
+## Tree/rock obstacle shapes pre-created on every new chunk node (up to ~50 per wooded chunk).
+@export_range(0, 256) var obstacle_reserve: int = 0
+
 
 ## Returns human-readable problems with the tunables; empty when valid.
 func get_validation_errors() -> PackedStringArray:

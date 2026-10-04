@@ -245,6 +245,35 @@ func regrow() -> void:
 		set_process(false)
 
 
+## Pre-creates up to [param food] food target shapes and [param obstacles] obstacle shapes,
+## disabled, so a later [method apply] up to those counts never creates physics objects (the
+## first apply of a cold node used to cost up to ~7 ms). Creates at most [param max_new] shapes
+## per call so the work can be spread over frames; returns whether the reserve is complete.
+## [br][br]
+## Budget: ≈ 40 µs per new shape; nothing once the reserve is complete.
+func reserve(food: int, obstacles: int, max_new: int = 1 << 30) -> bool:
+	var budget := max_new
+	if _food_owners.size() < food and budget > 0:
+		remove_child(_food_area)  # shape owners register in one go when the area comes back
+		while _food_owners.size() < food and budget > 0:
+			var owner := _food_owner(_food_owners.size())
+			_food_area.shape_owner_set_disabled(owner, true)
+			budget -= 1
+		add_child(_food_area)
+	if _obstacles.size() < obstacles and budget > 0:
+		var space := _leave_space()
+		while _obstacles.size() < obstacles and budget > 0:
+			_obstacle(_obstacles.size()).disabled = true
+			budget -= 1
+		_return_to_space(space)
+	return _food_owners.size() >= food and _obstacles.size() >= obstacles
+
+
+## Shapes created so far: [food targets, obstacles] (tests and tools).
+func reserved() -> Vector2i:
+	return Vector2i(_food_owners.size(), _obstacles.size())
+
+
 ## Clears state so the node can go back to a pool. Keeps the mesh/shape objects for reuse.
 func reset() -> void:
 	visible = false
@@ -294,6 +323,9 @@ func _apply_vegetation(data: ChunkData, library: VegetationLibrary) -> void:
 ## Upright collision cylinders for trees and large rocks, in LOD 0 chunks only (the player
 ## never walks on coarse chunks). Shape nodes and their CylinderShape3Ds are pooled.
 func _apply_obstacles(data: ChunkData, library: VegetationLibrary) -> void:
+	# Moving shapes of a body inside the physics space costs ~40 µs each (2 ms for a wooded
+	# chunk); out of the space they are registered once when the body goes back.
+	var space := _leave_space()
 	var used := 0
 	if library != null and data.lod == 0:
 		for id: StringName in data.vegetation:
@@ -314,6 +346,19 @@ func _apply_obstacles(data: ChunkData, library: VegetationLibrary) -> void:
 				node.disabled = false
 				used += 1
 	_disable_obstacles(used)
+	_return_to_space(space)
+
+
+# Takes the body (terrain + obstacles) out of the physics space, so moving its shapes skips the
+# broadphase; returns the space to give back to [method _return_to_space].
+func _leave_space() -> RID:
+	var space := PhysicsServer3D.body_get_space(_body.get_rid())
+	PhysicsServer3D.body_set_space(_body.get_rid(), RID())
+	return space
+
+
+func _return_to_space(space: RID) -> void:
+	PhysicsServer3D.body_set_space(_body.get_rid(), space)
 
 
 func _obstacle(index: int) -> CollisionShape3D:
