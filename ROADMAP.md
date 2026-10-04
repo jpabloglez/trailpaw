@@ -238,7 +238,7 @@ animals. Small animals are made in code (low-poly, procedural animation) and the
 them playfully; nothing is hunted.
 
 - [x] Herd cohesion: herds spawn whole, wander around their centre and flee together.
-- [ ] Critter layer (light simulation + MultiMesh) and rabbits.
+- [x] Critter layer (light simulation + MultiMesh) and rabbits.
 - [ ] Birds: flocks that perch, fly and scatter; birdsong follows the birds nearby.
 - [ ] Ducks on lakes and rivers.
 - [ ] Butterflies by day, fireflies at night.

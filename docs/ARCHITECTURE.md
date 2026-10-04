@@ -588,6 +588,31 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
     `move_and_slide` 0.48, alignment 0.13, brain 0.05) — under the 1.5 ms budget. The engine's
     per-body/per-skeleton work adds ≈ 1–1.5 ms of physics time on top (noisy under WSL).
 
+### 7.x Critters (Phase 13)
+Small animals live in a **critter layer**, separate from `FaunaAgent`: no nodes, no physics,
+no AnimationTree.
+- **`CritterPlan`** (pure) rolls a full-detail chunk's critters of each `CritterKind`
+  (`data/critters/<id>.tres`: biome counts, chance, hops, flee values). It is deterministic
+  from (world seed, chunk, kind), so a chunk always brings back the same ones.
+- **`CritterSystem`** (in `world.tscn` and the terrain sandbox, `data/critters/system.tres`):
+  - Keeps every critter in packed arrays: kind, chunk, home, hop from/to/progress/length/
+    height, state (IDLE / HOP / FLEE), timer, yaw, scale, zig-zag sign. Removal swaps with the
+    last entry, written out per array, because packed arrays are values in GDScript.
+  - Decides at 30 Hz (beyond 60 m, every 3rd tick) and animates hops every frame: a parabola
+    between ground heights from the `HeightSampler`, so there are no rays.
+  - Draws one `MultiMeshInstance3D` per kind with a vertex-coloured, flat-shaded mesh built
+    in code (`ProceduralMeshes.critter()` / `ellipsoids()`).
+  - Follows `WorldStreamer.chunks_changed` (full-detail chunks) and `EventBus.origin_shifted`.
+  - Cap: 120.
+- **Rabbits:** meadow (1–3 per hosting chunk) and hills (1–2), 45 % of chunks. They graze
+  with short hops around home.
+  - **The fox running at one** (within 7 m, moving faster than 2 m/s, or bumping into it
+    within 1.5 m) makes it **flee**: 1.4 m zig-zag hops away for ≥ 6 s, after which it
+    calms down where it is.
+  - Hops never land in water or on slopes steeper than 35°.
+- **Budget (measured, 120 critters):** decisions + hops ≈ 0.11 ms (p95 0.19), drawing
+  ≈ 0.07 ms per frame.
+
 ## 8. Environment and audio
 
 - Day/night cycle drives sun angle, sky colours and fog; temperature reacts to time of day.

@@ -34,6 +34,10 @@
 [ext_resource type="Script" path="res://scripts/audio/ui_sounds.gd" id="53_ui"]
 [ext_resource type="Resource" path="res://data/audio/ui_sounds.tres" id="54_uiset"]
 [ext_resource type="Script" path="res://scripts/world/animal_spawner.gd" id="55_spawn"]
+[ext_resource type="Script" path="res://scripts/critters/critter_system.gd" id="70_crit"]
+[ext_resource type="Script" path="res://scripts/critters/critter_kind.gd" id="71_critkind"]
+[ext_resource type="Resource" path="res://data/critters/rabbit.tres" id="72_rabbit"]
+[ext_resource type="Resource" path="res://data/critters/system.tres" id="73_critset"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_k7oal"]
 
@@ -150,3 +154,11 @@ sniffer = NodePath("../Animal/Sniffer")
 script = ExtResource("55_spawn")
 animal = NodePath("../Animal")
 streamer = NodePath("../WorldStreamer")
+
+[node name="CritterSystem" type="Node3D" parent="." node_paths=PackedStringArray("streamer", "player")]
+script = ExtResource("70_crit")
+kinds = Array[ExtResource("71_critkind")]([ExtResource("72_rabbit")])
+settings = ExtResource("73_critset")
+terrain = ExtResource("3_u18in")
+streamer = NodePath("../WorldStreamer")
+player = NodePath("../Animal")
