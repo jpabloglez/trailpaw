@@ -6,16 +6,25 @@ GL-on-D3D12 layer with the Compatibility renderer.
 
 ## Running the probe on Windows
 
-From PowerShell (the game window opens and flies on its own for about 4 minutes, then
-closes):
+**With the release build (preferred: it is what players run).** Unzip the `trailpaw-windows`
+artifact (or a Release) and, from PowerShell in that folder:
 
 ```powershell
-$godot = "C:\Godot\Godot_v4.7.1-stable_win64_console.exe"
+.\Trailpaw.exe -- --perf-probe
+```
+
+**Or with the editor's Godot** and the project folder:
+
+```powershell
+$godot = "C:\Users\juanp\Downloads\Godot_v4.7.1-stable_win64.exe\Godot_v4.7.1-stable_win64_console.exe"
 & $godot --path C:\Users\juanp\Juegos\trailpaw res://scenes/debug/perf_probe.tscn
 ```
 
-Options after `--`: `--distance=3600` (m), `--speed=15` (m/s), `--preset=low|medium|high`,
-`--out=user://perf/name.csv`. Leave the PC otherwise idle while it runs.
+The window opens, waits for the first area to load, flies on its own for about 4 minutes and
+closes. Options after `--`: `--distance=3600` (m), `--speed=15` (m/s),
+`--preset=low|medium|high`, `--out=user://perf/name.csv`. Leave the PC otherwise idle while it
+runs. (Release builds cannot open a scene given on the command line, hence the game's own
+`--perf-probe` flag, handled by `GameFlow`.)
 
 The CSV is written to `%APPDATA%\Godot\app_userdata\Trailpaw\perf\` (seen from WSL as
 `/mnt/c/Users/juanp/AppData/Roaming/Godot/app_userdata/Trailpaw/perf/`).

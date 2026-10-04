@@ -236,3 +236,10 @@ func test_the_world_is_swapped_behind_a_black_screen() -> void:
 	assert_bool(flow.is_playing()).is_true()
 	await get_tree().create_timer(ScreenFade.SECONDS + 0.1).timeout
 	assert_float(flow.screen_fade().opacity()).is_equal_approx(0.0, 0.01)  # and back
+
+
+func test_the_perf_probe_flag_is_recognised() -> void:
+	assert_bool(GameFlow.wants_perf_probe(PackedStringArray(["--perf-probe"]))).is_true()
+	assert_bool(GameFlow.wants_perf_probe(PackedStringArray(["--distance=300"]))).is_false()
+	assert_bool(GameFlow.wants_perf_probe(PackedStringArray())).is_false()
+	assert_bool(ResourceLoader.exists(GameFlow.PERF_PROBE_SCENE)).is_true()
