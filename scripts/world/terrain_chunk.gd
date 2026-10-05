@@ -31,6 +31,8 @@ const FOOD_SHAPE_LIFT: float = 0.15
 const REGROW_CHECK_INTERVAL: float = 1.0
 ## Bits of a food key holding the instance index (the rest is the food slot).
 const FOOD_INDEX_BITS: int = 16
+## Vegetation that grows at the water ([method spots] [code]&"water_plant"[/code]).
+const WATER_PLANTS: Array[StringName] = [&"reeds", &"cattails", &"water_lily", &"water_lily_flower"]
 
 ## Grid coordinate of the data currently applied (absolute).
 var coord: Vector2i = Vector2i.ZERO
@@ -66,6 +68,7 @@ var _shade_buffers: Array[PackedFloat32Array] = []
 var _shade_radii := PackedFloat32Array()
 var _shade_heights := PackedFloat32Array()
 var _flower_buffers: Array[PackedFloat32Array] = []
+var _water_plant_buffers: Array[PackedFloat32Array] = []
 
 @onready var _mesh_instance: MeshInstance3D = %Mesh
 @onready var _collision: CollisionShape3D = %Collision
@@ -191,15 +194,16 @@ func is_shaded(local_position: Vector3) -> bool:
 
 
 ## Appends spots of [param kind] in this chunk (global positions) to [param out]:
-## [code]&"tree_top"[/code], the top of every tree's crown (birds perch there), or
-## [code]&"flower"[/code], every flower (butterflies visit them).
+## [code]&"tree_top"[/code], the top of every tree's crown (birds perch there),
+## [code]&"flower"[/code], every flower (butterflies visit them), or
+## [code]&"water_plant"[/code], every reed, cattail and water lily (dragonflies dart over them).
 ## [br][br]
-## Budget: O(trees or flowers in the chunk); called when a flock picks a perch, or a couple of
-## times per second for flowers.
+## Budget: O(trees, flowers or water plants in the chunk); called when a flock picks a perch,
+## or a couple of times per second for flowers and water plants.
 func spots(kind: StringName, out: PackedVector3Array) -> void:
 	var stride := VegetationScatterer.FLOATS_PER_INSTANCE
-	if kind == &"flower":
-		for buffer in _flower_buffers:
+	if kind == &"flower" or kind == &"water_plant":
+		for buffer in _flower_buffers if kind == &"flower" else _water_plant_buffers:
 			for o in range(0, buffer.size(), stride):
 				out.append(to_global(Vector3(buffer[o + 3], buffer[o + 7], buffer[o + 11])))
 		return
@@ -314,6 +318,7 @@ func reset() -> void:
 ## One reused MultiMeshInstance3D per type: the buffer is copied as-is from the worker.
 func _apply_vegetation(data: ChunkData, library: VegetationLibrary) -> void:
 	_flower_buffers.clear()
+	_water_plant_buffers.clear()
 	for node: MultiMeshInstance3D in _vegetation.values():
 		node.visible = false
 	if library == null:
@@ -341,6 +346,8 @@ func _apply_vegetation(data: ChunkData, library: VegetationLibrary) -> void:
 			_vegetation[id] = node
 		if String(id).begins_with("flower"):
 			_flower_buffers.append(buffer)  # a reference, not a copy
+		elif WATER_PLANTS.has(id):
+			_water_plant_buffers.append(buffer)
 		var count := buffer.size() / VegetationScatterer.FLOATS_PER_INSTANCE
 		if node.multimesh.instance_count != count:
 			node.multimesh.instance_count = count
