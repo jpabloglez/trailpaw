@@ -258,7 +258,7 @@ A water biome (user decision: wetlands, after the river valley; ADR-006).
 - [x] Reeds, cattails and water lilies (aquatic placement).
 - [x] Frogs (banks, diving in) and the frog chorus at night (CC0 audio).
 - [x] Herons and dragonflies.
-- [ ] Morning mist over the wetland.
+- [x] Morning mist over the wetland.
 
 **Tests:** wetland water coverage and depth; band order with five biomes; old saves land
 safely; aquatic plants only at their depths; frogs dive and return; mist only at dawn there.

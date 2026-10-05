@@ -11,6 +11,8 @@ extends Resource
 @export_range(0.0, 2.0, 0.05) var vegetation_density: float = 0.0
 ## Dust puffs and water splashes ([MotionEffects]).
 @export var motion_effects: bool = true
+## How thick the morning mist gets ([Mist]; 1 = as designed).
+@export_range(0.0, 1.0, 0.05) var mist: float = 1.0
 
 
 ## Returns human-readable problems with the data; empty when valid.

@@ -48,6 +48,8 @@
 [ext_resource type="Script" path="res://scripts/critters/flitters.gd" id="77_bflies"]
 [ext_resource type="Resource" path="res://data/critters/butterflies.tres" id="80_bkind"]
 [ext_resource type="Resource" path="res://data/critters/dragonflies.tres" id="81_dkind"]
+[ext_resource type="Script" path="res://scripts/world/mist.gd" id="83_mist"]
+[ext_resource type="Resource" path="res://data/world/mist.tres" id="84_mistset"]
 [ext_resource type="Script" path="res://scripts/critters/fireflies.gd" id="78_ffly"]
 [ext_resource type="Resource" path="res://data/critters/small_life.tres" id="79_small"]
 
@@ -210,3 +212,11 @@ script = ExtResource("78_ffly")
 settings = ExtResource("79_small")
 player = NodePath("../Animal")
 day_night = NodePath("../DayNightCycle")
+
+[node name="Mist" type="Node" parent="." node_paths=PackedStringArray("world_environment", "day_night", "player")]
+script = ExtResource("83_mist")
+settings = ExtResource("84_mistset")
+terrain = ExtResource("3_u18in")
+world_environment = NodePath("../WorldEnvironment")
+day_night = NodePath("../DayNightCycle")
+player = NodePath("../Animal")
