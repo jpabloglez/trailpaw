@@ -748,6 +748,19 @@ the critter layer (packed arrays, one MultiMesh, chunk-driven, origin-shifted), 
   pure `DayCurve` (linear, seamless across midnight). Nights are moonlit and readable
   (ambient luminance ≥ 0.2, user choice); fog takes the horizon colour and covers 35 % of the
   sky, so the streaming edge still dissolves.
+- **Morning mist (Phase 14):** `Mist` (both sandboxes; `data/world/mist.tres`,
+  `MistSettings`) closes the environment's depth fog in from 90–200 m to **12–70 m** and pales
+  it, from 10 Hz updates.
+  - **Strength** = hour × biomes at the player × `QualityPreset.mist` (Low 0.6):
+    - hour: rising from 4:30, full 5:30–8:00, gone by 9:30
+    - biomes: wetland 1, valley 0.35, through the resolver's blend, so it fades in over the
+      150 m border
+  - It eases towards that target (0.35 per second), so a clock jump or a border fades rather
+    than switching.
+  - The fog distances are interpolated from the environment's own values (captured at start),
+    so with no mist the fog is exactly as before.
+  - The colour is mixed in by `DayNightCycle` (`mist_color`, `mist_amount` = strength × 0.6),
+    so the two never fight over `fog_light_color`.
 - Weather states (clear, cloudy, rain) with GPU particles; rain boosts cooling, reduces thirst.
 - **Implemented (Phase 9):** `WeatherModel` (pure Markov chain, one state per game-hour slot,
   seeded per (world seed, slot) so the same time brings the same weather; never rain straight

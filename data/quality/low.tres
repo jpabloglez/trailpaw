@@ -8,3 +8,4 @@ id = &"low"
 display_name = "Low"
 vegetation_density = 0.4
 motion_effects = false
+mist = 0.6

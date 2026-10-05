@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="MistSettings" format=3]
+
+[ext_resource type="Script" path="res://scripts/world/mist_settings.gd" id="1_mist"]
+
+[resource]
+script = ExtResource("1_mist")
+biomes = Dictionary[StringName, float]({
+&"river_valley": 0.35,
+&"wetland": 1.0
+})
+key_hours = PackedFloat32Array(4.5, 5.5, 8, 9.5)
+amount = PackedFloat32Array(0, 1, 1, 0)
+depth_begin = 12.0
+depth_end = 70.0
+color = Color(0.85, 0.87, 0.88, 1)
+color_mix = 0.6
+response = 0.35

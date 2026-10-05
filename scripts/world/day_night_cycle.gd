@@ -29,6 +29,10 @@ const SUN_MIN_ENERGY: float = 0.02
 var cloud_cover: float = 0.0
 ## Fraction of the sunlight that gets through the clouds (set by the weather; 1 = clear).
 var sunlight_factor: float = 1.0
+## Colour mixed into the fog by [member mist_amount] (set by the [Mist]).
+var mist_color := Color.WHITE
+## How much of [member mist_color] the fog takes (0 = the day/night colour alone).
+var mist_amount: float = 0.0
 
 var _moon: DirectionalLight3D
 var _sky_material: ShaderMaterial
@@ -82,7 +86,8 @@ func apply_hour(hour: float) -> void:
 	var environment := world_environment.environment
 	environment.ambient_light_color = DayCurve.sample_color(keys, s.ambient_color, hour)
 	environment.ambient_light_energy = DayCurve.sample(keys, s.ambient_energy, hour)
-	environment.fog_light_color = DayCurve.sample_color(keys, s.fog_color, hour)
+	var fog := DayCurve.sample_color(keys, s.fog_color, hour)
+	environment.fog_light_color = fog.lerp(mist_color, mist_amount)
 	var top := DayCurve.sample_color(keys, s.sky_top, hour)
 	var horizon := DayCurve.sample_color(keys, s.sky_horizon, hour)
 	_sky_material.set_shader_parameter(&"top_color", top)
