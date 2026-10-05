@@ -61,6 +61,10 @@ Every third-party asset in `assets/` must be listed here (see CLAUDE.md §1).
 | `water_3` | `assets/audio/footsteps/water_3.ogg` | rubberduck, *40 CC0 water / splash / slime SFX* (`splash_04`, OpenGameArt) | CC0 1.0 | https://opengameart.org/content/40-cc0-water-splash-slime-sfx |
 | `water_4` | `assets/audio/footsteps/water_4.ogg` | rubberduck, *40 CC0 water / splash / slime SFX* (`splash_05`, OpenGameArt) | CC0 1.0 | https://opengameart.org/content/40-cc0-water-splash-slime-sfx |
 | `donkey_bray` | `assets/audio/animals/donkey_bray.ogg` | StarNinjas, *Donkey Bray* (OpenGameArt) | CC0 1.0 | https://opengameart.org/content/donkey-bray |
+| `frog_01` | `assets/audio/animals/frog_01.wav` | EZduzziteh, *Ribbit Frog Sounds* (OpenGameArt; ribbit_01.mp3, trimmed and normalised to −3 dB, mono 22 050 Hz) | CC0 1.0 | https://opengameart.org/content/ribbit-frog-sounds |
+| `frog_02` | `assets/audio/animals/frog_02.wav` | EZduzziteh, *Ribbit Frog Sounds* (OpenGameArt; ribbit_02.mp3, trimmed and normalised to −3 dB, mono 22 050 Hz) | CC0 1.0 | https://opengameart.org/content/ribbit-frog-sounds |
+| `frog_03` | `assets/audio/animals/frog_03.wav` | EZduzziteh, *Ribbit Frog Sounds* (OpenGameArt; ribbit_03.mp3, trimmed and normalised to −3 dB, mono 22 050 Hz) | CC0 1.0 | https://opengameart.org/content/ribbit-frog-sounds |
+| `frog_chorus` | `assets/audio/ambience/frog_chorus.wav` | Built from `frog_01`–`frog_03` above with `tools/frog_chorus.py` (seed 14, 20 s, 50 calls in bouts, pitch 0.85–1.2×, distance filtering) | CC0 1.0 | https://opengameart.org/content/ribbit-frog-sounds |
 | `pluck_002` | `assets/audio/ui/pluck_002.ogg` | Kenney (kenney.nl), Interface Sounds | CC0 1.0 | https://kenney.nl/assets/interface-sounds |
 | `glass_002` | `assets/audio/ui/glass_002.ogg` | Kenney (kenney.nl), Interface Sounds | CC0 1.0 | https://kenney.nl/assets/interface-sounds |
 | `drop_002` | `assets/audio/ui/drop_002.ogg` | Kenney (kenney.nl), Interface Sounds | CC0 1.0 | https://kenney.nl/assets/interface-sounds |

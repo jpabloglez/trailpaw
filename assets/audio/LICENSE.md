@@ -10,7 +10,11 @@ listed in `assets/CREDITS.md`.
   small.
 - Footsteps: Kenney *Impact Sounds* (grass and concrete steps; licence text in
   `footsteps/Kenney_License.txt`) and rubberduck's *40 CC0 water / splash / slime SFX* for wading.
-- Animals: StarNinjas' *Donkey Bray* (OpenGameArt, CC0). The Shiba Inu's "yip" is synthesised in
+- Animals: StarNinjas' *Donkey Bray* (OpenGameArt, CC0). Frogs: EZduzziteh's *Ribbit Frog Sounds*
+  (OpenGameArt, CC0), three croaks trimmed and normalised (the originals peak at 1–4 % of full
+  scale). Their pulsed structure (17–27 pulses per call, 420–590 Hz) is that of real frog calls,
+  not a voice imitation. The night chorus (`ambience/frog_chorus.wav`) is built from these single croaks by
+  `tools/frog_chorus.py`. The Shiba Inu's "yip" is synthesised in
   code (`SynthSounds.yip()`); deer, stags, horses and alpacas are quiet (no CC0 calls found that
   fit, and they rarely vocalise). A CC0 dog "montage" was discarded: it could not be auditioned
   to rule out human voices.

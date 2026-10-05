@@ -8,6 +8,7 @@
 [ext_resource type="AudioStream" path="res://assets/audio/ambience/wind.wav" id="6_wind"]
 [ext_resource type="AudioStream" path="res://assets/audio/ambience/night_crickets.mp3" id="7_crickets"]
 [ext_resource type="AudioStream" path="res://assets/audio/ambience/rain.ogg" id="8_rain"]
+[ext_resource type="AudioStream" path="res://assets/audio/ambience/frog_chorus.wav" id="9_frogs"]
 
 [sub_resource type="Resource" id="Resource_meadow"]
 script = ExtResource("2_layer")
@@ -41,13 +42,24 @@ script = ExtResource("2_layer")
 stream = ExtResource("5_river")
 day = Dictionary[StringName, float]({
 &"river_valley": 0.5,
-&"wetland": 0.3
+&"wetland": 0.18
 })
 night = Dictionary[StringName, float]({
 &"river_valley": 0.45,
-&"wetland": 0.25
+&"wetland": 0.15
 })
 under_rain = 0.8
+
+[sub_resource type="Resource" id="Resource_frogs"]
+script = ExtResource("2_layer")
+stream = ExtResource("9_frogs")
+day = Dictionary[StringName, float]({
+&"wetland": 0.04
+})
+night = Dictionary[StringName, float]({
+&"river_valley": 0.12,
+&"wetland": 0.4
+})
 
 [sub_resource type="Resource" id="Resource_wind"]
 script = ExtResource("2_layer")
@@ -88,6 +100,6 @@ rain_volume = 0.6
 
 [resource]
 script = ExtResource("1_amb")
-layers = Array[ExtResource("2_layer")]([SubResource("Resource_meadow"), SubResource("Resource_forest"), SubResource("Resource_river"), SubResource("Resource_wind"), SubResource("Resource_crickets"), SubResource("Resource_rain")])
+layers = Array[ExtResource("2_layer")]([SubResource("Resource_meadow"), SubResource("Resource_forest"), SubResource("Resource_river"), SubResource("Resource_wind"), SubResource("Resource_crickets"), SubResource("Resource_rain"), SubResource("Resource_frogs")])
 fade_seconds = 3.0
 bus = &"Ambience"

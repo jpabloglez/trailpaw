@@ -12,14 +12,15 @@ const CENTRE_TRIES: int = 12
 
 ## Absolute X/Z positions of the [param kind] critters of chunk [param coord] in biome
 ## [param biome_id] (empty when the chunk hosts none). With [param accept], the group's centre
-## is the first of [constant CENTRE_TRIES] deterministic candidates it accepts (none: empty).
+## is the first of [param tries] deterministic candidates it accepts (none: empty).
 static func roll(
 	coord: Vector2i,
 	chunk_size: float,
 	biome_id: StringName,
 	kind: CritterKind,
 	world_seed: int,
-	accept: Callable = Callable()
+	accept: Callable = Callable(),
+	tries: int = CENTRE_TRIES
 ) -> PackedVector2Array:
 	var out := PackedVector2Array()
 	if not kind.biome_counts.has(biome_id) or kind.chance <= 0.0:
@@ -33,7 +34,7 @@ static func roll(
 	var count := rng.randi_range(counts.x, counts.y)
 	var margin := minf(kind.group_spread, chunk_size * 0.4)
 	var centre := Vector2.INF
-	for attempt in CENTRE_TRIES:
+	for attempt in tries:
 		var candidate := (
 			Vector2(coord) * chunk_size
 			+ Vector2(
