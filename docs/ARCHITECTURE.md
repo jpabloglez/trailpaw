@@ -644,6 +644,30 @@ no AnimationTree.
   - **A running fox makes them flee** across the water (3 m in 1 s, zig-zag 20°) with a
     splash: `MotionEffects.make_emitter()`, a pool of 3, off on Low.
   - Every move must land on water deep enough, so they never leave it.
+- **Frogs (Phase 14)** are `CritterKind.behaviour = &"amphibian"` (`data/critters/frog.tres`,
+  mesh in code): wetland (3–5) and river valley (1–3), 75 % of the chunks that have banks.
+  - **A bank** is ground from 5 cm under the water up to `bank_height` (0.4 m) above it,
+    gentle, with water ≥ `min_depth` (10 cm) within 2 m. That rule holds for spawning, every
+    hop and resurfacing.
+  - The group centre is the first of **24** candidates (`CritterPlan.roll(…, tries)`) that is
+    a bank. The group spreads within 2 m and grazes within 1.5 m of home.
+  - **Rolled one chunk per tick**, after the other kinds: finding banks takes ≈ 0.4 ms per
+    chunk (≤ 1.3 ms). A row of chunks turning full-detail at once would otherwise cost
+    ~2 ms in one frame; this way frogs appear < 0.2 s after their chunk.
+  - **Scared** (the same running-fox rule):
+    - the frog leaps (`State.DIVE`) into water deep enough within 2.5 m, looking in 12
+      directions starting straight away from the fox
+    - on landing: a **plop** (`SynthSounds.plop()`, an `AudioStreamPlayer3D` on SFX) and a
+      splash
+    - it stays under the water (`State.UNDER`, not drawn) for 4–8 s
+    - it comes back up on a bank 1.5–8 m away, out of the fox's reach if it can (else at
+      least twice its startle distance)
+    - no water within reach: it flees on land like a rabbit
+  - **The chorus** (`assets/audio/ambience/frog_chorus.wav`) is an ambience layer: wetland
+    0.4 at night (0.04 by day), valley 0.12 at night. It is built by `tools/frog_chorus.py`
+    from three CC0 croaks: 50 calls in bouts over a 20 s seamless loop, each pitched 0.85–1.2×
+    and filtered by distance.
+  - The wetland's water layer is the river's, quieter (0.18 / 0.15).
 
 ### 7.y Birds (Phase 13)
 `BirdFlocks` (in `world.tscn` and the terrain sandbox; `data/critters/birds.tres`) works like

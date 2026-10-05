@@ -7,9 +7,14 @@ extends Resource
 @export var id: StringName = &""
 ## Mesh built in code ([method ProceduralMeshes.critter]).
 @export var shape: StringName = &""
-## How it moves: [code]&"hopper"[/code] (on dry ground, in hops) or [code]&"swimmer"[/code] (on
-## the water surface, gliding; never leaves the water).
+## How it moves: [code]&"hopper"[/code] (on dry ground, in hops), [code]&"swimmer"[/code] (on
+## the water surface, gliding; never leaves the water) or [code]&"amphibian"[/code] (on the
+## banks; dives into the water when scared and comes back up on a nearby bank).
 @export var behaviour: StringName = &"hopper"
+## Amphibians live on ground up to this high above the water (m).
+@export_range(0.0, 5.0, 0.05, "suffix:m") var bank_height: float = 0.8
+## Amphibians stay under water this long after diving (min, max, s).
+@export var dive_seconds: Vector2 = Vector2(4.0, 8.0)
 ## Swimmers only use water at least this deep (m).
 @export_range(0.0, 5.0, 0.05, "suffix:m") var min_depth: float = 0.4
 ## Biome id → how many in a chunk that hosts them (min, max).

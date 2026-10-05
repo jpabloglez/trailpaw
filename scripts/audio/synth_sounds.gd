@@ -7,6 +7,7 @@ extends RefCounted
 const RATE: int = 22050
 
 static var _yip: AudioStreamWAV
+static var _plop: AudioStreamWAV
 
 
 ## A small dog's friendly "yip": two quick chirps gliding down (~0.25 s). Synthesised once
@@ -15,6 +16,30 @@ static func yip() -> AudioStreamWAV:
 	if _yip == null:
 		_yip = _make_yip()
 	return _yip
+
+
+## A small "plop" of something dropping into water (a frog diving): a bubble's resonance
+## rising quickly and dying away (~0.15 s). Synthesised once and shared.
+static func plop() -> AudioStreamWAV:
+	if _plop == null:
+		_plop = _make_plop()
+	return _plop
+
+
+static func _make_plop() -> AudioStreamWAV:
+	var samples := PackedFloat32Array()
+	var length := int(RATE * 0.15)
+	var phase := 0.0
+	var noise := RandomNumberGenerator.new()
+	noise.seed = 7
+	for i in length:
+		var t := float(i) / RATE
+		var frequency := 320.0 + 900.0 * (1.0 - exp(-t * 28.0))
+		phase += TAU * frequency / RATE
+		var envelope := exp(-t * 22.0) * minf(1.0, t * 900.0)
+		var splash := noise.randf_range(-1.0, 1.0) * exp(-t * 60.0) * 0.25
+		samples.append((sin(phase) * envelope + splash) * 0.6)
+	return to_wav(samples)
 
 
 static func _make_yip() -> AudioStreamWAV:

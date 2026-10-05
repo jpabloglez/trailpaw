@@ -11,15 +11,24 @@ extends Node3D
 ## then calm down where they are. Ground heights come from the [HeightSampler] (no rays, no
 ## physics bodies); hops never land in water or on steep ground. Swimmers (ducks) live on the
 ## water surface instead: they glide, bob, and flee across the water with a splash, never
-## leaving it.
+## leaving it. Amphibians (frogs) live on the banks; scared, they leap into water deep enough
+## nearby with a plop, stay under (hidden) for a few seconds and come back up on a bank a few
+## metres away, out of the fox's reach.
 ## [br][br]
 ## Budget: decisions at [member CritterSettings.sim_hz] (critters beyond
-## [member CritterSettings.far_distance] every 3rd tick), ≤ 2 height samples per hop; each frame
+## [member CritterSettings.far_distance] every 3rd tick), ≤ 2 height samples per hop (≤ 15 for
+## an amphibian, which also looks for water nearby; ≤ 36 when it dives); each frame
 ## one transform per critter. ≤ 1 ms for 120 critters (measured in tests). Arrays grow only
 ## when critters spawn.
 
-## Critter states.
-enum State { IDLE, HOP, FLEE }
+## Critter states ([constant DIVE]: leaping into the water; [constant UNDER]: under it, hidden).
+enum State { IDLE, HOP, FLEE, DIVE, UNDER }
+
+## Directions a scared amphibian looks for water in (radians from straight away from the fox,
+## nearest first; 12 around).
+const DIVE_TURNS: Array[float] = [
+	0.0, 0.52, -0.52, 1.05, -1.05, 1.57, -1.57, 2.09, -2.09, 2.62, -2.62, PI
+]
 
 ## Kinds that live in this world.
 @export var kinds: Array[CritterKind] = []
@@ -34,12 +43,15 @@ enum State { IDLE, HOP, FLEE }
 
 ## Splashes made so far (tests and tools).
 var splashes: int = 0
+## Plops (an amphibian reaching the water) so far (tests and tools).
+var plops: int = 0
 
 var _sampler: HeightSampler
 var _sampler_seed: int = -1
 var _resolver: BiomeResolver
 var _rng := RandomNumberGenerator.new()
 var _rolled: Dictionary[Vector2i, bool] = {}
+var _pending: Array[Vector2i] = []  # chunks whose amphibians are still to roll (1 per tick)
 var _since_tick: float = 0.0
 var _tick_count: int = 0
 var _player_previous := Vector3.INF
@@ -63,6 +75,7 @@ var _meshes: Array[MultiMeshInstance3D] = []
 var _splashes: Array[GPUParticles3D] = []
 var _next_splash: int = 0
 var _time: float = 0.0
+var _plop: AudioStreamPlayer3D
 
 
 func _ready() -> void:
@@ -83,12 +96,20 @@ func _ready() -> void:
 		add_child(node)
 		_meshes.append(node)
 	_counts.resize(kinds.size())
-	if kinds.any(func(kind: CritterKind) -> bool: return kind.behaviour == &"swimmer"):
+	var wet := func(kind: CritterKind) -> bool: return kind.behaviour != &"hopper"
+	if kinds.any(wet):
 		for i in 3:
 			var splash := MotionEffects.make_emitter(12, 0.8)
 			splash.top_level = true
 			add_child(splash)
 			_splashes.append(splash)
+	if kinds.any(func(kind: CritterKind) -> bool: return kind.behaviour == &"amphibian"):
+		_plop = AudioStreamPlayer3D.new()
+		_plop.stream = SynthSounds.plop()
+		_plop.bus = &"SFX"
+		_plop.unit_size = 3.0
+		_plop.top_level = true
+		add_child(_plop)
 	EventBus.origin_shifted.connect(_on_origin_shifted)
 	if streamer != null:
 		streamer.chunks_changed.connect(sync_from_streamer)
@@ -131,27 +152,42 @@ func sync(lod0_coords: Array[Vector2i]) -> void:
 	for coord: Vector2i in _rolled.keys():
 		if not available.has(coord):
 			_rolled.erase(coord)  # rolls again (identically) when it comes back
+			_pending.erase(coord)
 	for coord in lod0_coords:
 		if _rolled.has(coord):
 			continue
 		_rolled[coord] = true
-		var biome := _biome_at(coord)
-		for k in kinds.size():
-			var accept := Callable()
-			if kinds[k].behaviour == &"swimmer":
-				accept = _deep_water.bind(kinds[k])
-			var spots := CritterPlan.roll(
-				coord, terrain.chunk_size, biome, kinds[k], GameState.world_seed, accept
-			)
-			for xz in spots:
-				if _kind.size() >= settings.max_total:
-					return
-				_spawn(k, coord, xz)
+		_roll(coord, false)
+		_pending.append(coord)
 
 
-## One decision tick ([param elapsed] seconds since the last one): fleeing, next hops.
+# Spawns the critters of chunk [param coord]: the amphibians (whose banks take many height
+# samples to find, ≈ 0.4 ms a chunk) or every other kind.
+func _roll(coord: Vector2i, amphibians: bool) -> void:
+	var biome := _biome_at(coord)
+	for k in kinds.size():
+		if (kinds[k].behaviour == &"amphibian") != amphibians:
+			continue
+		var accept := Callable()
+		if kinds[k].behaviour != &"hopper":
+			accept = _livable.bind(kinds[k])
+		# Banks are a narrow strip: amphibians look harder for a group centre.
+		var tries := 24 if amphibians else CritterPlan.CENTRE_TRIES
+		var spots := CritterPlan.roll(
+			coord, terrain.chunk_size, biome, kinds[k], GameState.world_seed, accept, tries
+		)
+		for xz in spots:
+			if _kind.size() >= settings.max_total:
+				return
+			_spawn(k, coord, xz)
+
+
+## One decision tick ([param elapsed] seconds since the last one): one chunk's amphibians
+## spawn (they are rolled after the others, spread over ticks), then fleeing, next hops.
 func tick(elapsed: float) -> void:
 	_tick_count += 1
+	if not _pending.is_empty():
+		_roll(_pending.pop_front(), true)
 	var focus := _player()
 	var at := focus.global_position if focus != null else Vector3.INF
 	if focus != null and _player_previous != Vector3.INF and elapsed > 0.0:
@@ -165,6 +201,8 @@ func tick(elapsed: float) -> void:
 			continue
 		var kind := kinds[_kind[i]]
 		_timer[i] -= elapsed * (3.0 if distance > settings.far_distance else 1.0)
+		if kind.behaviour == &"amphibian" and _amphibian_tick(i, kind, distance, at):
+			continue
 		if focus != null and _scared(kind, distance):
 			if _state[i] != State.FLEE:
 				_state[i] = State.FLEE
@@ -200,6 +238,8 @@ func draw() -> void:
 	for i in _kind.size():
 		var k := _kind[i]
 		var basis := Basis(Vector3.UP, _yaw[i]).scaled(Vector3.ONE * _scale[i])
+		if _state[i] == State.UNDER:
+			continue  # under the water: not drawn
 		var at := _position(i)
 		if kinds[k].behaviour == &"swimmer":
 			at.y += sin(_time * 1.8 + _scale[i] * 40.0) * 0.012  # bobbing on the water
@@ -348,6 +388,86 @@ func _hop(i: int, from: Vector3, to: Vector3, hop: Vector3, kind: CritterKind) -
 	return true
 
 
+# Amphibian decisions that differ from a hopper's (true when they replace the rest of the
+# tick): landing in the water, coming back up, and diving instead of fleeing on land.
+func _amphibian_tick(i: int, kind: CritterKind, distance: float, threat: Vector3) -> bool:
+	match _state[i]:
+		State.DIVE:
+			if _t[i] >= 1.0:
+				_plop_at(_to[i])
+				_state[i] = State.UNDER
+				_timer[i] = _rng.randf_range(kind.dive_seconds.x, kind.dive_seconds.y)
+			return true
+		State.UNDER:
+			if _timer[i] <= 0.0:
+				_resurface(i, kind, threat)
+			return true
+	if _state[i] != State.FLEE and _scared(kind, distance):
+		return _dive(i, kind, threat)
+	return false
+
+
+# Leaps into water at least [member CritterKind.min_depth] deep within 2.5 m, preferring
+# directions away from [param threat]; false when there is none (it flees on land). ≤ 36
+# height samples, only when scared.
+func _dive(i: int, kind: CritterKind, threat: Vector3) -> bool:
+	if is_inf(GameState.water_level):
+		return false
+	var from := _to[i]
+	var away := Vector3(from.x - threat.x, 0.0, from.z - threat.z)
+	if away.length_squared() < 1e-6:
+		away = Vector3(sin(_yaw[i]), 0.0, cos(_yaw[i]))
+	away = away.normalized()
+	for turn: float in DIVE_TURNS:
+		var direction := away.rotated(Vector3.UP, turn)
+		for reach: float in [0.8, 1.6, 2.5]:
+			var spot := from + direction * reach
+			if _ground(spot) > GameState.water_level - kind.min_depth:
+				continue
+			_from[i] = from
+			_to[i] = Vector3(spot.x, GameState.water_level, spot.z)
+			_t[i] = 0.0
+			_hop_seconds[i] = kind.flee_hop.z * maxf(1.0, reach / kind.flee_hop.x)
+			_hop_height[i] = kind.flee_hop.y
+			_yaw[i] = atan2(-direction.x, -direction.z)
+			_state[i] = State.DIVE
+			return true
+	return false
+
+
+# Comes back up on a bank 1.5–8 m from where it dived, out of the fox's reach
+# ([member CritterKind.flee_radius]) if it can, else at least out of startling distance; stays
+# under a little longer when no bank is found. ≤ 12 height samples, once per dive.
+func _resurface(i: int, kind: CritterKind, threat: Vector3) -> void:
+	var under := _to[i]
+	for attempt in 12:
+		var angle := _rng.randf() * TAU
+		var spot := under + Vector3(cos(angle), 0.0, sin(angle)) * _rng.randf_range(1.5, 8.0)
+		spot.y = _ground(spot)
+		if not _valid_spot(spot, kind):
+			continue
+		var clear := kind.flee_radius if attempt < 8 else kind.startle_radius * 2.0
+		if Vector2(spot.x - threat.x, spot.z - threat.z).length() < clear:
+			continue
+		_from[i] = spot
+		_to[i] = spot
+		_home[i] = spot
+		_t[i] = 1.0
+		_state[i] = State.IDLE
+		_timer[i] = _rng.randf_range(kind.idle_seconds.x, kind.idle_seconds.y)
+		return
+	_timer[i] = 1.0
+
+
+func _plop_at(at: Vector3) -> void:
+	plops += 1
+	_splash(at)
+	if _plop != null and _plop.is_inside_tree():
+		_plop.global_position = at
+		_plop.pitch_scale = _rng.randf_range(0.85, 1.2)
+		_plop.play()
+
+
 # Where a critter of [param kind] at [param local] sits: the ground, or the water surface.
 func _surface(local: Vector3, kind: CritterKind) -> float:
 	if kind.behaviour == &"swimmer":
@@ -361,12 +481,33 @@ func _valid_spot(local: Vector3, kind: CritterKind) -> bool:
 			not is_inf(GameState.water_level)
 			and (_ground(local) <= GameState.water_level - kind.min_depth)
 		)
+	if kind.behaviour == &"amphibian":  # a bank: from the waterline up to bank_height
+		if is_inf(GameState.water_level):
+			return false
+		var height := local.y - GameState.water_level
+		if height < -0.05 or height > kind.bank_height or not _gentle(local, kind):
+			return false
+		return _water_near(local, kind)
 	return _dry_and_gentle(local, kind)
 
 
-# Whether absolute X/Z [param xz] is water deep enough for [param kind] (group centres).
-func _deep_water(xz: Vector2, kind: CritterKind) -> bool:
+# Whether water deep enough to dive into ([member CritterKind.min_depth]) is within 2 m of
+# [param local] (6 directions × 2 distances: ≤ 12 height samples, stopping at the first).
+func _water_near(local: Vector3, kind: CritterKind) -> bool:
+	for reach: float in [1.0, 2.0]:
+		for d in 6:
+			var angle := d * TAU / 6.0 + reach
+			var spot := local + Vector3(cos(angle), 0.0, sin(angle)) * reach
+			if _ground(spot) <= GameState.water_level - kind.min_depth:
+				return true
+	return false
+
+
+# Whether absolute X/Z [param xz] is a place [param kind] lives (water deep enough for a
+# swimmer, a bank for an amphibian): group centres.
+func _livable(xz: Vector2, kind: CritterKind) -> bool:
 	var local := GameState.local_position(Vector3(xz.x, 0.0, xz.y))
+	local.y = _surface(local, kind)
 	return _valid_spot(local, kind)
 
 
@@ -385,6 +526,10 @@ func _splash(at: Vector3) -> void:
 func _dry_and_gentle(local: Vector3, kind: CritterKind) -> bool:
 	if not is_inf(GameState.water_level) and local.y < GameState.water_level + 0.1:
 		return false
+	return _gentle(local, kind)
+
+
+func _gentle(local: Vector3, kind: CritterKind) -> bool:
 	var ahead := _ground(local + Vector3(0.5, 0.0, 0.0))
 	var side := _ground(local + Vector3(0.0, 0.0, 0.5))
 	var slope := atan(Vector2(ahead - local.y, side - local.y).length() / 0.5)
