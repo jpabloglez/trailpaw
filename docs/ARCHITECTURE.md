@@ -668,6 +668,17 @@ no AnimationTree.
     from three CC0 croaks: 50 calls in bouts over a 20 s seamless loop, each pitched 0.85–1.2×
     and filtered by distance.
   - The wetland's water layer is the river's, quieter (0.18 / 0.15).
+- **Herons (Phase 14)** are `CritterKind.behaviour = &"wader"` (`data/critters/heron.tres`,
+  mesh in code, ≈ 1 m tall): wetland (1–2) and valley (1), 30 % of chunks with shallow water.
+  - They stand in water 5–40 cm deep (`wade_depth`), on the bed, and take slow 35 cm steps
+    every 4–12 s around home.
+  - **Scared** (within 12 m and the fox faster than 1.5 m/s, or within 5 m): they **fly**
+    (`flee_hop` is the flight): ~20 m (0.5–1.4×), 4 m high, 3.5 s, to shallow water. They
+    look in 12 directions starting straight away from the fox, splash on take-off, and wade a
+    step away if no landing is found.
+  - Wings: the heron's MultiMesh uses `shaders/bird.gdshader` with custom data, so the wings
+    are folded along the body while wading and beat slowly (7 rad/s) in flight
+    (`CritterSystem.is_flying()`).
 
 ### 7.y Birds (Phase 13)
 `BirdFlocks` (in `world.tscn` and the terrain sandbox; `data/critters/birds.tres`) works like
@@ -692,10 +703,13 @@ the critter layer (packed arrays, one MultiMesh, chunk-driven, origin-shifted), 
   stay.
 - **Budget:** decisions at 15 Hz; per frame one transform, custom data and colour per bird.
 
-### 7.z Butterflies and fireflies (Phase 13)
-Values in `data/critters/small_life.tres` (`SmallLifeSettings`).
-- **`Butterflies`** (by day, in the meadow, valley and hills): up to 14 around the player, one
-  per 6 flowers within 22 m.
+### 7.z Butterflies, dragonflies and fireflies (Phases 13–14)
+- **`Flitters`** (one node per `FlitterKind`; `data/critters/butterflies.tres`,
+  `dragonflies.tres`): small fliers around the player, each visiting a chunk spot
+  (`FlitterKind.spots`), by day or at night, in their biomes. Phase 14 generalised the Phase
+  13 `Butterflies` into it, with butterfly behaviour unchanged.
+- **Butterflies** (by day, in the meadow, valley, hills and wetland): up to 14 around the
+  player, one per 6 flowers within 22 m.
   - Flowers come from the full-detail chunks (`TerrainChunk.spots(&"flower")`; the chunk
     keeps references to its flower buffers, not copies) twice a second.
   - Each flits in a wobbly loop ≈ 0.75 m above its flower and moves on to a nearby one every
@@ -703,12 +717,20 @@ Values in `data/critters/small_life.tres` (`SmallLifeSettings`).
   - The fox moving faster than 2.5 m/s within 2.5 m scatters them up and away for 1.5 s.
   - Drawing: `ProceduralMeshes.butterfly()` (≈ 9 cm, drawn at 1.6×; wings marked in `UV.x`)
     with the bird shader at a faster beat; colour per butterfly from a palette.
-- **`Fireflies`** (a `GPUParticles3D` following the player): at night in the forest and the
-  river valley.
+- **Dragonflies** (by day, in the valley and the wetland): up to 10, one per 10 water plants
+  within 22 m.
+  - Spots: `TerrainChunk.spots(&"water_plant")`, i.e. every reed, cattail and water lily
+    (`TerrainChunk.WATER_PLANTS`).
+  - They **dart** (`FlitterKind.darts`): hover still for 0.5–1.8 s, then dash at 5 m/s to a
+    new point within 1.6 m of the spot, 0.4–0.8 m up. They move on every ~8 s.
+  - Drawing: `ProceduralMeshes.dragonfly()` (≈ 7 cm, drawn at 2.4×: a long body tinted
+    blue/green/red, four pale narrow wings at a fast, shallow beat). They face where they go.
+- **`Fireflies`** (a `GPUParticles3D` following the player; `data/critters/small_life.tres`,
+  `SmallLifeSettings`): at night in the forest, the river valley and the wetland.
   - 60 additive soft dots drift on turbulence in a 28 × 2 × 28 m box, with a pulsing alpha.
   - `amount_ratio` follows the darkness (the sky's stars).
   - No CPU work beyond positioning the box.
-- Both are off on the Low preset (`QualityPreset.motion_effects`).
+- All are off on the Low preset (`QualityPreset.motion_effects`).
 
 ## 8. Environment and audio
 

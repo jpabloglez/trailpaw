@@ -97,6 +97,8 @@ static func ellipsoids(parts: Array, radial_segments: int = 7, rings: int = 5) -
 ## A small animal facing −Z, standing on its origin (≈ its real size in metres).
 static func critter(shape: StringName) -> ArrayMesh:
 	match shape:
+		&"heron":
+			return _heron()
 		&"rabbit":
 			var fur := Color(0.56, 0.47, 0.38)
 			var dark := Color(0.42, 0.34, 0.27)
@@ -216,6 +218,89 @@ static func butterfly() -> ArrayMesh:
 			[Vector3(0.004, 0, -0.002), Vector3(0.036, 0, 0.012), Vector3(0.006, 0, 0.026)],
 		]
 		for wing: Array in wings:
+			for corner: Vector3 in wing:
+				var point := Vector3(corner.x * side, corner.y, corner.z)
+				tool.set_uv(Vector2(absf(point.x) * side, 0.0))
+				tool.add_vertex(point)
+	tool.generate_normals()
+	return tool.commit()
+
+
+# A grey heron ≈ 1 m tall, facing −Z, standing on its origin on long legs, its neck in an S.
+# The wings (≈ 1.5 m across) carry their distance from the body in UV.x like the bird's, so
+# shaders/bird.gdshader folds them along the body or beats them in flight.
+static func _heron() -> ArrayMesh:
+	var grey := Color(0.56, 0.59, 0.63)
+	var pale := Color(0.86, 0.87, 0.86)
+	var dark := Color(0.15, 0.15, 0.17)
+	var parts := [
+		[Vector3(0, 0.64, 0.02), Vector3(0.09, 0.1, 0.2), grey],
+		[Vector3(0, 0.6, 0.0), Vector3(0.075, 0.08, 0.16), pale],
+		[Vector3(0, 0.62, 0.23), Vector3(0.06, 0.03, 0.07), grey],
+		[Vector3(0, 0.78, -0.13), Vector3(0.035, 0.09, 0.035), pale],
+		[Vector3(0, 0.9, -0.16), Vector3(0.03, 0.07, 0.03), pale],
+		[Vector3(0, 0.97, -0.19), Vector3(0.04, 0.035, 0.05), pale],
+		[Vector3(0, 0.99, -0.16), Vector3(0.014, 0.012, 0.055), dark],
+		[Vector3(0, 0.965, -0.28), Vector3(0.011, 0.011, 0.07), Color(0.86, 0.7, 0.3)],
+		[Vector3(-0.035, 0.27, 0.03), Vector3(0.012, 0.27, 0.012), Color(0.45, 0.4, 0.3)],
+		[Vector3(0.035, 0.27, 0.03), Vector3(0.012, 0.27, 0.012), Color(0.45, 0.4, 0.3)],
+	]
+	var sphere := SphereMesh.new()
+	sphere.radial_segments = 7
+	sphere.rings = 5
+	var source := sphere.get_mesh_arrays()
+	var unit_vertices: PackedVector3Array = source[Mesh.ARRAY_VERTEX]
+	var unit_indices: PackedInt32Array = source[Mesh.ARRAY_INDEX]
+	var tool := SurfaceTool.new()
+	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+	tool.set_uv(Vector2.ZERO)
+	for part: Array in parts:
+		tool.set_color(part[2])
+		for index in unit_indices:
+			tool.add_vertex(
+				(part[0] as Vector3) + unit_vertices[index] * 2.0 * (part[1] as Vector3)
+			)
+	tool.set_color(Color(0.5, 0.53, 0.58))
+	for side: float in [-1.0, 1.0]:
+		for corner: Vector3 in [
+			Vector3(0.07 * side, 0.7, -0.1),
+			Vector3(0.75 * side, 0.7, 0.14),
+			Vector3(0.07 * side, 0.7, 0.18),
+		]:
+			tool.set_uv(Vector2(absf(corner.x) * side, 0.0))
+			tool.add_vertex(corner)
+	tool.generate_normals()
+	return tool.commit()
+
+
+## A dragonfly ≈ 7 cm long and 9 cm across, facing −Z, centred on its origin: a long slim body
+## (tinted by the instance colour) and two pairs of narrow, pale wings whose vertices carry their
+## distance from the body in [code]UV.x[/code], so [code]shaders/bird.gdshader[/code] beats them.
+static func dragonfly() -> ArrayMesh:
+	var tool := SurfaceTool.new()
+	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var sphere := SphereMesh.new()
+	sphere.radial_segments = 5
+	sphere.rings = 3
+	var source := sphere.get_mesh_arrays()
+	var unit_vertices: PackedVector3Array = source[Mesh.ARRAY_VERTEX]
+	tool.set_uv(Vector2.ZERO)
+	tool.set_color(Color.WHITE)
+	for part: Array in [
+		[Vector3(0, 0, -0.022), Vector3(0.006, 0.006, 0.008)],  # head
+		[Vector3(0, 0, -0.01), Vector3(0.005, 0.005, 0.012)],  # thorax
+		[Vector3(0, 0, 0.018), Vector3(0.0025, 0.0025, 0.03)],  # abdomen
+	]:
+		for index: int in source[Mesh.ARRAY_INDEX]:
+			tool.add_vertex(
+				(part[0] as Vector3) + unit_vertices[index] * 2.0 * (part[1] as Vector3)
+			)
+	tool.set_color(Color(0.86, 0.92, 0.96))
+	for side: float in [-1.0, 1.0]:
+		for wing: Array in [
+			[Vector3(0.003, 0, -0.014), Vector3(0.046, 0, -0.016), Vector3(0.044, 0, -0.006)],
+			[Vector3(0.003, 0, -0.006), Vector3(0.042, 0, -0.002), Vector3(0.04, 0, 0.007)],
+		]:
 			for corner: Vector3 in wing:
 				var point := Vector3(corner.x * side, corner.y, corner.z)
 				tool.set_uv(Vector2(absf(point.x) * side, 0.0))

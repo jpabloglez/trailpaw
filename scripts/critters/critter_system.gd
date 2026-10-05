@@ -13,7 +13,9 @@ extends Node3D
 ## water surface instead: they glide, bob, and flee across the water with a splash, never
 ## leaving it. Amphibians (frogs) live on the banks; scared, they leap into water deep enough
 ## nearby with a plop, stay under (hidden) for a few seconds and come back up on a bank a few
-## metres away, out of the fox's reach.
+## metres away, out of the fox's reach. Waders (herons) step slowly through shallow water;
+## scared, they fly off ([member CritterKind.flee_hop] is the flight, wings beating in
+## [code]shaders/bird.gdshader[/code]) to shallow water farther away.
 ## [br][br]
 ## Budget: decisions at [member CritterSettings.sim_hz] (critters beyond
 ## [member CritterSettings.far_distance] every 3rd tick), ≤ 2 height samples per hop (≤ 15 for
@@ -86,13 +88,25 @@ func _ready() -> void:
 		var multimesh := MultiMesh.new()
 		multimesh.transform_format = MultiMesh.TRANSFORM_3D
 		multimesh.mesh = ProceduralMeshes.critter(kind.shape)
+		# The bird shader reads a wing beat (custom data) and a tint (colour): set before the count.
+		multimesh.use_custom_data = kind.behaviour == &"wader"
+		multimesh.use_colors = kind.behaviour == &"wader"
 		multimesh.instance_count = settings.max_total
 		multimesh.visible_instance_count = 0
 		node.multimesh = multimesh
-		var material := StandardMaterial3D.new()
-		material.vertex_color_use_as_albedo = true
-		material.roughness = 0.9
-		node.material_override = material
+		if kind.behaviour == &"wader":  # wings folded while wading, beating in flight
+			var wings := ShaderMaterial.new()
+			wings.shader = preload("res://shaders/bird.gdshader")
+			wings.set_shader_parameter(&"flap_rate", 7.0)
+			wings.set_shader_parameter(&"flap_angle", 0.8)
+			wings.set_shader_parameter(&"tuck", 0.05)
+			wings.set_shader_parameter(&"shoulder", Vector2(0.07, 0.7))
+			node.material_override = wings
+		else:
+			var material := StandardMaterial3D.new()
+			material.vertex_color_use_as_albedo = true
+			material.roughness = 0.9
+			node.material_override = material
 		add_child(node)
 		_meshes.append(node)
 	_counts.resize(kinds.size())
@@ -244,6 +258,12 @@ func draw() -> void:
 		if kinds[k].behaviour == &"swimmer":
 			at.y += sin(_time * 1.8 + _scale[i] * 40.0) * 0.012  # bobbing on the water
 		_meshes[k].multimesh.set_instance_transform(_counts[k], Transform3D(basis, at))
+		if kinds[k].behaviour == &"wader":
+			var flying := 1.0 if is_flying(i) else 0.0
+			_meshes[k].multimesh.set_instance_custom_data(
+				_counts[k], Color(flying, _scale[i] * 40.0, 0.0, 0.0)
+			)
+			_meshes[k].multimesh.set_instance_color(_counts[k], Color.WHITE)
 		_counts[k] += 1
 	for k in kinds.size():
 		_meshes[k].multimesh.visible_instance_count = _counts[k]
@@ -268,6 +288,17 @@ func position_of(i: int) -> Vector3:
 ## State of critter [param i] (a [enum State] value).
 func state_of(i: int) -> int:
 	return _state[i]
+
+
+## Whether critter [param i] is a wader in flight (not just wading a step away).
+func is_flying(i: int) -> bool:
+	var kind := kinds[_kind[i]]
+	return (
+		kind.behaviour == &"wader"
+		and _state[i] == State.FLEE
+		and _t[i] < 1.0
+		and _hop_height[i] >= kind.flee_hop.y * 0.5
+	)
 
 
 ## Lines for the F3 overlay.
@@ -359,6 +390,9 @@ func _graze_hop(i: int, kind: CritterKind) -> void:
 
 
 func _flee_hop(i: int, kind: CritterKind, threat: Vector3) -> void:
+	if kind.behaviour == &"wader":
+		_fly(i, kind, threat)
+		return
 	var from := _to[i]
 	var away := Vector3(from.x - threat.x, 0.0, from.z - threat.z)
 	if away.length_squared() < 1e-6:
@@ -435,6 +469,26 @@ func _dive(i: int, kind: CritterKind, threat: Vector3) -> bool:
 	return false
 
 
+# Flies off to shallow water about [member CritterKind.flee_hop] [code]x[/code] metres away,
+# preferring directions away from [param threat], with a splash as it takes off; when none is
+# found it wades a step away instead. ≤ 48 height samples, only when scared.
+func _fly(i: int, kind: CritterKind, threat: Vector3) -> void:
+	var from := _to[i]
+	var away := Vector3(from.x - threat.x, 0.0, from.z - threat.z)
+	if away.length_squared() < 1e-6:
+		away = Vector3(sin(_yaw[i]), 0.0, cos(_yaw[i]))
+	away = away.normalized()
+	for turn: float in DIVE_TURNS:
+		var direction := away.rotated(Vector3.UP, turn)
+		for reach: float in [1.0, 0.7, 1.4, 0.5]:
+			if _hop(i, from, from + direction * kind.flee_hop.x * reach, kind.flee_hop, kind):
+				_splash(from)
+				return
+	var step := away * kind.graze_hop.x
+	if not _hop(i, from, from + step, kind.graze_hop, kind):
+		_t[i] = 1.0
+
+
 # Comes back up on a bank 1.5–8 m from where it dived, out of the fox's reach
 # ([member CritterKind.flee_radius]) if it can, else at least out of startling distance; stays
 # under a little longer when no bank is found. ≤ 12 height samples, once per dive.
@@ -476,19 +530,31 @@ func _surface(local: Vector3, kind: CritterKind) -> float:
 
 
 func _valid_spot(local: Vector3, kind: CritterKind) -> bool:
-	if kind.behaviour == &"swimmer":
-		return (
-			not is_inf(GameState.water_level)
-			and (_ground(local) <= GameState.water_level - kind.min_depth)
-		)
-	if kind.behaviour == &"amphibian":  # a bank: from the waterline up to bank_height
-		if is_inf(GameState.water_level):
-			return false
-		var height := local.y - GameState.water_level
-		if height < -0.05 or height > kind.bank_height or not _gentle(local, kind):
-			return false
-		return _water_near(local, kind)
-	return _dry_and_gentle(local, kind)
+	if kind.behaviour == &"hopper":
+		return _dry_and_gentle(local, kind)
+	if is_inf(GameState.water_level):
+		return false  # every other kind needs water
+	match kind.behaviour:
+		&"swimmer":
+			return _ground(local) <= GameState.water_level - kind.min_depth
+		&"wader":
+			return _wading(local, kind)
+	return _on_a_bank(local, kind)
+
+
+# Standing in shallow water ([member CritterKind.wade_depth]) on a gentle bed.
+func _wading(local: Vector3, kind: CritterKind) -> bool:
+	var depth := GameState.water_level - local.y
+	return depth >= kind.wade_depth.x and depth <= kind.wade_depth.y and _gentle(local, kind)
+
+
+# A bank: from just under the waterline up to [member CritterKind.bank_height], gentle, with
+# water to dive into nearby.
+func _on_a_bank(local: Vector3, kind: CritterKind) -> bool:
+	var height := local.y - GameState.water_level
+	if height < -0.05 or height > kind.bank_height or not _gentle(local, kind):
+		return false
+	return _water_near(local, kind)
 
 
 # Whether water deep enough to dive into ([member CritterKind.min_depth]) is within 2 m of

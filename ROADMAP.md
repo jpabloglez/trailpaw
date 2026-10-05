@@ -257,7 +257,7 @@ A water biome (user decision: wetlands, after the river valley; ADR-006).
 - [x] The wetland band: shallow pools, channels and islets; every biome list knows it.
 - [x] Reeds, cattails and water lilies (aquatic placement).
 - [x] Frogs (banks, diving in) and the frog chorus at night (CC0 audio).
-- [ ] Herons and dragonflies.
+- [x] Herons and dragonflies.
 - [ ] Morning mist over the wetland.
 
 **Tests:** wetland water coverage and depth; band order with five biomes; old saves land

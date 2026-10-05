@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="CritterKind" format=3]
+
+[ext_resource type="Script" path="res://scripts/critters/critter_kind.gd" id="1_ck"]
+
+[resource]
+script = ExtResource("1_ck")
+id = &"heron"
+shape = &"heron"
+behaviour = &"wader"
+wade_depth = Vector2(0.05, 0.4)
+biome_counts = Dictionary[StringName, Vector2i]({
+&"river_valley": Vector2i(1, 1),
+&"wetland": Vector2i(1, 2)
+})
+chance = 0.3
+scale_range = Vector2(0.9, 1.05)
+group_spread = 12.0
+home_radius = 5.0
+idle_seconds = Vector2(4, 12)
+graze_hop = Vector3(0.35, 0.03, 0.9)
+flee_hop = Vector3(20, 4, 3.5)
+zigzag = 0.0
+max_slope = 30.0
+flee_radius = 12.0
+flee_trigger_speed = 1.5
+startle_radius = 5.0
+calm_seconds = 2.0
