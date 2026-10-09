@@ -7,7 +7,8 @@ extends Node
 ## [br][br]
 ## Budget: [member JournalSettings.check_hz] checks per second; each looks only at entries not
 ## yet seen, with a distance test (and a frustum test when close) per animal of their system —
-## ≈ 10 agents, 120 critters, 60 birds and 24 fliers at most; no allocations. Measured in the
+## ≈ 10 agents, 120 critters (plus a few dozen in the trees), 60 birds and 24 fliers at most;
+## no allocations. Measured in the
 ## world at the spawn with nothing met yet (the worst case): p50 0.07 ms, p99 0.23 ms per check.
 
 ## Entries and what counts as an encounter.
@@ -17,6 +18,7 @@ extends Node
 ## Where the animals are (each optional).
 @export var fauna: FaunaDirector
 @export var critters: CritterSystem
+@export var tree_life: TreeLife
 @export var birds: BirdFlocks
 @export var flitters: Array[Flitters] = []
 @export var fireflies: Fireflies
@@ -75,11 +77,13 @@ func _sees(entry: JournalEntry, at: Vector3, eye: Camera3D) -> bool:
 					):
 						return true
 		JournalEntry.Source.CRITTER:
-			if critters != null:
-				for i in critters.count():
-					if critters.kind_of(i) != entry.animal or not critters.is_shown(i):
+			for system: Node3D in [critters, tree_life]:  # the same interface
+				if system == null:
+					continue
+				for i in system.count():
+					if system.kind_of(i) != entry.animal or not system.is_shown(i):
 						continue
-					if _in_view(critters.to_global(critters.position_of(i)), at, reach, eye):
+					if _in_view(system.to_global(system.position_of(i)), at, reach, eye):
 						return true
 		JournalEntry.Source.BIRD:
 			if birds != null and birds.settings == entry.animal:

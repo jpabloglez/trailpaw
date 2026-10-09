@@ -99,6 +99,26 @@ static func critter(shape: StringName) -> ArrayMesh:
 	match shape:
 		&"heron":
 			return _heron()
+		&"owl":
+			return _owl()
+		&"squirrel":
+			var fur := Color(0.62, 0.33, 0.16)
+			var belly := Color(0.86, 0.72, 0.55)
+			var dark := Color(0.06, 0.04, 0.03)
+			return ellipsoids(
+				[
+					[Vector3(0, 0.07, 0.0), Vector3(0.045, 0.05, 0.075), fur],
+					[Vector3(0, 0.06, -0.02), Vector3(0.035, 0.04, 0.05), belly],
+					[Vector3(0, 0.11, -0.07), Vector3(0.035, 0.034, 0.04), fur],
+					[Vector3(-0.018, 0.145, -0.07), Vector3(0.008, 0.016, 0.008), fur],
+					[Vector3(0.018, 0.145, -0.07), Vector3(0.008, 0.016, 0.008), fur],
+					[Vector3(-0.02, 0.12, -0.1), Vector3(0.006, 0.006, 0.006), dark],
+					[Vector3(0.02, 0.12, -0.1), Vector3(0.006, 0.006, 0.006), dark],
+					[Vector3(0, 0.1, 0.09), Vector3(0.035, 0.05, 0.04), fur],  # the tail, curled up
+					[Vector3(0, 0.17, 0.07), Vector3(0.04, 0.05, 0.035), fur],
+					[Vector3(0, 0.2, 0.03), Vector3(0.03, 0.03, 0.03), fur],
+				]
+			)
 		&"hedgehog":
 			var spines := Color(0.33, 0.27, 0.22)
 			var tips := Color(0.62, 0.55, 0.45)
@@ -265,6 +285,52 @@ static func butterfly() -> ArrayMesh:
 				var point := Vector3(corner.x * side, corner.y, corner.z)
 				tool.set_uv(Vector2(absf(point.x) * side, 0.0))
 				tool.add_vertex(point)
+	tool.generate_normals()
+	return tool.commit()
+
+
+# A tawny owl ≈ 35 cm tall, facing −Z, perching on its origin: a round body, a big head with a
+# pale facial disc and dark eyes. Its wings (≈ 0.8 m across) carry their distance from the body
+# in UV.x, like the heron's, so shaders/bird.gdshader folds or beats them.
+static func _owl() -> ArrayMesh:
+	var brown := Color(0.48, 0.34, 0.22)
+	var pale := Color(0.82, 0.72, 0.58)
+	var dark := Color(0.05, 0.04, 0.03)
+	var parts := [
+		[Vector3(0, 0.13, 0.0), Vector3(0.09, 0.12, 0.08), brown],
+		[Vector3(0, 0.11, -0.03), Vector3(0.07, 0.09, 0.06), pale],
+		[Vector3(0, 0.27, -0.01), Vector3(0.085, 0.075, 0.075), brown],
+		[Vector3(0, 0.265, -0.05), Vector3(0.065, 0.055, 0.035), pale],
+		[Vector3(-0.025, 0.275, -0.08), Vector3(0.014, 0.014, 0.01), dark],
+		[Vector3(0.025, 0.275, -0.08), Vector3(0.014, 0.014, 0.01), dark],
+		[Vector3(0, 0.25, -0.085), Vector3(0.008, 0.012, 0.01), Color(0.75, 0.62, 0.3)],
+		[Vector3(-0.03, 0.01, -0.02), Vector3(0.015, 0.012, 0.025), Color(0.6, 0.55, 0.4)],
+		[Vector3(0.03, 0.01, -0.02), Vector3(0.015, 0.012, 0.025), Color(0.6, 0.55, 0.4)],
+	]
+	var sphere := SphereMesh.new()
+	sphere.radial_segments = 7
+	sphere.rings = 5
+	var source := sphere.get_mesh_arrays()
+	var unit_vertices: PackedVector3Array = source[Mesh.ARRAY_VERTEX]
+	var unit_indices: PackedInt32Array = source[Mesh.ARRAY_INDEX]
+	var tool := SurfaceTool.new()
+	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+	tool.set_uv(Vector2.ZERO)
+	for part: Array in parts:
+		tool.set_color(part[2])
+		for index in unit_indices:
+			tool.add_vertex(
+				(part[0] as Vector3) + unit_vertices[index] * 2.0 * (part[1] as Vector3)
+			)
+	tool.set_color(Color(0.42, 0.3, 0.2))
+	for side: float in [-1.0, 1.0]:
+		for corner: Vector3 in [
+			Vector3(0.06 * side, 0.22, -0.05),
+			Vector3(0.4 * side, 0.2, 0.06),
+			Vector3(0.06 * side, 0.22, 0.09),
+		]:
+			tool.set_uv(Vector2(absf(corner.x) * side, 0.0))
+			tool.add_vertex(corner)
 	tool.generate_normals()
 	return tool.commit()
 

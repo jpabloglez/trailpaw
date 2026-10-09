@@ -292,7 +292,7 @@ and four small animals built in code. Farm animals wait for the villages (Phase 
 
 - [x] The wolf (forest and hills, shy, rare).
 - [x] Hedgehogs at night and leaping fish.
-- [ ] Squirrels and owls in the trees.
+- [x] Squirrels and owls in the trees.
 
 **Tests:** every new animal has its journal entry; night animals only at night; fish hidden
 except while leaping; tree dwellers spawn by trees, climb or fly off when scared.

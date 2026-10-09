@@ -62,6 +62,8 @@ func test_every_animal_of_the_world_has_exactly_one_entry() -> void:
 				animals.append(fauna.species)
 	for kind: Resource in _scene_value("CritterSystem", "kinds"):  # rabbits, ducks, frogs...
 		animals.append(kind)
+	for kind: Resource in _scene_value("TreeLife", "kinds"):  # squirrels and owls
+		animals.append(kind)
 	animals.append(_scene_value("BirdFlocks", "settings"))
 	animals.append(_scene_value("Butterflies", "kind"))
 	animals.append(_scene_value("Dragonflies", "kind"))

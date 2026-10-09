@@ -9,6 +9,7 @@ const RATE: int = 22050
 static var _yip: AudioStreamWAV
 static var _plop: AudioStreamWAV
 static var _chime: AudioStreamWAV
+static var _hoot: AudioStreamWAV
 
 
 ## A small dog's friendly "yip": two quick chirps gliding down (~0.25 s). Synthesised once
@@ -25,6 +26,34 @@ static func plop() -> AudioStreamWAV:
 	if _plop == null:
 		_plop = _make_plop()
 	return _plop
+
+
+## An owl's hoot: a soft, breathy "hoo… hoo-hoo-hoo" around 400 Hz, gliding down at the end of
+## each note (~1.6 s). Synthesised once and shared.
+static func hoot() -> AudioStreamWAV:
+	if _hoot == null:
+		_hoot = _make_hoot()
+	return _hoot
+
+
+static func _make_hoot() -> AudioStreamWAV:
+	var samples := PackedFloat32Array()
+	samples.resize(int(RATE * 1.6))
+	samples.fill(0.0)
+	var breath := RandomNumberGenerator.new()
+	breath.seed = 11
+	for note: Array in [[0.0, 0.42], [0.75, 0.16], [0.97, 0.16], [1.18, 0.34]]:
+		var start := int(RATE * float(note[0]))
+		var length := int(RATE * float(note[1]))
+		var phase := 0.0
+		for n in length:
+			var t := float(n) / length
+			phase += TAU * lerpf(420.0, 380.0, t * t) / RATE
+			var envelope := sin(PI * minf(1.0, t * 1.15)) * (1.0 - 0.3 * t)
+			var tone := sin(phase) + 0.15 * sin(phase * 2.0) + breath.randf_range(-0.08, 0.08)
+			if start + n < samples.size():
+				samples[start + n] += tone * envelope * 0.5
+	return to_wav(samples)
 
 
 ## A soft two-note chime (a new animal in the journal): bell-like tones, a fifth apart, that

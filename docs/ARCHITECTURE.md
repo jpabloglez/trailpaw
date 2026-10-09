@@ -705,6 +705,32 @@ no AnimationTree.
     at each end, and lands only in deep water. The fox doesn't scare them.
   - The journal needs only 0.3 s of a leap (`JournalEntry.sight_seconds`).
 
+- **Tree life (Phase 15b):** `TreeLife` (in both world scenes; `data/critters/squirrel.tres`,
+  `owl.tres`) keeps the critters that live in trees. It uses packed arrays and a MultiMesh per
+  kind like `CritterSystem`, and has the same `count` / `position_of` / `kind_of` /
+  `is_shown` interface, so the journal reads both.
+  - When a chunk turns full detail, its trees (`tree_source`, by default
+    `TerrainChunk.spots(&"tree_top")`) are read **once**. A seeded roll per (world, chunk,
+    kind) picks which trees host each kind (`biome_counts`, `chance`). Hours as for critters.
+  - **Squirrels** (`climber`; forest 1–3, 55 % of chunks, out 7:00–19:30):
+    - they forage in hops within 2.5 m of their tree's foot
+    - scared (startle 2.5 m, or the fox running within 7 m), they **dash up the trunk and
+      cling to it under the crown** (45 % of the tree's height, 18 cm off its axis)
+    - they come down 6 s after the fox has gone
+  - **Owls** (`percher`; forest and valley, 1 per hosting chunk, 30 %, out 20:00–5:30):
+    - they sit on the crown's **real top**: `perch_point()` lifts the top spot, which is at
+      92 % of the tree's height
+    - they turn their head every 2–5 s and **hoot** (`SynthSounds.hoot()`, positional) every
+      20–45 s when the player is within 60 m
+    - scared (startle 5 m, or the fox running within 10 m), they **fly** (3 m arc, 2.5 s) to
+      the loaded tree top closest to 20 m away, wings beating in the bird shader
+  - Journal entries: squirrel (sight 8 m) and owl (12 m). 19 animals in all.
+  - **Budget:**
+    - Each tree's foot height is sampled once, at spawn: the first version sampled it every
+      tick for every squirrel, 0.45 ms per tick for 76 critters.
+    - Critters beyond `far_distance` are updated every third tick.
+    - Measured: 0.063 ms p50 per tick for 76 tree critters in a 7×7 forest.
+
 ### 7.y Birds (Phase 13)
 `BirdFlocks` (in `world.tscn` and the terrain sandbox; `data/critters/birds.tres`) works like
 the critter layer (packed arrays, one MultiMesh, chunk-driven, origin-shifted), but for flocks.
