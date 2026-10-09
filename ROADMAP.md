@@ -24,6 +24,7 @@ Claude Code; one sprint = 2 weeks.
 | 14 | Wetlands | 2 | 48 w |
 | 15 | Animal journal | 1 | 49 w |
 | 15b | More animals (wolf, hedgehog, fish, squirrel, owl) | 1 | 50 w |
+| 16 | Rural hamlets | 2 | 52 w |
 
 Milestones: **M1 "Walk the world"** (end of Phase 3), **M2 "A day in the life"**
 (end of Phase 7), **M3 "Living world"** (end of Phase 10), **M4 Vertical slice** (Phase 12).
@@ -297,6 +298,25 @@ and four small animals built in code. Farm animals wait for the villages (Phase 
 **Tests:** every new animal has its journal entry; night animals only at night; fish hidden
 except while leaping; tree dwellers spawn by trees, climb or fly off when scared.
 **Exit:** the world feels busier, by day and especially at night.
+
+---
+
+## Phase 16 — Rural hamlets
+
+Sparse hamlets to watch from a distance and visit carefully (user decisions: cautious villagers
+who shoo the fox when it comes close; rare hamlets on flat, dry meadow or hills ground; food
+with a risk). ADR-007.
+
+- [x] Hamlets: placement, clearings, buildings, night windows, smoke, map icon.
+- [ ] Farm animals (sheep, pigs, cows) and chickens.
+- [ ] Villagers with daily routines, who shoo the fox.
+- [ ] Eggs and vegetables: food with a risk.
+- [ ] Sounds of the hamlets.
+
+**Tests:** deterministic, flat and dry placement; clearings only near hamlets; animals stay in
+their pen; routines follow the hour; shooing by distance and field of view; food regrows and
+persists.
+**Exit:** hamlets feel like quiet, inhabited places worth watching and visiting carefully.
 
 ---
 

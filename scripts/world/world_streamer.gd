@@ -86,6 +86,7 @@ func _ready() -> void:
 	if terrain.biomes != null:
 		# Immutable snapshot of the vegetation tables, shared read-only by every job.
 		_scatterer = VegetationScatterer.new(terrain.biomes)
+		_scatterer.hamlets = terrain.hamlets
 		_library = VegetationLibrary.new(terrain.biomes, vegetation_palette)
 	if wind != null:
 		RenderingServer.global_shader_parameter_set(WIND_PARAM, wind.as_uniform())

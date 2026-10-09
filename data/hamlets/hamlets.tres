@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="HamletSettings" format=3]
+
+[ext_resource type="Script" path="res://scripts/hamlets/hamlet_settings.gd" id="1_hs"]
+[ext_resource type="Script" path="res://scripts/hamlets/hamlet_piece.gd" id="2_hp"]
+[ext_resource type="Resource" path="res://data/hamlets/pieces/house_a.tres" id="3_house_a"]
+[ext_resource type="Resource" path="res://data/hamlets/pieces/house_b.tres" id="4_house_b"]
+[ext_resource type="Resource" path="res://data/hamlets/pieces/house_c.tres" id="5_house_c"]
+[ext_resource type="Resource" path="res://data/hamlets/pieces/stable.tres" id="6_stable"]
+[ext_resource type="Resource" path="res://data/hamlets/pieces/well.tres" id="7_well"]
+[ext_resource type="Resource" path="res://data/hamlets/pieces/fence.tres" id="8_fence"]
+[ext_resource type="Resource" path="res://data/hamlets/pieces/cart.tres" id="9_cart"]
+[ext_resource type="Resource" path="res://data/hamlets/pieces/barrel.tres" id="10_barrel"]
+[ext_resource type="Resource" path="res://data/hamlets/pieces/hay.tres" id="11_hay"]
+[ext_resource type="Resource" path="res://data/hamlets/pieces/crate.tres" id="12_crate"]
+[ext_resource type="Resource" path="res://data/hamlets/pieces/bench.tres" id="13_bench"]
+
+[resource]
+script = ExtResource("1_hs")
+cell_size = 1500.0
+chance = 0.45
+biomes = Array[StringName]([&"meadow", &"hills"])
+tries = 8
+site_radius = 45.0
+site_step = 11.25
+max_slope = 8.0
+above_water = 0.5
+houses = Vector2i(3, 6)
+ring = Vector2(18, 28)
+yard_radius = 10.0
+clear_radius = 40.0
+model_scale = 3.0
+pieces = Array[ExtResource("2_hp")]([ExtResource("3_house_a"), ExtResource("4_house_b"), ExtResource("5_house_c"), ExtResource("6_stable"), ExtResource("7_well"), ExtResource("8_fence"), ExtResource("9_cart"), ExtResource("10_barrel"), ExtResource("11_hay"), ExtResource("12_crate"), ExtResource("13_bench")])
+house_ids = Array[StringName]([&"house_a", &"house_b", &"house_c"])
+prop_ids = Array[StringName]([&"cart", &"barrel", &"hay", &"crate", &"bench"])
+props_per_house = Vector2i(1, 3)

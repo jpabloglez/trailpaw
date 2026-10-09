@@ -29,12 +29,17 @@ const DROP_SALT: int = 0xD70B
 ## Drops on the ground stay this far above the water surface (m).
 const DROP_DRY_MARGIN: float = 0.05
 
+## Rural hamlets (Phase 16): no plant grows on their pieces, and no tall one near their well
+## ([method HamletPlan.circles_in]). Optional; set by the [WorldStreamer].
+var hamlets: HamletSettings
+
 var _type_ids: Array[StringName] = []
 var _scale_min := PackedFloat32Array()
 var _scale_max := PackedFloat32Array()
 var _align := PackedFloat32Array()
 var _near_only: Array[bool] = []
 var _floats: Array[bool] = []
+var _tall: Array[bool] = []  # trees, bushes, rocks and logs: cleared around a hamlet's well
 var _max_density := PackedFloat32Array()
 ## Per biome (index), per type (index): entry parameters (density 0 = does not grow there).
 var _density: Array[PackedFloat32Array] = []
@@ -62,6 +67,7 @@ func _init(table: BiomeTable) -> void:
 				_align.append(entry.type.align_to_ground)
 				_near_only.append(entry.type.near_only)
 				_floats.append(entry.type.float_on_water)
+				_tall.append(entry.type.collision_radius > 0.0)
 				_max_density.append(0.0)
 				_snapshot_drop(entry.type.drop)
 	var n := _type_ids.size()
@@ -118,6 +124,11 @@ func scatter(
 	cluster_noise.seed = HeightSampler.layer_seed(world_seed, CLUSTER_SALT)
 	cluster_noise.frequency = _cluster_frequency
 	var rng := RandomNumberGenerator.new()
+	var cleared := PackedVector4Array()  # hamlet clearings touching this chunk (usually none)
+	if hamlets != null:
+		cleared = HamletPlan.circles_in(
+			Rect2(origin, Vector2(size, size)), hamlets, sampler, world_seed, water_level
+		)
 	for t in _type_ids.size():
 		if _near_only[t] and data.lod != 0:
 			continue
@@ -136,6 +147,8 @@ func scatter(
 				var scale_roll := rng.randf()
 				var ax := origin.x + lx
 				var az := origin.y + lz
+				if not cleared.is_empty() and _in_clearing(cleared, ax, az, _tall[t]):
+					continue
 				if not uniform:
 					resolver.blend_into(ax, az, blend)
 				var surface := surface_at(data, lx, lz)
@@ -154,6 +167,19 @@ func scatter(
 			data.vegetation[_type_ids[t]] = out
 			if data.lod == 0 and _drop_ids[t] != &"":
 				_derive_drops(data, t, out, world_seed, water_level)
+
+
+# Whether absolute (x, z) is inside a hamlet clearing that removes this plant: a piece's
+# footprint removes everything, the area around the well only [param tall] plants.
+static func _in_clearing(cleared: PackedVector4Array, x: float, z: float, tall: bool) -> bool:
+	for c in cleared:
+		if c.w < 0.5 and not tall:
+			continue
+		var dx := x - c.x
+		var dz := z - c.y
+		if dx * dx + dz * dz < c.z * c.z:
+			return true
+	return false
 
 
 ## Drop id of type [param type_id] (&"" when it has none).

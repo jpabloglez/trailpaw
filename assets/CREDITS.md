@@ -39,6 +39,17 @@ Every third-party asset in `assets/` must be listed here (see CLAUDE.md §1).
 | `alpaca` | `assets/animals/alpaca/alpaca.glb` | Quaternius, Ultimate Animated Animal Pack (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/bCVFD48i2l |
 | `horse` | `assets/animals/horse/horse.glb` | Quaternius, Ultimate Animated Animal Pack (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/qvTrSG9pZF |
 | `wolf` | `assets/animals/wolf/wolf.glb` | Quaternius, Ultimate Animated Animal Pack (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/P1gU3Qkr9r |
+| `village/barrel` | `assets/village/barrel.glb` | Quaternius, Medieval Village Pack — Barrel (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/zjCQP1TAci |
+| `village/bench` | `assets/village/bench.glb` | Quaternius, Medieval Village Pack — Bench (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/7uSlZo3n9Y |
+| `village/cart` | `assets/village/cart.glb` | Quaternius, Medieval Village Pack — Cart (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/l7bDe7ak6j |
+| `village/crate` | `assets/village/crate.glb` | Quaternius, Medieval Village Pack — Crate (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/3OEFd1AWfa |
+| `village/fence` | `assets/village/fence.glb` | Quaternius, Medieval Village Pack — Fence (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/UXmKfG81fG |
+| `village/hay` | `assets/village/hay.glb` | Quaternius, Medieval Village Pack — Hay (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/Yu8TOERkpw |
+| `village/house_a` | `assets/village/house_a.glb` | Quaternius, Medieval Village Pack — Fantasy House (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/BH2XHWUNmF |
+| `village/house_b` | `assets/village/house_b.glb` | Quaternius, Medieval Village Pack — Fantasy House (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/dcPho4SUA3 |
+| `village/house_c` | `assets/village/house_c.glb` | Quaternius, Medieval Village Pack — Fantasy House (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/he3p42mUTH |
+| `village/stable` | `assets/village/stable.glb` | Quaternius, Medieval Village Pack — Fantasy Stable (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/qhNQSOGGbi |
+| `village/well` | `assets/village/well.glb` | Quaternius, Medieval Village Pack — Well (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/QlqncKYxXb |
 | `donkey` | `assets/animals/donkey/donkey.glb` | Quaternius, Ultimate Animated Animal Pack (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/qmX6nhnvp7 |
 | `forest_birds` | `assets/audio/ambience/forest_birds.wav` | Thimras, *Park ambiences* (birds track; cut to a 40 s mono loop with `tools/ambience_loop.py`) (OpenGameArt) | CC0 1.0 | https://opengameart.org/content/park-ambiences |
 | `river` | `assets/audio/ambience/river.wav` | Thimras, *Park ambiences* (river track; 40 s mono loop, `tools/ambience_loop.py`) (OpenGameArt) | CC0 1.0 | https://opengameart.org/content/park-ambiences |

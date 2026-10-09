@@ -839,6 +839,30 @@ the critter layer (packed arrays, one MultiMesh, chunk-driven, origin-shifted), 
   - Opening it emits `EventBus.journal_opened`. The last onboarding hint, "J to open your
     journal", shows once the first animal is met.
 
+### 7.v Rural hamlets (Phase 16, ADR-007)
+- **`HamletPlan`** (pure and thread-safe; `data/hamlets/hamlets.tres`, `HamletSettings`, hung
+  off `TerrainSettings.hamlets`) places hamlets; ADR-007 has the site rules.
+  - **Layout:** the well at the centre, then 3–6 houses (three Quaternius variants) and a
+    stable sharing a ring 18–28 m out, facing the well. The stable gets a 16-panel fenced pen
+    beside it (`HamletLayout.pen`, for the farm animals of PR 2). Each house has 1–3 props
+    (cart, barrel, hay, crate, bench).
+  - Every piece is a `HamletPiece` (`data/hamlets/pieces/`): model, footprint radius, smoke,
+    solid. No two pieces overlap (pen panels aside).
+  - Layouts are cached per (seed, cell). Generating one costs ≈ 0.2 ms.
+- **Clearings:** `VegetationScatterer.hamlets` (set by the `WorldStreamer`) asks
+  `HamletPlan.circles_in(chunk rect)` once per chunk (usually nothing).
+- **`HamletDirector`** (both world scenes):
+  - Once a second it builds the hamlets within 300 m and frees those beyond 400 m. Building
+    is spread over frames, ≤ 1 piece per frame.
+  - A hamlet is one root node in the floating-origin group, with its pieces placed relative
+    to the well. Models are scaled ×3 (the pack is modelled at a tenth of a metre).
+  - Solid pieces get a box collider from the model's bounds on the world layer (1).
+  - The `Windows` material surfaces share one emissive material, which glows warm with the
+    darkness (the sky's stars).
+  - Houses get chimney smoke (soft-dot `GPUParticles3D`, off on Low).
+- **The map** marks the hamlets you have explored with a small house icon
+  (`MapScreen.hamlet_marks()`).
+
 ## 8. Environment and audio
 
 - Day/night cycle drives sun angle, sky colours and fog; temperature reacts to time of day.
@@ -1081,5 +1105,6 @@ Stored in `docs/adr/NNN-title.md`. Initial set:
 - [ADR-004](adr/004-floating-origin.md) Floating origin instead of a double-precision engine build.
 - [ADR-005](adr/005-biome-blended-terrain.md) Biome-blended terrain height function.
 - [ADR-006](adr/006-wetland-band.md) A wetland band after the river valley.
+- [ADR-007](adr/007-rural-hamlets.md) Rural hamlets placed on the existing terrain.
 
 New ADRs start from [`000-template.md`](adr/000-template.md).

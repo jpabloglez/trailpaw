@@ -26,6 +26,8 @@ const MAX_OCTAVES: int = 8
 ## Biome bands that reshape and colour the terrain. Without a table the terrain is the
 ## plain layered noise (useful for tests).
 @export var biomes: BiomeTable
+## Rural hamlets (Phase 16, ADR-007); none when null.
+@export var hamlets: HamletSettings
 
 @export_group("Water")
 ## Absolute height of the water surface. Chunks with ground below it get a water plane
