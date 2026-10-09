@@ -50,3 +50,7 @@ signal need_recovered(need_id: StringName)
 ## The player opened the map (Phase 12: onboarding).
 @warning_ignore("unused_signal")
 signal map_opened
+
+## The player met an animal of the journal for the first time (Phase 15).
+@warning_ignore("unused_signal")
+signal animal_discovered(entry_id: StringName)

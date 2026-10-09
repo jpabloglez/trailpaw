@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="JournalEntry" format=3]
+
+[ext_resource type="Script" path="res://scripts/journal/journal_entry.gd" id="1_je"]
+[ext_resource type="Resource" path="res://data/critters/birds.tres" id="2_animal"]
+
+[resource]
+script = ExtResource("1_je")
+id = &"songbird"
+display_name = "Songbird"
+blurb = "Sings from the treetops and flits off in little flocks."
+source = 2
+animal = ExtResource("2_animal")
+sight_radius = 12.0

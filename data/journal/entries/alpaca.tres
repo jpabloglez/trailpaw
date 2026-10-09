@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="JournalEntry" format=3]
+
+[ext_resource type="Script" path="res://scripts/journal/journal_entry.gd" id="1_je"]
+[ext_resource type="Resource" path="res://data/fauna/alpaca.tres" id="2_animal"]
+
+[resource]
+script = ExtResource("1_je")
+id = &"alpaca"
+display_name = "Alpaca"
+blurb = "Soft as a cloud and just as unbothered."
+source = 0
+animal = ExtResource("2_animal")
+sight_radius = 8.0

@@ -68,6 +68,9 @@ func test_a_saved_game_continues_exactly_where_it_was() -> void:
 	var seen := ExploredMap.new(EXPLORATION)
 	seen.reveal(Vector3(100, 0, 100), 96.0)  # somewhere visited long ago
 	save.explored = seen.to_dict()
+	var met := AnimalJournal.new()
+	met.discover(&"heron", 900.0, &"wetland")
+	save.journal = met.to_dict()
 	var world := _world(save)
 	assert_int(GameState.world_seed).is_equal(777)
 	assert_float(GameState.game_minutes).is_equal(save.game_minutes)
@@ -89,6 +92,12 @@ func test_a_saved_game_continues_exactly_where_it_was() -> void:
 	map.from_dict(world.collect_save().explored)
 	assert_bool(map.is_explored(100, 100)).is_true()
 	assert_bool(map.is_explored(save.player_position.x, save.player_position.z)).is_true()
+	# The journal remembers the heron met before.
+	assert_bool(world.encounters.journal.is_seen(&"heron")).is_true()
+	var journal := AnimalJournal.new()
+	journal.from_dict(world.collect_save().journal)
+	assert_str(String(journal.first_biome(&"heron"))).is_equal("wetland")
+	assert_int(journal.seen_count()).is_greater_equal(1)
 
 
 func test_positions_are_saved_absolute_across_a_rebase() -> void:
@@ -140,6 +149,8 @@ func test_the_attract_world_explores_nothing() -> void:
 	add_child(world)
 	await get_tree().process_frame
 	assert_int(world.exploration.process_mode).is_equal(Node.PROCESS_MODE_DISABLED)
+	assert_int(world.encounters.process_mode).is_equal(Node.PROCESS_MODE_DISABLED)  # meets no one
+	assert_int(world.encounters.flitters.size()).is_equal(2)  # butterflies and dragonflies
 
 
 func test_a_game_saved_where_the_wetland_now_is_lands_safely() -> void:

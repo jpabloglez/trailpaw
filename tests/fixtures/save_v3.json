@@ -1,0 +1,43 @@
+{
+	"version": 3,
+	"world_seed": 12345,
+	"player": {
+		"position": [
+			2810.0,
+			-5.5,
+			40.25
+		],
+		"yaw": 1.25
+	},
+	"needs": {
+		"hunger": 66.0,
+		"thirst": 40.0,
+		"temperature": 88.0,
+		"energy": 51.5
+	},
+	"game_minutes": 3000.0,
+	"chunk_deltas": {
+		"version": 1,
+		"chunks": []
+	},
+	"biome": "wetland",
+	"species": "res://data/species/fox.tres",
+	"saved_at": 1795000000,
+	"explored": {
+		"version": 1,
+		"cell_size": 32.0,
+		"cells": [
+			87,
+			1,
+			88,
+			1
+		],
+		"water": [
+			[
+				2800.0,
+				-6.0,
+				60.0
+			]
+		]
+	}
+}

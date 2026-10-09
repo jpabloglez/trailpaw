@@ -290,6 +290,16 @@ func state_of(i: int) -> int:
 	return _state[i]
 
 
+## The kind of critter [param i].
+func kind_of(i: int) -> CritterKind:
+	return kinds[_kind[i]]
+
+
+## Whether critter [param i] is drawn (not hidden under the water).
+func is_shown(i: int) -> bool:
+	return _state[i] != State.UNDER
+
+
 ## Whether critter [param i] is a wader in flight (not just wading a step away).
 func is_flying(i: int) -> bool:
 	var kind := kinds[_kind[i]]

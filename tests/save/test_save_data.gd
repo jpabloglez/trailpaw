@@ -4,6 +4,7 @@ extends GdUnitTestSuite
 
 const FIXTURE_V1: String = "res://tests/fixtures/save_v1.json"
 const FIXTURE_V2: String = "res://tests/fixtures/save_v2.json"
+const FIXTURE_V3: String = "res://tests/fixtures/save_v3.json"
 const EXPLORATION: ExplorationSettings = preload("res://data/world/exploration.tres")
 const TEST_DIR: String = "user://test_saves"
 
@@ -99,6 +100,23 @@ func test_migrates_the_v2_fixture() -> void:
 	var map := ExploredMap.new(EXPLORATION)
 	map.from_dict(save.explored)
 	assert_int(map.cell_count()).is_equal(0)
+
+
+func test_migrates_the_v3_fixture() -> void:
+	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(FIXTURE_V3))
+	assert_int(int(data["version"])).is_equal(3)
+	var migrated := SaveMigrations.migrate(data)
+	assert_int(int(migrated["version"])).is_equal(SaveData.VERSION)
+	var save := SaveData.from_dict(migrated)
+	assert_vector(save.player_position).is_equal(Vector3(2810.0, -5.5, 40.25))
+	assert_str(String(save.biome)).is_equal("wetland")
+	var map := ExploredMap.new(EXPLORATION)
+	map.from_dict(save.explored)
+	assert_int(map.cell_count()).is_equal(2)  # the explored area survives
+	assert_dict(save.journal).is_empty()  # added by v3 → v4: nobody met yet
+	var journal := AnimalJournal.new()
+	journal.from_dict(save.journal)
+	assert_int(journal.seen_count()).is_equal(0)
 
 
 func test_migration_does_not_touch_its_input() -> void:

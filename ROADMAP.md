@@ -22,6 +22,7 @@ Claude Code; one sprint = 2 weeks.
 | 12 | Vertical slice release | 1 | 40 w |
 | 13 | Biodiversity | 2 | 44 w |
 | 14 | Wetlands | 2 | 48 w |
+| 15 | Animal journal | 1 | 49 w |
 
 Milestones: **M1 "Walk the world"** (end of Phase 3), **M2 "A day in the life"**
 (end of Phase 7), **M3 "Living world"** (end of Phase 10), **M4 Vertical slice** (Phase 12).
@@ -263,6 +264,23 @@ A water biome (user decision: wetlands, after the river valley; ADR-006).
 **Tests:** wetland water coverage and depth; band order with five biomes; old saves land
 safely; aquatic plants only at their depths; frogs dive and return; mist only at dawn there.
 **Exit:** the wetland feels like its own place, and the most alive one for water.
+
+---
+
+## Phase 15 — Animal journal
+
+A reason to explore: meet every animal of the world (user decisions: an encounter is seeing it
+up close; a card shows the figure, name, biomes and a short line; a discreet "New!" card; a
+journal modal like the map). Rural villages follow as Phase 16.
+
+- [x] Record the animals the fox sees (encounters, journal, SaveData v4).
+- [ ] Portraits and the new-animal card.
+- [ ] The journal screen (J).
+
+**Tests:** every animal has one entry; met only close, on screen and long enough, and only
+once; old saves load with an empty journal; the card queues and never pauses; the screen
+pauses and shows silhouettes for animals not met.
+**Exit:** the journal makes the user want to explore and meet every animal.
 
 ---
 

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="JournalEntry" format=3]
+
+[ext_resource type="Script" path="res://scripts/journal/journal_entry.gd" id="1_je"]
+[ext_resource type="Resource" path="res://data/critters/butterflies.tres" id="2_animal"]
+
+[resource]
+script = ExtResource("1_je")
+id = &"butterfly"
+display_name = "Butterfly"
+blurb = "Drifts from flower to flower on sunny days."
+source = 3
+animal = ExtResource("2_animal")
+sight_radius = 4.0

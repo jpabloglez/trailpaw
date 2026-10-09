@@ -3,14 +3,14 @@ extends RefCounted
 ## Everything needed to continue a game exactly where it was left: the world seed, where the
 ## player stands (absolute, so floating-origin rebases do not matter), its needs, the game time
 ## (which also fixes the weather), what the player changed in the world (eaten food) and the
-## area explored so far (for the map).
+## area explored so far (for the map) and the animals met (for the journal).
 ##
 ## Saved as plain JSON through [method to_dict] / [method from_dict] — never as a resource,
 ## because loading a resource can run scripts and a save file is user-editable. Older files are
 ## upgraded by [SaveMigrations] first.
 
 ## Current schema version (see [SaveMigrations] for the history).
-const VERSION: int = 3
+const VERSION: int = 4
 
 ## World seed.
 var world_seed: int = 0
@@ -32,6 +32,8 @@ var species: String = ""
 var saved_at: int = 0
 ## Explored area and scented water ([method ExploredMap.to_dict]).
 var explored: Dictionary = {}
+## Animals met ([method AnimalJournal.to_dict]).
+var journal: Dictionary = {}
 
 
 ## Plain, JSON-friendly copy (current [constant VERSION]).
@@ -54,6 +56,7 @@ func to_dict() -> Dictionary:
 		"species": species,
 		"saved_at": saved_at,
 		"explored": explored,
+		"journal": journal,
 	}
 
 
@@ -76,4 +79,5 @@ static func from_dict(data: Dictionary) -> SaveData:
 	save.species = str(data.get("species", ""))
 	save.saved_at = int(data.get("saved_at", 0))
 	save.explored = data.get("explored", {})
+	save.journal = data.get("journal", {})
 	return save

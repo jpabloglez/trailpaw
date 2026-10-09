@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="JournalSettings" format=3]
+
+[ext_resource type="Script" path="res://scripts/journal/journal_settings.gd" id="1_js"]
+[ext_resource type="Script" path="res://scripts/journal/journal_entry.gd" id="1_je"]
+[ext_resource type="Resource" path="res://data/journal/entries/deer.tres" id="2_deer"]
+[ext_resource type="Resource" path="res://data/journal/entries/stag.tres" id="3_stag"]
+[ext_resource type="Resource" path="res://data/journal/entries/shiba_inu.tres" id="4_shiba_inu"]
+[ext_resource type="Resource" path="res://data/journal/entries/alpaca.tres" id="5_alpaca"]
+[ext_resource type="Resource" path="res://data/journal/entries/horse.tres" id="6_horse"]
+[ext_resource type="Resource" path="res://data/journal/entries/donkey.tres" id="7_donkey"]
+[ext_resource type="Resource" path="res://data/journal/entries/rabbit.tres" id="8_rabbit"]
+[ext_resource type="Resource" path="res://data/journal/entries/duck.tres" id="9_duck"]
+[ext_resource type="Resource" path="res://data/journal/entries/frog.tres" id="10_frog"]
+[ext_resource type="Resource" path="res://data/journal/entries/heron.tres" id="11_heron"]
+[ext_resource type="Resource" path="res://data/journal/entries/songbird.tres" id="12_songbird"]
+[ext_resource type="Resource" path="res://data/journal/entries/butterfly.tres" id="13_butterfly"]
+[ext_resource type="Resource" path="res://data/journal/entries/dragonfly.tres" id="14_dragonfly"]
+[ext_resource type="Resource" path="res://data/journal/entries/firefly.tres" id="15_firefly"]
+
+[resource]
+script = ExtResource("1_js")
+entries = Array[ExtResource("1_je")]([ExtResource("2_deer"), ExtResource("3_stag"), ExtResource("4_shiba_inu"), ExtResource("5_alpaca"), ExtResource("6_horse"), ExtResource("7_donkey"), ExtResource("8_rabbit"), ExtResource("9_duck"), ExtResource("10_frog"), ExtResource("11_heron"), ExtResource("12_songbird"), ExtResource("13_butterfly"), ExtResource("14_dragonfly"), ExtResource("15_firefly")])
+sight_seconds = 1.0
+check_hz = 4.0
+firefly_glow = 0.5
