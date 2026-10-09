@@ -9,7 +9,9 @@ extends CanvasLayer
 ## Budget: the rules are checked 4 times a second (a few comparisons); the label only fades.
 
 ## Order the hints are taught in.
-const ORDER: Array[StringName] = [&"move", &"run", &"sniff", &"water", &"eat", &"map", &"rest"]
+const ORDER: Array[StringName] = [
+	&"move", &"run", &"sniff", &"water", &"eat", &"map", &"rest", &"journal"
+]
 ## Seconds between rule checks.
 const CHECK_INTERVAL: float = 0.25
 
@@ -37,6 +39,7 @@ var _start := Vector3.INF
 var _walked: float = 0.0
 var _last_position := Vector3.INF
 var _ran: float = 0.0
+var _met_animal: bool = false
 var _water_scented: bool = false
 
 
@@ -60,6 +63,8 @@ func _ready() -> void:
 		)
 	EventBus.interaction_performed.connect(_on_interaction)
 	EventBus.map_opened.connect(func() -> void: complete(&"map"))
+	EventBus.animal_discovered.connect(func(_id: StringName) -> void: _met_animal = true)
+	EventBus.journal_opened.connect(func() -> void: complete(&"journal"))
 
 
 func _process(delta: float) -> void:
@@ -112,6 +117,8 @@ func is_due(id: StringName) -> bool:
 			due = _water_scented or _playing_time > settings.map_after
 		&"rest":
 			due = _need(&"energy") < settings.rest_below
+		&"journal":
+			due = _met_animal  # once the first animal is in it
 	return due
 
 
@@ -140,6 +147,7 @@ func text_for(id: StringName) -> String:
 				"sniff": Settings.binding_text(&"sniff"),
 				"interact": Settings.binding_text(&"interact"),
 				"map": Settings.binding_text(&"map"),
+				"journal": Settings.binding_text(&"journal"),
 				"rest": Settings.binding_text(&"rest"),
 				"hold_sprint": "Press" if Settings.sprint_toggle else "Hold",
 				"hold_rest": "Press" if Settings.rest_toggle else "Hold",

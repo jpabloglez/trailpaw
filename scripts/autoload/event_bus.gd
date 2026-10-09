@@ -54,3 +54,7 @@ signal map_opened
 ## The player met an animal of the journal for the first time (Phase 15).
 @warning_ignore("unused_signal")
 signal animal_discovered(entry_id: StringName)
+
+## The player opened the journal (Phase 15: onboarding).
+@warning_ignore("unused_signal")
+signal journal_opened

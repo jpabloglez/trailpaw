@@ -48,7 +48,7 @@ func test_settings_persist_across_a_save_and_a_load() -> void:
 	Settings.set_sprint_toggle(true)
 	Settings.set_rest_toggle(true)
 	Settings.set_ui_scale(1.3)
-	assert_str(String(Settings.rebind(&"jump", _key(KEY_J)))).is_empty()
+	assert_str(String(Settings.rebind(&"jump", _key(KEY_K)))).is_empty()
 	assert_int(Settings.save_settings()).is_equal(OK)
 	# Forget everything, then read it back.
 	Settings.set_quality(load("res://data/quality/high.tres"))
@@ -74,7 +74,7 @@ func test_settings_persist_across_a_save_and_a_load() -> void:
 	assert_bool(Settings.rest_toggle).is_true()
 	assert_float(Settings.ui_scale).is_equal_approx(1.3, 1e-4)
 	assert_float(get_tree().root.content_scale_factor).is_equal_approx(1.3, 1e-4)
-	assert_bool(InputMap.action_has_event(&"jump", _key(KEY_J))).is_true()
+	assert_bool(InputMap.action_has_event(&"jump", _key(KEY_K))).is_true()
 	assert_bool(InputMap.action_has_event(&"jump", _key(KEY_SPACE))).is_false()
 
 
@@ -107,10 +107,10 @@ func test_debug_actions_cannot_be_rebound() -> void:
 
 
 func test_restore_defaults_brings_back_the_project_bindings() -> void:
-	Settings.rebind(&"jump", _key(KEY_J))
+	Settings.rebind(&"jump", _key(KEY_K))
 	Settings.restore_default_bindings()
 	assert_bool(InputMap.action_has_event(&"jump", _key(KEY_SPACE))).is_true()
-	assert_bool(InputMap.action_has_event(&"jump", _key(KEY_J))).is_false()
+	assert_bool(InputMap.action_has_event(&"jump", _key(KEY_K))).is_false()
 
 
 func test_the_camera_follows_fov_sensitivity_and_invert_y() -> void:

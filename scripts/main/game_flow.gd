@@ -28,6 +28,7 @@ var _menu: MainMenu
 var _pause: PauseMenu
 var _settings: SettingsMenu
 var _map: MapScreen
+var _journal: JournalScreen
 var _fade: ScreenFade
 var _playing: bool = false
 
@@ -52,6 +53,10 @@ func _ready() -> void:
 	_map.name = "MapScreen"
 	add_child(_map)
 	_pause.map_requested.connect(_open_map)
+	_journal = JournalScreen.new()
+	_journal.name = "JournalScreen"
+	add_child(_journal)
+	_pause.journal_requested.connect(_open_journal)
 	_fade = ScreenFade.new()
 	_fade.name = "ScreenFade"
 	add_child(_fade)
@@ -76,6 +81,9 @@ func show_menu() -> void:
 	_map.enabled = false
 	_map.close()
 	_map.world = null
+	_journal.enabled = false
+	_journal.close()
+	_journal.world = null
 	var saved := SaveSystem.read() if SaveSystem.exists() else null
 	var world := world_scene.instantiate() as WorldController
 	world.attract_mode = true
@@ -140,6 +148,11 @@ func settings_menu() -> SettingsMenu:
 	return _settings
 
 
+## The journal screen.
+func journal_screen() -> JournalScreen:
+	return _journal
+
+
 ## The map screen.
 func map_screen() -> MapScreen:
 	return _map
@@ -186,6 +199,8 @@ func _play(world: WorldController) -> void:
 	_pause.enabled = true
 	_map.world = world
 	_map.enabled = true
+	_journal.world = world
+	_journal.enabled = true
 
 
 func _replace_world(world: WorldController) -> void:
@@ -208,6 +223,11 @@ func _on_save_requested() -> void:
 func _open_map() -> void:
 	_pause.close()
 	_map.open()
+
+
+func _open_journal() -> void:
+	_pause.close()
+	_journal.open()
 
 
 func _open_settings() -> void:

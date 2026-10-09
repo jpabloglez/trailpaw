@@ -93,14 +93,22 @@ func snapshot(shown: JournalEntry) -> Texture2D:
 	show_entry(shown)
 	var image: Image = null
 	if DisplayServer.get_name() != "headless":  # headless never draws (nor signals a frame)
-		render_target_update_mode = SubViewport.UPDATE_ONCE
-		await RenderingServer.frame_post_draw
-		image = get_texture().get_image()
+		for attempt in 4:  # a new studio's first render can come out empty: ask again
+			render_target_update_mode = SubViewport.UPDATE_ONCE
+			await RenderingServer.frame_post_draw
+			image = get_texture().get_image()
+			if image != null and not image.is_invisible():
+				break
 	if image == null or image.is_empty():
 		image = Image.create_empty(size.x, size.y, false, Image.FORMAT_RGBA8)
 	var texture := ImageTexture.create_from_image(image)
 	_cache[shown.id] = texture
 	return texture
+
+
+## Forgets every cached portrait (tests; a change of quality could also use it).
+static func clear_cache() -> void:
+	_cache.clear()
 
 
 ## The cached portrait of entry [param id], or null.

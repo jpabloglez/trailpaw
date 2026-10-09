@@ -2,9 +2,9 @@ class_name HintSettings
 extends Resource
 ## The onboarding hints: their short texts and when they show. Values live in
 ## [code]data/ui/hints.tres[/code]. Texts may use [code]{move}[/code], [code]{sprint}[/code],
-## [code]{sniff}[/code], [code]{interact}[/code], [code]{map}[/code], [code]{rest}[/code] (the
-## player's keys) and [code]{hold_sprint}[/code] / [code]{hold_rest}[/code] ("Hold" or "Press",
-## following the hold-or-toggle setting).
+## [code]{sniff}[/code], [code]{interact}[/code], [code]{map}[/code], [code]{journal}[/code],
+## [code]{rest}[/code] (the player's keys) and [code]{hold_sprint}[/code] /
+## [code]{hold_rest}[/code] ("Hold" or "Press", following the hold-or-toggle setting).
 
 ## Hint id → text, in the order they are taught.
 @export var texts: Dictionary[StringName, String] = {}

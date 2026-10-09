@@ -44,6 +44,7 @@ const REMAPPABLE: Array[StringName] = [
 	&"camera_zoom_in",
 	&"camera_zoom_out",
 	&"map",
+	&"journal",
 	&"pause",
 ]
 ## Where settings are kept (tests point it elsewhere).

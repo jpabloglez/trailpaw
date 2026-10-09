@@ -146,3 +146,18 @@ func test_every_hint_has_a_short_text() -> void:
 		var text: String = SETTINGS.texts.get(id, "")
 		assert_str(text).override_failure_message(String(id)).is_not_empty()
 		assert_int(text.length()).override_failure_message(String(id)).is_less(60)
+
+
+func test_the_journal_is_suggested_once_an_animal_is_met() -> void:
+	var hints := _director()
+	for id: StringName in HintDirector.ORDER:
+		if id != &"journal":
+			Settings.hints.mark(id)
+	await _wait(SETTINGS.first_delay + 0.4)
+	assert_str(String(hints.current())).is_equal("")  # nothing met yet: nothing to see there
+	EventBus.animal_discovered.emit(&"rabbit")
+	await _wait(0.4)
+	assert_str(String(hints.current())).is_equal("journal")
+	assert_str(hints.text_for(&"journal")).is_equal("J to open your journal")
+	EventBus.journal_opened.emit()
+	assert_bool(Settings.hints.is_done(&"journal")).is_true()

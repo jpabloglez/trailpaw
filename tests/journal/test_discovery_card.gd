@@ -81,6 +81,7 @@ func test_the_chime_is_short_soft_and_audible() -> void:
 
 
 func test_every_animal_gets_a_framed_figure_and_a_portrait() -> void:
+	PortraitStudio.clear_cache()  # the cache lives for the session: start from nothing
 	var studio: PortraitStudio = auto_free(PortraitStudio.new())
 	studio.size = Vector2i(96, 96)
 	add_child(studio)
