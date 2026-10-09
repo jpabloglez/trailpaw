@@ -15,6 +15,7 @@
 [ext_resource type="Resource" path="res://data/fauna/alpaca.tres" id="61_alpaca"]
 [ext_resource type="Resource" path="res://data/fauna/stag.tres" id="61_stag"]
 [ext_resource type="Resource" path="res://data/fauna/donkey.tres" id="61_donkey"]
+[ext_resource type="Resource" path="res://data/fauna/wolf.tres" id="62_wolf"]
 
 [sub_resource type="Resource" id="Resource_106pq"]
 script = ExtResource("2_8dl78")
@@ -112,6 +113,11 @@ script = ExtResource("60_fentry")
 species = ExtResource("61_donkey")
 weight = 2.0
 
+[sub_resource type="Resource" id="Resource_fauna_wolf"]
+script = ExtResource("60_fentry")
+species = ExtResource("62_wolf")
+weight = 1.0
+
 [resource]
 script = ExtResource("1_muwrv")
 id = &"hills"
@@ -125,5 +131,5 @@ ridged_scale = 2.4
 vegetation = Array[ExtResource("2_8dl78")]([SubResource("Resource_106pq"), SubResource("Resource_ymyuc"), SubResource("Resource_uhtki"), SubResource("Resource_807ui"), SubResource("Resource_hyghp"), SubResource("Resource_j23hn"), SubResource("Resource_1o3ts"), SubResource("Resource_n7isi"), SubResource("Resource_den_log")])
 ground_color_a = Color(0.66, 0.6, 0.34, 1)
 ground_color_b = Color(0.56, 0.42, 0.3, 1)
-fauna_chance = 0.18
-fauna = Array[ExtResource("60_fentry")]([SubResource("Resource_fauna_alpaca"), SubResource("Resource_fauna_stag"), SubResource("Resource_fauna_donkey")])
+fauna_chance = 0.19
+fauna = Array[ExtResource("60_fentry")]([SubResource("Resource_fauna_alpaca"), SubResource("Resource_fauna_stag"), SubResource("Resource_fauna_donkey"), SubResource("Resource_fauna_wolf")])

@@ -8,6 +8,7 @@
 [ext_resource type="Resource" path="res://data/journal/entries/alpaca.tres" id="5_alpaca"]
 [ext_resource type="Resource" path="res://data/journal/entries/horse.tres" id="6_horse"]
 [ext_resource type="Resource" path="res://data/journal/entries/donkey.tres" id="7_donkey"]
+[ext_resource type="Resource" path="res://data/journal/entries/wolf.tres" id="20_wolf"]
 [ext_resource type="Resource" path="res://data/journal/entries/rabbit.tres" id="8_rabbit"]
 [ext_resource type="Resource" path="res://data/journal/entries/duck.tres" id="9_duck"]
 [ext_resource type="Resource" path="res://data/journal/entries/frog.tres" id="10_frog"]
@@ -19,7 +20,7 @@
 
 [resource]
 script = ExtResource("1_js")
-entries = Array[ExtResource("1_je")]([ExtResource("2_deer"), ExtResource("3_stag"), ExtResource("4_shiba_inu"), ExtResource("5_alpaca"), ExtResource("6_horse"), ExtResource("7_donkey"), ExtResource("8_rabbit"), ExtResource("9_duck"), ExtResource("10_frog"), ExtResource("11_heron"), ExtResource("12_songbird"), ExtResource("13_butterfly"), ExtResource("14_dragonfly"), ExtResource("15_firefly")])
+entries = Array[ExtResource("1_je")]([ExtResource("2_deer"), ExtResource("3_stag"), ExtResource("4_shiba_inu"), ExtResource("5_alpaca"), ExtResource("6_horse"), ExtResource("7_donkey"), ExtResource("20_wolf"), ExtResource("8_rabbit"), ExtResource("9_duck"), ExtResource("10_frog"), ExtResource("11_heron"), ExtResource("12_songbird"), ExtResource("13_butterfly"), ExtResource("14_dragonfly"), ExtResource("15_firefly")])
 sight_seconds = 1.0
 check_hz = 4.0
 firefly_glow = 0.5
