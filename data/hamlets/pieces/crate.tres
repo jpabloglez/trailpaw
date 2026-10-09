@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="HamletPiece" format=3]
+
+[ext_resource type="Script" path="res://scripts/hamlets/hamlet_piece.gd" id="1_hp"]
+[ext_resource type="PackedScene" path="res://assets/village/crate.glb" id="2_model"]
+
+[resource]
+script = ExtResource("1_hp")
+id = &"crate"
+scene = ExtResource("2_model")
+footprint = 0.4
+smoke = false
+solid = true

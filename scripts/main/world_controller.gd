@@ -30,6 +30,8 @@ const NEW_GAME_POSITION: Vector3 = Vector3(32.0, 30.0, 32.0)
 @export var exploration: ExplorationTracker
 ## The animals met (optional; saved and restored).
 @export var encounters: EncounterTracker
+## Builds the rural hamlets nearby (optional; the map marks those explored).
+@export var hamlets: HamletDirector
 
 ## Game to restore on start (null = new game with [member world_seed]).
 var pending_save: SaveData

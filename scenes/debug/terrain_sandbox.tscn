@@ -45,6 +45,7 @@
 [ext_resource type="Script" path="res://scripts/critters/tree_life.gd" id="91_tree"]
 [ext_resource type="Resource" path="res://data/critters/squirrel.tres" id="92_squirrel"]
 [ext_resource type="Resource" path="res://data/critters/owl.tres" id="93_owl"]
+[ext_resource type="Script" path="res://scripts/hamlets/hamlet_director.gd" id="94_hamlets"]
 [ext_resource type="Resource" path="res://data/critters/system.tres" id="73_critset"]
 [ext_resource type="Script" path="res://scripts/critters/bird_flocks.gd" id="74_birds"]
 [ext_resource type="Resource" path="res://data/critters/birds.tres" id="75_birdset"]
@@ -224,3 +225,9 @@ settings = ExtResource("73_critset")
 terrain = ExtResource("3_u18in")
 streamer = NodePath("../WorldStreamer")
 player = NodePath("../Animal")
+
+[node name="HamletDirector" type="Node3D" parent="." node_paths=PackedStringArray("player", "day_night")]
+script = ExtResource("94_hamlets")
+terrain = ExtResource("3_u18in")
+player = NodePath("../Animal")
+day_night = NodePath("../DayNightCycle")

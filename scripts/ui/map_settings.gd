@@ -24,5 +24,7 @@ extends Resource
 @export var start_color: Color = Color(1.0, 0.95, 0.75)
 ## Scented water marker.
 @export var water_mark_color: Color = Color(0.45, 0.8, 1.0)
+## Colour of an explored hamlet's house icon (Phase 16).
+@export var hamlet_color: Color = Color(0.95, 0.75, 0.45)
 ## Marker size on screen (pixels).
 @export_range(4.0, 64.0, 1.0) var marker_size: float = 20.0

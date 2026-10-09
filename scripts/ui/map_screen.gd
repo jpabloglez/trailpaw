@@ -216,6 +216,8 @@ func _draw_markers() -> void:
 	for mark in world.exploration.explored.water_marks():
 		_marker(_shown.pixel_of(mark.x, mark.z) * scale, r, SETTINGS.water_mark_color, false)
 	var at := _player_absolute()
+	for centre in hamlet_marks():
+		_house(_shown.pixel_of(centre.x, centre.z) * scale, r)
 	var tip := _shown.pixel_of(at.x, at.z) * scale
 	var forward := player_direction()
 	var side := Vector2(-forward.y, forward.x)
@@ -229,6 +231,36 @@ func _draw_markers() -> void:
 	)
 	_overlay.draw_colored_polygon(arrow, SETTINGS.player_color)
 	_overlay.draw_polyline(arrow + PackedVector2Array([arrow[0]]), Color.BLACK, 2.0, true)
+
+
+## Explored hamlets within the map's span (absolute well positions).
+func hamlet_marks() -> PackedVector3Array:
+	var out := PackedVector3Array()
+	if world == null or world.hamlets == null or world.exploration == null:
+		return out
+	var at := _player_absolute()
+	for hamlet in world.hamlets.hamlets_near(at, SETTINGS.spans[_zoom] * 0.75):
+		if world.exploration.explored.is_explored(hamlet.centre.x, hamlet.centre.z):
+			out.append(hamlet.centre)
+	return out
+
+
+# A little house: a square with a roof.
+func _house(at: Vector2, r: float) -> void:
+	var inside := Rect2(Vector2.ZERO, _overlay.size).grow(-r)
+	if not inside.has_point(at):
+		return
+	var shape := PackedVector2Array(
+		[
+			at + Vector2(-r * 0.6, r * 0.6),
+			at + Vector2(-r * 0.6, -r * 0.1),
+			at + Vector2(0.0, -r * 0.7),
+			at + Vector2(r * 0.6, -r * 0.1),
+			at + Vector2(r * 0.6, r * 0.6),
+		]
+	)
+	_overlay.draw_colored_polygon(shape, SETTINGS.hamlet_color)
+	_overlay.draw_polyline(shape + PackedVector2Array([shape[0]]), Color.BLACK, 2.0, true)
 
 
 func _marker(at: Vector2, r: float, color: Color, square: bool) -> void:

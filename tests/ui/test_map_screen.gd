@@ -198,3 +198,17 @@ func test_the_map_key_is_remappable() -> void:
 	assert_bool(Settings.REMAPPABLE.has(&"map")).is_true()
 	assert_str(Settings.binding_text(&"map")).is_equal("M")
 	assert_bool(SettingsMenu.ACTION_NAMES.has(&"map")).is_true()
+
+
+func test_explored_hamlets_show_on_the_map() -> void:
+	var flow := await _playing()
+	var map := flow.map_screen()
+	var at := GameState.absolute_position(flow.world().animal.global_position)
+	var hamlets := flow.world().hamlets.hamlets_near(at, 700.0)
+	assert_int(hamlets.size()).is_greater(0)  # the meadow near the start has one
+	var centre := hamlets[0].centre
+	map.open()
+	assert_bool(map.hamlet_marks().has(centre)).is_false()  # not seen yet: not on the map
+	flow.world().exploration.explored.reveal(centre, EXPLORATION.reveal_radius)
+	assert_bool(map.hamlet_marks().has(centre)).is_true()
+	map.close()

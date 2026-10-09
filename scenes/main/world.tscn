@@ -47,6 +47,7 @@
 [ext_resource type="Script" path="res://scripts/critters/tree_life.gd" id="91_tree"]
 [ext_resource type="Resource" path="res://data/critters/squirrel.tres" id="92_squirrel"]
 [ext_resource type="Resource" path="res://data/critters/owl.tres" id="93_owl"]
+[ext_resource type="Script" path="res://scripts/hamlets/hamlet_director.gd" id="94_hamlets"]
 [ext_resource type="Resource" path="res://data/critters/system.tres" id="73_critset"]
 [ext_resource type="Script" path="res://scripts/critters/bird_flocks.gd" id="74_birds"]
 [ext_resource type="Resource" path="res://data/critters/birds.tres" id="75_birdset"]
@@ -80,7 +81,7 @@ fog_depth_curve = 1.6
 fog_depth_begin = 90.0
 fog_depth_end = 200.0
 
-[node name="World" type="Node3D" node_paths=PackedStringArray("streamer", "animal", "spawner", "biome_tracker", "exploration", "encounters")]
+[node name="World" type="Node3D" node_paths=PackedStringArray("streamer", "animal", "spawner", "biome_tracker", "exploration", "encounters", "hamlets")]
 script = ExtResource("56_world")
 autosave = ExtResource("57_auto")
 streamer = NodePath("WorldStreamer")
@@ -89,6 +90,7 @@ spawner = NodePath("AnimalSpawner")
 biome_tracker = NodePath("BiomeTracker")
 exploration = NodePath("ExplorationTracker")
 encounters = NodePath("EncounterTracker")
+hamlets = NodePath("HamletDirector")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_atku0")
@@ -254,3 +256,9 @@ settings = ExtResource("73_critset")
 terrain = ExtResource("3_u18in")
 streamer = NodePath("../WorldStreamer")
 player = NodePath("../Animal")
+
+[node name="HamletDirector" type="Node3D" parent="." node_paths=PackedStringArray("player", "day_night")]
+script = ExtResource("94_hamlets")
+terrain = ExtResource("3_u18in")
+player = NodePath("../Animal")
+day_night = NodePath("../DayNightCycle")
