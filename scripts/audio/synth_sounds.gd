@@ -8,6 +8,7 @@ const RATE: int = 22050
 
 static var _yip: AudioStreamWAV
 static var _plop: AudioStreamWAV
+static var _chime: AudioStreamWAV
 
 
 ## A small dog's friendly "yip": two quick chirps gliding down (~0.25 s). Synthesised once
@@ -24,6 +25,28 @@ static func plop() -> AudioStreamWAV:
 	if _plop == null:
 		_plop = _make_plop()
 	return _plop
+
+
+## A soft two-note chime (a new animal in the journal): bell-like tones, a fifth apart, that
+## ring out (~0.9 s). Synthesised once and shared.
+static func chime() -> AudioStreamWAV:
+	if _chime == null:
+		_chime = _make_chime()
+	return _chime
+
+
+static func _make_chime() -> AudioStreamWAV:
+	var samples := PackedFloat32Array()
+	samples.resize(int(RATE * 0.9))
+	samples.fill(0.0)
+	for note: Array in [[659.25, 0.0], [987.77, 0.12]]:  # E5, then B5
+		var start := int(RATE * float(note[1]))
+		for i in range(start, samples.size()):
+			var t := float(i - start) / RATE
+			var envelope := exp(-t * 5.0) * minf(1.0, t * 300.0)
+			var tone := sin(TAU * float(note[0]) * t) + 0.25 * sin(TAU * float(note[0]) * 2.0 * t)
+			samples[i] += tone * envelope * 0.32
+	return to_wav(samples)
 
 
 static func _make_plop() -> AudioStreamWAV:

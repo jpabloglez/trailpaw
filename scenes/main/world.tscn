@@ -52,6 +52,8 @@
 [ext_resource type="Resource" path="res://data/world/mist.tres" id="84_mistset"]
 [ext_resource type="Script" path="res://scripts/journal/encounter_tracker.gd" id="85_enc"]
 [ext_resource type="Resource" path="res://data/journal/journal.tres" id="86_journal"]
+[ext_resource type="Script" path="res://scripts/ui/discovery_card.gd" id="87_card"]
+[ext_resource type="Resource" path="res://data/ui/discovery_card.tres" id="88_cardset"]
 [ext_resource type="Script" path="res://scripts/critters/fireflies.gd" id="78_ffly"]
 [ext_resource type="Resource" path="res://data/critters/small_life.tres" id="79_small"]
 
@@ -233,3 +235,8 @@ critters = NodePath("../CritterSystem")
 birds = NodePath("../BirdFlocks")
 flitters = [NodePath("../Butterflies"), NodePath("../Dragonflies")]
 fireflies = NodePath("../Fireflies")
+
+[node name="DiscoveryCard" type="CanvasLayer" parent="."]
+script = ExtResource("87_card")
+settings = ExtResource("88_cardset")
+journal = ExtResource("86_journal")
