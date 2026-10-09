@@ -99,6 +99,49 @@ static func critter(shape: StringName) -> ArrayMesh:
 	match shape:
 		&"heron":
 			return _heron()
+		&"hedgehog":
+			var spines := Color(0.33, 0.27, 0.22)
+			var tips := Color(0.62, 0.55, 0.45)
+			var face := Color(0.72, 0.62, 0.5)
+			var dark := Color(0.05, 0.04, 0.04)
+			var parts := [
+				[Vector3(0, 0.07, 0.01), Vector3(0.08, 0.065, 0.1), spines],
+				[Vector3(0, 0.05, 0.0), Vector3(0.065, 0.045, 0.09), face],
+				[Vector3(0, 0.05, -0.1), Vector3(0.035, 0.03, 0.045), face],
+				[Vector3(0, 0.045, -0.145), Vector3(0.009, 0.009, 0.009), dark],
+				[Vector3(-0.022, 0.065, -0.11), Vector3(0.006, 0.006, 0.006), dark],
+				[Vector3(0.022, 0.065, -0.11), Vector3(0.006, 0.006, 0.006), dark],
+			]
+			for row in 3:  # tufts of spines along the back, pale-tipped
+				for side in 3:
+					var x := (side - 1) * 0.04
+					var z := -0.04 + row * 0.05
+					parts.append(
+						[Vector3(x, 0.115 - absf(x) * 0.6, z), Vector3(0.018, 0.022, 0.03), tips]
+					)
+			return ellipsoids(parts, 5, 4)
+		&"fish":
+			var scales := Color(0.72, 0.76, 0.78)
+			return ellipsoids(
+				[
+					[Vector3(0, 0.0, 0.0), Vector3(0.035, 0.05, 0.15), scales],
+					[Vector3(0, 0.025, 0.0), Vector3(0.025, 0.03, 0.13), Color(0.32, 0.4, 0.42)],
+					[Vector3(0, 0.0, 0.17), Vector3(0.006, 0.06, 0.05), Color(0.55, 0.6, 0.62)],
+					[Vector3(0, 0.055, 0.02), Vector3(0.005, 0.03, 0.04), Color(0.4, 0.46, 0.48)],
+					[
+						Vector3(-0.025, 0.012, -0.1),
+						Vector3(0.006, 0.006, 0.006),
+						Color(0.05, 0.05, 0.05)
+					],
+					[
+						Vector3(0.025, 0.012, -0.1),
+						Vector3(0.006, 0.006, 0.006),
+						Color(0.05, 0.05, 0.05)
+					],
+				],
+				6,
+				4
+			)
 		&"rabbit":
 			var fur := Color(0.56, 0.47, 0.38)
 			var dark := Color(0.42, 0.34, 0.27)

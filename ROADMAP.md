@@ -291,7 +291,7 @@ The journal grows from 14 to 19 animals (user decision): the wolf from the Quate
 and four small animals built in code. Farm animals wait for the villages (Phase 16).
 
 - [x] The wolf (forest and hills, shy, rare).
-- [ ] Hedgehogs at night and leaping fish.
+- [x] Hedgehogs at night and leaping fish.
 - [ ] Squirrels and owls in the trees.
 
 **Tests:** every new animal has its journal entry; night animals only at night; fish hidden

@@ -56,7 +56,8 @@ func check(elapsed: float) -> void:
 			_in_sight[e] = 0.0
 			continue
 		_in_sight[e] += elapsed
-		if _in_sight[e] >= settings.sight_seconds:
+		var needed := entry.sight_seconds if entry.sight_seconds > 0.0 else settings.sight_seconds
+		if _in_sight[e] >= needed:
 			if journal.discover(entry.id, GameState.game_minutes, GameState.current_biome):
 				EventBus.animal_discovered.emit(entry.id)
 

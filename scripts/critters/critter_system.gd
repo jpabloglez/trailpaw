@@ -15,7 +15,9 @@ extends Node3D
 ## nearby with a plop, stay under (hidden) for a few seconds and come back up on a bank a few
 ## metres away, out of the fox's reach. Waders (herons) step slowly through shallow water;
 ## scared, they fly off ([member CritterKind.flee_hop] is the flight, wings beating in
-## [code]shaders/bird.gdshader[/code]) to shallow water farther away.
+## [code]shaders/bird.gdshader[/code]) to shallow water farther away. Curlers (hedgehogs) curl
+## into a ball instead of fleeing; leapers (fish) stay hidden under the water and now and then
+## leap out with a splash. Kinds with [member CritterKind.hours] are only out in their hours.
 ## [br][br]
 ## Budget: decisions at [member CritterSettings.sim_hz] (critters beyond
 ## [member CritterSettings.far_distance] every 3rd tick), ≤ 2 height samples per hop (≤ 15 for
@@ -23,11 +25,16 @@ extends Node3D
 ## one transform per critter. ≤ 1 ms for 120 critters (measured in tests). Arrays grow only
 ## when critters spawn.
 
-## Critter states ([constant DIVE]: leaping into the water; [constant UNDER]: under it, hidden).
-enum State { IDLE, HOP, FLEE, DIVE, UNDER }
+## Critter states ([constant DIVE]: leaping into the water; [constant UNDER]: under it, hidden;
+## [constant LEAP]: a fish out of the water mid-leap).
+enum State { IDLE, HOP, FLEE, DIVE, UNDER, LEAP }
 
 ## Directions a scared amphibian looks for water in (radians from straight away from the fox,
 ## nearest first; 12 around).
+## Behaviours of dry land (no splashes, no water checks when rolling).
+const DRY: Array[StringName] = [&"hopper", &"curler"]
+## Behaviours that plop into the water.
+const PLOPPING: Array[StringName] = [&"amphibian", &"leaper"]
 const DIVE_TURNS: Array[float] = [
 	0.0, 0.52, -0.52, 1.05, -1.05, 1.57, -1.57, 2.09, -2.09, 2.62, -2.62, PI
 ]
@@ -78,6 +85,7 @@ var _splashes: Array[GPUParticles3D] = []
 var _next_splash: int = 0
 var _time: float = 0.0
 var _plop: AudioStreamPlayer3D
+var _out := PackedByteArray()  # per kind: 1 while it is in its hours
 
 
 func _ready() -> void:
@@ -110,14 +118,16 @@ func _ready() -> void:
 		add_child(node)
 		_meshes.append(node)
 	_counts.resize(kinds.size())
-	var wet := func(kind: CritterKind) -> bool: return kind.behaviour != &"hopper"
+	_out.resize(kinds.size())
+	_out.fill(1)
+	var wet := func(kind: CritterKind) -> bool: return kind.behaviour not in DRY
 	if kinds.any(wet):
 		for i in 3:
 			var splash := MotionEffects.make_emitter(12, 0.8)
 			splash.top_level = true
 			add_child(splash)
 			_splashes.append(splash)
-	if kinds.any(func(kind: CritterKind) -> bool: return kind.behaviour == &"amphibian"):
+	if kinds.any(func(kind: CritterKind) -> bool: return kind.behaviour in PLOPPING):
 		_plop = AudioStreamPlayer3D.new()
 		_plop.stream = SynthSounds.plop()
 		_plop.bus = &"SFX"
@@ -183,10 +193,13 @@ func _roll(coord: Vector2i, amphibians: bool) -> void:
 		if (kinds[k].behaviour == &"amphibian") != amphibians:
 			continue
 		var accept := Callable()
-		if kinds[k].behaviour != &"hopper":
+		if kinds[k].behaviour not in DRY:
 			accept = _livable.bind(kinds[k])
-		# Banks are a narrow strip: amphibians look harder for a group centre.
-		var tries := 24 if amphibians else CritterPlan.CENTRE_TRIES
+		# Banks are a narrow strip and deep water is patchy: amphibians and fish look harder
+		# for a group centre (a fish's check is one height sample).
+		var tries := CritterPlan.CENTRE_TRIES
+		if kinds[k].behaviour in PLOPPING:
+			tries = 24
 		var spots := CritterPlan.roll(
 			coord, terrain.chunk_size, biome, kinds[k], GameState.world_seed, accept, tries
 		)
@@ -208,7 +221,12 @@ func tick(elapsed: float) -> void:
 		_player_speed = Vector2(at.x - _player_previous.x, at.z - _player_previous.z).length()
 		_player_speed /= elapsed
 	_player_previous = at
+	var hour := GameState.time_of_day() / 60.0
+	for k in kinds.size():
+		_out[k] = int(kinds[k].is_out(hour))
 	for i in _kind.size():
+		if _out[_kind[i]] == 0:
+			continue  # not its hours: it is away (and keeps its timers)
 		var here := _position(i)
 		var distance := Vector2(here.x - at.x, here.z - at.z).length() if focus != null else INF
 		if distance > settings.far_distance and (_tick_count + i) % 3 != 0:
@@ -216,6 +234,9 @@ func tick(elapsed: float) -> void:
 		var kind := kinds[_kind[i]]
 		_timer[i] -= elapsed * (3.0 if distance > settings.far_distance else 1.0)
 		if kind.behaviour == &"amphibian" and _amphibian_tick(i, kind, distance, at):
+			continue
+		if kind.behaviour == &"leaper":
+			_leaper_tick(i, kind)
 			continue
 		if focus != null and _scared(kind, distance):
 			if _state[i] != State.FLEE:
@@ -229,7 +250,7 @@ func tick(elapsed: float) -> void:
 				_state[i] = State.IDLE
 				_home[i] = _to[i]
 				_timer[i] = _rng.randf_range(kind.idle_seconds.x, kind.idle_seconds.y)
-			elif _t[i] >= 1.0:
+			elif _t[i] >= 1.0 and kind.behaviour != &"curler":  # a curler stays curled up
 				_flee_hop(i, kind, at)
 		elif _t[i] >= 1.0:
 			if _state[i] == State.HOP:
@@ -251,9 +272,16 @@ func draw() -> void:
 	_counts.fill(0)
 	for i in _kind.size():
 		var k := _kind[i]
-		var basis := Basis(Vector3.UP, _yaw[i]).scaled(Vector3.ONE * _scale[i])
-		if _state[i] == State.UNDER:
-			continue  # under the water: not drawn
+		if not is_shown(i):
+			continue  # under the water, or not its hours
+		var basis := Basis(Vector3.UP, _yaw[i])
+		match kinds[k].behaviour:
+			&"curler":
+				if _state[i] == State.FLEE:  # curled into a spiky ball
+					basis = basis.scaled(Vector3(0.9, 0.8, 0.62))
+			&"leaper":  # nose up leaving the water, nose down diving back
+				basis = basis * Basis(Vector3.RIGHT, lerpf(0.9, -0.9, _t[i]))
+		basis = basis.scaled(Vector3.ONE * _scale[i])
 		var at := _position(i)
 		if kinds[k].behaviour == &"swimmer":
 			at.y += sin(_time * 1.8 + _scale[i] * 40.0) * 0.012  # bobbing on the water
@@ -295,9 +323,9 @@ func kind_of(i: int) -> CritterKind:
 	return kinds[_kind[i]]
 
 
-## Whether critter [param i] is drawn (not hidden under the water).
+## Whether critter [param i] is drawn (not hidden under the water, and in its hours).
 func is_shown(i: int) -> bool:
-	return _state[i] != State.UNDER
+	return _state[i] != State.UNDER and _out[_kind[i]] == 1
 
 
 ## Whether critter [param i] is a wader in flight (not just wading a step away).
@@ -345,7 +373,7 @@ func _spawn(k: int, coord: Vector2i, xz: Vector2) -> void:
 	_t.append(1.0)
 	_hop_seconds.append(kinds[k].graze_hop.z)
 	_hop_height.append(0.0)
-	_state.append(State.IDLE)
+	_state.append(State.UNDER if kinds[k].behaviour == &"leaper" else State.IDLE)
 	_timer.append(_rng.randf_range(0.0, kinds[k].idle_seconds.y))
 	_yaw.append(_rng.randf() * TAU)
 	_scale.append(_rng.randf_range(kinds[k].scale_range.x, kinds[k].scale_range.y))
@@ -430,6 +458,38 @@ func _hop(i: int, from: Vector3, to: Vector3, hop: Vector3, kind: CritterKind) -
 	_hop_height[i] = hop.y
 	_yaw[i] = atan2(-(to.x - from.x), -(to.z - from.z))
 	return true
+
+
+# A fish: hidden until its timer runs out, then a leap; back in the water, hidden again.
+func _leaper_tick(i: int, kind: CritterKind) -> void:
+	if _state[i] == State.LEAP:
+		if _t[i] >= 1.0:
+			_plop_at(_to[i])
+			_state[i] = State.UNDER
+			_timer[i] = _rng.randf_range(kind.idle_seconds.x, kind.idle_seconds.y)
+		return
+	if _timer[i] > 0.0:
+		return
+	var from := Vector3(_to[i].x, GameState.water_level, _to[i].z)
+	var home := Vector3(_home[i].x - from.x, 0.0, _home[i].z - from.z)
+	for attempt in 4:  # towards home when it has strayed, else anywhere
+		var angle := _rng.randf() * TAU
+		var direction := Vector3(cos(angle), 0.0, sin(angle))
+		if attempt == 0 and home.length() > kind.home_radius:
+			direction = home.normalized()
+		var to := from + direction * kind.graze_hop.x
+		if _ground(to) > GameState.water_level - kind.min_depth:
+			continue
+		_from[i] = from
+		_to[i] = to
+		_t[i] = 0.0
+		_hop_seconds[i] = kind.graze_hop.z
+		_hop_height[i] = kind.graze_hop.y
+		_yaw[i] = atan2(-direction.x, -direction.z)
+		_state[i] = State.LEAP
+		_plop_at(from)
+		return
+	_timer[i] = 1.0
 
 
 # Amphibian decisions that differ from a hopper's (true when they replace the rest of the
@@ -534,18 +594,18 @@ func _plop_at(at: Vector3) -> void:
 
 # Where a critter of [param kind] at [param local] sits: the ground, or the water surface.
 func _surface(local: Vector3, kind: CritterKind) -> float:
-	if kind.behaviour == &"swimmer":
+	if kind.behaviour == &"swimmer" or kind.behaviour == &"leaper":
 		return GameState.water_level
 	return _ground(local)
 
 
 func _valid_spot(local: Vector3, kind: CritterKind) -> bool:
-	if kind.behaviour == &"hopper":
+	if kind.behaviour in DRY:
 		return _dry_and_gentle(local, kind)
 	if is_inf(GameState.water_level):
 		return false  # every other kind needs water
 	match kind.behaviour:
-		&"swimmer":
+		&"swimmer", &"leaper":
 			return _ground(local) <= GameState.water_level - kind.min_depth
 		&"wader":
 			return _wading(local, kind)

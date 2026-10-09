@@ -25,6 +25,9 @@ enum Source {
 @export var animal: Resource
 ## Seen closer than this (m, from the player) and on screen counts as an encounter.
 @export_range(1.0, 30.0, 0.5, "suffix:m") var sight_radius: float = 5.0
+## Seconds it must stay in sight; 0 uses [member JournalSettings.sight_seconds] (fish, out of
+## the water only for a moment, need less).
+@export_range(0.0, 10.0, 0.05, "suffix:s") var sight_seconds: float = 0.0
 
 
 ## Ids of the biomes it lives in, in the table's order.

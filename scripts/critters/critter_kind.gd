@@ -11,12 +11,18 @@ extends Resource
 ## the water surface, gliding; never leaves the water), [code]&"amphibian"[/code] (on the
 ## banks; dives into the water when scared and comes back up on a nearby bank) or
 ## [code]&"wader"[/code] (a heron: steps slowly through shallow water; scared, it flies off,
-## [member flee_hop] being the flight, to shallow water farther away).
+## [member flee_hop] being the flight, to shallow water farther away), [code]&"curler"[/code]
+## (a hedgehog: hops like a hopper, but scared it curls into a ball where it is) or
+## [code]&"leaper"[/code] (a fish: hidden in water at least [member min_depth] deep, it leaps
+## out every [member idle_seconds], [member graze_hop] being the leap).
 @export var behaviour: StringName = &"hopper"
 ## Amphibians live on ground up to this high above the water (m).
 @export_range(0.0, 5.0, 0.05, "suffix:m") var bank_height: float = 0.8
 ## Amphibians stay under water this long after diving (min, max, s).
 @export var dive_seconds: Vector2 = Vector2(4.0, 8.0)
+## Hours of the day it is out (from, to; game hours, wrapping past midnight, e.g. 20 → 5).
+## Zero: always. Out of its hours it is not simulated, not drawn and cannot be met.
+@export var hours: Vector2 = Vector2.ZERO
 ## Waders stand in water this deep (min, max, m).
 @export var wade_depth: Vector2 = Vector2(0.05, 0.4)
 ## Swimmers only use water at least this deep (m).
@@ -53,3 +59,12 @@ extends Resource
 @export_range(0.0, 10.0, 0.1, "suffix:m") var startle_radius: float = 1.5
 ## They keep fleeing at least this long, then calm down where they are (s).
 @export_range(0.5, 30.0, 0.5, "suffix:s") var calm_seconds: float = 6.0
+
+
+## Whether it is out at [param hour] (0…24).
+func is_out(hour: float) -> bool:
+	if hours == Vector2.ZERO:
+		return true
+	if hours.x <= hours.y:
+		return hour >= hours.x and hour < hours.y
+	return hour >= hours.x or hour < hours.y

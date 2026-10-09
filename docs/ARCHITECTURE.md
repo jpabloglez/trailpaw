@@ -687,6 +687,24 @@ no AnimationTree.
     are folded along the body while wading and beat slowly (7 rad/s) in flight
     (`CritterSystem.is_flying()`).
 
+- **Hours (Phase 15b):** `CritterKind.hours` (from → to, wrapping past midnight; zero means
+  always). Each tick marks which kinds are out. Out of its hours a critter keeps its place and
+  timers but is not simulated, not drawn and not `is_shown()`, so the journal can't meet it.
+- **Hedgehogs (Phase 15b)** are `behaviour = &"curler"` (`data/critters/hedgehog.tres`, mesh
+  in code: a spiny back with pale-tipped tufts, a pale face, a black nose).
+  - Meadow and forest (1–2), 35 % of chunks, out 20:30–5:30.
+  - They graze in short, slow hops like a hopper. **Scared, they curl into a ball where they
+    are** (drawn squashed) until the fox is gone and `calm_seconds` pass.
+- **Fish (Phase 15b)** are `behaviour = &"leaper"` (`data/critters/fish.tres`, a silver body
+  with a dark back and a tail).
+  - Lakes and rivers of the meadow, forest, valley and wetland, in water ≥ 0.6 m deep.
+    Group centres get 24 tries, like frogs: deep water is patchy.
+  - They are **hidden under the water** (`State.UNDER`). Every 6–20 s one **leaps**
+    (`State.LEAP`, `graze_hop` = 1.2 m across, 0.5 m up, 0.6 s) towards home if it has
+    strayed. It goes nose up out of the water and nose down back in, with a plop and a splash
+    at each end, and lands only in deep water. The fox doesn't scare them.
+  - The journal needs only 0.3 s of a leap (`JournalEntry.sight_seconds`).
+
 ### 7.y Birds (Phase 13)
 `BirdFlocks` (in `world.tscn` and the terrain sandbox; `data/critters/birds.tres`) works like
 the critter layer (packed arrays, one MultiMesh, chunk-driven, origin-shifted), but for flocks.
