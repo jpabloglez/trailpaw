@@ -275,7 +275,7 @@ journal modal like the map). Rural villages follow as Phase 16.
 
 - [x] Record the animals the fox sees (encounters, journal, SaveData v4).
 - [x] Portraits and the new-animal card.
-- [ ] The journal screen (J).
+- [x] The journal screen (J).
 
 **Tests:** every animal has one entry; met only close, on screen and long enough, and only
 once; old saves load with an empty journal; the card queues and never pauses; the screen

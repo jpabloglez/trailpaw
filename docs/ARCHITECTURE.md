@@ -772,6 +772,21 @@ the critter layer (packed arrays, one MultiMesh, chunk-driven, origin-shifted), 
   - It shows a turning figure on an opaque backdrop, "New!", the name and "Added to your
     journal", plus `SynthSounds.chime()` (E5 then B5, ≈ 0.9 s, −8 dB on SFX).
   - Discoveries queue. Its tween stops while the tree is paused, and it hides meanwhile.
+- **`JournalScreen`** (built in code by `GameFlow`, layer 55) opens with the `journal` action
+  (J, remappable) or the pause menu's Journal button, and pauses the world. J or Esc closes
+  it; it is off in the main menu.
+  - A counter ("8 / 14 animals") over a 5-column grid of cards, in journal order, that
+    scrolls when the window is short.
+  - **Met animals:** the portrait, the name, "Lives in: …" (biome display names from
+    `entry.biome_ids()`) and the blurb.
+  - **Not met yet:** the same portrait as a dark silhouette, "???" and the "Lives in" line,
+    to guide exploration.
+  - Portraits are rendered by its own `PortraitStudio` (264 px, shown at 132) one after
+    another on the first opening (≈ 50–70 ms each under WSL), and kept for the session.
+  - A new studio's first render can come out empty, so `snapshot()` asks again (up to 4
+    times) until the image has something in it.
+  - Opening it emits `EventBus.journal_opened`. The last onboarding hint, "J to open your
+    journal", shows once the first animal is met.
 
 ## 8. Environment and audio
 

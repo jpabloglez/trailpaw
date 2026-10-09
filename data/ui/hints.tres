@@ -11,7 +11,8 @@ texts = Dictionary[StringName, String]({
 &"water": "Follow the blue sparkles to water",
 &"eat": "Walk up to food and press {interact}",
 &"map": "{map} to see where you have been",
-&"rest": "Tired? {hold_rest} {rest} to rest — shade helps"
+&"rest": "Tired? {hold_rest} {rest} to rest — shade helps",
+&"journal": "{journal} to open your journal"
 })
 first_delay = 1.5
 move_distance = 6.0

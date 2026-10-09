@@ -22,6 +22,7 @@ const ACTION_NAMES: Dictionary[StringName, String] = {
 	&"camera_zoom_in": "Zoom in",
 	&"camera_zoom_out": "Zoom out",
 	&"map": "Map",
+	&"journal": "Journal",
 	&"pause": "Pause",
 }
 ## Quality preset ids in menu order.
