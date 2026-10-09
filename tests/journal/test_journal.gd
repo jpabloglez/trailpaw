@@ -185,3 +185,17 @@ func test_on_screen_follows_the_cameras_field_of_view() -> void:
 		assert_bool(EncounterTracker.on_screen(camera, inside)).is_true()
 		assert_bool(EncounterTracker.on_screen(camera, outside)).is_false()
 	assert_bool(EncounterTracker.on_screen(camera, Vector3(0, 7, -10))).is_false()  # above the top
+
+
+func test_an_entry_can_need_less_time_in_sight() -> void:
+	var made := _scene(Vector3(0, 0, 3), Vector3(0, 0.6, 0))
+	var tracker: EncounterTracker = made[0]
+	var quick: JournalSettings = JOURNAL.duplicate()
+	quick.entries = JOURNAL.entries.duplicate()
+	var entry: JournalEntry = JOURNAL.entry(&"butterfly").duplicate()
+	entry.sight_seconds = 0.25  # like a leaping fish
+	quick.entries[JOURNAL.entries.find(JOURNAL.entry(&"butterfly"))] = entry
+	tracker.settings = quick
+	tracker.check(0.25)
+	assert_bool(tracker.journal.is_seen(&"butterfly")).is_true()
+	assert_float(JOURNAL.entry(&"fish").sight_seconds).is_between(0.1, 0.5)

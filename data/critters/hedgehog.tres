@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="CritterKind" format=3]
+
+[ext_resource type="Script" path="res://scripts/critters/critter_kind.gd" id="1_ck"]
+
+[resource]
+script = ExtResource("1_ck")
+id = &"hedgehog"
+shape = &"hedgehog"
+behaviour = &"curler"
+hours = Vector2(20.5, 5.5)
+biome_counts = Dictionary[StringName, Vector2i]({
+&"forest": Vector2i(1, 2),
+&"meadow": Vector2i(1, 2)
+})
+chance = 0.35
+scale_range = Vector2(1.0, 1.15)
+group_spread = 6.0
+home_radius = 4.0
+idle_seconds = Vector2(2, 6)
+graze_hop = Vector3(0.25, 0.02, 0.5)
+flee_hop = Vector3(0.25, 0.02, 0.5)
+zigzag = 0.0
+max_slope = 30.0
+flee_radius = 4.0
+flee_trigger_speed = 2.0
+startle_radius = 1.5
+calm_seconds = 5.0

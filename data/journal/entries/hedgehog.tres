@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="JournalEntry" format=3]
+
+[ext_resource type="Script" path="res://scripts/journal/journal_entry.gd" id="1_je"]
+[ext_resource type="Resource" path="res://data/critters/hedgehog.tres" id="2_animal"]
+
+[resource]
+script = ExtResource("1_je")
+id = &"hedgehog"
+display_name = "Hedgehog"
+blurb = "Snuffles through the grass at night and rolls into a prickly ball when startled."
+source = 1
+animal = ExtResource("2_animal")
+sight_radius = 5.0

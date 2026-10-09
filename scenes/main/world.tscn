@@ -42,6 +42,8 @@
 [ext_resource type="Resource" path="res://data/critters/duck.tres" id="76_duck"]
 [ext_resource type="Resource" path="res://data/critters/frog.tres" id="77_frog"]
 [ext_resource type="Resource" path="res://data/critters/heron.tres" id="82_heron"]
+[ext_resource type="Resource" path="res://data/critters/hedgehog.tres" id="89_hedge"]
+[ext_resource type="Resource" path="res://data/critters/fish.tres" id="90_fish"]
 [ext_resource type="Resource" path="res://data/critters/system.tres" id="73_critset"]
 [ext_resource type="Script" path="res://scripts/critters/bird_flocks.gd" id="74_birds"]
 [ext_resource type="Resource" path="res://data/critters/birds.tres" id="75_birdset"]
@@ -184,7 +186,7 @@ spawner = NodePath("../AnimalSpawner")
 
 [node name="CritterSystem" type="Node3D" parent="." node_paths=PackedStringArray("streamer", "player")]
 script = ExtResource("70_crit")
-kinds = Array[ExtResource("71_critkind")]([ExtResource("72_rabbit"), ExtResource("76_duck"), ExtResource("77_frog"), ExtResource("82_heron")])
+kinds = Array[ExtResource("71_critkind")]([ExtResource("72_rabbit"), ExtResource("76_duck"), ExtResource("77_frog"), ExtResource("82_heron"), ExtResource("89_hedge"), ExtResource("90_fish")])
 settings = ExtResource("73_critset")
 terrain = ExtResource("3_u18in")
 streamer = NodePath("../WorldStreamer")
