@@ -127,6 +127,7 @@ func test_a_running_fox_makes_a_frog_dive_and_come_back_up_on_a_bank() -> void:
 		assert_int(system.plops).is_greater(0)
 		assert_int(system.state_of(i)).is_equal(CritterSystem.State.UNDER)
 		var under := system.position_of(i)
+		assert_bool(system.is_shown(i)).is_false()  # hidden: not drawn, not seen (journal)
 		system.draw()  # under the water it is not drawn
 		var drawn: MultiMesh = system.get_child(0).multimesh
 		assert_int(drawn.visible_instance_count).is_less(system.count())

@@ -732,6 +732,30 @@ the critter layer (packed arrays, one MultiMesh, chunk-driven, origin-shifted), 
   - No CPU work beyond positioning the box.
 - All are off on the Low preset (`QualityPreset.motion_effects`).
 
+### 7.w Animal journal (Phase 15)
+- **Entries:** `data/journal/journal.tres` (`JournalSettings`) lists 14 `JournalEntry`s in
+  journal order: 6 fauna species, rabbit, duck, frog, heron, songbird, butterfly, dragonfly,
+  firefly.
+  - Each entry holds its name, a short blurb, a `sight_radius` and its `animal`: the very
+    resource its system uses (`FaunaSpecies`, `CritterKind`, `BirdSettings`, `FlitterKind`,
+    `SmallLifeSettings`).
+  - Sightings are matched by that resource, and `biome_ids(table)` reads the biomes it lives
+    in from the same data, so nothing is listed twice.
+  - A test checks that every animal of the world (biome fauna, the scene's critter kinds,
+    birds, both flitter kinds, fireflies) has exactly one entry.
+- **`AnimalJournal`** (RefCounted): the animals met, with the game minute and biome of the
+  first sighting. `discover()` is true only the first time. JSON is
+  `{version, seen: {id: {minutes, biome}}}`.
+- **`EncounterTracker`** (in `world.tscn`; disabled in the attract world) checks at 4 Hz, only
+  for entries not yet seen, whether an animal of that entry is:
+  - within its `sight_radius` of the player: 4 m for frogs and insects, 5–8 m for most,
+    10–12 m for the shy and the far (deer, heron, ducks on the water, birds in the treetops)
+  - **on screen**: `on_screen()` is a by-hand check against the camera's field of view,
+    because `Camera3D.is_position_in_frustum` returns false headless
+  - and it must stay there for 1 s. Frogs under water (`CritterSystem.is_shown()`) don't
+    count; fireflies count once they glow ≥ 0.5 around the player.
+  - The first sighting emits `EventBus.animal_discovered(id)`.
+
 ## 8. Environment and audio
 
 - Day/night cycle drives sun angle, sky colours and fog; temperature reacts to time of day.
@@ -829,6 +853,9 @@ the critter layer (packed arrays, one MultiMesh, chunk-driven, origin-shifted), 
   - `WorldController` saves the map in `SaveData.explored` and restores it.
   - `SaveMigrations.v2_to_v3` adds a blank map (fixture `tests/fixtures/save_v2.json`).
   - `migrate()` rejects a step that does not raise the version instead of looping.
+- **Animal journal (Phase 15, SaveData v4):** see §7.w. `WorldController` saves
+  `EncounterTracker.journal` in `SaveData.journal` and restores it; `SaveMigrations.v3_to_v4`
+  adds an empty journal (fixture `tests/fixtures/save_v3.json`).
 - **Map screen (Phase 10b):** `MapScreen` (built in code by `GameFlow`, layer 55, values in
   `data/ui/map.tres`) opens with the `map` action (M, remappable) or the pause menu's Map
   button, and pauses the world.

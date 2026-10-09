@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="JournalEntry" format=3]
+
+[ext_resource type="Script" path="res://scripts/journal/journal_entry.gd" id="1_je"]
+[ext_resource type="Resource" path="res://data/fauna/shiba_inu.tres" id="2_animal"]
+
+[resource]
+script = ExtResource("1_je")
+id = &"shiba_inu"
+display_name = "Shiba Inu"
+blurb = "Bouncy and curious, always up for a game of chase."
+source = 0
+animal = ExtResource("2_animal")
+sight_radius = 8.0

@@ -50,6 +50,8 @@
 [ext_resource type="Resource" path="res://data/critters/dragonflies.tres" id="81_dkind"]
 [ext_resource type="Script" path="res://scripts/world/mist.gd" id="83_mist"]
 [ext_resource type="Resource" path="res://data/world/mist.tres" id="84_mistset"]
+[ext_resource type="Script" path="res://scripts/journal/encounter_tracker.gd" id="85_enc"]
+[ext_resource type="Resource" path="res://data/journal/journal.tres" id="86_journal"]
 [ext_resource type="Script" path="res://scripts/critters/fireflies.gd" id="78_ffly"]
 [ext_resource type="Resource" path="res://data/critters/small_life.tres" id="79_small"]
 
@@ -71,7 +73,7 @@ fog_depth_curve = 1.6
 fog_depth_begin = 90.0
 fog_depth_end = 200.0
 
-[node name="World" type="Node3D" node_paths=PackedStringArray("streamer", "animal", "spawner", "biome_tracker", "exploration")]
+[node name="World" type="Node3D" node_paths=PackedStringArray("streamer", "animal", "spawner", "biome_tracker", "exploration", "encounters")]
 script = ExtResource("56_world")
 autosave = ExtResource("57_auto")
 streamer = NodePath("WorldStreamer")
@@ -79,6 +81,7 @@ animal = NodePath("Animal")
 spawner = NodePath("AnimalSpawner")
 biome_tracker = NodePath("BiomeTracker")
 exploration = NodePath("ExplorationTracker")
+encounters = NodePath("EncounterTracker")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_atku0")
@@ -220,3 +223,13 @@ terrain = ExtResource("3_u18in")
 world_environment = NodePath("../WorldEnvironment")
 day_night = NodePath("../DayNightCycle")
 player = NodePath("../Animal")
+
+[node name="EncounterTracker" type="Node" parent="." node_paths=PackedStringArray("player", "fauna", "critters", "birds", "flitters", "fireflies")]
+script = ExtResource("85_enc")
+settings = ExtResource("86_journal")
+player = NodePath("../Animal")
+fauna = NodePath("../FaunaDirector")
+critters = NodePath("../CritterSystem")
+birds = NodePath("../BirdFlocks")
+flitters = [NodePath("../Butterflies"), NodePath("../Dragonflies")]
+fireflies = NodePath("../Fireflies")

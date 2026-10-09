@@ -28,6 +28,8 @@ const NEW_GAME_POSITION: Vector3 = Vector3(32.0, 30.0, 32.0)
 @export var biome_tracker: BiomeTracker
 ## Remembers the explored area for the map (optional).
 @export var exploration: ExplorationTracker
+## The animals met (optional; saved and restored).
+@export var encounters: EncounterTracker
 
 ## Game to restore on start (null = new game with [member world_seed]).
 var pending_save: SaveData
@@ -97,6 +99,8 @@ func collect_save() -> SaveData:
 	save.species = animal.movement.species.resource_path
 	if exploration != null:
 		save.explored = exploration.explored.to_dict()
+	if encounters != null:
+		save.journal = encounters.journal.to_dict()
 	return save
 
 
@@ -108,6 +112,8 @@ func apply_save(save: SaveData) -> void:
 	streamer.deltas().from_dict(save.chunk_deltas)
 	if exploration != null:
 		exploration.explored.from_dict(save.explored)
+	if encounters != null:
+		encounters.journal.from_dict(save.journal)
 	for id: StringName in save.needs:
 		if _needs.model.ids().has(id):
 			_needs.set_value(id, save.needs[id])
@@ -141,7 +147,7 @@ func _enter_attract_mode() -> void:
 	for child in get_children():
 		if child is CanvasLayer:
 			child.queue_free()  # HUD, prompt, toasts: some show themselves on events
-		elif child is CameraRig or child is ExplorationTracker:
+		elif child is CameraRig or child is ExplorationTracker or child is EncounterTracker:
 			(child as Node).process_mode = Node.PROCESS_MODE_DISABLED
 	var camera := AttractCamera.new()
 	camera.name = "AttractCamera"

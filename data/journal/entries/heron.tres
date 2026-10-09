@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="JournalEntry" format=3]
+
+[ext_resource type="Script" path="res://scripts/journal/journal_entry.gd" id="1_je"]
+[ext_resource type="Resource" path="res://data/critters/heron.tres" id="2_animal"]
+
+[resource]
+script = ExtResource("1_je")
+id = &"heron"
+display_name = "Heron"
+blurb = "Stands as still as a reed, then lifts off on slow grey wings."
+source = 1
+animal = ExtResource("2_animal")
+sight_radius = 10.0
