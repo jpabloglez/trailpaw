@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="DiscoveryCardSettings" format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/discovery_card_settings.gd" id="1_dc"]
+
+[resource]
+script = ExtResource("1_dc")
+slide_in = 0.45
+hold = 4.0
+slide_out = 0.4
+portrait_size = 150
+spin = 1.2
+margin = Vector2(24, 140)
+chime_volume_db = -8.0

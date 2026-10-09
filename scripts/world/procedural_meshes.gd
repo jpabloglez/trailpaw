@@ -273,6 +273,23 @@ static func _heron() -> ArrayMesh:
 	return tool.commit()
 
 
+## A firefly ≈ 2 cm long, facing −Z, centred on its origin: a dark body with a pale abdomen and
+## two folded wing covers (the glow is added by whoever shows it).
+static func firefly() -> ArrayMesh:
+	var body := Color(0.18, 0.16, 0.14)
+	return ellipsoids(
+		[
+			[Vector3(0, 0.003, -0.0085), Vector3(0.003, 0.0028, 0.0035), Color(0.75, 0.35, 0.2)],
+			[Vector3(0, 0.003, 0.0), Vector3(0.005, 0.004, 0.008), body],
+			[Vector3(0, 0.002, 0.009), Vector3(0.0045, 0.0035, 0.005), Color(0.85, 0.85, 0.55)],
+			[Vector3(-0.003, 0.005, 0.002), Vector3(0.003, 0.002, 0.01), body],
+			[Vector3(0.003, 0.005, 0.002), Vector3(0.003, 0.002, 0.01), body],
+		],
+		5,
+		3
+	)
+
+
 ## A dragonfly ≈ 7 cm long and 9 cm across, facing −Z, centred on its origin: a long slim body
 ## (tinted by the instance colour) and two pairs of narrow, pale wings whose vertices carry their
 ## distance from the body in [code]UV.x[/code], so [code]shaders/bird.gdshader[/code] beats them.

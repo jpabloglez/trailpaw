@@ -755,6 +755,23 @@ the critter layer (packed arrays, one MultiMesh, chunk-driven, origin-shifted), 
   - and it must stay there for 1 s. Frogs under water (`CritterSystem.is_shown()`) don't
     count; fireflies count once they glow ≥ 0.5 around the player.
   - The first sighting emits `EventBus.animal_discovered(id)`.
+- **`PortraitStudio`** (a `SubViewport` with its own 3D world, transparent background, a key
+  and a fill light) shows one entry's figure:
+  - **Figures:** fauna use their game model held in the idle pose. The rest are their
+    procedural mesh with a vertex-colour material, so wings show spread in their rest pose,
+    tinted like in the game; the firefly is `ProceduralMeshes.firefly()` plus an unshaded
+    glowing bulb.
+  - **Framing** is automatic from the figure's bounds (filling 80 % of the bounding sphere),
+    seen from its left front. Walkers are seen from a little above, fliers from well above.
+  - `spin` turns it. `snapshot(entry)` renders it once into a texture, cached per entry for
+    the session. Headless it skips the render (no frame is ever drawn there) and returns a
+    blank image of the right size.
+- **`DiscoveryCard`** (a CanvasLayer in `world.tscn`, so it is freed in the attract world;
+  `data/ui/discovery_card.tres`) shows the new-animal card on `animal_discovered`:
+  - It slides in from the right (0.45 s), holds for 4 s and slides out (0.4 s).
+  - It shows a turning figure on an opaque backdrop, "New!", the name and "Added to your
+    journal", plus `SynthSounds.chime()` (E5 then B5, ≈ 0.9 s, −8 dB on SFX).
+  - Discoveries queue. Its tween stops while the tree is paused, and it hides meanwhile.
 
 ## 8. Environment and audio
 
