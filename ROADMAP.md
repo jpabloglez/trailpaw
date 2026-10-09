@@ -23,6 +23,7 @@ Claude Code; one sprint = 2 weeks.
 | 13 | Biodiversity | 2 | 44 w |
 | 14 | Wetlands | 2 | 48 w |
 | 15 | Animal journal | 1 | 49 w |
+| 15b | More animals (wolf, hedgehog, fish, squirrel, owl) | 1 | 50 w |
 
 Milestones: **M1 "Walk the world"** (end of Phase 3), **M2 "A day in the life"**
 (end of Phase 7), **M3 "Living world"** (end of Phase 10), **M4 Vertical slice** (Phase 12).
@@ -281,6 +282,21 @@ journal modal like the map). Rural villages follow as Phase 16.
 once; old saves load with an empty journal; the card queues and never pauses; the screen
 pauses and shows silhouettes for animals not met.
 **Exit:** the journal makes the user want to explore and meet every animal.
+
+---
+
+## Phase 15b — More animals
+
+The journal grows from 14 to 19 animals (user decision): the wolf from the Quaternius pack,
+and four small animals built in code. Farm animals wait for the villages (Phase 16).
+
+- [x] The wolf (forest and hills, shy, rare).
+- [ ] Hedgehogs at night and leaping fish.
+- [ ] Squirrels and owls in the trees.
+
+**Tests:** every new animal has its journal entry; night animals only at night; fish hidden
+except while leaping; tree dwellers spawn by trees, climb or fly off when scared.
+**Exit:** the world feels busier, by day and especially at night.
 
 ---
 

@@ -38,6 +38,7 @@ Every third-party asset in `assets/` must be listed here (see CLAUDE.md §1).
 | `shiba_inu` | `assets/animals/shiba_inu/shiba_inu.glb` | Quaternius, Ultimate Animated Animal Pack (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/y4wdQpg767 |
 | `alpaca` | `assets/animals/alpaca/alpaca.glb` | Quaternius, Ultimate Animated Animal Pack (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/bCVFD48i2l |
 | `horse` | `assets/animals/horse/horse.glb` | Quaternius, Ultimate Animated Animal Pack (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/qvTrSG9pZF |
+| `wolf` | `assets/animals/wolf/wolf.glb` | Quaternius, Ultimate Animated Animal Pack (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/P1gU3Qkr9r |
 | `donkey` | `assets/animals/donkey/donkey.glb` | Quaternius, Ultimate Animated Animal Pack (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/qmX6nhnvp7 |
 | `forest_birds` | `assets/audio/ambience/forest_birds.wav` | Thimras, *Park ambiences* (birds track; cut to a 40 s mono loop with `tools/ambience_loop.py`) (OpenGameArt) | CC0 1.0 | https://opengameart.org/content/park-ambiences |
 | `river` | `assets/audio/ambience/river.wav` | Thimras, *Park ambiences* (river track; 40 s mono loop, `tools/ambience_loop.py`) (OpenGameArt) | CC0 1.0 | https://opengameart.org/content/park-ambiences |

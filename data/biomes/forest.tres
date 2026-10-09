@@ -21,6 +21,7 @@
 [ext_resource type="Resource" path="res://data/fauna/deer.tres" id="61_deer"]
 [ext_resource type="Resource" path="res://data/fauna/stag.tres" id="61_stag"]
 [ext_resource type="Resource" path="res://data/fauna/shiba_inu.tres" id="61_shiba_inu"]
+[ext_resource type="Resource" path="res://data/fauna/wolf.tres" id="62_wolf"]
 
 [sub_resource type="Resource" id="Resource_rgie2"]
 script = ExtResource("2_w3brh")
@@ -172,6 +173,11 @@ script = ExtResource("60_fentry")
 species = ExtResource("61_shiba_inu")
 weight = 2.0
 
+[sub_resource type="Resource" id="Resource_fauna_wolf"]
+script = ExtResource("60_fentry")
+species = ExtResource("62_wolf")
+weight = 1.0
+
 [resource]
 script = ExtResource("1_s8i2t")
 id = &"forest"
@@ -186,4 +192,4 @@ vegetation = Array[ExtResource("2_w3brh")]([SubResource("Resource_rgie2"), SubRe
 ground_color_a = Color(0.27, 0.44, 0.22, 1)
 ground_color_b = Color(0.4, 0.36, 0.23, 1)
 fauna_chance = 0.22
-fauna = Array[ExtResource("60_fentry")]([SubResource("Resource_fauna_deer"), SubResource("Resource_fauna_stag"), SubResource("Resource_fauna_shiba_inu")])
+fauna = Array[ExtResource("60_fentry")]([SubResource("Resource_fauna_deer"), SubResource("Resource_fauna_stag"), SubResource("Resource_fauna_shiba_inu"), SubResource("Resource_fauna_wolf")])

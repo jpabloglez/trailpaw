@@ -573,6 +573,13 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
     `body_length`, fitted by `FaunaAgent`); none swims. `data/fauna/<id>.tres` adds
     temperament, herd size and wander radius. Hoofed clips differ in name (`Idle_Headlow`,
     `Jump_toIdle`).
+  - **Wolf (Phase 15b):** a seventh species from the same Quaternius pack (Poly Pizza
+    `P1gU3Qkr9r`, CC0), with the same rig and clips as the husky and shiba.
+    - `data/species/wolf.tres`: scale 0.4 (head 0.84 m, body 1.15 m: between the shiba and
+      the deer); measured `clip_ground_speeds` Walk 0.724, Gallop 3.243.
+    - `data/fauna/wolf.tres`: **shy**, packs of 1–3, wanders 24 m, quiet.
+    - Forest and hills at weight 1, the rarest of each. The hills' `fauna_chance` went from
+      0.18 to 0.19, so their animal density stays ≥ 0.4 per chunk.
   - **Spawning** (`FaunaDirector` in the world scene, `data/fauna/director.tres`): when a chunk
     becomes full detail (LOD 0, `WorldStreamer.chunks_changed`), the pure `FaunaPlan.roll()`
     decides — seeded per (world seed, chunk) — whether it hosts a herd (biome `fauna_chance`,

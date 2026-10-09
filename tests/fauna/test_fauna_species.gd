@@ -1,5 +1,6 @@
-## Tests for the six wild species: data, temperaments, model fit and orientation, relative
-## sizes, credits and the agent's collision capsule.
+## Tests for the wild species (the six of Phase 8 and the Phase 15b wolf): data,
+## temperaments, model fit and orientation, relative sizes, credits and the agent's collision
+## capsule.
 extends GdUnitTestSuite
 
 const AGENT_SCENE: String = "res://scenes/fauna/fauna_agent.tscn"
@@ -10,6 +11,7 @@ const TEMPERAMENTS: Dictionary = {
 	&"alpaca": FaunaSpecies.Temperament.CURIOUS,
 	&"horse": FaunaSpecies.Temperament.CALM,
 	&"donkey": FaunaSpecies.Temperament.CALM,
+	&"wolf": FaunaSpecies.Temperament.SHY,
 }
 
 
@@ -68,6 +70,8 @@ func test_relative_sizes_make_sense() -> void:
 	assert_float(heights[&"horse"]).is_greater(heights[&"donkey"])
 	assert_float(heights[&"donkey"]).is_greater(heights[&"shiba_inu"])
 	assert_float(heights[&"stag"]).is_greater_equal(heights[&"deer"] * 0.95)
+	assert_float(heights[&"wolf"]).is_greater(heights[&"shiba_inu"])  # bigger than a dog...
+	assert_float(heights[&"wolf"]).is_less(heights[&"deer"])  # ...smaller than a deer
 	for id: StringName in heights:
 		assert_float(heights[id]).override_failure_message(String(id)).is_between(0.5, 2.6)
 
@@ -122,3 +126,18 @@ func test_animals_of_a_species_share_one_clip_library_and_skip_footsteps() -> vo
 		assert_bool(controller.footsteps).is_false()
 		assert_array(controller.contacts_for("Walk")).is_empty()
 	assert_object(libraries[0]).is_same(libraries[1])
+
+
+func test_the_wolf_lives_in_the_forest_and_hills_rarer_than_deer() -> void:
+	var wolf := _fauna(&"wolf")
+	assert_bool(wolf.herd_size.x >= 1 and wolf.herd_size.y <= 3).is_true()
+	assert_object(wolf.call_stream()).is_null()  # a quiet animal
+	for path: String in ["res://data/biomes/forest.tres", "res://data/biomes/hills.tres"]:
+		var biome: BiomeDefinition = load(path)
+		var weights := {}
+		for entry in biome.fauna:
+			weights[entry.species.id] = entry.weight
+		assert_bool(weights.has(&"wolf")).override_failure_message(path).is_true()
+		for other: StringName in weights:
+			if other != &"wolf":
+				assert_float(weights[&"wolf"]).is_less_equal(weights[other])  # the rarest
