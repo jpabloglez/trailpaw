@@ -42,6 +42,9 @@
 [ext_resource type="Resource" path="res://data/critters/heron.tres" id="82_heron"]
 [ext_resource type="Resource" path="res://data/critters/hedgehog.tres" id="89_hedge"]
 [ext_resource type="Resource" path="res://data/critters/fish.tres" id="90_fish"]
+[ext_resource type="Script" path="res://scripts/critters/tree_life.gd" id="91_tree"]
+[ext_resource type="Resource" path="res://data/critters/squirrel.tres" id="92_squirrel"]
+[ext_resource type="Resource" path="res://data/critters/owl.tres" id="93_owl"]
 [ext_resource type="Resource" path="res://data/critters/system.tres" id="73_critset"]
 [ext_resource type="Script" path="res://scripts/critters/bird_flocks.gd" id="74_birds"]
 [ext_resource type="Resource" path="res://data/critters/birds.tres" id="75_birdset"]
@@ -212,4 +215,12 @@ settings = ExtResource("84_mistset")
 terrain = ExtResource("3_u18in")
 world_environment = NodePath("../WorldEnvironment")
 day_night = NodePath("../DayNightCycle")
+player = NodePath("../Animal")
+
+[node name="TreeLife" type="Node3D" parent="." node_paths=PackedStringArray("streamer", "player")]
+script = ExtResource("91_tree")
+kinds = Array[ExtResource("71_critkind")]([ExtResource("92_squirrel"), ExtResource("93_owl")])
+settings = ExtResource("73_critset")
+terrain = ExtResource("3_u18in")
+streamer = NodePath("../WorldStreamer")
 player = NodePath("../Animal")

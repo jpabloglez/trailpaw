@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="CritterKind" format=3]
+
+[ext_resource type="Script" path="res://scripts/critters/critter_kind.gd" id="1_ck"]
+
+[resource]
+script = ExtResource("1_ck")
+id = &"squirrel"
+shape = &"squirrel"
+behaviour = &"climber"
+hours = Vector2(7, 19.5)
+biome_counts = Dictionary[StringName, Vector2i]({
+&"forest": Vector2i(1, 3)
+})
+chance = 0.55
+scale_range = Vector2(1.0, 1.2)
+home_radius = 2.5
+idle_seconds = Vector2(1, 3.5)
+graze_hop = Vector3(0.4, 0.1, 0.22)
+flee_hop = Vector3(1.0, 0.0, 1.0)
+zigzag = 0.0
+flee_radius = 7.0
+flee_trigger_speed = 2.0
+startle_radius = 2.5
+calm_seconds = 6.0

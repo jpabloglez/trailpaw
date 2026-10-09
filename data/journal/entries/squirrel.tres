@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="JournalEntry" format=3]
+
+[ext_resource type="Script" path="res://scripts/journal/journal_entry.gd" id="1_je"]
+[ext_resource type="Resource" path="res://data/critters/squirrel.tres" id="2_animal"]
+
+[resource]
+script = ExtResource("1_je")
+id = &"squirrel"
+display_name = "Squirrel"
+blurb = "Busy at the foot of its tree, and up the trunk in a flash when you come running."
+source = 1
+animal = ExtResource("2_animal")
+sight_radius = 8.0
