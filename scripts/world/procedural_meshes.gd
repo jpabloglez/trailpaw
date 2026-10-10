@@ -138,6 +138,24 @@ static func critter(shape: StringName) -> ArrayMesh:
 					[Vector3(0, 0.2, 0.03), Vector3(0.03, 0.03, 0.03), fur],
 				]
 			)
+		&"marmot":  # chubby, brown with a paler belly and a dark short tail
+			var fur := Color(0.52, 0.4, 0.27)
+			var belly := Color(0.72, 0.6, 0.44)
+			var dark := Color(0.2, 0.15, 0.1)
+			var eye := Color(0.04, 0.03, 0.03)
+			return ellipsoids(
+				[
+					[Vector3(0, 0.11, 0.02), Vector3(0.1, 0.095, 0.15), fur],
+					[Vector3(0, 0.09, -0.02), Vector3(0.08, 0.075, 0.12), belly],
+					[Vector3(0, 0.17, -0.14), Vector3(0.065, 0.06, 0.07), fur],
+					[Vector3(0, 0.155, -0.2), Vector3(0.035, 0.03, 0.035), belly],  # the muzzle
+					[Vector3(-0.045, 0.22, -0.13), Vector3(0.015, 0.015, 0.01), dark],
+					[Vector3(0.045, 0.22, -0.13), Vector3(0.015, 0.015, 0.01), dark],
+					[Vector3(-0.033, 0.19, -0.19), Vector3(0.009, 0.009, 0.009), eye],
+					[Vector3(0.033, 0.19, -0.19), Vector3(0.009, 0.009, 0.009), eye],
+					[Vector3(0, 0.12, 0.18), Vector3(0.03, 0.03, 0.06), dark],  # the tail
+				]
+			)
 		&"hedgehog":
 			var spines := Color(0.33, 0.27, 0.22)
 			var tips := Color(0.62, 0.55, 0.45)

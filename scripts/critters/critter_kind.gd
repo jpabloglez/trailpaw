@@ -14,11 +14,14 @@ extends Resource
 ## [member flee_hop] being the flight, to shallow water farther away), [code]&"curler"[/code]
 ## (a hedgehog: hops like a hopper, but scared it curls into a ball where it is) or
 ## [code]&"leaper"[/code] (a fish: hidden in water at least [member min_depth] deep, it leaps
-## out every [member idle_seconds], [member graze_hop] being the leap).
+## out every [member idle_seconds], [member graze_hop] being the leap) or
+## [code]&"whistler"[/code] (a marmot: grazes around its burrow, sitting up now and then;
+## scared, it whistles and runs into the burrow, [member flee_hop] being its dash, hides there
+## for [member dive_seconds] and peeks out once the fox has gone; never above the snow line).
 @export var behaviour: StringName = &"hopper"
 ## Amphibians live on ground up to this high above the water (m).
 @export_range(0.0, 5.0, 0.05, "suffix:m") var bank_height: float = 0.8
-## Amphibians stay under water this long after diving (min, max, s).
+## Amphibians stay under water this long after diving, whistlers in their burrow (min, max, s).
 @export var dive_seconds: Vector2 = Vector2(4.0, 8.0)
 ## Hours of the day it is out (from, to; game hours, wrapping past midnight, e.g. 20 → 5).
 ## Zero: always. Out of its hours it is not simulated, not drawn and cannot be met.
