@@ -40,6 +40,10 @@ extends Resource
 @export var prop_ids: Array[StringName] = [&"cart", &"barrel", &"hay", &"crate", &"bench"]
 ## Props per house (min, max).
 @export var props_per_house: Vector2i = Vector2i(1, 3)
+## Hamlets this close but not yet built show a tall smoke plume, a clue seen from afar (m), and
+## how high it rises (m).
+@export_range(100.0, 5000.0, 10.0, "suffix:m") var plume_radius: float = 1200.0
+@export_range(5.0, 80.0, 1.0, "suffix:m") var plume_height: float = 60.0
 ## Ids of the vegetable patch and the hens' nest (food, Phase 16; pieces without a model).
 @export var patch_id: StringName = &"patch"
 @export var nest_id: StringName = &"nest"

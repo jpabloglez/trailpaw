@@ -25,6 +25,7 @@ Claude Code; one sprint = 2 weeks.
 | 15 | Animal journal | 1 | 49 w |
 | 15b | More animals (wolf, hedgehog, fish, squirrel, owl) | 1 | 50 w |
 | 16 | Rural hamlets | 2 | 52 w |
+| 16b | Distant smoke + biome atlas | 1 | 53 w |
 
 Milestones: **M1 "Walk the world"** (end of Phase 3), **M2 "A day in the life"**
 (end of Phase 7), **M3 "Living world"** (end of Phase 10), **M4 Vertical slice** (Phase 12).
@@ -317,6 +318,21 @@ with a risk). ADR-007.
 their pen; routines follow the hour; shooing by distance and field of view; food regrows and
 persists.
 **Exit:** hamlets feel like quiet, inhabited places worth watching and visiting carefully.
+
+---
+
+## Phase 16b — Distant smoke and biome atlas
+
+Hamlets stay rare and scattered (no guaranteed hamlet near the start), but their smoke can be
+seen from afar; the journal also records the biomes visited. Mountains follow as Phase 17.
+
+- [x] Far smoke plumes: hamlets within 1.2 km show a tall smoke column above the horizon.
+- [ ] Biome atlas: a Biomes tab in the journal, with a "New biome" card and the area explored.
+
+**Tests:** plumes appear within the radius, hand over to the chimneys and are off on Low;
+biome visits are recorded once, saved and loaded.
+**Exit:** a column of smoke can lead the player to a hamlet; the journal shows where they've
+been.
 
 ---
 

@@ -5,6 +5,10 @@ extends Node3D
 ## houses, the well and fences), windows that glow at night and chimney smoke (off on Low).
 ## A hamlet is one node in the floating-origin group, its pieces placed relative to its well.
 ## [br][br]
+## Hamlets farther away, up to [member HamletSettings.plume_radius], show only a tall, slow smoke
+## plume above their roofs: a clue seen across the land (it ignores the distance fog, so it reads
+## above the hazy horizon). It hands over to the chimneys when the hamlet is built.
+## [br][br]
 ## Budget: hamlets are looked up once a second (cached per cell); building is spread over frames,
 ## ≤ 1 piece per frame; the window glow is one shared material updated once a second.
 
@@ -34,6 +38,8 @@ var _since: float = 1.0
 var _sampler: HeightSampler
 var _sampler_seed: int = -1
 var _windows: StandardMaterial3D
+var _plumes: Dictionary[Vector2i, GPUParticles3D] = {}
+var _plume_look: StandardMaterial3D
 var _smoke_texture: Texture2D
 
 
@@ -63,6 +69,7 @@ func refresh() -> void:
 	if focus == null or terrain == null or terrain.hamlets == null:
 		return
 	var at := GameState.absolute_position(focus.global_position)
+	_refresh_plumes(at)
 	for cell: Vector2i in _built.keys():
 		var centre := _layouts[cell].centre
 		if Vector2(centre.x - at.x, centre.z - at.z).length() > free_radius:
@@ -84,6 +91,11 @@ func refresh() -> void:
 		for i in hamlet.size():
 			_queue.append([hamlet.cell, i])
 		hamlet_built.emit(hamlet, root)
+
+
+## The far plume of the hamlet of [param cell] (null when it has none).
+func plume_of(cell: Vector2i) -> GPUParticles3D:
+	return _plumes.get(cell)
 
 
 ## Builds everything still queued now (tests and tools).
@@ -194,8 +206,9 @@ func _smoke(at: Vector3) -> GPUParticles3D:
 	process.initial_velocity_max = 0.8
 	process.gravity = Vector3(0.15, 0.1, 0.0)  # drifts a little with the breeze
 	process.scale_min = 0.8
-	process.scale_max = 1.6
+	process.scale_max = 1.5
 	var grow := Curve.new()
+	grow.max_value = 2.0  # points above the default 1 would be clamped
 	grow.add_point(Vector2(0.0, 0.4))
 	grow.add_point(Vector2(1.0, 1.6))
 	var grow_texture := CurveTexture.new()
@@ -221,12 +234,94 @@ func _smoke(at: Vector3) -> GPUParticles3D:
 	return smoke
 
 
+# Plumes for hamlets within plume_radius that are not built; none on the Low preset.
+func _refresh_plumes(at: Vector3) -> void:
+	var settings := terrain.hamlets
+	var wanted := {}
+	if Settings.quality == null or Settings.quality.motion_effects:
+		for hamlet in hamlets_near(at, settings.plume_radius):
+			if not _built.has(hamlet.cell) and not _is_close(hamlet, at):
+				wanted[hamlet.cell] = hamlet
+	for cell: Vector2i in _plumes.keys():
+		if not wanted.has(cell):
+			_plumes[cell].queue_free()
+			_plumes.erase(cell)
+	for cell: Vector2i in wanted:
+		if _plumes.has(cell):
+			continue
+		var hamlet: HamletLayout = wanted[cell]
+		var plume := _plume(settings.plume_height)
+		plume.name = "Plume_%d_%d" % [cell.x, cell.y]
+		plume.add_to_group(FloatingOrigin.SHIFTABLE_GROUP)
+		add_child(plume)
+		plume.global_position = GameState.local_position(hamlet.centre) + Vector3.UP * 8.0
+		_plumes[cell] = plume
+
+
+func _is_close(hamlet: HamletLayout, at: Vector3) -> bool:
+	return Vector2(hamlet.centre.x - at.x, hamlet.centre.z - at.z).length() <= build_radius
+
+
+# A tall, slow column of pale smoke rising [param height] metres (a plume seen from afar).
+func _plume(height: float) -> GPUParticles3D:
+	var plume := GPUParticles3D.new()
+	plume.amount = 48
+	plume.lifetime = 14.0
+	plume.preprocess = 14.0  # already risen when it appears
+	plume.local_coords = false
+	plume.visibility_aabb = AABB(Vector3(-40, -5, -40), Vector3(80, height + 40.0, 80))
+	var process := ParticleProcessMaterial.new()
+	process.direction = Vector3.UP
+	process.spread = 6.0
+	var speed := height / 14.0
+	process.initial_velocity_min = speed * 0.85
+	process.initial_velocity_max = speed * 1.15
+	process.gravity = Vector3(0.12, 0.0, 0.05)  # leans a little with the breeze
+	process.scale_min = 1.0
+	process.scale_max = 1.5
+	var grow := Curve.new()
+	grow.max_value = 3.0  # points above the default 1 would be clamped
+	grow.add_point(Vector2(0.0, 0.6))
+	grow.add_point(Vector2(1.0, 2.5))
+	var grow_texture := CurveTexture.new()
+	grow_texture.curve = grow
+	process.scale_curve = grow_texture
+	var fade := Gradient.new()
+	# Grey rather than white: it must stand out against the pale sky near the horizon.
+	fade.set_color(0, Color(0.55, 0.55, 0.57, 0.8))
+	fade.set_color(1, Color(0.72, 0.72, 0.74, 0.0))
+	fade.add_point(0.6, Color(0.64, 0.64, 0.66, 0.7))  # still thick as it spreads
+	var fade_texture := GradientTexture1D.new()
+	fade_texture.gradient = fade
+	process.color_ramp = fade_texture
+	plume.process_material = process
+	var quad := QuadMesh.new()
+	quad.size = Vector2(16.0, 16.0)  # a few pixels wide even a kilometre away
+	quad.material = _plume_material()
+	plume.draw_pass_1 = quad
+	return plume
+
+
+func _plume_material() -> StandardMaterial3D:
+	if _plume_look == null:
+		_plume_look = StandardMaterial3D.new()
+		_plume_look.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		_plume_look.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		_plume_look.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
+		_plume_look.vertex_color_use_as_albedo = true
+		_plume_look.albedo_texture = MotionEffects.soft_dot()
+		_plume_look.disable_fog = true  # a clue above the hazy horizon
+	return _plume_look
+
+
 func _update_glow() -> void:
 	var dark := 0.0
 	if day_night != null:
 		var hour := GameState.time_of_day() / 60.0
 		dark = DayCurve.sample(day_night.settings.key_hours, day_night.settings.stars, hour)
 	_windows.emission_energy_multiplier = 2.5 * dark
+	if _plume_look != null:  # dimmer against the night sky
+		_plume_look.albedo_color = Color(1.0, 1.0, 1.0, lerpf(1.0, 0.4, dark))
 
 
 func _height_sampler() -> HeightSampler:

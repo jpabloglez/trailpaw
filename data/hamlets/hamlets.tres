@@ -37,3 +37,5 @@ prop_ids = Array[StringName]([&"cart", &"barrel", &"hay", &"crate", &"bench"])
 props_per_house = Vector2i(1, 3)
 patch_id = &"patch"
 nest_id = &"nest"
+plume_radius = 1200.0
+plume_height = 60.0

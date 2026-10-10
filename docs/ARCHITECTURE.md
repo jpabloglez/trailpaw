@@ -860,6 +860,14 @@ the critter layer (packed arrays, one MultiMesh, chunk-driven, origin-shifted), 
   - The `Windows` material surfaces share one emissive material, which glows warm with the
     darkness (the sky's stars).
   - Houses get chimney smoke (soft-dot `GPUParticles3D`, off on Low).
+  - **Far plumes (Phase 16b):** hamlets that are not built but lie within `plume_radius`
+    (1.2 km) show one tall, slow grey smoke column (`plume_height` 60 m). It is a clue for
+    finding them, since hamlets stay rare.
+    - The plume is a `GPUParticles3D` of 48 soft dots, 16 m wide and growing as they rise.
+      Its material sets `disable_fog`, so it reads above the hazy horizon.
+    - It dims at night and is in the floating-origin group (`plume_of(cell)`).
+    - It is freed when the hamlet is built (its chimneys take over) or beyond the radius.
+      There are none on Low.
 - **The map** marks the hamlets you have explored with a small house icon
   (`MapScreen.hamlet_marks()`).
 - **`FarmLife`** (both world scenes) populates each hamlet as it's built
