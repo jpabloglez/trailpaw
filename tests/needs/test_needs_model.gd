@@ -123,6 +123,48 @@ func test_running_heats_up_and_water_cools_down() -> void:
 	)
 
 
+func test_only_the_snow_is_too_cold() -> void:
+	var model := _model()
+	var table: BiomeTable = load("res://data/biomes/biome_table.tres")
+	# The coldest a biome gets off the snow (midnight, rain, standing still) stays above the
+	# knee, so its comfort is exactly what it was before the cold existed.
+	var coldest_extra := (
+		_modifiers.night_warmth + _modifiers.weather_warmth.z + _modifiers.heat(IDLE)
+	)
+	for biome in table.biomes:
+		var felt := biome.warmth + coldest_extra
+		assert_float(felt).is_greater_equal(_modifiers.cold_knee)
+		assert_float(_modifiers.comfort_warmth(felt)).is_equal(felt)
+	for felt: float in [-1.6, -0.8, 0.0, 1.5]:
+		assert_float(_modifiers.comfort_warmth(felt)).is_equal(felt)
+	var mountains := -0.5
+	var snow := mountains + _modifiers.snow_warmth
+	# Midnight on the snow, standing still: comfort drops.
+	var midnight := snow + _modifiers.night_warmth
+	assert_float(model.rate_for(&"temperature", IDLE, midnight)).is_less(0.0)
+	assert_bool(_modifiers.is_too_cold(midnight + _modifiers.heat(IDLE))).is_true()
+	# Running at noon warms the fox up: it recovers again.
+	var noon := snow + _modifiers.noon_warmth
+	assert_float(model.rate_for(&"temperature", RUN, noon)).is_greater(0.0)
+	assert_bool(_modifiers.is_too_cold(noon + _modifiers.heat(RUN))).is_false()
+	# The mountain off the snow refreshes like any cool biome.
+	assert_float(model.rate_for(&"temperature", IDLE, mountains)).is_greater(0.0)
+	# Water keeps its own coolness whatever the air.
+	assert_float(model.rate_for(&"temperature", SWIM, midnight, true)).is_equal(
+		model.rate_for(&"temperature", SWIM, 0.0, true)
+	)
+
+
+func test_the_cold_curve_is_continuous() -> void:
+	var knee := _modifiers.cold_knee
+	assert_float(_modifiers.comfort_warmth(knee - 1e-4)).is_equal_approx(knee, 1e-3)
+	var previous := _modifiers.comfort_warmth(knee)
+	for i in range(1, 40):
+		var value := _modifiers.comfort_warmth(knee - i * 0.05)
+		assert_float(value).is_greater(previous)  # colder and colder below the knee
+		previous = value
+
+
 # --- critical signals ---------------------------------------------------------------------
 
 

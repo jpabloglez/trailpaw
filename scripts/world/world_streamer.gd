@@ -97,6 +97,7 @@ func _ready() -> void:
 	RenderingServer.global_shader_parameter_set(WATER_LEVEL_PARAM, terrain.sea_level)
 	GameState.water_level = terrain.sea_level
 	RenderingServer.global_shader_parameter_set(SNOW_LINE_PARAM, terrain.snow_line)
+	GameState.snow_line = terrain.snow_line
 	RenderingServer.global_shader_parameter_set(SNOW_BLEND_PARAM, terrain.snow_blend)
 	EventBus.origin_shifted.connect(_on_origin_shifted)
 	vegetation_density = Settings.quality.vegetation_density

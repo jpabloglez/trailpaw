@@ -343,7 +343,7 @@ A 1.2 km mountain band after the hills: snowy peaks with passes always crossable
 cold on the snow, and mountain animals (user decisions; ADR-008).
 
 - [x] The mountain band: relief profile, snow line, pines and rocks, alpacas and deer.
-- [ ] Cold on the snow: a two-sided temperature, a frosty vignette.
+- [x] Cold on the snow: a two-sided temperature, a frosty vignette.
 - [ ] Marmots that whistle and hide in their burrows.
 - [ ] A golden eagle soaring over the peaks.
 - [ ] The ibex (built in code with bpy), at home on the cliffs.

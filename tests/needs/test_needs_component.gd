@@ -6,16 +6,19 @@ const ANIMAL_SCENE: String = "res://scenes/player/animal.tscn"
 
 var _saved_biome: StringName
 var _saved_water: float
+var _saved_snow: float
 
 
 func before_test() -> void:
 	_saved_biome = GameState.current_biome
 	_saved_water = GameState.water_level
+	_saved_snow = GameState.snow_line
 
 
 func after_test() -> void:
 	GameState.current_biome = _saved_biome
 	GameState.water_level = _saved_water
+	GameState.snow_line = _saved_snow
 
 
 func _animal_on_floor() -> Animal:
@@ -89,6 +92,29 @@ func test_standing_in_water_cools_off() -> void:
 	GameState.water_level = animal.global_position.y + 0.1  # wading
 	needs.tick(60.0)
 	assert_float(needs.value(&"temperature")).is_greater(50.0)
+
+
+func test_on_the_snow_it_gets_cold() -> void:
+	var animal := _animal_on_floor()
+	var needs := _needs(animal)
+	GameState.current_biome = &"mountains"
+	GameState.snow_line = INF
+	var bare := needs.felt_warmth()
+	assert_bool(needs.on_snow()).is_false()
+	assert_bool(needs.is_cold()).is_false()
+	GameState.snow_line = animal.global_position.y - 1.0  # standing above it
+	assert_bool(needs.on_snow()).is_true()
+	assert_float(needs.felt_warmth()).is_equal_approx(bare + needs.modifiers.snow_warmth, 1e-4)
+	var saved_minutes := GameState.game_minutes
+	GameState.game_minutes = 0.0  # midnight
+	assert_bool(needs.is_cold()).is_true()
+	assert_str(needs.get_debug_lines()[0]).contains("cold")
+	needs.set_value(&"temperature", 80.0)
+	needs.tick(60.0)
+	assert_float(needs.value(&"temperature")).is_less(80.0)
+	GameState.water_level = animal.global_position.y + 0.1  # a pool on the snow
+	assert_bool(needs.is_cold()).is_false()
+	GameState.game_minutes = saved_minutes
 
 
 func test_critical_and_recovery_reach_the_event_bus() -> void:

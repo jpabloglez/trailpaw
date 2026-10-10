@@ -10,3 +10,5 @@ intensity_per_need = 0.5
 fade_per_second = 0.25
 inner_radius = 0.7
 outer_radius = 1.45
+cold_tint = Color(0.32, 0.52, 0.86, 1)
+cold_intensity = 0.6
