@@ -16,6 +16,9 @@ extends Resource
 @export_range(0.0, 2.0, 0.01) var inner_radius: float = 0.0
 ## Normalised radius where the tint reaches full strength.
 @export_range(0.0, 2.0, 0.01) var outer_radius: float = 0.0
+## Frosty edge colour while the animal is too cold, and its intensity (Phase 17).
+@export var cold_tint: Color = Color.WHITE
+@export_range(0.0, 1.0, 0.01) var cold_intensity: float = 0.0
 
 
 ## Target intensity for [param critical_count] critical needs.

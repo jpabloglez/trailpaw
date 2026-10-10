@@ -94,6 +94,11 @@ func gait() -> LocomotionModel.Gait:
 	return LocomotionModel.gait_for_speed(_speed, species)
 
 
+## Absolute height of the body (m; the snow line is absolute).
+func absolute_height() -> float:
+	return GameState.absolute_position(_body.global_position).y
+
+
 ## Water depth over the paws (m); 0 or less on dry land.
 func water_depth() -> float:
 	return GameState.water_level - _body.global_position.y

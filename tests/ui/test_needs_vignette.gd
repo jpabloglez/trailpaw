@@ -47,6 +47,30 @@ func test_intensity_follows_the_critical_count() -> void:
 	assert_float(vignette.intensity()).is_equal(0.0)
 
 
+func test_the_edges_turn_frosty_while_too_cold() -> void:
+	var setup := _setup()
+	var needs: NeedsComponent = setup[0]
+	var vignette: NeedsVignette = setup[1]
+	var saved := [GameState.snow_line, GameState.current_biome, GameState.game_minutes]
+	GameState.current_biome = &"mountains"
+	GameState.game_minutes = 0.0
+	GameState.snow_line = -100.0  # everything is snow
+	assert_bool(needs.is_cold()).is_true()
+	_advance(vignette, 10.0)
+	assert_float(vignette.intensity()).is_equal_approx(vignette.settings.cold_intensity, 1e-4)
+	assert_float(vignette.coldness()).is_equal(1.0)
+	var material := (vignette.get_node("%Rect") as ColorRect).material as ShaderMaterial
+	var tint: Color = material.get_shader_parameter(&"tint")
+	assert_bool(tint.is_equal_approx(vignette.settings.cold_tint)).is_true()
+	GameState.snow_line = INF  # down from the snow: it eases back
+	_advance(vignette, 10.0)
+	assert_float(vignette.intensity()).is_equal(0.0)
+	assert_float(vignette.coldness()).is_equal(0.0)
+	GameState.snow_line = saved[0]
+	GameState.current_biome = saved[1]
+	GameState.game_minutes = saved[2]
+
+
 func test_intensity_eases_instead_of_jumping() -> void:
 	var setup := _setup()
 	var needs: NeedsComponent = setup[0]

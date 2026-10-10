@@ -7,7 +7,9 @@ extends Resource
 ## with the multiplier of the current activity (missing = 1; negative = recovery, e.g. energy
 ## while idle). [member warmth_need] follows the felt warmth instead:
 ## [code]-decay_per_minute × (biome warmth + activity heat)[/code], and in water the felt warmth
-## is [member water_warmth]. Positive warmth lowers comfort, negative restores it.
+## is [member water_warmth]. Positive warmth lowers comfort, negative restores it, down to
+## [member cold_knee]: colder than that, comfort recovers less and less and then drops (too
+## cold; in practice only on the mountain snow, Phase 17).
 
 ## Need driven by warmth rather than activity multipliers.
 @export var warmth_need: StringName = &"temperature"
@@ -34,6 +36,13 @@ extends Resource
 @export_range(-2.0, 2.0, 0.05) var noon_warmth: float = 0.0
 ## Warmth added by the weather: clear, cloudy, rain.
 @export var weather_warmth: Vector3 = Vector3.ZERO
+@export_group("Cold")
+## Warmth added while standing on snow (above [member TerrainSettings.snow_line]).
+@export_range(-5.0, 0.0, 0.05) var snow_warmth: float = 0.0
+## Felt warmth that refreshes the most; colder feels worse ([method comfort_warmth]).
+@export_range(-5.0, 0.0, 0.05) var cold_knee: float = -5.0
+## How fast comfort turns from recovering to dropping below [member cold_knee].
+@export_range(0.1, 10.0, 0.1) var cold_steepness: float = 1.0
 
 @export_group("Rain")
 ## Need id → rate multiplier while it rains (e.g. less thirst).
@@ -75,6 +84,20 @@ func weather_warmth_for(weather: StringName) -> float:
 		&"rain":
 			return weather_warmth.z
 	return weather_warmth.x
+
+
+## The warmth comfort reacts to for a felt warmth of [param felt]: [param felt] itself down to
+## [member cold_knee], then rising again with [member cold_steepness] (positive = too cold).
+## Continuous; the identity for every felt warmth above the knee.
+func comfort_warmth(felt: float) -> float:
+	if felt >= cold_knee:
+		return felt
+	return cold_knee + (cold_knee - felt) * cold_steepness
+
+
+## Whether a felt warmth of [param felt] is too cold (comfort drops).
+func is_too_cold(felt: float) -> bool:
+	return felt < cold_knee and comfort_warmth(felt) > 0.0
 
 
 ## Warmth added by [param activity] (see [enum NeedsModel.Activity]).

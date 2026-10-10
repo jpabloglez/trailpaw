@@ -424,6 +424,16 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
   Since Phase 9 the felt warmth also follows the **time of day** (−0.3 at midnight … +0.2 at
   noon, cosine) and the **weather** (cloudy −0.1, rain −0.5): `NeedsComponent.felt_warmth()`.
   While it rains thirst drains ×0.7 (`NeedModifiers.rain`).
+- **Cold on the snow (Phase 17):** above `GameState.snow_line` (set by `WorldStreamer` from
+  `TerrainSettings`), the felt warmth gets `snow_warmth` (−2.2).
+  - Comfort reacts to `NeedModifiers.comfort_warmth(felt)`. That is the felt warmth itself
+    down to `cold_knee` (−1.6); colder, it rises again at `cold_steepness` (×2), so comfort
+    recovers less and less and then drops once the value turns positive (`is_too_cold`).
+  - No biome reaches the knee off the snow, even at midnight in the rain standing still (a
+    test checks this). Water keeps its own −1.5.
+  - On the snow at midnight, standing still, comfort drops. Running at noon recovers it, and
+    so does coming down.
+  - `NeedsComponent.is_cold()` drives the vignette. The F3 line says "cold".
 - `NeedsModel` (pure): values, `rate_for()`, `tick()`, clamping and critical state with signals
   `value_changed` / `critical_entered` / `critical_exited`. `NeedsComponent` (on the Animal) ticks
   it at 4 Hz with the activity from `MovementComponent`, the warmth of `GameState.current_biome`
@@ -437,6 +447,8 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
   `NeedsVignette` (`scenes/ui/needs_vignette.tscn`, `shaders/needs_vignette.gdshader`,
   `data/ui/needs_vignette.tres`) warms and darkens the screen edges, half intensity for one
   critical need and full for two or more, fading at 0.25/s.
+  While the animal is too cold, its edges ease to a frosty blue (`cold_tint`) at no less
+  than `cold_intensity` (0.6).
 - HUD (`NeedsHud`, `scenes/ui/needs_hud.tscn`, `data/ui/needs_hud.tres`): bottom left, one
   `NeedMeter` per need, an icon inside a ring that empties with the need (ring colour
   `NeedDefinition.color`). Icons are silhouettes drawn in code by `NeedIcon`: a drop (thirst), an

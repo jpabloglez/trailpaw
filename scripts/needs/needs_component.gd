@@ -1,7 +1,8 @@
 class_name NeedsComponent
 extends Node
 ## Ticks the animal's needs ([NeedsModel]) at [constant TICK_HZ] with the current activity
-## (from the [MovementComponent]), the current biome's warmth and whether it is in water.
+## (from the [MovementComponent]), the current biome's warmth, whether it is in water and
+## whether it stands on snow (above [code]GameState.snow_line[/code], colder).
 ##
 ## Emits [signal need_changed] for the HUD and relays critical crossings both locally and on
 ## [code]EventBus.need_critical[/code] / [code]EventBus.need_recovered[/code]. The debug action
@@ -110,13 +111,24 @@ func biome_warmth() -> float:
 	return _warmth.get(GameState.current_biome, 0.0)
 
 
-## Warmth the animal feels: its biome's, plus the time of day and the weather.
+## Warmth the animal feels: its biome's, plus the time of day, the weather and the snow.
 func felt_warmth() -> float:
 	return (
 		biome_warmth()
 		+ modifiers.time_warmth(GameState.time_of_day() / 60.0)
 		+ modifiers.weather_warmth_for(GameState.weather)
+		+ (modifiers.snow_warmth if on_snow() else 0.0)
 	)
+
+
+## Whether the animal stands above the snow line.
+func on_snow() -> bool:
+	return movement != null and movement.absolute_height() > GameState.snow_line
+
+
+## Whether the animal is too cold now (comfort drops; never in water).
+func is_cold() -> bool:
+	return not in_water() and modifiers.is_too_cold(felt_warmth() + modifiers.heat(activity()))
 
 
 ## Whether it rains (less thirst, see [member NeedModifiers.rain]).
@@ -156,7 +168,12 @@ func get_debug_lines() -> PackedStringArray:
 		parts.append("%s %.0f%s" % [id, model.value(id), "!" if model.is_critical(id) else ""])
 	var activity_name := NeedsModel.ACTIVITY_NAMES[activity()]
 	return PackedStringArray(
-		["needs %s  (%s, feels %+.2f)" % ["  ".join(parts), activity_name, felt_warmth()]]
+		[
+			(
+				"needs %s  (%s, feels %+.2f%s)"
+				% ["  ".join(parts), activity_name, felt_warmth(), ", cold" if is_cold() else ""]
+			)
+		]
 	)
 
 

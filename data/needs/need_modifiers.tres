@@ -37,6 +37,9 @@ tired_ease_per_second = 0.5
 night_warmth = -0.3
 noon_warmth = 0.2
 weather_warmth = Vector3(0, -0.1, -0.5)
+snow_warmth = -2.2
+cold_knee = -1.6
+cold_steepness = 2.0
 rain = Dictionary[StringName, float]({
 &"thirst": 0.7
 })

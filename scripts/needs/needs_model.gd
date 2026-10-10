@@ -113,8 +113,10 @@ func rate_for(
 ) -> float:
 	var need := definition(need_id)
 	if need_id == _modifiers.warmth_need:
-		var felt := _modifiers.water_warmth if in_water else warmth + _modifiers.heat(activity)
-		return -need.decay_per_minute * felt
+		if in_water:
+			return -need.decay_per_minute * _modifiers.water_warmth
+		var felt := warmth + _modifiers.heat(activity)
+		return -need.decay_per_minute * _modifiers.comfort_warmth(felt)
 	var rate := -need.decay_per_minute * _modifiers.multiplier(need_id, activity)
 	if raining:
 		rate *= _modifiers.rain.get(need_id, 1.0)
