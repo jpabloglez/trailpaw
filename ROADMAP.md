@@ -310,7 +310,7 @@ with a risk). ADR-007.
 - [x] Hamlets: placement, clearings, buildings, night windows, smoke, map icon.
 - [x] Farm animals (sheep, pigs, cows) and chickens.
 - [x] Villagers with daily routines, who shoo the fox.
-- [ ] Eggs and vegetables: food with a risk.
+- [x] Eggs and vegetables: food with a risk.
 - [ ] Sounds of the hamlets.
 
 **Tests:** deterministic, flat and dry placement; clearings only near hamlets; animals stay in

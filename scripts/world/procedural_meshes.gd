@@ -401,6 +401,40 @@ static func _heron() -> ArrayMesh:
 	return tool.commit()
 
 
+## Hamlet food and its places (Phase 16): [code]&"cabbage"[/code] (≈ 35 cm),
+## [code]&"egg"[/code] (≈ 6 cm), [code]&"nest"[/code] (a ring of straw ≈ 50 cm) and
+## [code]&"soil"[/code] (a dug bed ≈ 4 × 2.6 m), standing on their origin.
+static func hamlet_food(shape: StringName) -> ArrayMesh:
+	match shape:
+		&"cabbage":
+			var outer := Color(0.35, 0.55, 0.25)
+			var inner := Color(0.62, 0.78, 0.42)
+			return ellipsoids(
+				[
+					[Vector3(0, 0.1, 0), Vector3(0.17, 0.1, 0.17), outer],
+					[Vector3(0.05, 0.13, 0.04), Vector3(0.12, 0.08, 0.12), outer],
+					[Vector3(0, 0.15, 0), Vector3(0.1, 0.09, 0.1), inner],
+				]
+			)
+		&"egg":
+			return ellipsoids(
+				[[Vector3(0, 0.03, 0), Vector3(0.022, 0.03, 0.022), Color(0.97, 0.94, 0.86)]], 6, 4
+			)
+		&"nest":
+			var straw := Color(0.78, 0.66, 0.38)
+			var parts := []
+			for n in 8:
+				var a := n * TAU / 8.0
+				parts.append(
+					[Vector3(cos(a) * 0.17, 0.04, sin(a) * 0.17), Vector3(0.1, 0.045, 0.1), straw]
+				)
+			parts.append([Vector3(0, 0.015, 0), Vector3(0.18, 0.015, 0.18), straw.darkened(0.15)])
+			return ellipsoids(parts, 6, 3)
+	return ellipsoids(
+		[[Vector3(0, 0.0, 0), Vector3(2.0, 0.04, 1.3), Color(0.36, 0.25, 0.16)]], 8, 3
+	)
+
+
 ## A firefly ≈ 2 cm long, facing −Z, centred on its origin: a dark body with a pale abdomen and
 ## two folded wing covers (the glow is added by whoever shows it).
 static func firefly() -> ArrayMesh:

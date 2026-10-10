@@ -5,7 +5,8 @@ extends Resource
 
 ## Identifier (layouts refer to pieces by it).
 @export var id: StringName = &""
-## The model (a CC0 glTF in [code]assets/village/[/code]).
+## The model (a CC0 glTF in [code]assets/village/[/code]); none for places such as the vegetable
+## patch, which others fill ([HamletFood]).
 @export var scene: PackedScene
 ## Radius of the ground it takes (m): pieces never overlap and no plant grows inside.
 @export_range(0.1, 20.0, 0.1, "suffix:m") var footprint: float = 1.0

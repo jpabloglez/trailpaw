@@ -40,6 +40,9 @@ extends Resource
 @export var prop_ids: Array[StringName] = [&"cart", &"barrel", &"hay", &"crate", &"bench"]
 ## Props per house (min, max).
 @export var props_per_house: Vector2i = Vector2i(1, 3)
+## Ids of the vegetable patch and the hens' nest (food, Phase 16; pieces without a model).
+@export var patch_id: StringName = &"patch"
+@export var nest_id: StringName = &"nest"
 
 
 ## The piece with [param id], or null.

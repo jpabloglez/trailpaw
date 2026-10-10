@@ -10,7 +10,7 @@ const SEED: int = 12345
 const FOREST := Vector2i(17, 2)
 const MEADOW := Vector2i(3, 3)
 const VALLEY := Vector2i(29, -3)
-const FOX_DIET: Array[StringName] = [&"berries", &"fruit", &"mushroom"]
+const FOX_DIET: Array[StringName] = [&"berries", &"fruit", &"mushroom", &"eggs", &"vegetables"]
 
 var _settings: TerrainSettings
 var _scatterer: VegetationScatterer
@@ -228,7 +228,7 @@ func test_reapplying_the_same_chunk_keeps_it_eaten_but_a_new_chunk_is_fresh() ->
 # --- diet ---------------------------------------------------------------------------------
 
 
-func test_fox_eats_berries_fruit_and_mushrooms_not_grass() -> void:
+func test_fox_eats_berries_fruit_mushrooms_and_hamlet_food_not_grass() -> void:
 	var fox := load("res://data/species/fox.tres") as AnimalSpecies
 	assert_array(fox.diet).contains_exactly_in_any_order(FOX_DIET)
 	for id: StringName in [&"berries", &"apple", &"mushroom", &"grass"]:

@@ -62,3 +62,7 @@ signal journal_opened
 ## A villager shooed the fox away from [param from] (global) (Phase 16).
 @warning_ignore("unused_signal")
 signal fox_shooed(from: Vector3)
+
+## The fox came near a hamlet's food for the first time this session (Phase 16: onboarding).
+@warning_ignore("unused_signal")
+signal hamlet_food_seen

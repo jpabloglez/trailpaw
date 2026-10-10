@@ -13,6 +13,8 @@
 [ext_resource type="Resource" path="res://data/hamlets/pieces/hay.tres" id="11_hay"]
 [ext_resource type="Resource" path="res://data/hamlets/pieces/crate.tres" id="12_crate"]
 [ext_resource type="Resource" path="res://data/hamlets/pieces/bench.tres" id="13_bench"]
+[ext_resource type="Resource" path="res://data/hamlets/pieces/patch.tres" id="14_patch"]
+[ext_resource type="Resource" path="res://data/hamlets/pieces/nest.tres" id="15_nest"]
 
 [resource]
 script = ExtResource("1_hs")
@@ -29,7 +31,9 @@ ring = Vector2(18, 28)
 yard_radius = 10.0
 clear_radius = 40.0
 model_scale = 3.0
-pieces = Array[ExtResource("2_hp")]([ExtResource("3_house_a"), ExtResource("4_house_b"), ExtResource("5_house_c"), ExtResource("6_stable"), ExtResource("7_well"), ExtResource("8_fence"), ExtResource("9_cart"), ExtResource("10_barrel"), ExtResource("11_hay"), ExtResource("12_crate"), ExtResource("13_bench")])
+pieces = Array[ExtResource("2_hp")]([ExtResource("3_house_a"), ExtResource("4_house_b"), ExtResource("5_house_c"), ExtResource("6_stable"), ExtResource("7_well"), ExtResource("8_fence"), ExtResource("9_cart"), ExtResource("10_barrel"), ExtResource("11_hay"), ExtResource("12_crate"), ExtResource("13_bench"), ExtResource("14_patch"), ExtResource("15_nest")])
 house_ids = Array[StringName]([&"house_a", &"house_b", &"house_c"])
 prop_ids = Array[StringName]([&"cart", &"barrel", &"hay", &"crate", &"bench"])
 props_per_house = Vector2i(1, 3)
+patch_id = &"patch"
+nest_id = &"nest"

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="HamletPiece" format=3]
+
+[ext_resource type="Script" path="res://scripts/hamlets/hamlet_piece.gd" id="1_hp"]
+
+[resource]
+script = ExtResource("1_hp")
+id = &"nest"
+footprint = 0.8
+smoke = false
+solid = false

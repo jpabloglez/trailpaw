@@ -88,6 +88,9 @@ func populate(layout: HamletLayout, root: Node3D) -> void:
 		var house := layout.positions[1 + rng.randi() % mini(3, layout.size() - 1)]
 		var toward := (layout.centre - house).normalized()
 		var spot := house - layout.centre + toward * (layout.radii[1] + 2.5)
+		var nest := layout.ids.find(director.terrain.hamlets.nest_id)
+		if nest >= 0:
+			spot = layout.positions[nest] - layout.centre  # around their nest
 		for n in rng.randi_range(chickens.x, chickens.y):
 			var angle := rng.randf() * TAU
 			var at := spot + Vector3(cos(angle), 0.0, sin(angle)) * rng.randf() * 3.0

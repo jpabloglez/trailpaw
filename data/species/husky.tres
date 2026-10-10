@@ -6,7 +6,7 @@
 [resource]
 script = ExtResource("2_ec3tc")
 display_name = "Husky"
-diet = Array[StringName]([&"berries", &"fruit", &"mushroom"])
+diet = Array[StringName]([&"berries", &"fruit", &"mushroom", &"eggs", &"vegetables"])
 model_scene = ExtResource("1_lpn18")
 model_scale = 0.34
 model_yaw_degrees = 180.0

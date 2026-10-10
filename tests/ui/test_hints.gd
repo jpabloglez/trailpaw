@@ -161,3 +161,20 @@ func test_the_journal_is_suggested_once_an_animal_is_met() -> void:
 	assert_str(hints.text_for(&"journal")).is_equal("J to open your journal")
 	EventBus.journal_opened.emit()
 	assert_bool(Settings.hints.is_done(&"journal")).is_true()
+
+
+func test_hamlet_food_is_hinted_once_seen_and_learnt_by_eating_it() -> void:
+	var hints := _director()
+	for id: StringName in HintDirector.ORDER:
+		if id != &"hamlet_food":
+			Settings.hints.mark(id)
+	await _wait(SETTINGS.first_delay + 0.4)
+	assert_str(String(hints.current())).is_equal("")
+	EventBus.hamlet_food_seen.emit()
+	await _wait(0.4)
+	assert_str(String(hints.current())).is_equal("hamlet_food")
+	assert_str(hints.text_for(&"hamlet_food")).contains("if nobody is looking")
+	EventBus.interaction_performed.emit(InteractionDefinition.Type.EAT, &"berries")
+	assert_bool(Settings.hints.is_done(&"hamlet_food")).is_false()  # berries don't count
+	EventBus.interaction_performed.emit(InteractionDefinition.Type.EAT, &"eggs")
+	assert_bool(Settings.hints.is_done(&"hamlet_food")).is_true()
