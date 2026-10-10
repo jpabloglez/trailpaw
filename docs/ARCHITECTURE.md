@@ -733,6 +733,20 @@ no AnimationTree.
     strayed. It goes nose up out of the water and nose down back in, with a plop and a splash
     at each end, and lands only in deep water. The fox doesn't scare them.
   - The journal needs only 0.3 s of a leap (`JournalEntry.sight_seconds`).
+- **Marmots (Phase 17)** are `behaviour = &"whistler"` (`data/critters/marmot.tres`, mesh in
+  code: chubby and brown, with a pale belly and muzzle, small ears and a dark tail).
+  - Where and when: mountains (2–4), 40 % of chunks, out 7:00–19:30, on slopes ≤ 32°.
+    **Never above the snow line**, which `_dry_and_gentle` checks.
+  - Their spawn spot is their **burrow** (`home`). They graze in short hops within 3.5 m of
+    it. Idle, they **sit up** now and then, keeping watch (drawn stretched up, 3 s in every
+    7).
+  - **Scared** (the fox moving within 14 m, or anywhere within 8 m):
+    - **it whistles** (`SynthSounds.whistle()`: two sharp calls sliding from 2.9 to
+      2.3 kHz, ≈ 0.45 s; one 3D player, `whistles` counts them)
+    - it dashes home in 1.6 m bounds and **hides in the burrow** (`State.UNDER`, not shown)
+      for 20–40 s
+    - it stays in while the fox is within 14 m, then **peeks out** and grazes again
+  - A fox standing still beyond 8 m can watch them. Journal `sight_radius` 16 m.
 
 - **Tree life (Phase 15b):** `TreeLife` (in both world scenes; `data/critters/squirrel.tres`,
   `owl.tres`) keeps the critters that live in trees. It uses packed arrays and a MultiMesh per

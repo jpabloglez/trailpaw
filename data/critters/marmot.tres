@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="CritterKind" format=3]
+
+[ext_resource type="Script" path="res://scripts/critters/critter_kind.gd" id="1_ck"]
+
+[resource]
+script = ExtResource("1_ck")
+id = &"marmot"
+shape = &"marmot"
+behaviour = &"whistler"
+dive_seconds = Vector2(20, 40)
+hours = Vector2(7, 19.5)
+biome_counts = Dictionary[StringName, Vector2i]({
+&"mountains": Vector2i(2, 4)
+})
+chance = 0.4
+scale_range = Vector2(0.95, 1.1)
+group_spread = 10.0
+home_radius = 3.5
+idle_seconds = Vector2(2, 6)
+graze_hop = Vector3(0.35, 0.04, 0.35)
+flee_hop = Vector3(1.6, 0.12, 0.3)
+zigzag = 0.0
+max_slope = 32.0
+flee_radius = 14.0
+flee_trigger_speed = 0.5
+startle_radius = 8.0
+calm_seconds = 5.0

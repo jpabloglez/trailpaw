@@ -17,7 +17,9 @@ extends Node3D
 ## scared, they fly off ([member CritterKind.flee_hop] is the flight, wings beating in
 ## [code]shaders/bird.gdshader[/code]) to shallow water farther away. Curlers (hedgehogs) curl
 ## into a ball instead of fleeing; leapers (fish) stay hidden under the water and now and then
-## leap out with a splash. Kinds with [member CritterKind.hours] are only out in their hours.
+## leap out with a splash. Whistlers (marmots, Phase 17) whistle and dash into their burrow,
+## hide there for a while and peek out once the fox has gone. Kinds with
+## [member CritterKind.hours] are only out in their hours.
 ## [br][br]
 ## Budget: decisions at [member CritterSettings.sim_hz] (critters beyond
 ## [member CritterSettings.far_distance] every 3rd tick), ≤ 2 height samples per hop (≤ 15 for
@@ -26,13 +28,14 @@ extends Node3D
 ## when critters spawn.
 
 ## Critter states ([constant DIVE]: leaping into the water; [constant UNDER]: under it, hidden;
-## [constant LEAP]: a fish out of the water mid-leap).
+## [constant LEAP]: a fish out of the water mid-leap; a hidden whistler is [constant UNDER]
+## in its burrow).
 enum State { IDLE, HOP, FLEE, DIVE, UNDER, LEAP }
 
 ## Directions a scared amphibian looks for water in (radians from straight away from the fox,
 ## nearest first; 12 around).
 ## Behaviours of dry land (no splashes, no water checks when rolling).
-const DRY: Array[StringName] = [&"hopper", &"curler"]
+const DRY: Array[StringName] = [&"hopper", &"curler", &"whistler"]
 ## Behaviours that plop into the water.
 const PLOPPING: Array[StringName] = [&"amphibian", &"leaper"]
 const DIVE_TURNS: Array[float] = [
@@ -54,6 +57,8 @@ const DIVE_TURNS: Array[float] = [
 var splashes: int = 0
 ## Plops (an amphibian reaching the water) so far (tests and tools).
 var plops: int = 0
+## Alarm whistles (a scared marmot) so far (tests and tools).
+var whistles: int = 0
 
 var _sampler: HeightSampler
 var _sampler_seed: int = -1
@@ -85,6 +90,7 @@ var _splashes: Array[GPUParticles3D] = []
 var _next_splash: int = 0
 var _time: float = 0.0
 var _plop: AudioStreamPlayer3D
+var _whistle: AudioStreamPlayer3D
 var _out := PackedByteArray()  # per kind: 1 while it is in its hours
 
 
@@ -134,6 +140,13 @@ func _ready() -> void:
 		_plop.unit_size = 3.0
 		_plop.top_level = true
 		add_child(_plop)
+	if kinds.any(func(kind: CritterKind) -> bool: return kind.behaviour == &"whistler"):
+		_whistle = AudioStreamPlayer3D.new()
+		_whistle.stream = SynthSounds.whistle()
+		_whistle.bus = &"SFX"
+		_whistle.unit_size = 8.0  # a sharp call that carries across the slope
+		_whistle.top_level = true
+		add_child(_whistle)
 	EventBus.origin_shifted.connect(_on_origin_shifted)
 	if streamer != null:
 		streamer.chunks_changed.connect(sync_from_streamer)
@@ -238,6 +251,8 @@ func tick(elapsed: float) -> void:
 		if kind.behaviour == &"leaper":
 			_leaper_tick(i, kind)
 			continue
+		if kind.behaviour == &"whistler" and _whistler_tick(i, kind, distance):
+			continue
 		if focus != null and _scared(kind, distance):
 			if _state[i] != State.FLEE:
 				_state[i] = State.FLEE
@@ -281,6 +296,9 @@ func draw() -> void:
 					basis = basis.scaled(Vector3(0.9, 0.8, 0.62))
 			&"leaper":  # nose up leaving the water, nose down diving back
 				basis = basis * Basis(Vector3.RIGHT, lerpf(0.9, -0.9, _t[i]))
+			&"whistler":  # sits up on its haunches now and then, keeping watch
+				if _state[i] == State.IDLE and fmod(_time + _scale[i] * 40.0, 7.0) < 3.0:
+					basis = basis.scaled(Vector3(0.85, 1.45, 0.8))
 		basis = basis.scaled(Vector3.ONE * _scale[i])
 		var at := _position(i)
 		if kinds[k].behaviour == &"swimmer":
@@ -494,6 +512,56 @@ func _leaper_tick(i: int, kind: CritterKind) -> void:
 
 # Amphibian decisions that differ from a hopper's (true when they replace the rest of the
 # tick): landing in the water, coming back up, and diving instead of fleeing on land.
+# A marmot: scared, it whistles and dashes home; at its burrow it hides, and peeks out again
+# once the fox is beyond [member CritterKind.flee_radius]. True when the tick is handled.
+func _whistler_tick(i: int, kind: CritterKind, distance: float) -> bool:
+	match _state[i]:
+		State.UNDER:
+			if _timer[i] <= 0.0:
+				if distance < kind.flee_radius:
+					_timer[i] = 3.0  # the fox is still about: wait a little longer
+				else:
+					_state[i] = State.IDLE
+					_timer[i] = _rng.randf_range(kind.idle_seconds.x, kind.idle_seconds.y)
+			return true
+		State.FLEE:
+			if _t[i] >= 1.0:
+				_run_home(i, kind)
+			return true
+	if _scared(kind, distance):
+		_whistle_at(_position(i))
+		_state[i] = State.FLEE
+		_run_home(i, kind)
+		return true
+	return false
+
+
+# One dash towards the burrow ([member CritterKind.flee_hop]); there, it disappears inside.
+func _run_home(i: int, kind: CritterKind) -> void:
+	var from := _to[i]
+	var offset := Vector3(_home[i].x - from.x, 0.0, _home[i].z - from.z)
+	if offset.length() < 0.3:
+		_state[i] = State.UNDER
+		_timer[i] = _rng.randf_range(kind.dive_seconds.x, kind.dive_seconds.y)
+		return
+	var to := from + offset.normalized() * minf(offset.length(), kind.flee_hop.x)
+	to.y = _ground(to)
+	_from[i] = from
+	_to[i] = to
+	_t[i] = 0.0
+	_hop_seconds[i] = kind.flee_hop.z
+	_hop_height[i] = kind.flee_hop.y
+	_yaw[i] = atan2(-offset.x, -offset.z)
+
+
+func _whistle_at(at: Vector3) -> void:
+	whistles += 1
+	if _whistle != null and _whistle.is_inside_tree():
+		_whistle.global_position = at
+		_whistle.pitch_scale = _rng.randf_range(0.95, 1.08)
+		_whistle.play()
+
+
 func _amphibian_tick(i: int, kind: CritterKind, distance: float, threat: Vector3) -> bool:
 	match _state[i]:
 		State.DIVE:
@@ -662,6 +730,8 @@ func _splash(at: Vector3) -> void:
 func _dry_and_gentle(local: Vector3, kind: CritterKind) -> bool:
 	if not is_inf(GameState.water_level) and local.y < GameState.water_level + 0.1:
 		return false
+	if kind.behaviour == &"whistler" and GameState.absolute_position(local).y > GameState.snow_line:
+		return false  # marmots dig their burrows below the snow
 	return _gentle(local, kind)
 
 

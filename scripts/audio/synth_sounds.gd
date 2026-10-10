@@ -10,6 +10,7 @@ static var _yip: AudioStreamWAV
 static var _plop: AudioStreamWAV
 static var _chime: AudioStreamWAV
 static var _hoot: AudioStreamWAV
+static var _whistle: AudioStreamWAV
 
 
 ## A small dog's friendly "yip": two quick chirps gliding down (~0.25 s). Synthesised once
@@ -34,6 +35,30 @@ static func hoot() -> AudioStreamWAV:
 	if _hoot == null:
 		_hoot = _make_hoot()
 	return _hoot
+
+
+## A marmot's alarm call: a sharp, high whistle sliding down, given twice (~0.5 s).
+## Synthesised once and shared.
+static func whistle() -> AudioStreamWAV:
+	if _whistle == null:
+		_whistle = _make_whistle()
+	return _whistle
+
+
+static func _make_whistle() -> AudioStreamWAV:
+	var samples := PackedFloat32Array()
+	for call in 2:
+		var length := int(RATE * 0.16)
+		var phase := 0.0
+		for n in length:
+			var t := float(n) / length
+			phase += TAU * lerpf(2900.0, 2300.0, t) / RATE
+			var envelope := minf(1.0, t * 12.0) * (1.0 - t) * (1.0 - t * 0.2)
+			samples.append((sin(phase) + 0.08 * sin(phase * 2.0)) * envelope * 0.5)
+		if call == 0:
+			for n in int(RATE * 0.12):
+				samples.append(0.0)
+	return to_wav(samples)
 
 
 static func _make_hoot() -> AudioStreamWAV:
