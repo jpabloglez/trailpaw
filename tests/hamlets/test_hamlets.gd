@@ -191,3 +191,54 @@ func test_a_site_by_the_water_or_on_a_slope_is_refused() -> void:
 		hamlet.centre.x, hamlet.centre.z, steep, _sampler, TERRAIN.sea_level
 	)
 	assert_bool(flat).is_false()
+
+
+func test_a_far_hamlet_shows_a_smoke_plume_until_it_is_built() -> void:
+	var hamlet: HamletLayout = (
+		HamletPlan.near(0, 0, 2000, TERRAIN.hamlets, _sampler, SEED, TERRAIN.sea_level)[0]
+	)
+	var player: Node3D = auto_free(Node3D.new())
+	add_child(player)
+	var director: HamletDirector = auto_free(HamletDirector.new())
+	director.terrain = TERRAIN
+	director.player = player
+	add_child(director)
+	director.set_process(false)
+	player.global_position = GameState.local_position(hamlet.centre + Vector3(800, 0, 0))
+	director.refresh()
+	var plume := director.plume_of(hamlet.cell)
+	assert_object(plume).is_not_null()  # seen from 800 m
+	assert_array(director.built_cells()).is_empty()
+	assert_bool(plume.is_in_group(FloatingOrigin.SHIFTABLE_GROUP)).is_true()
+	assert_float(plume.global_position.y - GameState.local_position(hamlet.centre).y).is_greater(
+		5.0
+	)
+	var look := (plume.draw_pass_1 as QuadMesh).material as StandardMaterial3D
+	assert_bool(look.disable_fog).is_true()  # it reads above the hazy horizon
+	var grow := (plume.process_material as ParticleProcessMaterial).scale_curve as CurveTexture
+	assert_float(grow.curve.sample(1.0)).is_greater(2.0)  # spreads as it rises (not clamped at 1)
+	player.global_position = GameState.local_position(hamlet.centre + Vector3(30, 0, 0))
+	director.refresh()  # close: the hamlet is built and its chimneys take over
+	assert_object(director.plume_of(hamlet.cell)).is_null()
+	player.global_position = GameState.local_position(hamlet.centre + Vector3(3000, 0, 0))
+	director.refresh()  # far beyond the plume radius
+	assert_object(director.plume_of(hamlet.cell)).is_null()
+
+
+func test_no_plumes_on_the_low_preset() -> void:
+	var saved := Settings.quality
+	Settings.set_quality(load("res://data/quality/low.tres"))
+	var hamlet: HamletLayout = (
+		HamletPlan.near(0, 0, 2000, TERRAIN.hamlets, _sampler, SEED, TERRAIN.sea_level)[0]
+	)
+	var player: Node3D = auto_free(Node3D.new())
+	add_child(player)
+	player.global_position = GameState.local_position(hamlet.centre + Vector3(800, 0, 0))
+	var director: HamletDirector = auto_free(HamletDirector.new())
+	director.terrain = TERRAIN
+	director.player = player
+	add_child(director)
+	director.set_process(false)
+	director.refresh()
+	assert_object(director.plume_of(hamlet.cell)).is_null()
+	Settings.set_quality(saved)
