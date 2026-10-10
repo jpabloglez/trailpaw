@@ -346,7 +346,7 @@ cold on the snow, and mountain animals (user decisions; ADR-008).
 - [x] Cold on the snow: a two-sided temperature, a frosty vignette.
 - [x] Marmots that whistle and hide in their burrows.
 - [x] A golden eagle soaring over the peaks.
-- [ ] The ibex (built in code with bpy), at home on the cliffs.
+- [x] The ibex (built in code with bpy), at home on the cliffs.
 
 **Tests:** peaks above the snow line, passes crossable on a slope-limited grid, gentle edges,
 plants below the snow; cold only on snow; each animal's behaviour, and the journal covers it.

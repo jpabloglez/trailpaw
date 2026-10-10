@@ -609,6 +609,18 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
     - `data/fauna/wolf.tres`: **shy**, packs of 1–3, wanders 24 m, quiet.
     - Forest and hills at weight 1, the rarest of each. The hills' `fauna_chance` went from
       0.18 to 0.19, so their animal density stays ≥ 0.4 per chunk.
+  - **Ibex (Phase 17):** `tools/make_ibex.py` (bpy, run locally; ADR-008) builds
+    `assets/animals/ibex/ibex.glb` from the CC0 alpaca.
+    - It keeps the rig and every clip, so `data/species/ibex.tres` is the alpaca's with the
+      dimensions scaled to 0.3. The clip speeds were measured again (Walk 0.614, Gallop 2.827).
+    - The changes: a shorter neck, a slimmer body, two scimitar horns skinned to `Head`, and
+      a grey-brown coat with a pale belly and dark legs.
+    - It climbs slopes up to **60°**, where the fox stops at 45°, and jumps higher (1.2 m).
+    - `data/fauna/ibex.tres`: **shy**, herds of 3–5, wanders 20 m.
+    - Mountains only, at weight 4 (the commonest there), with alpacas (3), deer (2) and
+      stags (1).
+    - Its re-exported mesh stores vertices in world space, so its box is 100× its pose. The
+      portrait studio frames it by its bones (below).
   - **Spawning** (`FaunaDirector` in the world scene, `data/fauna/director.tres`): when a chunk
     becomes full detail (LOD 0, `WorldStreamer.chunks_changed`), the pure `FaunaPlan.roll()`
     decides — seeded per (world seed, chunk) — whether it hosts a herd (biome `fauna_chance`,
@@ -879,6 +891,8 @@ the critter layer (packed arrays, one MultiMesh, chunk-driven, origin-shifted), 
     glowing bulb.
   - **Framing** is automatic from the figure's bounds (filling 80 % of the bounding sphere),
     seen from its left front. Walkers are seen from a little above, fliers from well above.
+    Farm animals are framed by their bones. So is any rigged figure whose mesh box is over
+    5× its skeleton's (the ibex; a test checks every animal's framed box is 0.2–4 m).
   - `spin` turns it. `snapshot(entry)` renders it once into a texture, cached per entry for
     the session. Headless it skips the render (no frame is ever drawn there) and returns a
     blank image of the right size.

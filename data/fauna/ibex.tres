@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="FaunaSpecies" format=3]
+
+[ext_resource type="Script" path="res://scripts/fauna/fauna_species.gd" id="1_fauna"]
+[ext_resource type="Resource" path="res://data/species/ibex.tres" id="2_animal"]
+[ext_resource type="Resource" path="res://data/fauna/temperaments/shy.tres" id="3_profile"]
+
+[resource]
+script = ExtResource("1_fauna")
+id = &"ibex"
+display_name = "Ibex"
+animal = ExtResource("2_animal")
+temperament = 0
+profile = ExtResource("3_profile")
+herd_size = Vector2i(3, 5)
+wander_radius = 20.0
