@@ -862,6 +862,28 @@ the critter layer (packed arrays, one MultiMesh, chunk-driven, origin-shifted), 
   - Houses get chimney smoke (soft-dot `GPUParticles3D`, off on Low).
 - **The map** marks the hamlets you have explored with a small house icon
   (`MapScreen.hamlet_marks()`).
+- **`FarmLife`** (both world scenes) populates each hamlet as it's built
+  (`HamletDirector.hamlet_built` / `hamlet_freed`). Its animals are children of the hamlet's
+  root, so they follow the floating origin and go with the hamlet.
+  - **Penned animals** (`FarmAnimalKind`, `data/hamlets/farm/`; Quaternius *Farm Animal Pack*,
+    CC0): 3–5 sheep, pigs and cows in the stable's pen.
+    - They stand 4–15 s, then move to a spot of the pen.
+    - The cow walks with its Walk clip. The sheep and pig models have only Idle and Jump, so
+      they move in **little hops** (one per Jump clip).
+    - They keep `ROOM` (1.6 m) from each other's spot and landing point.
+    - Models face +Z and are turned 180°. They're scaled so the cow's head is at ≈ 1.5 m, the
+      sheep's ≈ 0.9 m, the pig's ≈ 0.65 m.
+  - **Chickens** (mesh in code; `data/hamlets/farm/chicken.tres`, a `CritterKind` for their
+    look, hops and hours): 3–6 pecking within 4 m of a spot in front of a house.
+    - They **scatter** in quick hops when the fox runs within 5 m or comes within 1.5 m, and
+      wander back after.
+    - Indoors (hidden) 20:30–6:00.
+  - Same interface as the critter systems (`count`, `position_of`, `kind_of`, `is_shown`).
+    The journal's tracker reads it for the new `JournalEntry.Source.FARM` and for chickens.
+- **Journal (23 animals):** sheep, pig, cow and chicken. `JournalEntry.lives_in` ("Hamlets")
+  replaces the biome list on the card.
+- **`PortraitStudio`** frames farm models by their bones: their skinned meshes report boxes
+  far from the pose.
 
 ## 8. Environment and audio
 

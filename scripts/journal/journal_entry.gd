@@ -11,6 +11,7 @@ enum Source {
 	BIRD,  ## the [BirdSettings] of the songbird flocks ([BirdFlocks])
 	FLITTER,  ## a [FlitterKind] ([Flitters])
 	FIREFLY,  ## the [SmallLifeSettings] of the fireflies ([Fireflies])
+	FARM,  ## a [FarmAnimalKind] of the hamlets' pens ([FarmLife])
 }
 
 ## Stable identifier (saves, events).
@@ -25,6 +26,8 @@ enum Source {
 @export var animal: Resource
 ## Seen closer than this (m, from the player) and on screen counts as an encounter.
 @export_range(1.0, 30.0, 0.5, "suffix:m") var sight_radius: float = 5.0
+## Where it lives, in words, when that is not a list of biomes (e.g. "Hamlets"); shown instead.
+@export var lives_in: String = ""
 ## Seconds it must stay in sight; 0 uses [member JournalSettings.sight_seconds] (fish, out of
 ## the water only for a moment, need less).
 @export_range(0.0, 10.0, 0.05, "suffix:s") var sight_seconds: float = 0.0
@@ -50,6 +53,7 @@ func get_validation_errors() -> PackedStringArray:
 		Source.BIRD: "BirdSettings",
 		Source.FLITTER: "FlitterKind",
 		Source.FIREFLY: "SmallLifeSettings",
+		Source.FARM: "FarmAnimalKind",
 	}
 	var script: Script = animal.get_script() if animal != null else null
 	if script == null or script.get_global_name() != expected[source]:
@@ -58,6 +62,8 @@ func get_validation_errors() -> PackedStringArray:
 
 
 func _lives_in(biome: BiomeDefinition) -> bool:
+	if not lives_in.is_empty():
+		return false  # (shown as words instead)
 	match source:
 		Source.FAUNA:
 			return biome.fauna.any(func(e: FaunaEntry) -> bool: return e.species == animal)

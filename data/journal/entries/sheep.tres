@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="JournalEntry" format=3]
+
+[ext_resource type="Script" path="res://scripts/journal/journal_entry.gd" id="1_je"]
+[ext_resource type="Resource" path="res://data/hamlets/farm/sheep.tres" id="2_animal"]
+
+[resource]
+script = ExtResource("1_je")
+id = &"sheep"
+display_name = "Sheep"
+blurb = "Grazes in the pen and bounces about when it's in a good mood."
+source = 5
+animal = ExtResource("2_animal")
+sight_radius = 8.0
+lives_in = "Hamlets"

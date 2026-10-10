@@ -8,6 +8,12 @@ extends Node3D
 ## Budget: hamlets are looked up once a second (cached per cell); building is spread over frames,
 ## ≤ 1 piece per frame; the window glow is one shared material updated once a second.
 
+## A hamlet was built near the player: [param root] is its node (at the well, in the
+## floating-origin group); its pieces follow over the next frames.
+signal hamlet_built(layout: HamletLayout, root: Node3D)
+## The hamlet of [param cell] was freed (its root and everything under it).
+signal hamlet_freed(cell: Vector2i)
+
 static var _bounds: Dictionary[StringName, AABB] = {}
 
 ## Hamlets closer than this are built (m).
@@ -64,6 +70,7 @@ func refresh() -> void:
 			_built.erase(cell)
 			_layouts.erase(cell)
 			_queue = _queue.filter(func(item: Array) -> bool: return item[0] != cell)
+			hamlet_freed.emit(cell)
 	for hamlet in hamlets_near(at, build_radius):
 		if _built.has(hamlet.cell):
 			continue
@@ -76,6 +83,7 @@ func refresh() -> void:
 		_layouts[hamlet.cell] = hamlet
 		for i in hamlet.size():
 			_queue.append([hamlet.cell, i])
+		hamlet_built.emit(hamlet, root)
 
 
 ## Builds everything still queued now (tests and tools).

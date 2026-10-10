@@ -108,7 +108,10 @@ func refresh() -> void:
 		var card := _cards[entry.id]
 		(card.name as Label).text = entry.display_name if seen else "???"
 		(card.blurb as Label).text = entry.blurb if seen else ""
-		(card.biomes as Label).text = "Lives in: " + ", ".join(_biome_names(entry))
+		var lives := (
+			entry.lives_in if not entry.lives_in.is_empty() else ", ".join(_biome_names(entry))
+		)
+		(card.biomes as Label).text = "Lives in: " + lives
 		var portrait := card.portrait as TextureRect
 		portrait.texture = PortraitStudio.cached(entry.id)
 		portrait.self_modulate = Color.WHITE if seen else SILHOUETTE

@@ -308,7 +308,7 @@ who shoo the fox when it comes close; rare hamlets on flat, dry meadow or hills 
 with a risk). ADR-007.
 
 - [x] Hamlets: placement, clearings, buildings, night windows, smoke, map icon.
-- [ ] Farm animals (sheep, pigs, cows) and chickens.
+- [x] Farm animals (sheep, pigs, cows) and chickens.
 - [ ] Villagers with daily routines, who shoo the fox.
 - [ ] Eggs and vegetables: food with a risk.
 - [ ] Sounds of the hamlets.

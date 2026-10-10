@@ -46,6 +46,12 @@
 [ext_resource type="Resource" path="res://data/critters/squirrel.tres" id="92_squirrel"]
 [ext_resource type="Resource" path="res://data/critters/owl.tres" id="93_owl"]
 [ext_resource type="Script" path="res://scripts/hamlets/hamlet_director.gd" id="94_hamlets"]
+[ext_resource type="Script" path="res://scripts/hamlets/farm_life.gd" id="95_farm"]
+[ext_resource type="Script" path="res://scripts/hamlets/farm_animal_kind.gd" id="96_farmkind"]
+[ext_resource type="Resource" path="res://data/hamlets/farm/sheep.tres" id="97_sheep"]
+[ext_resource type="Resource" path="res://data/hamlets/farm/pig.tres" id="98_pig"]
+[ext_resource type="Resource" path="res://data/hamlets/farm/cow.tres" id="99_cow"]
+[ext_resource type="Resource" path="res://data/hamlets/farm/chicken.tres" id="100_chicken"]
 [ext_resource type="Resource" path="res://data/critters/system.tres" id="73_critset"]
 [ext_resource type="Script" path="res://scripts/critters/bird_flocks.gd" id="74_birds"]
 [ext_resource type="Resource" path="res://data/critters/birds.tres" id="75_birdset"]
@@ -231,3 +237,10 @@ script = ExtResource("94_hamlets")
 terrain = ExtResource("3_u18in")
 player = NodePath("../Animal")
 day_night = NodePath("../DayNightCycle")
+
+[node name="FarmLife" type="Node" parent="." node_paths=PackedStringArray("director", "player")]
+script = ExtResource("95_farm")
+director = NodePath("../HamletDirector")
+kinds = Array[ExtResource("96_farmkind")]([ExtResource("97_sheep"), ExtResource("98_pig"), ExtResource("99_cow")])
+chicken = ExtResource("100_chicken")
+player = NodePath("../Animal")
