@@ -42,6 +42,7 @@ Every third-party asset in `assets/` must be listed here (see CLAUDE.md §1).
 | `sheep` | `assets/animals/sheep/sheep.glb` | Quaternius, Farm Animal Pack (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/C39AUXUUes |
 | `pig` | `assets/animals/pig/pig.glb` | Quaternius, Farm Animal Pack (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/TNvG3QUFlp |
 | `cow` | `assets/animals/cow/cow.glb` | Quaternius, Farm Animal Pack (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/5XSc2Fka3F |
+| `villager` | `assets/villagers/villager.glb` (+ 6 palette PNGs) | Quaternius, Animated Human (OpenGameArt; exported to glTF from the pack's .blend, see its LICENSE.md) | CC0 1.0 | https://opengameart.org/content/animated-human-low-poly |
 | `village/barrel` | `assets/village/barrel.glb` | Quaternius, Medieval Village Pack — Barrel (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/zjCQP1TAci |
 | `village/bench` | `assets/village/bench.glb` | Quaternius, Medieval Village Pack — Bench (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/7uSlZo3n9Y |
 | `village/cart` | `assets/village/cart.glb` | Quaternius, Medieval Village Pack — Cart (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/l7bDe7ak6j |

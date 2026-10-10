@@ -58,3 +58,7 @@ signal animal_discovered(entry_id: StringName)
 ## The player opened the journal (Phase 15: onboarding).
 @warning_ignore("unused_signal")
 signal journal_opened
+
+## A villager shooed the fox away from [param from] (global) (Phase 16).
+@warning_ignore("unused_signal")
+signal fox_shooed(from: Vector3)

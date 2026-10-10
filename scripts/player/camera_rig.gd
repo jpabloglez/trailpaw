@@ -108,6 +108,12 @@ func on_landed(fall_speed: float) -> void:
 	_trauma = maxf(_trauma, clampf((fall_speed - settings.shake_min_fall) / span, 0.2, 1.0))
 
 
+## A short jolt of [param amount] (0…1), e.g. when the fox is shooed, unless shaking is off.
+func jolt(amount: float) -> void:
+	if Settings.camera_shake:
+		_trauma = maxf(_trauma, clampf(amount, 0.0, 1.0))
+
+
 ## How strong the shake is now (0 … 1).
 func trauma() -> float:
 	return _trauma
