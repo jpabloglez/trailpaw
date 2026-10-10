@@ -58,6 +58,8 @@
 [ext_resource type="Script" path="res://scripts/hamlets/hamlet_food.gd" id="104_food"]
 [ext_resource type="Resource" path="res://data/interactions/eggs.tres" id="105_eggs"]
 [ext_resource type="Resource" path="res://data/interactions/vegetables.tres" id="106_veg"]
+[ext_resource type="Script" path="res://scripts/audio/hamlet_sounds.gd" id="107_hsounds"]
+[ext_resource type="Resource" path="res://data/audio/hamlet_sounds.tres" id="108_hsoundset"]
 [ext_resource type="Resource" path="res://data/critters/system.tres" id="73_critset"]
 [ext_resource type="Script" path="res://scripts/critters/bird_flocks.gd" id="74_birds"]
 [ext_resource type="Resource" path="res://data/critters/birds.tres" id="75_birdset"]
@@ -271,3 +273,8 @@ villagers = NodePath("../Villagers")
 player = NodePath("../Animal")
 eggs = ExtResource("105_eggs")
 vegetables = ExtResource("106_veg")
+
+[node name="HamletSounds" type="Node" parent="." node_paths=PackedStringArray("director")]
+script = ExtResource("107_hsounds")
+settings = ExtResource("108_hsoundset")
+director = NodePath("../HamletDirector")

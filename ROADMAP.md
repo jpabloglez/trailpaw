@@ -311,7 +311,7 @@ with a risk). ADR-007.
 - [x] Farm animals (sheep, pigs, cows) and chickens.
 - [x] Villagers with daily routines, who shoo the fox.
 - [x] Eggs and vegetables: food with a risk.
-- [ ] Sounds of the hamlets.
+- [x] Sounds of the hamlets.
 
 **Tests:** deterministic, flat and dry placement; clearings only near hamlets; animals stay in
 their pen; routines follow the hour; shooing by distance and field of view; food regrows and

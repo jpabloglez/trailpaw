@@ -81,6 +81,12 @@ Every third-party asset in `assets/` must be listed here (see CLAUDE.md §1).
 | `frog_02` | `assets/audio/animals/frog_02.wav` | EZduzziteh, *Ribbit Frog Sounds* (OpenGameArt; ribbit_02.mp3, trimmed and normalised to −3 dB, mono 22 050 Hz) | CC0 1.0 | https://opengameart.org/content/ribbit-frog-sounds |
 | `frog_03` | `assets/audio/animals/frog_03.wav` | EZduzziteh, *Ribbit Frog Sounds* (OpenGameArt; ribbit_03.mp3, trimmed and normalised to −3 dB, mono 22 050 Hz) | CC0 1.0 | https://opengameart.org/content/ribbit-frog-sounds |
 | `frog_chorus` | `assets/audio/ambience/frog_chorus.wav` | Built from `frog_01`–`frog_03` above with `tools/frog_chorus.py` (seed 14, 20 s, 50 calls in bouts, pitch 0.85–1.2×, distance filtering) | CC0 1.0 | https://opengameart.org/content/ribbit-frog-sounds |
+| `hamlets/sheep_baa` | `assets/audio/hamlets/sheep_baa.wav` | AntumDeluge, *Sheep Baa* (OpenGameArt; FLAC trimmed and normalised to −3 dB, mono 22 050 Hz) | CC0 1.0 | https://opengameart.org/content/sheep-baa |
+| `hamlets/hens_loop` | `assets/audio/hamlets/hens_loop.wav` | Synthesised for Trailpaw by `tools/farm_sounds.py` (seed 16): hens clucking, a 20 s seamless loop | CC0 1.0 | (this repository) |
+| `hamlets/rooster` | `assets/audio/hamlets/rooster.wav` | Synthesised for Trailpaw by `tools/farm_sounds.py` (seed 16): a stylised rooster's crow | CC0 1.0 | (this repository) |
+| `hamlets/moo` | `assets/audio/hamlets/moo.wav` | Synthesised for Trailpaw by `tools/farm_sounds.py` (seed 16): a cow's moo | CC0 1.0 | (this repository) |
+| `hamlets/grunt` | `assets/audio/hamlets/grunt.wav` | Synthesised for Trailpaw by `tools/farm_sounds.py` (seed 16): a pig's grunts | CC0 1.0 | (this repository) |
+| `hamlets/claps` | `assets/audio/hamlets/claps.wav` | Synthesised for Trailpaw by `tools/farm_sounds.py` (seed 16): two hand claps (a villager shooing) | CC0 1.0 | (this repository) |
 | `pluck_002` | `assets/audio/ui/pluck_002.ogg` | Kenney (kenney.nl), Interface Sounds | CC0 1.0 | https://kenney.nl/assets/interface-sounds |
 | `glass_002` | `assets/audio/ui/glass_002.ogg` | Kenney (kenney.nl), Interface Sounds | CC0 1.0 | https://kenney.nl/assets/interface-sounds |
 | `drop_002` | `assets/audio/ui/drop_002.ogg` | Kenney (kenney.nl), Interface Sounds | CC0 1.0 | https://kenney.nl/assets/interface-sounds |
