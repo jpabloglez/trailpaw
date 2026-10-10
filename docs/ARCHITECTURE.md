@@ -880,6 +880,24 @@ the critter layer (packed arrays, one MultiMesh, chunk-driven, origin-shifted), 
     - Indoors (hidden) 20:30–6:00.
   - Same interface as the critter systems (`count`, `position_of`, `kind_of`, `is_shown`).
     The journal's tracker reads it for the new `JournalEntry.Source.FARM` and for chickens.
+- **`Villagers`** (both world scenes; `data/hamlets/villagers.tres`, `VillagerSettings`): 1–3
+  people per hamlet, built with it as children of its root.
+  - The model is Quaternius *Animated Human* (CC0). It ships no glTF, so it was exported from
+    its .blend with `bpy`; see `assets/villagers/LICENSE.md`. Each villager gets one of six
+    clothing palettes.
+  - **Their day** (`activity(hour, offset)`, each villager ±0.5 h): home until 6:00, the well,
+    work from 7:30 (by the pen, or in front of the stable; the Working clip), the well
+    12:00–14:00, work, a rest by the door from 18:00, home from 20:30.
+  - "Home" means walking to the door, then hidden. They walk between spots by way of the yard
+    (radial lines from the well are clear of houses).
+  - **Wary:**
+    - inside their 120° field of view and within 12 m they stop and watch the fox
+    - within 6 m (9 m while `set_food_alert(true)`, for PR 4) they **shoo** it: the Punch clip
+      at 0.6× as a shove of the arm, and `EventBus.fox_shooed(from)`, with a 4 s cooldown
+    - never from behind, and not when the fox is far
+- **`Shooed`** (both scenes; runs after `PlayerInput`): on `fox_shooed`, for 1.2 s the
+  player's move intent is a trot straight away from the villager (`camera_relative` off),
+  with a small `CameraRig.jolt()`. Then control returns.
 - **Journal (23 animals):** sheep, pig, cow and chicken. `JournalEntry.lives_in` ("Hamlets")
   replaces the biome list on the card.
 - **`PortraitStudio`** frames farm models by their bones: their skinned meshes report boxes
