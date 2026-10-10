@@ -137,6 +137,8 @@ func _build_next() -> void:
 	root.add_child(holder)
 	holder.position = hamlet.positions[i] - hamlet.centre
 	holder.rotation.y = hamlet.yaws[i] + deg_to_rad(piece.yaw_offset)
+	if piece.scene == null:
+		return  # a place (the patch, the nest): filled by others
 	var model: Node3D = piece.scene.instantiate()
 	model.scale = Vector3.ONE * terrain.hamlets.model_scale
 	holder.add_child(model)

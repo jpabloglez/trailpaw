@@ -90,6 +90,11 @@ func set_food_alert(on: bool) -> void:
 	_food_alert = on
 
 
+## Whether they are on alert (the fox at their food).
+func food_alert() -> bool:
+	return _food_alert
+
+
 ## What a villager does at [param hour] with its own [param offset] (hours):
 ## [code]&"home"[/code], [code]&"well"[/code], [code]&"work"[/code] or [code]&"rest"[/code].
 func activity(hour: float, offset: float) -> StringName:

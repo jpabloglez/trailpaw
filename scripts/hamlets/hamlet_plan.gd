@@ -228,6 +228,29 @@ static func _lay_out(
 				continue
 			at.y = sampler.height_at(at.x, at.z)
 			hamlet.add(id, at, rng.randf() * TAU, piece.footprint)
+	# Last (so the pieces above stay the same): a vegetable patch and a hens' nest, each by a
+	# house, on the yard side.
+	for id: StringName in [settings.patch_id, settings.nest_id]:
+		var piece := settings.piece(id)
+		if piece == null:
+			continue
+		for h in range(1, house_count):
+			if not settings.house_ids.has(hamlet.ids[h]):
+				continue
+			var house := hamlet.positions[h]
+			var toward := Vector3(centre.x - house.x, 0.0, centre.z - house.z).normalized()
+			var side := (
+				Vector3(toward.z, 0.0, -toward.x) * (1.0 if id == settings.patch_id else -1.0)
+			)
+			var at := (
+				house
+				+ (toward * 0.6 + side).normalized() * (hamlet.radii[h] + piece.footprint + 0.8)
+			)
+			if hamlet.overlaps(at.x, at.z, piece.footprint):
+				continue
+			at.y = sampler.height_at(at.x, at.z)
+			hamlet.add(id, at, atan2(toward.x, toward.z), piece.footprint)
+			break
 	return hamlet
 
 

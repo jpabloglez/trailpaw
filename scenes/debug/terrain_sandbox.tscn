@@ -55,6 +55,9 @@
 [ext_resource type="Script" path="res://scripts/hamlets/villagers.gd" id="101_vill"]
 [ext_resource type="Resource" path="res://data/hamlets/villagers.tres" id="102_villset"]
 [ext_resource type="Script" path="res://scripts/player/shooed.gd" id="103_shooed"]
+[ext_resource type="Script" path="res://scripts/hamlets/hamlet_food.gd" id="104_food"]
+[ext_resource type="Resource" path="res://data/interactions/eggs.tres" id="105_eggs"]
+[ext_resource type="Resource" path="res://data/interactions/vegetables.tres" id="106_veg"]
 [ext_resource type="Resource" path="res://data/critters/system.tres" id="73_critset"]
 [ext_resource type="Script" path="res://scripts/critters/bird_flocks.gd" id="74_birds"]
 [ext_resource type="Resource" path="res://data/critters/birds.tres" id="75_birdset"]
@@ -259,3 +262,12 @@ script = ExtResource("103_shooed")
 movement = NodePath("../Animal/MovementComponent")
 body = NodePath("../Animal")
 camera_rig = NodePath("../CameraRig")
+
+[node name="HamletFood" type="Node" parent="." node_paths=PackedStringArray("director", "streamer", "villagers", "player")]
+script = ExtResource("104_food")
+director = NodePath("../HamletDirector")
+streamer = NodePath("../WorldStreamer")
+villagers = NodePath("../Villagers")
+player = NodePath("../Animal")
+eggs = ExtResource("105_eggs")
+vegetables = ExtResource("106_veg")

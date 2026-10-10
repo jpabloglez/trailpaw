@@ -10,7 +10,7 @@ extends CanvasLayer
 
 ## Order the hints are taught in.
 const ORDER: Array[StringName] = [
-	&"move", &"run", &"sniff", &"water", &"eat", &"map", &"rest", &"journal"
+	&"move", &"run", &"sniff", &"water", &"eat", &"map", &"rest", &"journal", &"hamlet_food"
 ]
 ## Seconds between rule checks.
 const CHECK_INTERVAL: float = 0.25
@@ -40,6 +40,7 @@ var _walked: float = 0.0
 var _last_position := Vector3.INF
 var _ran: float = 0.0
 var _met_animal: bool = false
+var _seen_hamlet_food: bool = false
 var _water_scented: bool = false
 
 
@@ -65,6 +66,7 @@ func _ready() -> void:
 	EventBus.map_opened.connect(func() -> void: complete(&"map"))
 	EventBus.animal_discovered.connect(func(_id: StringName) -> void: _met_animal = true)
 	EventBus.journal_opened.connect(func() -> void: complete(&"journal"))
+	EventBus.hamlet_food_seen.connect(func() -> void: _seen_hamlet_food = true)
 
 
 func _process(delta: float) -> void:
@@ -119,6 +121,8 @@ func is_due(id: StringName) -> bool:
 			due = _need(&"energy") < settings.rest_below
 		&"journal":
 			due = _met_animal  # once the first animal is in it
+		&"hamlet_food":
+			due = _seen_hamlet_food
 	return due
 
 
@@ -191,9 +195,11 @@ func _need(id: StringName) -> float:
 	return needs.value(id) if needs != null else 100.0
 
 
-func _on_interaction(type: int, _definition_id: StringName) -> void:
+func _on_interaction(type: int, definition_id: StringName) -> void:
 	match type:
 		InteractionDefinition.Type.DRINK:
 			complete(&"water")
 		InteractionDefinition.Type.EAT:
 			complete(&"eat")
+			if definition_id == &"eggs" or definition_id == &"vegetables":
+				complete(&"hamlet_food")  # learnt: they got some

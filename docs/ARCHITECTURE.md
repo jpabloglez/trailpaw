@@ -898,6 +898,26 @@ the critter layer (packed arrays, one MultiMesh, chunk-driven, origin-shifted), 
 - **`Shooed`** (both scenes; runs after `PlayerInput`): on `fox_shooed`, for 1.2 s the
   player's move intent is a trot straight away from the villager (`camera_relative` off),
   with a small `CameraRig.jolt()`. Then control returns.
+- **Food with a risk:**
+  - **The plan:** each layout ends with a **vegetable patch** and a **hens' nest**, each by a
+    house on the yard side. They are appended last, so every earlier piece is unchanged. They
+    are pieces without a model (`HamletPiece.scene` null).
+  - **`HamletFood`** (both scenes) gives each built hamlet a **`HamletPantry`**: an `Area3D`
+    on the interactable layer with one sphere per item, and the provider protocol.
+    - The patch: a dug bed with 6 cabbages (`vegetables.tres`, +25 hunger).
+    - The nest: 3 eggs (`eggs.tres`, +35 hunger). The chickens peck around the nest.
+    - The fox's (and husky's) diet now includes eggs and vegetables.
+  - **Eaten items** are kept in the world's `ChunkDeltaStore` (id `hamlet_<food>`, the item's
+    chunk), so they stay eaten when the hamlet is freed and rebuilt, and in saves. They
+    regrow after a day (1440 game minutes).
+  - **The risk:**
+    - while the fox is within 3 m of an item still there, `Villagers.set_food_alert(true)`:
+      they shoo from 9 m instead of 6
+    - a shoo moves the fox, and moving cancels eating without effects (`PlayerInteractState`)
+    - at night (villagers indoors) or unseen, eating is safe
+  - **The hint:** the first time the fox comes within 15 m of hamlet food
+    (`EventBus.hamlet_food_seen`), the hint "Hamlets have food… if nobody is looking" shows.
+    It is learnt by eating eggs or vegetables.
 - **Journal (23 animals):** sheep, pig, cow and chicken. `JournalEntry.lives_in` ("Hamlets")
   replaces the biome list on the card.
 - **`PortraitStudio`** frames farm models by their bones: their skinned meshes report boxes
