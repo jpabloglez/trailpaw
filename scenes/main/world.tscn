@@ -263,6 +263,7 @@ fireflies = NodePath("../Fireflies")
 script = ExtResource("87_card")
 settings = ExtResource("88_cardset")
 journal = ExtResource("86_journal")
+terrain = ExtResource("3_u18in")
 
 [node name="TreeLife" type="Node3D" parent="." node_paths=PackedStringArray("streamer", "player")]
 script = ExtResource("91_tree")

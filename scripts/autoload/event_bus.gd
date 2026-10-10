@@ -55,6 +55,11 @@ signal map_opened
 @warning_ignore("unused_signal")
 signal animal_discovered(entry_id: StringName)
 
+## The player entered a biome for the first time, except the very first one where the game
+## starts (Phase 16b: the atlas).
+@warning_ignore("unused_signal")
+signal biome_discovered(biome_id: StringName)
+
 ## The player opened the journal (Phase 15: onboarding).
 @warning_ignore("unused_signal")
 signal journal_opened

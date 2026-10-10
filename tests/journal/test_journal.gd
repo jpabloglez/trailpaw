@@ -1,6 +1,7 @@
 ## Tests for the animal journal: its entries cover every animal of the world exactly once, the
 ## journal records each the first time only and saves, and an animal counts as met only when it
-## stays close and on screen long enough.
+## stays close and on screen long enough. Also the biomes visited (the atlas): recorded once,
+## saved, announced after the first, and not in the main menu's world.
 extends GdUnitTestSuite
 
 const JOURNAL: JournalSettings = preload("res://data/journal/journal.tres")
@@ -12,6 +13,7 @@ const WORLD: PackedScene = preload("res://scenes/main/world.tscn")
 var _saved_biome: StringName
 var _saved_minutes: float
 var _discovered: Array[StringName] = []
+var _biomes_found: Array[StringName] = []
 
 
 func before_test() -> void:
@@ -20,17 +22,24 @@ func before_test() -> void:
 	GameState.current_biome = &"meadow"
 	GameState.game_minutes = 12.0 * 60.0
 	_discovered.clear()
+	_biomes_found.clear()
 	EventBus.animal_discovered.connect(_on_discovered)
+	EventBus.biome_discovered.connect(_on_biome_found)
 
 
 func after_test() -> void:
 	EventBus.animal_discovered.disconnect(_on_discovered)
+	EventBus.biome_discovered.disconnect(_on_biome_found)
 	GameState.current_biome = _saved_biome
 	GameState.game_minutes = _saved_minutes
 
 
 func _on_discovered(id: StringName) -> void:
 	_discovered.append(id)
+
+
+func _on_biome_found(id: StringName) -> void:
+	_biomes_found.append(id)
 
 
 # Resources the world scene gives node [param node_name] in property [param property].
@@ -98,6 +107,50 @@ func test_the_journal_records_the_first_sighting_only_and_saves() -> void:
 	assert_int(copy.seen_count()).is_equal(2)
 	copy.from_dict({})  # an old save: nobody met yet
 	assert_int(copy.seen_count()).is_equal(0)
+
+
+func test_the_journal_records_each_biome_visited_once_and_saves() -> void:
+	var journal := AnimalJournal.new()
+	assert_bool(journal.visit_biome(&"meadow", 480.0, Vector3(10, 2, -5))).is_true()
+	assert_bool(journal.visit_biome(&"meadow", 900.0, Vector3(500, 0, 0))).is_false()
+	assert_bool(journal.visit_biome(&"forest", 2000.0, Vector3(820, 4, 3))).is_true()
+	assert_int(journal.visited_count()).is_equal(2)
+	var data := journal.to_dict()
+	assert_int(int(data["version"])).is_equal(2)
+	var copy := AnimalJournal.new()
+	copy.from_dict(JSON.parse_string(JSON.stringify(data)))
+	assert_bool(copy.has_visited(&"forest")).is_true()
+	assert_bool(copy.has_visited(&"wetland")).is_false()
+	assert_float(copy.first_visit(&"meadow")).is_equal(480.0)  # the first time
+	assert_float(copy.first_visit(&"hills")).is_equal(-1.0)
+	assert_dict(copy.to_dict()["biomes"]).is_equal(data["biomes"])  # where too
+	copy.from_dict({"version": 1, "seen": {"frog": {"minutes": 600.0, "biome": "wetland"}}})
+	assert_bool(copy.is_seen(&"frog")).is_true()  # a version 1 journal: animals, no biomes
+	assert_int(copy.visited_count()).is_equal(0)
+
+
+func test_biomes_entered_are_recorded_and_announced_after_the_first() -> void:
+	var player: Node3D = auto_free(Node3D.new())
+	add_child(player)
+	var tracker: EncounterTracker = auto_free(EncounterTracker.new())
+	tracker.settings = JOURNAL
+	tracker.player = player
+	add_child(tracker)
+	tracker.set_process(false)
+	EventBus.biome_entered.emit(&"meadow", "Meadow")  # where the game starts: no card
+	player.global_position = Vector3(830, 0, 12)
+	GameState.game_minutes = 2000.0
+	EventBus.biome_entered.emit(&"forest", "Forest")
+	EventBus.biome_entered.emit(&"meadow", "Meadow")  # back again: nothing new
+	assert_int(tracker.journal.visited_count()).is_equal(2)
+	assert_array(_biomes_found).is_equal([&"forest"] as Array[StringName])
+	assert_float(tracker.journal.first_visit(&"forest")).is_equal(2000.0)
+	var at := GameState.absolute_position(player.global_position)
+	var visit: Dictionary = tracker.journal.to_dict()["biomes"]["forest"]
+	assert_float(visit["x"]).is_equal_approx(at.x, 0.01)
+	tracker.process_mode = Node.PROCESS_MODE_DISABLED  # the main menu's flying camera
+	EventBus.biome_entered.emit(&"wetland", "Wetland")
+	assert_bool(tracker.journal.has_visited(&"wetland")).is_false()
 
 
 # Butterflies over one flower at the origin, a camera 3 m south looking at it, and a tracker.

@@ -5,6 +5,7 @@ extends GdUnitTestSuite
 
 const JOURNAL: JournalSettings = preload("res://data/journal/journal.tres")
 const CARD: DiscoveryCardSettings = preload("res://data/ui/discovery_card.tres")
+const TERRAIN: TerrainSettings = preload("res://data/world/terrain_settings.tres")
 
 
 func after_test() -> void:
@@ -19,6 +20,7 @@ func _card() -> DiscoveryCard:
 	var card: DiscoveryCard = auto_free(DiscoveryCard.new())
 	card.settings = fast
 	card.journal = JOURNAL
+	card.terrain = TERRAIN
 	add_child(card)
 	return card
 
@@ -53,6 +55,33 @@ func test_discoveries_close_together_wait_their_turn() -> void:
 	assert_str(String(card.showing)).is_equal("dragonfly")
 	assert_str(card.shown_name()).is_equal("Dragonfly")
 	assert_int(card.waiting()).is_equal(0)
+
+
+func test_a_new_biome_gets_a_card_with_its_colour_after_an_animal() -> void:
+	var card := _card()
+	card.enqueue(&"frog")
+	EventBus.biome_discovered.emit(&"wetland")
+	card.enqueue_biome(&"not_a_biome")  # ignored
+	assert_int(card.waiting()).is_equal(1)
+	var swatch: ColorRect = card.find_child("Swatch", true, false)
+	assert_bool(swatch.visible).is_false()  # the frog's card: its figure
+	await _wait(0.45)
+	assert_str(String(card.showing)).is_equal("wetland")
+	assert_bool(card.showing_biome).is_true()
+	assert_str(card.shown_name()).is_equal("Wetland")
+	assert_str((card.find_child("New", true, false) as Label).text).is_equal("New biome!")
+	assert_bool(swatch.visible).is_true()
+	(
+		assert_bool((card.find_child("Portrait", true, false) as Control).is_visible_in_tree())
+		. is_false()
+	)
+	var wetland: BiomeDefinition = null
+	for biome in TERRAIN.biomes.biomes:
+		if biome.id == &"wetland":
+			wetland = biome
+	assert_object(swatch.color).is_equal(wetland.ground_color_a)
+	await _wait(0.45)
+	assert_str(String(card.showing)).is_equal("")
 
 
 func test_while_paused_it_hides_and_waits() -> void:
