@@ -19,4 +19,8 @@ listed in `assets/CREDITS.md`.
   fit, and they rarely vocalise). A CC0 dog "montage" was discarded: it could not be auditioned
   to rule out human voices.
 - Interface: Kenney *Interface Sounds* (`ui/Kenney_License.txt`).
-
+- Hamlets (Phase 16): AntumDeluge's *Sheep Baa* (OpenGameArt, CC0), trimmed and normalised.
+  No CC0 recording of hens, a rooster, a cow, a pig or a villager's voice fitted (the others
+  found were CC-BY or CC-BY-SA), so `hens_loop`, `rooster`, `moo`, `grunt` and `claps` are
+  synthesised by `tools/farm_sounds.py` (dedicated to the public domain like the rest of this
+  project's own audio).

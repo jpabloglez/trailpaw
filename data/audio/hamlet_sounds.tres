@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="HamletSoundSettings" format=3]
+
+[ext_resource type="Script" path="res://scripts/audio/hamlet_sound_settings.gd" id="1_hs"]
+[ext_resource type="AudioStream" path="res://assets/audio/hamlets/hens_loop.wav" id="2_hens"]
+[ext_resource type="AudioStream" path="res://assets/audio/hamlets/rooster.wav" id="3_rooster"]
+[ext_resource type="AudioStream" path="res://assets/audio/hamlets/sheep_baa.wav" id="4_sheep"]
+[ext_resource type="AudioStream" path="res://assets/audio/hamlets/moo.wav" id="5_moo"]
+[ext_resource type="AudioStream" path="res://assets/audio/hamlets/grunt.wav" id="6_grunt"]
+[ext_resource type="AudioStream" path="res://assets/audio/hamlets/claps.wav" id="7_claps"]
+
+[resource]
+script = ExtResource("1_hs")
+yard = ExtResource("2_hens")
+rooster = ExtResource("3_rooster")
+pen_calls = Array[AudioStream]([ExtResource("4_sheep"), ExtResource("5_moo"), ExtResource("6_grunt")])
+shoo = ExtResource("7_claps")
+rooster_hour = 6.0
+day = Vector2(6, 20.5)
+call_seconds = Vector2(12, 35)
+yard_db = -12.0
+rooster_db = -4.0
+call_db = -8.0
+shoo_db = -4.0
+yard_reach = Vector2(6, 70)
+call_reach = Vector2(8, 120)

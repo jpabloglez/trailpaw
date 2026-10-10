@@ -918,6 +918,18 @@ the critter layer (packed arrays, one MultiMesh, chunk-driven, origin-shifted), 
   - **The hint:** the first time the fox comes within 15 m of hamlet food
     (`EventBus.hamlet_food_seen`), the hint "Hamlets have food… if nobody is looking" shows.
     It is learnt by eating eggs or vegetables.
+- **`HamletSounds`** (both scenes; `data/audio/hamlet_sounds.tres`): positional, on SFX.
+  - **Hens about the yard:** a looped player at the well, 6:00–20:30, each hamlet starting
+    at its own point of the loop; −12 dB, heard to 70 m.
+  - **The rooster** once a day per hamlet when the clock crosses 6:00 (`crosses()` ignores
+    jumps over half a day, such as resting or loading).
+  - **A sheep, cow or pig** calling from the pen every 12–35 s by day.
+  - **Hand claps** where a villager shoos the fox.
+  - **The sources:**
+    - The sheep is a CC0 recording (AntumDeluge, *Sheep Baa*).
+    - The hens, rooster, cow, pig and claps are synthesised by `tools/farm_sounds.py`
+      (stdlib, tested; the hens' loop is mixed by `tools/frog_chorus.chorus`). The other
+      recordings found were CC-BY or CC-BY-SA.
 - **Journal (23 animals):** sheep, pig, cow and chicken. `JournalEntry.lives_in` ("Hamlets")
   replaces the biome list on the card.
 - **`PortraitStudio`** frames farm models by their bones: their skinned meshes report boxes
