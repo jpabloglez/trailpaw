@@ -327,7 +327,7 @@ Hamlets stay rare and scattered (no guaranteed hamlet near the start), but their
 seen from afar; the journal also records the biomes visited. Mountains follow as Phase 17.
 
 - [x] Far smoke plumes: hamlets within 1.2 km show a tall smoke column above the horizon.
-- [ ] Biome atlas: a Biomes tab in the journal, with a "New biome" card and the area explored.
+- [x] Biome atlas: a Biomes tab in the journal, with a "New biome" card and the area explored.
 
 **Tests:** plumes appear within the radius, hand over to the chimneys and are off on Low;
 biome visits are recorded once, saved and loaded.

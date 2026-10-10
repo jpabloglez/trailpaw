@@ -69,6 +69,11 @@ func cell_count() -> int:
 	return _cells.size()
 
 
+## Explored area (m²): the cells' area.
+func area() -> float:
+	return _cells.size() * cell_size * cell_size
+
+
 ## Remembers scented water at [param absolute]; replaces a mark that is already close by and
 ## drops the oldest beyond the limit.
 func add_water_mark(absolute: Vector3) -> void:

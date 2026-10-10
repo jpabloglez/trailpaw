@@ -6,6 +6,9 @@ extends CanvasLayer
 ## Opening it pauses the world; J or Esc closes it. Portraits are rendered by a
 ## [PortraitStudio] one at a time on the first opening and kept for the session. Built in code.
 ## [br][br]
+## Two tabs: Animals (the cards above) and Biomes (a [BiomeAtlasPage], Phase 16b), switched by
+## their buttons, Q / E or the left and right arrows.
+## [br][br]
 ## Budget: nothing while closed; on the first opening one portrait render per frame.
 
 ## The journal's entries.
@@ -17,6 +20,8 @@ const PORTRAIT: int = 132
 const COLUMNS: int = 5
 ## Tint of an animal not met yet (its figure as a silhouette).
 const SILHOUETTE: Color = Color(0.0, 0.0, 0.0, 0.75)
+## The tabs, in order.
+const TABS: PackedStringArray = ["Animals", "Biomes"]
 
 ## Whether J opens the journal (off while in the main menu).
 var enabled: bool = false
@@ -24,6 +29,10 @@ var enabled: bool = false
 var world: WorldController
 
 var _root: Control
+var _tab: int = 0
+var _tab_buttons: Array[Button] = []
+var _animals: VBoxContainer
+var _atlas: BiomeAtlasPage
 var _counter: Label
 var _scroll: ScrollContainer
 var _cards: Dictionary[StringName, Dictionary] = {}  # id → {portrait, name, biomes, blurb}
@@ -40,12 +49,19 @@ func _ready() -> void:
 	add_child(_root)
 	var box := MenuStyle.centred_box(_root, "JournalPage")
 	box.add_child(MenuStyle.label("Journal", 36))
+	box.add_child(_tab_bar())
+	_animals = VBoxContainer.new()
+	_animals.name = "AnimalsPage"
+	box.add_child(_animals)
 	_counter = MenuStyle.label("", 20, "Counter")
-	box.add_child(_counter)
+	_animals.add_child(_counter)
 	_scroll = ScrollContainer.new()
 	_scroll.name = "Cards"
 	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	box.add_child(_scroll)
+	_animals.add_child(_scroll)
+	_atlas = BiomeAtlasPage.new()
+	box.add_child(_atlas)
+	show_tab(0)
 	var grid := GridContainer.new()
 	grid.columns = COLUMNS
 	grid.add_theme_constant_override(&"h_separation", 12)
@@ -72,6 +88,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 	elif visible and event.is_action_pressed(&"pause"):
 		close()
+		get_viewport().set_input_as_handled()
+	elif visible and _tab_step(event) != 0:
+		show_tab(posmod(_tab + _tab_step(event), TABS.size()))
 		get_viewport().set_input_as_handled()
 
 
@@ -116,6 +135,29 @@ func refresh() -> void:
 		portrait.texture = PortraitStudio.cached(entry.id)
 		portrait.self_modulate = Color.WHITE if seen else SILHOUETTE
 	_counter.text = "%d / %d animals" % [count, SETTINGS.entries.size()]
+	var explored: ExploredMap = null
+	if world != null and world.exploration != null:
+		explored = world.exploration.explored
+	_atlas.refresh(_biome_table(), met, SETTINGS, explored)
+
+
+## Shows tab [param index] (0 Animals, 1 Biomes).
+func show_tab(index: int) -> void:
+	_tab = index
+	_animals.visible = index == 0
+	_atlas.visible = index == 1
+	for i in _tab_buttons.size():
+		_tab_buttons[i].set_pressed_no_signal(i == index)
+
+
+## The tab shown (0 Animals, 1 Biomes).
+func current_tab() -> int:
+	return _tab
+
+
+## The Biomes tab.
+func atlas() -> BiomeAtlasPage:
+	return _atlas
 
 
 ## The counter's text.
@@ -151,6 +193,35 @@ func _load_portraits() -> void:
 		(_cards[entry.id].portrait as TextureRect).texture = texture
 	_studio.show_entry(null)
 	_loading = false
+
+
+func _tab_bar() -> Control:
+	var bar := HBoxContainer.new()
+	bar.name = "Tabs"
+	bar.alignment = BoxContainer.ALIGNMENT_CENTER
+	bar.add_theme_constant_override(&"separation", 12)
+	for i in TABS.size():
+		var tab := MenuStyle.button(TABS[i], TABS[i] + "Tab")
+		tab.toggle_mode = true
+		tab.pressed.connect(show_tab.bind(i))
+		bar.add_child(tab)
+		_tab_buttons.append(tab)
+	return bar
+
+
+# −1 / +1 when [param event] asks for the previous / next tab (Q / E, left / right), else 0.
+func _tab_step(event: InputEvent) -> int:
+	var key := event as InputEventKey
+	if key != null and key.pressed and not key.echo:
+		if key.physical_keycode == KEY_Q:
+			return -1
+		if key.physical_keycode == KEY_E:
+			return 1
+	if event.is_action_pressed(&"ui_left"):
+		return -1
+	if event.is_action_pressed(&"ui_right"):
+		return 1
+	return 0
 
 
 func _card(entry: JournalEntry) -> Control:

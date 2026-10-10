@@ -23,6 +23,7 @@ func test_reveal_covers_the_cells_within_the_radius() -> void:
 	assert_bool(map.is_explored(at.x + inside, at.z + inside)).is_false()  # a disc, not a square
 	# About π r² of area.
 	var area := added * SETTINGS.cell_size * SETTINGS.cell_size
+	assert_float(map.area()).is_equal_approx(area, 0.01)  # the cells' area (the atlas shows it)
 	assert_float(area / (PI * SETTINGS.reveal_radius ** 2)).is_between(0.8, 1.25)
 
 

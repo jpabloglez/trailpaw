@@ -4,6 +4,8 @@ extends Node
 ## ([member JournalEntry.sight_radius]) and on screen (inside the current camera's view) for
 ## [member JournalSettings.sight_seconds]. Fireflies count once they glow around the player.
 ## The first time, [code]EventBus.animal_discovered[/code] fires.
+## It also records the biomes entered ([code]EventBus.biome_entered[/code]); a first visit
+## fires [code]EventBus.biome_discovered[/code] (not for the biome where the journal starts).
 ## [br][br]
 ## Budget: [member JournalSettings.check_hz] checks per second; each looks only at entries not
 ## yet seen, with a distance test (and a frustum test when close) per animal of their system —
@@ -35,6 +37,7 @@ var _in_sight := PackedFloat32Array()  # per entry: seconds in sight so far
 
 func _ready() -> void:
 	_in_sight.resize(settings.entries.size())
+	EventBus.biome_entered.connect(_on_biome_entered)
 
 
 func _process(delta: float) -> void:
@@ -63,6 +66,18 @@ func check(elapsed: float) -> void:
 		if _in_sight[e] >= needed:
 			if journal.discover(entry.id, GameState.game_minutes, GameState.current_biome):
 				EventBus.animal_discovered.emit(entry.id)
+
+
+# Records the biome entered; not while disabled (the main menu's world, which watches its
+# camera fly over the land).
+func _on_biome_entered(id: StringName, _display_name: String) -> void:
+	if not can_process():
+		return
+	var focus := _player()
+	var at := GameState.absolute_position(focus.global_position) if focus != null else Vector3.ZERO
+	var first := journal.visited_count() == 0
+	if journal.visit_biome(id, GameState.game_minutes, at) and not first:
+		EventBus.biome_discovered.emit(id)
 
 
 # Whether an animal of [param entry] is close to [param at] and on screen now.

@@ -100,6 +100,62 @@ func test_the_cards_follow_the_journal() -> void:
 	journal.close()
 
 
+func test_the_biomes_tab_shows_the_visited_biomes_and_the_area_explored() -> void:
+	var flow := await _playing()
+	var met := flow.world().encounters.journal
+	met.clear()
+	met.visit_biome(&"meadow", 600.0, Vector3.ZERO)  # day 1
+	met.visit_biome(&"wetland", GameState.DAY_MINUTES * 2.0 + 30.0, Vector3(2500, 0, 0))  # day 3
+	met.discover(&"frog", 3000.0, &"wetland")
+	var journal := flow.journal_screen()
+	journal.open()
+	assert_int(journal.current_tab()).is_equal(0)
+	assert_bool(journal.atlas().visible).is_false()
+	journal.show_tab(1)
+	assert_bool(journal.atlas().visible).is_true()
+	var atlas := journal.atlas()
+	var table := flow.world().streamer.terrain.biomes
+	assert_str(atlas.counter_text()).is_equal("2 / %d biomes" % table.biomes.size())
+	var wetland := atlas.card_texts(&"wetland")
+	assert_str(wetland.name).is_equal("Wetland")
+	assert_str(wetland.visit).is_equal("First visited: day 3")
+	var lives := 0
+	for entry in JOURNAL.entries:
+		lives += int(entry.biome_ids(table).has(&"wetland"))
+	assert_str(wetland.met).is_equal("Animals met here: 1 / %d" % lives)
+	assert_bool(wetland.greyed).is_false()
+	var hills := atlas.card_texts(&"hills")  # not visited yet
+	assert_str(hills.name).is_equal("???")
+	assert_str(hills.visit).is_equal("")
+	assert_bool(hills.greyed).is_true()
+	var km2 := flow.world().exploration.explored.area() / 1.0e6
+	assert_str(atlas.explored_text()).is_equal("Explored: %.2f km²" % km2)
+	journal.close()
+	var card: DiscoveryCard = flow.world().get_node("DiscoveryCard")
+	assert_object(card.terrain).is_not_null()  # the world gives the card its biomes
+
+
+func test_q_e_and_the_arrows_switch_tabs() -> void:
+	var flow := await _playing()
+	var journal := flow.journal_screen()
+	journal.open()
+	for step: Array in [[KEY_E, 1], [KEY_E, 0], [KEY_Q, 1], [KEY_Q, 0]]:  # it wraps round
+		var key := InputEventKey.new()
+		key.physical_keycode = step[0]
+		key.pressed = true
+		Input.parse_input_event(key)
+		await get_tree().process_frame
+		await get_tree().process_frame
+		assert_int(journal.current_tab()).is_equal(step[1])
+	await _press(&"ui_right")
+	assert_int(journal.current_tab()).is_equal(1)
+	await _press(&"ui_left")
+	assert_int(journal.current_tab()).is_equal(0)
+	(journal.find_child("BiomesTab", true, false) as Button).pressed.emit()
+	assert_int(journal.current_tab()).is_equal(1)
+	journal.close()
+
+
 func test_the_pause_menu_opens_it_and_the_main_menu_does_not() -> void:
 	var flow := await _playing()
 	await _press(&"pause")

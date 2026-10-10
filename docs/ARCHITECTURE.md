@@ -795,8 +795,11 @@ the critter layer (packed arrays, one MultiMesh, chunk-driven, origin-shifted), 
   - A test checks that every animal of the world (biome fauna, the scene's critter kinds,
     birds, both flitter kinds, fireflies) has exactly one entry.
 - **`AnimalJournal`** (RefCounted): the animals met, with the game minute and biome of the
-  first sighting. `discover()` is true only the first time. JSON is
-  `{version, seen: {id: {minutes, biome}}}`.
+  first sighting. `discover()` is true only the first time.
+  - **Biomes visited (Phase 16b):** `visit_biome()` records the game minute and the absolute
+    X, Z of the first entry into each biome.
+  - JSON (version 2) is `{version, seen: {id: {minutes, biome}}, biomes: {id: {minutes, x,
+    z}}}`. A version 1 journal loads with no biomes.
 - **`EncounterTracker`** (in `world.tscn`; disabled in the attract world) checks at 4 Hz, only
   for entries not yet seen, whether an animal of that entry is:
   - within its `sight_radius` of the player: 4 m for frogs and insects, 5–8 m for most,
@@ -806,6 +809,9 @@ the critter layer (packed arrays, one MultiMesh, chunk-driven, origin-shifted), 
   - and it must stay there for 1 s. Frogs under water (`CritterSystem.is_shown()`) don't
     count; fireflies count once they glow ≥ 0.5 around the player.
   - The first sighting emits `EventBus.animal_discovered(id)`.
+  - It also records every `EventBus.biome_entered` (not while disabled). A first visit emits
+    `EventBus.biome_discovered(id)`, except for the journal's very first biome (where the game
+    starts).
 - **`PortraitStudio`** (a `SubViewport` with its own 3D world, transparent background, a key
   and a fill light) shows one entry's figure:
   - **Figures:** fauna use their game model held in the idle pose. The rest are their
@@ -823,6 +829,9 @@ the critter layer (packed arrays, one MultiMesh, chunk-driven, origin-shifted), 
   - It shows a turning figure on an opaque backdrop, "New!", the name and "Added to your
     journal", plus `SynthSounds.chime()` (E5 then B5, ≈ 0.9 s, −8 dB on SFX).
   - Discoveries queue. Its tween stops while the tree is paused, and it hides meanwhile.
+  - On `biome_discovered` the same card shows the biome's ground colour in place of the
+    figure, "New biome!", its name and "Added to your atlas". The biomes come from its
+    `terrain`.
 - **`JournalScreen`** (built in code by `GameFlow`, layer 55) opens with the `journal` action
   (J, remappable) or the pause menu's Journal button, and pauses the world. J or Esc closes
   it; it is off in the main menu.
@@ -838,6 +847,13 @@ the critter layer (packed arrays, one MultiMesh, chunk-driven, origin-shifted), 
     times) until the image has something in it.
   - Opening it emits `EventBus.journal_opened`. The last onboarding hint, "J to open your
     journal", shows once the first animal is met.
+  - **Tabs (Phase 16b):** Animals (the above) and Biomes, switched by their buttons, Q / E or
+    the left and right arrows.
+  - **`BiomeAtlasPage`** (the Biomes tab) shows "N / 5 biomes", "Explored: X km²"
+    (`ExploredMap.area()`, the cells' area) and a card per biome of the table.
+    - **Visited:** a swatch of its two ground colours, its name, "First visited: day N" and
+      "Animals met here: m / n" (the entries whose `biome_ids()` include it).
+    - **Not visited:** a grey swatch and "???".
 
 ### 7.v Rural hamlets (Phase 16, ADR-007)
 - **`HamletPlan`** (pure and thread-safe; `data/hamlets/hamlets.tres`, `HamletSettings`, hung
@@ -1042,7 +1058,8 @@ the critter layer (packed arrays, one MultiMesh, chunk-driven, origin-shifted), 
   - `migrate()` rejects a step that does not raise the version instead of looping.
 - **Animal journal (Phase 15, SaveData v4):** see §7.w. `WorldController` saves
   `EncounterTracker.journal` in `SaveData.journal` and restores it; `SaveMigrations.v3_to_v4`
-  adds an empty journal (fixture `tests/fixtures/save_v3.json`).
+  adds an empty journal (fixture `tests/fixtures/save_v3.json`). The journal dict has its own
+  version (2 adds the biomes visited, Phase 16b), so `SaveData` stays v4.
 - **Map screen (Phase 10b):** `MapScreen` (built in code by `GameFlow`, layer 55, values in
   `data/ui/map.tres`) opens with the `map` action (M, remappable) or the pause menu's Map
   button, and pauses the world.
