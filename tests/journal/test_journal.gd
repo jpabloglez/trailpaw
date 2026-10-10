@@ -77,6 +77,7 @@ func test_every_animal_of_the_world_has_exactly_one_entry() -> void:
 		animals.append(kind)
 	animals.append(_scene_value("FarmLife", "chicken"))
 	animals.append(_scene_value("BirdFlocks", "settings"))
+	animals.append(_scene_value("Soarers", "settings"))  # the golden eagle
 	animals.append(_scene_value("Butterflies", "kind"))
 	animals.append(_scene_value("Dragonflies", "kind"))
 	animals.append(_scene_value("Fireflies", "settings"))

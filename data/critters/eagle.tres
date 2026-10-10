@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SoarerSettings" format=3]
+
+[ext_resource type="Script" path="res://scripts/critters/soarer_settings.gd" id="1_ss"]
+
+[resource]
+script = ExtResource("1_ss")
+biomes = Array[StringName]([&"mountains"])
+max_soarers = 2
+appear_chance = 0.05
+appear_distance = Vector2(60, 160)
+leave_distance = 450.0
+circle_radius = Vector2(35, 70)
+soar_height = Vector2(45, 70)
+speed = 9.0
+drift = 1.2
+bank_degrees = 18.0
+scale = 7.0
+tint = Color(0.3, 0.21, 0.12, 1)
+cry_seconds = Vector2(12, 35)
+cry_radius = 250.0

@@ -81,7 +81,10 @@ func show_entry(shown: JournalEntry) -> void:
 	_figure = figure_for(shown)
 	_stage.add_child(_figure)
 	_pose(_figure, shown)
-	var flier := shown.source in [JournalEntry.Source.BIRD, JournalEntry.Source.FLITTER]
+	var flier := (
+		shown.source
+		in [JournalEntry.Source.BIRD, JournalEntry.Source.FLITTER, JournalEntry.Source.SOARER]
+	)
 	_frame(FLIER_PITCH if flier or shown.source == JournalEntry.Source.FIREFLY else VIEW_PITCH)
 
 
@@ -142,6 +145,8 @@ static func figure_for(shown: JournalEntry) -> Node3D:
 			return _mesh_figure(
 				ProceduralMeshes.bird(), palette[0] if palette.size() > 0 else Color.WHITE
 			)
+		JournalEntry.Source.SOARER:
+			return _mesh_figure(ProceduralMeshes.bird(), (shown.animal as SoarerSettings).tint)
 		JournalEntry.Source.FLITTER:
 			var kind := shown.animal as FlitterKind
 			var mesh := (

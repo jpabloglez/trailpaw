@@ -9,7 +9,7 @@ extends Node
 ## [br][br]
 ## Budget: [member JournalSettings.check_hz] checks per second; each looks only at entries not
 ## yet seen, with a distance test (and a frustum test when close) per animal of their system —
-## ≈ 10 agents, 120 critters (plus a few dozen in the trees), 60 birds and 24 fliers at most;
+## ≈ 10 agents, 120 critters (plus a few dozen in the trees), 60 birds, 2 eagles and 24 fliers;
 ## no allocations. Measured in the
 ## world at the spawn with nothing met yet (the worst case): p50 0.07 ms, p99 0.23 ms per check.
 
@@ -23,6 +23,7 @@ extends Node
 @export var tree_life: TreeLife
 @export var farm: FarmLife
 @export var birds: BirdFlocks
+@export var soarers: Soarers
 @export var flitters: Array[Flitters] = []
 @export var fireflies: Fireflies
 ## The camera that must see them; defaults to the viewport's.
@@ -104,11 +105,8 @@ func _sees(entry: JournalEntry, at: Vector3, eye: Camera3D) -> bool:
 						where = (system as Node3D).to_global(where)
 					if _in_view(where, at, reach, eye):
 						return true
-		JournalEntry.Source.BIRD:
-			if birds != null and birds.settings == entry.animal:
-				for b in birds.count():
-					if _in_view(birds.to_global(birds.position_of(b)), at, reach, eye):
-						return true
+		JournalEntry.Source.BIRD, JournalEntry.Source.SOARER:
+			return _sees_aloft(entry, at, reach, eye)
 		JournalEntry.Source.FLITTER:
 			for node in flitters:
 				if node == null or node.kind != entry.animal:
@@ -123,6 +121,20 @@ func _sees(entry: JournalEntry, at: Vector3, eye: Camera3D) -> bool:
 				and fireflies.emitting
 				and fireflies.amount_ratio >= settings.firefly_glow
 			)
+	return false
+
+
+# Songbirds or birds of prey of [param entry] in view.
+func _sees_aloft(entry: JournalEntry, at: Vector3, reach: float, eye: Camera3D) -> bool:
+	if entry.source == JournalEntry.Source.BIRD:
+		if birds != null and birds.settings == entry.animal:
+			for b in birds.count():
+				if _in_view(birds.to_global(birds.position_of(b)), at, reach, eye):
+					return true
+	elif soarers != null and soarers.settings == entry.animal:
+		for s in soarers.count():
+			if _in_view(soarers.position_of(s), at, reach, eye):
+				return true
 	return false
 
 
