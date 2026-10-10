@@ -4,7 +4,9 @@ extends GdUnitTestSuite
 
 const TABLE_PATH: String = "res://data/biomes/biome_table.tres"
 const SEED: int = 12345
-const ORDER: Array[StringName] = [&"meadow", &"forest", &"river_valley", &"wetland", &"hills"]
+const ORDER: Array[StringName] = [
+	&"meadow", &"forest", &"river_valley", &"wetland", &"hills", &"mountains"
+]
 
 var _table: BiomeTable
 var _resolver: BiomeResolver
@@ -114,7 +116,7 @@ func test_non_cycling_table_keeps_the_last_biome_forever() -> void:
 	var table := _table.duplicate() as BiomeTable
 	table.cycle = false
 	var resolver := BiomeResolver.new(table, SEED)
-	assert_str(String(resolver.dominant_at(50000.0, 0.0).id)).is_equal("hills")
+	assert_str(String(resolver.dominant_at(50000.0, 0.0).id)).is_equal(String(ORDER[-1]))
 
 
 func test_same_seed_is_deterministic_and_seed_moves_boundaries() -> void:

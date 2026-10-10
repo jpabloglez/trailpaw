@@ -149,6 +149,14 @@ wetness={
 "type": "float",
 "value": 0.0
 }
+snow_line={
+"type": "float",
+"value": 1000.0
+}
+snow_blend={
+"type": "float",
+"value": 8.0
+}
 world_origin_offset={
 "type": "vec3",
 "value": Vector3(0, 0, 0)

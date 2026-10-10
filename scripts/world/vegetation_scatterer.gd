@@ -118,7 +118,7 @@ func scatter(
 	var origin := Vector2(data.coord) * size
 	var blend := BiomeBlend.new()
 	var uniform := resolver.uniform_blend(
-		origin.x + size * 0.5, origin.y + size * 0.5, size * 0.75, blend
+		origin.x + size * 0.5, origin.y + size * 0.5, size * 0.75, blend, false
 	)
 	var cluster_noise := FastNoiseLite.new()
 	cluster_noise.seed = HeightSampler.layer_seed(world_seed, CLUSTER_SALT)

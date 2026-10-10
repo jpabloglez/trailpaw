@@ -34,6 +34,12 @@ const MAX_OCTAVES: int = 8
 ## (lakes and channels, mostly in the river valley).
 @export_range(-100.0, 100.0, 0.1, "suffix:m") var sea_level: float = 0.0
 
+@export_group("Snow")
+## Absolute height above which the ground is snowy (the mountain peaks, Phase 17), and the
+## height over which the snow fades in. Nothing grows above the snow line.
+@export_range(0.0, 1000.0, 1.0, "suffix:m") var snow_line: float = 1000.0
+@export_range(0.5, 50.0, 0.5, "suffix:m") var snow_blend: float = 8.0
+
 @export_group("Height")
 ## Height offset added to every sample.
 @export_range(-100.0, 100.0, 0.1, "suffix:m") var base_height: float = 0.0

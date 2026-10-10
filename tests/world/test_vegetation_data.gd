@@ -99,10 +99,12 @@ func test_meadow_has_the_most_flowers() -> void:
 			assert_float(meadow).is_greater(_density(biome.id, "flower_"))
 
 
-func test_hills_have_the_most_rocks() -> void:
+func test_the_mountains_then_the_hills_have_the_most_rocks() -> void:
+	var mountains := _density(&"mountains", "rock_")
 	var hills := _density(&"hills", "rock_")
+	assert_float(mountains).is_greater(hills)
 	for biome in _table.biomes:
-		if biome.id != &"hills":
+		if biome.id != &"hills" and biome.id != &"mountains":
 			assert_float(hills).is_greater(_density(biome.id, "rock_"))
 
 

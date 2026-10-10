@@ -190,6 +190,8 @@ func _request_render() -> void:
 		GameState.water_level,
 		SETTINGS
 	)
+	_renderer.snow_line = world.streamer.terrain.snow_line
+	_renderer.snow_blend = world.streamer.terrain.snow_blend
 	_shown_revision = explored.revision
 	_renderer.task_id = WorkerThreadPool.add_task(_renderer.run, false, "Map")
 	_status.text = "Drawing the map…"

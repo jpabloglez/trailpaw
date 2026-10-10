@@ -14,6 +14,8 @@ extends Resource
 @export var shallow_color: Color = Color(0.45, 0.7, 0.85)
 ## Deep water.
 @export var deep_color: Color = Color(0.13, 0.3, 0.52)
+## Ground above the snow line (the mountain peaks).
+@export var snow_color: Color = Color(0.94, 0.95, 0.97)
 ## Depth at which water reaches [member deep_color] (m).
 @export_range(0.1, 50.0, 0.1, "suffix:m") var deep_depth: float = 6.0
 ## Hillshade strength (0 = flat colours).

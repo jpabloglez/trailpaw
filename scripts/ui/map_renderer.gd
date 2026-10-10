@@ -19,6 +19,9 @@ var task_id: int = -1
 var centre: Vector2
 ## Metres across the map.
 var span: float
+## Absolute height of the snow line and its fade-in height (no snow by default).
+var snow_line: float = INF
+var snow_blend: float = 8.0
 
 var _sampler: HeightSampler
 var _cells: Dictionary[Vector2i, bool]
@@ -87,6 +90,10 @@ func _land_or_water(
 	var h := _sampler.sample(x, z, _blend)
 	if is_inf(_water_level) or h >= _water_level:
 		var ground := _blend.color_a.lerp(_blend.color_b, 0.5)
+		if h > snow_line:
+			ground = ground.lerp(
+				_settings.snow_color, clampf((h - snow_line) / snow_blend, 0.0, 1.0)
+			)
 		var east := _height(u + 1, v, x + mpp, z, heights)
 		var south := _height(u, v + 1, x, z + mpp, heights)
 		# Light from the north-west: slopes rising to the east or south face away from it.

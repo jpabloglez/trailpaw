@@ -27,6 +27,9 @@ const DEBUG_LINES_GROUP: StringName = &"debug_lines"
 ## Global shader uniform holding [member TerrainSettings.sea_level] (declared in
 ## [code]project.godot[/code]). Absolute height: floating-origin rebases never shift Y.
 const WATER_LEVEL_PARAM: StringName = &"water_level"
+## Shader globals for the snow on the peaks (absolute height and fade-in height).
+const SNOW_LINE_PARAM: StringName = &"snow_line"
+const SNOW_BLEND_PARAM: StringName = &"snow_blend"
 ## Global shader uniform with the packed [WindSettings] (see [code]foliage.gdshader[/code]).
 const WIND_PARAM: StringName = &"wind"
 
@@ -93,6 +96,8 @@ func _ready() -> void:
 	# Shaders (terrain shores, underwater tint) need the absolute water height.
 	RenderingServer.global_shader_parameter_set(WATER_LEVEL_PARAM, terrain.sea_level)
 	GameState.water_level = terrain.sea_level
+	RenderingServer.global_shader_parameter_set(SNOW_LINE_PARAM, terrain.snow_line)
+	RenderingServer.global_shader_parameter_set(SNOW_BLEND_PARAM, terrain.snow_blend)
 	EventBus.origin_shifted.connect(_on_origin_shifted)
 	vegetation_density = Settings.quality.vegetation_density
 	Settings.quality_changed.connect(_on_quality_changed)
