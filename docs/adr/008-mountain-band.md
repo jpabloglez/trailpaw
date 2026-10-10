@@ -46,6 +46,13 @@ That changes the terrain past ≈ 4 km, and the golden heights pin it. Two other
   - ≈ 4 % of the band (≈ 12 % of its inner flank) steeper than 45°
   - a slope-limited walk on an 8 m grid crosses the band in every strip tested
 - `BiomeDefinition.height_offset` now ranges from −50 to 150 m.
+- **The ibex (PR 5)** is built by `tools/make_ibex.py` from the CC0 Quaternius alpaca. No
+  animated CC0 ibex or goat exists. The script reshapes the mesh, adds horns, recolours it and
+  re-exports it with the same rig and clips.
+  - It needs **bpy** (Blender as a Python module), which is an optional tool, not a project
+    dependency: it is not in `requirements-dev.txt` and not run in CI.
+  - Its geometry helpers are plain Python and are tested in `tools/tests`.
+  - The generated `.glb` is committed (LFS), like any other asset.
 
 ## Consequences
 - **Golden values:** the height at (−9000, 4200) changes from 3.591 to 144.569 m, because

@@ -124,6 +124,10 @@ func test_every_animal_gets_a_framed_figure_and_a_portrait() -> void:
 			. is_true()
 		)
 		figure.free()
+		if entry.source in [JournalEntry.Source.FAUNA, JournalEntry.Source.FARM]:
+			studio.show_entry(entry)  # framed by a box the size of the animal, not its file's
+			var longest := studio.framed_box().get_longest_axis_size()
+			assert_float(longest).override_failure_message(String(entry.id)).is_between(0.2, 4.0)
 		var texture: Texture2D = await studio.snapshot(entry)
 		assert_object(texture).is_not_null()
 		assert_int(texture.get_width()).is_equal(96)

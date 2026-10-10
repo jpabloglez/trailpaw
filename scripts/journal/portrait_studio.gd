@@ -29,6 +29,7 @@ var entry: JournalEntry
 var _stage: Node3D
 var _figure: Node3D
 var _camera: Camera3D
+var _framed := AABB()
 
 
 func _init() -> void:
@@ -107,6 +108,11 @@ func snapshot(shown: JournalEntry) -> Texture2D:
 	var texture := ImageTexture.create_from_image(image)
 	_cache[shown.id] = texture
 	return texture
+
+
+## The box (in the stage's space) the figure on stage was framed by.
+func framed_box() -> AABB:
+	return _framed
 
 
 ## Forgets every cached portrait (tests; a change of quality could also use it).
@@ -206,6 +212,13 @@ static func _pose(figure: Node3D, shown: JournalEntry) -> void:
 # Centres the figure on the stage's axis and places the camera so all of it fits.
 func _frame(pitch: float) -> void:
 	var box := _bounds(_figure, entry.source == JournalEntry.Source.FARM)
+	if entry.source != JournalEntry.Source.FARM:
+		var bones := _bounds(_figure, true)
+		# A mesh whose data is not in its skeleton's space (e.g. re-exported from Blender)
+		# reports a box far from its pose: frame it by its bones instead.
+		if bones.size != Vector3.ZERO and box.size.length() > 5.0 * bones.size.length():
+			box = bones
+	_framed = box
 	var centre := box.get_center()
 	_figure.position -= Vector3(centre.x, 0.0, centre.z)
 	var radius := maxf(box.size.length() * 0.5 * FILL, 0.005)

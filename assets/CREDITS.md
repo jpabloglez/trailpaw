@@ -37,6 +37,7 @@ Every third-party asset in `assets/` must be listed here (see CLAUDE.md §1).
 | `stag` | `assets/animals/stag/stag.glb` | Quaternius, Ultimate Animated Animal Pack (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/tQdzbZ1Cmw |
 | `shiba_inu` | `assets/animals/shiba_inu/shiba_inu.glb` | Quaternius, Ultimate Animated Animal Pack (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/y4wdQpg767 |
 | `alpaca` | `assets/animals/alpaca/alpaca.glb` | Quaternius, Ultimate Animated Animal Pack (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/bCVFD48i2l |
+| `ibex` | `assets/animals/ibex/ibex.glb` | Built for Trailpaw by `tools/make_ibex.py` from the Quaternius alpaca (rig and clips kept; neck, body, horns and colours changed) | CC0 1.0 | (this repository) |
 | `horse` | `assets/animals/horse/horse.glb` | Quaternius, Ultimate Animated Animal Pack (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/qvTrSG9pZF |
 | `wolf` | `assets/animals/wolf/wolf.glb` | Quaternius, Ultimate Animated Animal Pack (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/P1gU3Qkr9r |
 | `sheep` | `assets/animals/sheep/sheep.glb` | Quaternius, Farm Animal Pack (via Poly Pizza mirror) | CC0 1.0 | https://poly.pizza/m/C39AUXUUes |

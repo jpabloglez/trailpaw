@@ -15,6 +15,7 @@
 [ext_resource type="Resource" path="res://data/fauna/alpaca.tres" id="61_alpaca"]
 [ext_resource type="Resource" path="res://data/fauna/deer.tres" id="62_deer"]
 [ext_resource type="Resource" path="res://data/fauna/stag.tres" id="63_stag"]
+[ext_resource type="Resource" path="res://data/fauna/ibex.tres" id="64_ibex"]
 
 [sub_resource type="Resource" id="Resource_pine_tall"]
 script = ExtResource("2_entry")
@@ -112,6 +113,11 @@ script = ExtResource("60_fentry")
 species = ExtResource("63_stag")
 weight = 1.0
 
+[sub_resource type="Resource" id="Resource_fauna_ibex"]
+script = ExtResource("60_fentry")
+species = ExtResource("64_ibex")
+weight = 4.0
+
 [resource]
 script = ExtResource("1_def")
 id = &"mountains"
@@ -127,4 +133,4 @@ vegetation = Array[ExtResource("2_entry")]([SubResource("Resource_pine_tall"), S
 ground_color_a = Color(0.42, 0.56, 0.32, 1)
 ground_color_b = Color(0.6, 0.58, 0.4, 1)
 fauna_chance = 0.15
-fauna = Array[ExtResource("60_fentry")]([SubResource("Resource_fauna_alpaca"), SubResource("Resource_fauna_deer"), SubResource("Resource_fauna_stag")])
+fauna = Array[ExtResource("60_fentry")]([SubResource("Resource_fauna_alpaca"), SubResource("Resource_fauna_deer"), SubResource("Resource_fauna_stag"), SubResource("Resource_fauna_ibex")])
