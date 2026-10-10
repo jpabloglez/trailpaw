@@ -796,6 +796,22 @@ the critter layer (packed arrays, one MultiMesh, chunk-driven, origin-shifted), 
   of the player / 6, 0 at night. There is no birdsong without birds; the intermittent spells
   stay.
 - **Budget:** decisions at 15 Hz; per frame one transform, custom data and colour per bird.
+- **Golden eagles (Phase 17):** `Soarers` (in both world scenes; `SoarerSettings`,
+  `data/critters/eagle.tres`).
+  - **When:** by day, while the fox is over the mountains, up to 2 appear (5 % a second).
+    Their circle's centre is 60–160 m away and always over the mountains.
+  - **Flight:** they soar 45–70 m above the ground, in circles of 35–70 m at 9 m/s, banking
+    18°. The flight height eases towards the higher of the ground under them and under their
+    centre. The circle drifts at 1.2 m/s and turns back before leaving the mountains.
+  - **Look:** the songbird mesh ×7, tinted dark brown, wings always spread and flexing slightly
+    in `bird.gdshader`.
+  - **Sound:** every 12–35 s one within 250 m cries (`SynthSounds.cry()`: a high, falling,
+    wavering "kyee-ah", ≈ 0.8 s).
+  - **Leaving:** beyond 450 m from the fox, and at night.
+  - **Journal:** a new `JournalEntry.Source.SOARER` (`sight_radius` 110 m, since they are
+    seen from far below); the tracker reads `count()` / `position_of()`.
+  - **Budget:** decisions at 4 Hz (≤ 2 height and 2 biome samples each); per frame one
+    transform per eagle. Measured under 0.3 ms per tick and 0.05 ms per frame.
 
 ### 7.z Butterflies, dragonflies and fireflies (Phases 13–14)
 - **`Flitters`** (one node per `FlitterKind`; `data/critters/butterflies.tres`,

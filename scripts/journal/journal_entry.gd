@@ -12,6 +12,7 @@ enum Source {
 	FLITTER,  ## a [FlitterKind] ([Flitters])
 	FIREFLY,  ## the [SmallLifeSettings] of the fireflies ([Fireflies])
 	FARM,  ## a [FarmAnimalKind] of the hamlets' pens ([FarmLife])
+	SOARER,  ## the [SoarerSettings] of the birds of prey ([Soarers])
 }
 
 ## Stable identifier (saves, events).
@@ -25,7 +26,7 @@ enum Source {
 ## Its data in that system (the same resource the system uses).
 @export var animal: Resource
 ## Seen closer than this (m, from the player) and on screen counts as an encounter.
-@export_range(1.0, 30.0, 0.5, "suffix:m") var sight_radius: float = 5.0
+@export_range(1.0, 150.0, 0.5, "suffix:m") var sight_radius: float = 5.0
 ## Where it lives, in words, when that is not a list of biomes (e.g. "Hamlets"); shown instead.
 @export var lives_in: String = ""
 ## Seconds it must stay in sight; 0 uses [member JournalSettings.sight_seconds] (fish, out of
@@ -54,6 +55,7 @@ func get_validation_errors() -> PackedStringArray:
 		Source.FLITTER: "FlitterKind",
 		Source.FIREFLY: "SmallLifeSettings",
 		Source.FARM: "FarmAnimalKind",
+		Source.SOARER: "SoarerSettings",
 	}
 	var script: Script = animal.get_script() if animal != null else null
 	if script == null or script.get_global_name() != expected[source]:
@@ -71,6 +73,11 @@ func _lives_in(biome: BiomeDefinition) -> bool:
 			return (animal as CritterKind).biome_counts.has(biome.id)
 		Source.BIRD:
 			return (animal as BirdSettings).biome_chance.get(biome.id, 0.0) > 0.0
-		Source.FLITTER:
-			return (animal as FlitterKind).biomes.has(biome.id)
-	return (animal as SmallLifeSettings).firefly_biomes.has(biome.id)
+	var biomes: Array[StringName] = []
+	if source == Source.FLITTER:
+		biomes = (animal as FlitterKind).biomes
+	elif source == Source.SOARER:
+		biomes = (animal as SoarerSettings).biomes
+	else:
+		biomes = (animal as SmallLifeSettings).firefly_biomes
+	return biomes.has(biome.id)

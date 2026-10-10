@@ -11,6 +11,7 @@ static var _plop: AudioStreamWAV
 static var _chime: AudioStreamWAV
 static var _hoot: AudioStreamWAV
 static var _whistle: AudioStreamWAV
+static var _cry: AudioStreamWAV
 
 
 ## A small dog's friendly "yip": two quick chirps gliding down (~0.25 s). Synthesised once
@@ -43,6 +44,30 @@ static func whistle() -> AudioStreamWAV:
 	if _whistle == null:
 		_whistle = _make_whistle()
 	return _whistle
+
+
+## A golden eagle's cry: a thin, high "kyee-ah" falling and wavering, a little breathy
+## (~0.8 s). Synthesised once and shared.
+static func cry() -> AudioStreamWAV:
+	if _cry == null:
+		_cry = _make_cry()
+	return _cry
+
+
+static func _make_cry() -> AudioStreamWAV:
+	var samples := PackedFloat32Array()
+	var length := int(RATE * 0.8)
+	var phase := 0.0
+	var breath := RandomNumberGenerator.new()
+	breath.seed = 23
+	for n in length:
+		var t := float(n) / length
+		var frequency := lerpf(2600.0, 1500.0, t * t) * (1.0 + 0.03 * sin(t * TAU * 18.0))
+		phase += TAU * frequency / RATE
+		var envelope := minf(1.0, t * 25.0) * pow(1.0 - t, 1.5)
+		var tone := sin(phase) + 0.3 * sin(phase * 2.0) + 0.1 * sin(phase * 3.0)
+		samples.append((tone + breath.randf_range(-0.15, 0.15)) * envelope * 0.4)
+	return to_wav(samples)
 
 
 static func _make_whistle() -> AudioStreamWAV:
