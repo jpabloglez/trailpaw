@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="FarmAnimalKind" format=3]
+
+[ext_resource type="Script" path="res://scripts/hamlets/farm_animal_kind.gd" id="1_fk"]
+[ext_resource type="PackedScene" path="res://assets/animals/cow/cow.glb" id="2_model"]
+
+[resource]
+script = ExtResource("1_fk")
+id = &"cow"
+scene = ExtResource("2_model")
+model_scale = 0.32
+yaw_offset = 180.0
+idle_clip = "Armature|Idle"
+move_clip = "Armature|Walk"
+hops = false
+move = 0.55
+idle_seconds = Vector2(6, 15)
+weight = 1.5

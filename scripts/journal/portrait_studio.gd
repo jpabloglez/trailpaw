@@ -129,6 +129,14 @@ static func figure_for(shown: JournalEntry) -> Node3D:
 			return holder
 		JournalEntry.Source.CRITTER:
 			return _mesh_figure(ProceduralMeshes.critter((shown.animal as CritterKind).shape))
+		JournalEntry.Source.FARM:
+			var farm := shown.animal as FarmAnimalKind
+			var animal: Node3D = farm.scene.instantiate()
+			animal.scale = Vector3.ONE * farm.model_scale
+			animal.rotation.y = deg_to_rad(farm.yaw_offset)
+			var pen := Node3D.new()
+			pen.add_child(animal)
+			return pen
 		JournalEntry.Source.BIRD:
 			var palette := (shown.animal as BirdSettings).palette
 			return _mesh_figure(
@@ -171,13 +179,17 @@ static func _mesh_figure(mesh: Mesh, tint: Color = Color.WHITE) -> Node3D:
 
 # Holds a fauna model still in its idle pose (the clip's first moments).
 static func _pose(figure: Node3D, shown: JournalEntry) -> void:
-	if shown.source != JournalEntry.Source.FAUNA:
+	if shown.source != JournalEntry.Source.FAUNA and shown.source != JournalEntry.Source.FARM:
 		return
 	var players := figure.find_children("*", "AnimationPlayer", true, false)
 	if players.is_empty():
 		return
 	var player := players[0] as AnimationPlayer
-	var clip: String = (shown.animal as FaunaSpecies).animal.animations.get(&"idle", "Idle")
+	var clip: String
+	if shown.source == JournalEntry.Source.FARM:
+		clip = (shown.animal as FarmAnimalKind).idle_clip
+	else:
+		clip = (shown.animal as FaunaSpecies).animal.animations.get(&"idle", "Idle")
 	for name in player.get_animation_list():
 		if String(name).ends_with(clip):
 			player.play(name)
@@ -188,7 +200,7 @@ static func _pose(figure: Node3D, shown: JournalEntry) -> void:
 
 # Centres the figure on the stage's axis and places the camera so all of it fits.
 func _frame(pitch: float) -> void:
-	var box := _bounds(_figure)
+	var box := _bounds(_figure, entry.source == JournalEntry.Source.FARM)
 	var centre := box.get_center()
 	_figure.position -= Vector3(centre.x, 0.0, centre.z)
 	var radius := maxf(box.size.length() * 0.5 * FILL, 0.005)
@@ -204,11 +216,25 @@ func _frame(pitch: float) -> void:
 	_camera.far = distance + radius * 2.0
 
 
-# Bounding box of every visual under [param root], in [param root]'s parent space.
-static func _bounds(root: Node3D) -> AABB:
+# Bounding box of every visual under [param root], in [param root]'s parent space. With
+# [param by_bones] a rigged model is measured by its bones instead, with a margin: the farm
+# models' skinned meshes report boxes far from their pose.
+static func _bounds(root: Node3D, by_bones: bool = false) -> AABB:
 	var out := AABB()
 	var first := true
 	var parent_inverse := root.get_parent_node_3d().global_transform.affine_inverse()
+	var skeletons := root.find_children("*", "Skeleton3D", true, false)
+	if by_bones and not skeletons.is_empty():
+		var skeleton := skeletons[0] as Skeleton3D
+		for bone in skeleton.get_bone_count():
+			var pose := skeleton.global_transform * skeleton.get_bone_global_pose(bone).origin
+			var at: Vector3 = parent_inverse * pose
+			out = AABB(at, Vector3.ZERO) if first else out.expand(at)
+			first = false
+		var margin := out.size * 0.15
+		out = out.grow(maxf(maxf(margin.x, margin.y), margin.z))
+		out.position.y = minf(out.position.y, 0.0)  # down to the feet
+		return out
 	for node in [root] + root.find_children("*", "VisualInstance3D", true, false):
 		var visual := node as VisualInstance3D
 		if visual == null:

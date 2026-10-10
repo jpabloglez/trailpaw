@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="JournalEntry" format=3]
+
+[ext_resource type="Script" path="res://scripts/journal/journal_entry.gd" id="1_je"]
+[ext_resource type="Resource" path="res://data/hamlets/farm/chicken.tres" id="2_animal"]
+
+[resource]
+script = ExtResource("1_je")
+id = &"chicken"
+display_name = "Chicken"
+blurb = "Pecks about the yard all day, and flaps off squawking if you run at it."
+source = 1
+animal = ExtResource("2_animal")
+sight_radius = 6.0
+lives_in = "Hamlets"

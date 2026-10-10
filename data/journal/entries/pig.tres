@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="JournalEntry" format=3]
+
+[ext_resource type="Script" path="res://scripts/journal/journal_entry.gd" id="1_je"]
+[ext_resource type="Resource" path="res://data/hamlets/farm/pig.tres" id="2_animal"]
+
+[resource]
+script = ExtResource("1_je")
+id = &"pig"
+display_name = "Pig"
+blurb = "Snuffles in the mud of its pen, perfectly content."
+source = 5
+animal = ExtResource("2_animal")
+sight_radius = 7.0
+lives_in = "Hamlets"

@@ -101,6 +101,25 @@ static func critter(shape: StringName) -> ArrayMesh:
 			return _heron()
 		&"owl":
 			return _owl()
+		&"chicken":
+			var white := Color(0.95, 0.93, 0.88)
+			var red := Color(0.85, 0.15, 0.12)
+			var yellow := Color(0.95, 0.72, 0.2)
+			var dark := Color(0.05, 0.04, 0.03)
+			return ellipsoids(
+				[
+					[Vector3(0, 0.16, 0.01), Vector3(0.08, 0.075, 0.11), white],
+					[Vector3(0, 0.2, 0.11), Vector3(0.045, 0.06, 0.04), white],  # the tail
+					[Vector3(0, 0.27, -0.08), Vector3(0.045, 0.05, 0.045), white],
+					[Vector3(0, 0.325, -0.08), Vector3(0.012, 0.025, 0.03), red],  # the comb
+					[Vector3(0, 0.24, -0.125), Vector3(0.01, 0.02, 0.01), red],  # the wattle
+					[Vector3(0, 0.265, -0.13), Vector3(0.012, 0.01, 0.022), yellow],  # the beak
+					[Vector3(-0.03, 0.285, -0.11), Vector3(0.008, 0.008, 0.008), dark],
+					[Vector3(0.03, 0.285, -0.11), Vector3(0.008, 0.008, 0.008), dark],
+					[Vector3(-0.03, 0.05, 0.0), Vector3(0.008, 0.05, 0.008), yellow],
+					[Vector3(0.03, 0.05, 0.0), Vector3(0.008, 0.05, 0.008), yellow],
+				]
+			)
 		&"squirrel":
 			var fur := Color(0.62, 0.33, 0.16)
 			var belly := Color(0.86, 0.72, 0.55)

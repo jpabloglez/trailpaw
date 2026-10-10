@@ -19,6 +19,7 @@ extends Node
 @export var fauna: FaunaDirector
 @export var critters: CritterSystem
 @export var tree_life: TreeLife
+@export var farm: FarmLife
 @export var birds: BirdFlocks
 @export var flitters: Array[Flitters] = []
 @export var fireflies: Fireflies
@@ -76,14 +77,17 @@ func _sees(entry: JournalEntry, at: Vector3, eye: Camera3D) -> bool:
 						and _in_view(agent.global_position, at, reach, eye)
 					):
 						return true
-		JournalEntry.Source.CRITTER:
-			for system: Node3D in [critters, tree_life]:  # the same interface
+		JournalEntry.Source.CRITTER, JournalEntry.Source.FARM:
+			for system: Node in [critters, tree_life, farm]:  # the same interface
 				if system == null:
 					continue
 				for i in system.count():
 					if system.kind_of(i) != entry.animal or not system.is_shown(i):
 						continue
-					if _in_view(system.to_global(system.position_of(i)), at, reach, eye):
+					var where: Vector3 = system.position_of(i)
+					if system is Node3D:  # critter systems give local positions
+						where = (system as Node3D).to_global(where)
+					if _in_view(where, at, reach, eye):
 						return true
 		JournalEntry.Source.BIRD:
 			if birds != null and birds.settings == entry.animal:

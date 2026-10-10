@@ -64,6 +64,9 @@ func test_every_animal_of_the_world_has_exactly_one_entry() -> void:
 		animals.append(kind)
 	for kind: Resource in _scene_value("TreeLife", "kinds"):  # squirrels and owls
 		animals.append(kind)
+	for kind: Resource in _scene_value("FarmLife", "kinds"):  # the hamlets' sheep, pigs, cows
+		animals.append(kind)
+	animals.append(_scene_value("FarmLife", "chicken"))
 	animals.append(_scene_value("BirdFlocks", "settings"))
 	animals.append(_scene_value("Butterflies", "kind"))
 	animals.append(_scene_value("Dragonflies", "kind"))
@@ -77,7 +80,8 @@ func test_every_animal_of_the_world_has_exactly_one_entry() -> void:
 	assert_int(JOURNAL.entries.size()).is_equal(animals.size())  # and nothing else
 	for entry in JOURNAL.entries:  # every one lives somewhere the player can go
 		var biomes := entry.biome_ids(TERRAIN.biomes)
-		assert_array(biomes).override_failure_message(String(entry.id)).is_not_empty()
+		var somewhere := not biomes.is_empty() or not entry.lives_in.is_empty()
+		assert_bool(somewhere).override_failure_message(String(entry.id)).is_true()
 
 
 func test_the_journal_records_the_first_sighting_only_and_saves() -> void:
