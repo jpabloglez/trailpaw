@@ -1,5 +1,6 @@
 // Terrain surface: biome ground palettes (per-vertex, blended on the CPU) varied by a
-// world-space macro pattern, fine brightness detail, and rock on steep slopes.
+// world-space macro pattern, fine brightness detail, rock on steep slopes and snow above the
+// snow line (the mountain peaks; it slides off cliffs).
 // Distance fog comes from the Environment (applied by the engine to spatial shaders).
 //
 // COLOR.rgb           = biome palette colour A (sRGB)
@@ -13,6 +14,9 @@ global uniform vec3 world_origin_offset;
 global uniform float water_level;
 // Ground wetness from the weather (0 dry … 1 soaked): darker, glossier ground.
 global uniform float wetness;
+// Absolute height of the snow line and the height over which snow fades in (Phase 17).
+global uniform float snow_line;
+global uniform float snow_blend;
 
 uniform sampler2D pattern_noise : hint_default_white, filter_linear_mipmap, repeat_enable;
 // Macro pattern mixing palette A and B (1 / wavelength in m).
@@ -27,6 +31,10 @@ uniform vec3 rock_color : source_color = vec3(0.47, 0.44, 0.40);
 uniform float rock_start_degrees : hint_range(0.0, 90.0) = 28.0;
 uniform float rock_full_degrees : hint_range(0.0, 90.0) = 40.0;
 uniform float roughness_value : hint_range(0.0, 1.0) = 0.95;
+uniform vec3 snow_color : source_color = vec3(0.93, 0.95, 0.98);
+// Snow thins out between these slopes (degrees): cliffs stay bare rock.
+uniform float snow_slope_start : hint_range(0.0, 90.0) = 32.0;
+uniform float snow_slope_end : hint_range(0.0, 90.0) = 48.0;
 // Shore: wet sand/mud band just above the water line (m above water_level).
 uniform vec3 shore_color : source_color = vec3(0.62, 0.56, 0.42);
 uniform float shore_height : hint_range(0.0, 5.0) = 1.2;
@@ -58,6 +66,11 @@ void fragment() {
 	float slope_degrees = degrees(acos(clamp(world_normal.y, 0.0, 1.0)));
 	float rock = smoothstep(rock_start_degrees, rock_full_degrees, slope_degrees);
 	vec3 albedo = mix(ground, rock_color, rock);
+	// Patchy edge: the macro pattern lifts or lowers the line by up to a blend height.
+	float snow_height = absolute_position.y - snow_line + (macro - 0.5) * 2.0 * snow_blend;
+	float snow = smoothstep(0.0, snow_blend, snow_height)
+		* (1.0 - smoothstep(snow_slope_start, snow_slope_end, slope_degrees));
+	albedo = mix(albedo, snow_color, snow);
 	float height = absolute_position.y - water_level;
 	float shore = 1.0 - smoothstep(0.0, shore_height, height);
 	albedo = mix(albedo, shore_color, shore * (1.0 - rock));
@@ -66,4 +79,5 @@ void fragment() {
 	float wet = wetness * (1.0 - depth);
 	ALBEDO = albedo * (1.0 - 0.35 * wet);
 	ROUGHNESS = mix(roughness_value, 0.75, wet * (1.0 - rock * 0.5));
+	ROUGHNESS = mix(ROUGHNESS, 0.6, snow);
 }

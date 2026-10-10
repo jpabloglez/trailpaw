@@ -26,6 +26,7 @@ Claude Code; one sprint = 2 weeks.
 | 15b | More animals (wolf, hedgehog, fish, squirrel, owl) | 1 | 50 w |
 | 16 | Rural hamlets | 2 | 52 w |
 | 16b | Distant smoke + biome atlas | 1 | 53 w |
+| 17 | Mountains | 2 | 57 w |
 
 Milestones: **M1 "Walk the world"** (end of Phase 3), **M2 "A day in the life"**
 (end of Phase 7), **M3 "Living world"** (end of Phase 10), **M4 Vertical slice** (Phase 12).
@@ -333,6 +334,23 @@ seen from afar; the journal also records the biomes visited. Mountains follow as
 biome visits are recorded once, saved and loaded.
 **Exit:** a column of smoke can lead the player to a hamlet; the journal shows where they've
 been.
+
+---
+
+## Phase 17 — Mountains
+
+A 1.2 km mountain band after the hills: snowy peaks with passes always crossable, cool air but
+cold on the snow, and mountain animals (user decisions; ADR-008).
+
+- [x] The mountain band: relief profile, snow line, pines and rocks, alpacas and deer.
+- [ ] Cold on the snow: a two-sided temperature, a frosty vignette.
+- [ ] Marmots that whistle and hide in their burrows.
+- [ ] A golden eagle soaring over the peaks.
+- [ ] The ibex (built in code with bpy), at home on the cliffs.
+
+**Tests:** peaks above the snow line, passes crossable on a slope-limited grid, gentle edges,
+plants below the snow; cold only on snow; each animal's behaviour, and the journal covers it.
+**Exit:** the mountains feel high, cold at the top and alive, and are always crossable.
 
 ---
 

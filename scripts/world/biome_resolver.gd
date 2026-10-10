@@ -5,8 +5,10 @@ extends RefCounted
 ## [BiomeTable]; neighbouring bands cross-fade over [member BiomeTable.blend_width].
 ##
 ## Weights always sum to exactly 1 (at most two biomes mix, since the blend is never wider
-## than a band) and are continuous. Pure and self-contained like [HeightSampler]: build one
-## per worker task from a table copy and the world seed.
+## than a band) and are continuous. A band with [member BiomeDefinition.edge_relief] < 1 also
+## scales its relief across its width (lower at the edges, full in the middle). Pure and
+## self-contained like [HeightSampler]: build one per worker task from a table copy and the
+## world seed.
 ## [br][br]
 ## Budget: 1 noise lookup + O(bands per cycle) float ops per sample; [method blend_into]
 ## does not allocate.
@@ -19,6 +21,7 @@ var _offsets := PackedFloat32Array()
 var _continental := PackedFloat32Array()
 var _detail := PackedFloat32Array()
 var _ridged := PackedFloat32Array()
+var _edge := PackedFloat32Array()
 var _color_a := PackedColorArray()
 var _color_b := PackedColorArray()
 var _starts := PackedFloat64Array()
@@ -51,6 +54,7 @@ func _init(table: BiomeTable, world_seed: int) -> void:
 		_continental.append(biome.continental_scale)
 		_detail.append(biome.detail_scale)
 		_ridged.append(biome.ridged_scale)
+		_edge.append(biome.edge_relief)
 		_color_a.append(biome.ground_color_a)
 		_color_b.append(biome.ground_color_b)
 	_sequence_length = start
@@ -82,20 +86,28 @@ func blend_into(x: float, z: float, out: BiomeBlend) -> void:
 		neighbour = k + 1
 		neighbour_weight = smoothstep(end - _half_blend, end + _half_blend, d)
 	var own := _slot(k)
+	var own_relief := _relief(own, d, start)
 	if neighbour < 0 or neighbour_weight <= 0.0:
-		_fill(out, own, -1, 0.0)
-	elif neighbour_weight > 0.5:
-		_fill(out, _slot(neighbour), own, 1.0 - neighbour_weight)
+		_fill(out, own, -1, 0.0, own_relief)
+		return
+	var other := _slot(neighbour)
+	var other_relief := _relief(other, d, band_start(neighbour))
+	if neighbour_weight > 0.5:
+		_fill(out, other, own, 1.0 - neighbour_weight, other_relief, own_relief)
 	else:
-		_fill(out, own, _slot(neighbour), neighbour_weight)
+		_fill(out, own, other, neighbour_weight, own_relief, other_relief)
 
 
 ## If every point within [param radius] of absolute ([param x], [param z]) lies inside a
 ## single band, away from any cross-fade, fills [param out] with that band's values and
 ## returns [code]true[/code]; the blend is then exactly constant over the area. Uses a
 ## rigorous bound: the noisy distance changes by at most 1 + A·f·[constant
-## BiomeTable.NOISE_GRADIENT_FACTOR] per metre.
-func uniform_blend(x: float, z: float, radius: float, out: BiomeBlend) -> bool:
+## BiomeTable.NOISE_GRADIENT_FACTOR] per metre. A band with a relief profile is never uniform
+## for heights; pass [param heights] false when only the biome and its colours matter
+## (vegetation), and [param out]'s relief values are then the band's unprofiled ones.
+func uniform_blend(
+	x: float, z: float, radius: float, out: BiomeBlend, heights: bool = true
+) -> bool:
 	var d := effective_distance(x, z)
 	var reach := radius * (1.0 + _noise_slope)
 	var k := band_index(d)
@@ -104,6 +116,8 @@ func uniform_blend(x: float, z: float, radius: float, out: BiomeBlend) -> bool:
 	var pure_from := start + _half_blend if k > 0 else -INF
 	var pure_to := end - _half_blend if _has_band_after(k) else INF
 	if d - reach <= pure_from or d + reach >= pure_to:
+		return false
+	if heights and _edge[_slot(k)] < 1.0:
 		return false
 	_fill(out, _slot(k), -1, 0.0)
 	return true
@@ -171,22 +185,45 @@ func _has_band_after(k: int) -> bool:
 	return _cycle or k < _biomes.size() - 1
 
 
-func _fill(out: BiomeBlend, primary: int, secondary: int, weight: float) -> void:
+# Relief factor of biome [param slot] at effective distance [param d] in its band starting at
+# [param start]: edge_relief at the edges, 1 in the middle (1 everywhere without a profile).
+func _relief(slot: int, d: float, start: float) -> float:
+	var edge := _edge[slot]
+	if edge >= 1.0:
+		return 1.0
+	var t := clampf((d - start) / _biomes[slot].band_width, 0.0, 1.0)
+	return lerpf(edge, 1.0, sin(PI * t))
+
+
+func _fill(
+	out: BiomeBlend,
+	primary: int,
+	secondary: int,
+	weight: float,
+	relief: float = 1.0,
+	secondary_relief: float = 1.0
+) -> void:
 	out.primary = _biomes[primary]
 	out.secondary = _biomes[secondary] if secondary >= 0 else null
 	out.secondary_weight = weight
 	if secondary < 0:
-		out.height_offset = _offsets[primary]
-		out.continental_scale = _continental[primary]
+		out.height_offset = _offsets[primary] * relief
+		out.continental_scale = _continental[primary] * relief
 		out.detail_scale = _detail[primary]
-		out.ridged_scale = _ridged[primary]
+		out.ridged_scale = _ridged[primary] * relief
 		out.color_a = _color_a[primary]
 		out.color_b = _color_b[primary]
 		return
-	out.height_offset = lerpf(_offsets[primary], _offsets[secondary], weight)
-	out.continental_scale = lerpf(_continental[primary], _continental[secondary], weight)
+	out.height_offset = lerpf(
+		_offsets[primary] * relief, _offsets[secondary] * secondary_relief, weight
+	)
+	out.continental_scale = lerpf(
+		_continental[primary] * relief, _continental[secondary] * secondary_relief, weight
+	)
 	out.detail_scale = lerpf(_detail[primary], _detail[secondary], weight)
-	out.ridged_scale = lerpf(_ridged[primary], _ridged[secondary], weight)
+	out.ridged_scale = lerpf(
+		_ridged[primary] * relief, _ridged[secondary] * secondary_relief, weight
+	)
 	out.color_a = _color_a[primary].lerp(_color_a[secondary], weight)
 	out.color_b = _color_b[primary].lerp(_color_b[secondary], weight)
 

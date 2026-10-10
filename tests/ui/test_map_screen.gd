@@ -71,6 +71,26 @@ func test_draws_fog_land_and_water() -> void:
 	assert_int(unexplored.to_rgba32()).is_equal(Color(SETTINGS.fog_color, 1.0).to_rgba32())
 
 
+func test_the_peaks_above_the_snow_line_are_white() -> void:
+	var peak := Vector2(4446.817, -1359.529)  # 195 m, seed 12345 (test_height_sampler)
+	var explored := ExploredMap.new(EXPLORATION)
+	explored.reveal(Vector3(peak.x, 0, peak.y), EXPLORATION.reveal_radius)
+	var renderer := MapRenderer.new(
+		HeightSampler.new(TERRAIN, 12345),
+		explored.cells_snapshot(),
+		explored.cell_size,
+		peak,
+		1000.0,
+		TERRAIN.sea_level,
+		SETTINGS
+	)
+	var bare := _color_at(renderer, renderer.render(), peak.x, peak.y)
+	renderer.snow_line = TERRAIN.snow_line
+	var snowy := _color_at(renderer, renderer.render(), peak.x, peak.y)
+	assert_float(snowy.get_luminance()).is_greater(bare.get_luminance() + 0.2)
+	assert_float(snowy.b).is_greater_equal(snowy.g - 0.05)  # white, not green
+
+
 func test_the_span_sets_the_scale() -> void:
 	var near := _renderer(1000.0)
 	var far := _renderer(2000.0)

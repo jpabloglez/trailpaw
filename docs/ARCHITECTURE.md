@@ -111,14 +111,24 @@ generation. Revisit if the design moves to a finite, hand-crafted map.
 Scene-tree mutations happen only on the main thread; worker threads produce plain data.
 
 ### 3.4 Distance-driven biomes
-- Data: `BiomeDefinition` (`data/biomes/{meadow,forest,river_valley,wetland,hills}.tres`: id,
-  display name, band width, height offset/scales, two-colour ground palette) ordered by
-  `BiomeTable` (`data/biomes/biome_table.tres`): 800 m bands that **repeat in a cycle**
-  (5 bands = 4 km since the wetland, ADR-006), 150 m blend, ±110 m boundary noise, measured
-  from the spawn point.
+- Data: `BiomeDefinition` (`data/biomes/{meadow,forest,river_valley,wetland,hills,
+  mountains}.tres`: id, display name, band width, height offset/scales, two-colour ground
+  palette) ordered by `BiomeTable` (`data/biomes/biome_table.tres`).
+  - Bands **repeat in a cycle**: five 800 m bands and the 1.2 km mountains make 5.2 km
+    (ADR-006, ADR-008).
+  - 150 m blend and ±110 m boundary noise, measured from the spawn point.
 - **Wetland (Phase 14, ADR-006):** after the river valley. Its height offset of −5.8 m with
   little relief puts it just under the water level: ≈ 43 % water, 93 % of it shallower than
   1.2 m (pools, channels and islets to wade). Muddy ground, cool.
+- **Mountains (Phase 17, ADR-008):** after the hills, 1.2 km wide; offset 85 m, continental
+  ×5, ridged ×3.5.
+  - **Relief profile:** `edge_relief` (0.15) scales the band's offset and its continental and
+    ridged scales by `lerp(edge_relief, 1, sin(π·t))` across the band. The range rises from
+    the foothills to a central crest and comes down gently to the next meadow.
+  - **Shape (seed 12345):** median ≈ 61 m, peaks up to ≈ 195 m, ≈ 21 % above the snow line
+    and ≈ 4 % steeper than 45°.
+  - **Passes:** a slope-limited grid walk always crosses the band (`test_mountains`).
+  - Pines below ≈ 75 m, rocks everywhere, alpacas, deer and stags. Cool (warmth −0.5).
 - `BiomeDefinition` (Resource): name, height params, ground palette, vegetation table,
   fauna table, ambient audio, temperature (`warmth`, Phase 6), water frequency.
 - `BiomeResolver` (pure, seeded, one per worker task): noisy distance
@@ -137,14 +147,21 @@ Scene-tree mutations happen only on the main thread; worker threads produce plai
   per vertex from the biome weights (`HeightSampler.sample`, ADR-005). Colour A goes in
   `COLOR.rgb`, colour B in `(UV2.xy, COLOR.a)` — standard attributes, because the
   Compatibility renderer misreads custom (`CUSTOM0`) attributes. Chunks wholly inside one band use a bit-identical
-  constant-blend fast path. Each `ChunkJob` builds its sampler on the main thread so worker
+  constant-blend fast path, except in a band with a relief profile (the mountains), whose
+  heights vary across it; vegetation still takes the fast path there
+  (`uniform_blend(..., heights = false)`). Each `ChunkJob` builds its sampler on the main thread so worker
   threads never read the shared biome resources.
 - Shading: `shaders/terrain.gdshader` (`data/world/terrain_material.tres`, all tunables set
   in the material) mixes palette A↔B with a seamless world-space noise pattern, adds fine
   brightness detail and tints slopes between 28° and 40° with rock (at/under the 45° walk
   limit, so unwalkable ground reads as rock). Patterns use absolute coordinates through the
   `world_origin_offset` global shader uniform, which `FloatingOrigin` updates on every
-  rebase (verified pixel-identical across a rebase). Distance fog comes from the
+  rebase (verified pixel-identical across a rebase).
+  - **Snow (Phase 17):** above `TerrainSettings.snow_line` (90 m; the `snow_line` /
+    `snow_blend` globals set by `WorldStreamer`), the ground turns white. The edge is patchy
+    (macro pattern ± `snow_blend`), and snow thins between 32° and 48° so cliffs stay rock.
+  - The map renderer paints the same snow (`MapRenderer.snow_line`).
+  - Only the mountains reach the line, and their plants stop below it. Distance fog comes from the
   Environment; the debug sandbox uses depth fog closing (90→200 m) before the streaming
   edge (~210 m) with `fog_sky_affect = 1` so the edge never shows.
 - Water v1: `TerrainSettings.sea_level` (−6 m). A chunk whose ground dips below it shows a
@@ -1203,5 +1220,6 @@ Stored in `docs/adr/NNN-title.md`. Initial set:
 - [ADR-005](adr/005-biome-blended-terrain.md) Biome-blended terrain height function.
 - [ADR-006](adr/006-wetland-band.md) A wetland band after the river valley.
 - [ADR-007](adr/007-rural-hamlets.md) Rural hamlets placed on the existing terrain.
+- [ADR-008](adr/008-mountain-band.md) A mountain band after the hills, with a relief profile and snow.
 
 New ADRs start from [`000-template.md`](adr/000-template.md).

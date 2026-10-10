@@ -1,0 +1,130 @@
+[gd_resource type="Resource" script_class="BiomeDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/world/biome_definition.gd" id="1_def"]
+[ext_resource type="Script" path="res://scripts/world/vegetation_entry.gd" id="2_entry"]
+[ext_resource type="Resource" path="res://data/vegetation/tree_pineTallA.tres" id="3_pine_tall"]
+[ext_resource type="Resource" path="res://data/vegetation/tree_pineSmallA.tres" id="4_pine_small"]
+[ext_resource type="Resource" path="res://data/vegetation/tree_pineRoundB.tres" id="5_pine_round"]
+[ext_resource type="Resource" path="res://data/vegetation/rock_largeA.tres" id="6_rock_a"]
+[ext_resource type="Resource" path="res://data/vegetation/rock_largeC.tres" id="7_rock_c"]
+[ext_resource type="Resource" path="res://data/vegetation/rock_smallA.tres" id="8_rock_small"]
+[ext_resource type="Resource" path="res://data/vegetation/rock_smallFlatA.tres" id="9_rock_flat"]
+[ext_resource type="Resource" path="res://data/vegetation/grass_leafs.tres" id="10_grass"]
+[ext_resource type="Resource" path="res://data/vegetation/flower_purpleA.tres" id="11_flower"]
+[ext_resource type="Script" path="res://scripts/fauna/fauna_entry.gd" id="60_fentry"]
+[ext_resource type="Resource" path="res://data/fauna/alpaca.tres" id="61_alpaca"]
+[ext_resource type="Resource" path="res://data/fauna/deer.tres" id="62_deer"]
+[ext_resource type="Resource" path="res://data/fauna/stag.tres" id="63_stag"]
+
+[sub_resource type="Resource" id="Resource_pine_tall"]
+script = ExtResource("2_entry")
+type = ExtResource("3_pine_tall")
+density = 0.1
+max_slope_degrees = 34.0
+min_height = 2.0
+max_height = 78.0
+cluster = 0.6
+
+[sub_resource type="Resource" id="Resource_pine_small"]
+script = ExtResource("2_entry")
+type = ExtResource("4_pine_small")
+density = 0.14
+max_slope_degrees = 36.0
+min_height = 2.0
+max_height = 84.0
+cluster = 0.5
+
+[sub_resource type="Resource" id="Resource_pine_round"]
+script = ExtResource("2_entry")
+type = ExtResource("5_pine_round")
+density = 0.06
+max_slope_degrees = 32.0
+min_height = 2.0
+max_height = 74.0
+cluster = 0.6
+
+[sub_resource type="Resource" id="Resource_rock_a"]
+script = ExtResource("2_entry")
+type = ExtResource("6_rock_a")
+density = 0.2
+max_slope_degrees = 60.0
+min_height = 0.5
+max_height = 190.0
+cluster = 0.5
+
+[sub_resource type="Resource" id="Resource_rock_c"]
+script = ExtResource("2_entry")
+type = ExtResource("7_rock_c")
+density = 0.15
+max_slope_degrees = 60.0
+min_height = 0.5
+max_height = 190.0
+cluster = 0.5
+
+[sub_resource type="Resource" id="Resource_rock_small"]
+script = ExtResource("2_entry")
+type = ExtResource("8_rock_small")
+density = 1.2
+max_slope_degrees = 55.0
+min_height = 0.3
+max_height = 190.0
+cluster = 0.4
+
+[sub_resource type="Resource" id="Resource_rock_flat"]
+script = ExtResource("2_entry")
+type = ExtResource("9_rock_flat")
+density = 0.5
+max_slope_degrees = 45.0
+min_height = 0.3
+max_height = 190.0
+cluster = 0.4
+
+[sub_resource type="Resource" id="Resource_grass"]
+script = ExtResource("2_entry")
+type = ExtResource("10_grass")
+density = 3.0
+max_slope_degrees = 36.0
+min_height = 0.3
+max_height = 88.0
+cluster = 0.4
+
+[sub_resource type="Resource" id="Resource_flower"]
+script = ExtResource("2_entry")
+type = ExtResource("11_flower")
+density = 0.3
+max_slope_degrees = 30.0
+min_height = 0.5
+max_height = 82.0
+cluster = 0.5
+
+[sub_resource type="Resource" id="Resource_fauna_alpaca"]
+script = ExtResource("60_fentry")
+species = ExtResource("61_alpaca")
+weight = 3.0
+
+[sub_resource type="Resource" id="Resource_fauna_deer"]
+script = ExtResource("60_fentry")
+species = ExtResource("62_deer")
+weight = 2.0
+
+[sub_resource type="Resource" id="Resource_fauna_stag"]
+script = ExtResource("60_fentry")
+species = ExtResource("63_stag")
+weight = 1.0
+
+[resource]
+script = ExtResource("1_def")
+id = &"mountains"
+display_name = "Mountains"
+band_width = 1200.0
+warmth = -0.5
+height_offset = 85.0
+continental_scale = 5.0
+detail_scale = 0.8
+ridged_scale = 3.5
+edge_relief = 0.15
+vegetation = Array[ExtResource("2_entry")]([SubResource("Resource_pine_tall"), SubResource("Resource_pine_small"), SubResource("Resource_pine_round"), SubResource("Resource_rock_a"), SubResource("Resource_rock_c"), SubResource("Resource_rock_small"), SubResource("Resource_rock_flat"), SubResource("Resource_grass"), SubResource("Resource_flower")])
+ground_color_a = Color(0.42, 0.56, 0.32, 1)
+ground_color_b = Color(0.6, 0.58, 0.4, 1)
+fauna_chance = 0.15
+fauna = Array[ExtResource("60_fentry")]([SubResource("Resource_fauna_alpaca"), SubResource("Resource_fauna_deer"), SubResource("Resource_fauna_stag")])

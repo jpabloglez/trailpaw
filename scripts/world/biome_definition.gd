@@ -17,13 +17,18 @@ extends Resource
 
 @export_group("Height")
 ## Added to the terrain height.
-@export_range(-50.0, 50.0, 0.1, "suffix:m") var height_offset: float = 0.0
+@export_range(-50.0, 150.0, 0.1, "suffix:m") var height_offset: float = 0.0
 ## Multiplier for the continental layer amplitude.
 @export_range(0.0, 5.0, 0.01) var continental_scale: float = 0.0
 ## Multiplier for the detail layer amplitude.
 @export_range(0.0, 5.0, 0.01) var detail_scale: float = 0.0
 ## Multiplier for the ridged layer amplitude.
 @export_range(0.0, 5.0, 0.01) var ridged_scale: float = 0.0
+## Relief at the band's edges relative to its middle (Phase 17, ADR-008): the height offset and
+## the continental and ridged scales are multiplied by
+## [code]lerp(edge_relief, 1, sin(π · t))[/code], t going 0 → 1 across the band, so a mountain
+## band rises to a central crest and comes down gently on both sides. 1 = no profile.
+@export_range(0.0, 1.0, 0.01) var edge_relief: float = 1.0
 
 @export_group("Climate")
 ## How warm the biome feels (-1 cool … +1 warm). Warm biomes lower temperature comfort, cool
@@ -58,6 +63,8 @@ func get_validation_errors() -> PackedStringArray:
 		errors.append("band_width must be > 0")
 	if continental_scale < 0.0 or detail_scale < 0.0 or ridged_scale < 0.0:
 		errors.append("height scales must be >= 0")
+	if edge_relief < 0.0 or edge_relief > 1.0:
+		errors.append("edge_relief must be within [0, 1]")
 	if warmth < -1.0 or warmth > 1.0:
 		errors.append("warmth must be within [-1, 1]")
 	for i in vegetation.size():
