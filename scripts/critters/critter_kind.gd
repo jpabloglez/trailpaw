@@ -17,7 +17,9 @@ extends Resource
 ## out every [member idle_seconds], [member graze_hop] being the leap) or
 ## [code]&"whistler"[/code] (a marmot: grazes around its burrow, sitting up now and then;
 ## scared, it whistles and runs into the burrow, [member flee_hop] being its dash, hides there
-## for [member dive_seconds] and peeks out once the fox has gone; never above the snow line).
+## for [member dive_seconds] and peeks out once the fox has gone; never above the snow line;
+## a lizard is a quiet whistler that does not sit up, see [member alarm_call] and
+## [member sits_up]).
 @export var behaviour: StringName = &"hopper"
 ## Amphibians live on ground up to this high above the water (m).
 @export_range(0.0, 5.0, 0.05, "suffix:m") var bank_height: float = 0.8
@@ -38,6 +40,11 @@ extends Resource
 @export var scale_range: Vector2 = Vector2(0.9, 1.1)
 ## Spread of a chunk's group around a random point in the chunk (m).
 @export_range(0.0, 64.0, 0.5, "suffix:m") var group_spread: float = 6.0
+
+## Whistlers: whether they call when scared (marmots whistle, lizards just dart away).
+@export var alarm_call: bool = true
+## Whistlers: whether they sit up on their haunches now and then to keep watch.
+@export var sits_up: bool = true
 
 @export_group("Moving")
 ## They graze within this distance of their home (m).

@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="CritterKind" format=3]
+
+[ext_resource type="Script" path="res://scripts/critters/critter_kind.gd" id="1_ck"]
+
+[resource]
+script = ExtResource("1_ck")
+id = &"desert_hare"
+shape = &"desert_hare"
+hours = Vector2(17, 9.5)
+biome_counts = Dictionary[StringName, Vector2i]({
+&"desert": Vector2i(1, 2),
+&"savanna": Vector2i(1, 3)
+})
+chance = 0.4
+scale_range = Vector2(0.95, 1.15)
+group_spread = 8.0
+home_radius = 5.0
+idle_seconds = Vector2(1, 4)
+graze_hop = Vector3(0.45, 0.08, 0.25)
+flee_hop = Vector3(1.8, 0.3, 0.26)
+zigzag = 40.0
+max_slope = 35.0
+flee_radius = 9.0
+flee_trigger_speed = 2.0
+startle_radius = 2.0
+calm_seconds = 6.0

@@ -147,6 +147,43 @@ static func critter(shape: StringName) -> ArrayMesh:
 					[Vector3(0, 0.2, 0.03), Vector3(0.03, 0.03, 0.03), fur],
 				]
 			)
+		&"lizard":  # slim and low, a long tapering tail and four splayed legs
+			var scales := Color(0.66, 0.56, 0.36)
+			var back := Color(0.48, 0.38, 0.24)
+			var eye := Color(0.05, 0.04, 0.03)
+			return ellipsoids(
+				[
+					[Vector3(0, 0.025, 0.0), Vector3(0.03, 0.018, 0.08), scales],
+					[Vector3(0, 0.035, 0.0), Vector3(0.018, 0.01, 0.07), back],
+					[Vector3(0, 0.03, -0.1), Vector3(0.022, 0.016, 0.035), scales],
+					[Vector3(0, 0.02, 0.12), Vector3(0.014, 0.01, 0.06), scales],  # the tail…
+					[Vector3(0, 0.015, 0.2), Vector3(0.008, 0.007, 0.05), back],  # …tapering
+					[Vector3(-0.045, 0.012, -0.04), Vector3(0.022, 0.006, 0.008), scales],
+					[Vector3(0.045, 0.012, -0.04), Vector3(0.022, 0.006, 0.008), scales],
+					[Vector3(-0.045, 0.012, 0.05), Vector3(0.022, 0.006, 0.008), scales],
+					[Vector3(0.045, 0.012, 0.05), Vector3(0.022, 0.006, 0.008), scales],
+					[Vector3(-0.016, 0.04, -0.115), Vector3(0.005, 0.005, 0.005), eye],
+					[Vector3(0.016, 0.04, -0.115), Vector3(0.005, 0.005, 0.005), eye],
+				],
+				6,
+				4
+			)
+		&"desert_hare":  # a lean, sandy hare with very long ears
+			var fur := Color(0.78, 0.66, 0.46)
+			var dark := Color(0.5, 0.4, 0.28)
+			var eye := Color(0.06, 0.05, 0.04)
+			return ellipsoids(
+				[
+					[Vector3(0, 0.13, 0.03), Vector3(0.08, 0.08, 0.14), fur],
+					[Vector3(0, 0.11, 0.11), Vector3(0.085, 0.085, 0.08), fur],
+					[Vector3(0, 0.21, -0.11), Vector3(0.055, 0.058, 0.07), fur],
+					[Vector3(-0.03, 0.34, -0.08), Vector3(0.018, 0.1, 0.03), dark],
+					[Vector3(0.03, 0.34, -0.08), Vector3(0.018, 0.1, 0.03), dark],
+					[Vector3(0, 0.16, 0.19), Vector3(0.03, 0.03, 0.03), Color(0.95, 0.93, 0.88)],
+					[Vector3(-0.038, 0.23, -0.16), Vector3(0.01, 0.01, 0.01), eye],
+					[Vector3(0.038, 0.23, -0.16), Vector3(0.01, 0.01, 0.01), eye],
+				]
+			)
 		&"marmot":  # chubby, brown with a paler belly and a dark short tail
 			var fur := Color(0.52, 0.4, 0.27)
 			var belly := Color(0.72, 0.6, 0.44)

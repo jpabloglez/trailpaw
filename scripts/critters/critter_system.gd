@@ -140,7 +140,9 @@ func _ready() -> void:
 		_plop.unit_size = 3.0
 		_plop.top_level = true
 		add_child(_plop)
-	if kinds.any(func(kind: CritterKind) -> bool: return kind.behaviour == &"whistler"):
+	var calls := func(kind: CritterKind) -> bool:
+		return kind.behaviour == &"whistler" and kind.alarm_call
+	if kinds.any(calls):
 		_whistle = AudioStreamPlayer3D.new()
 		_whistle.stream = SynthSounds.whistle()
 		_whistle.bus = &"SFX"
@@ -289,17 +291,7 @@ func draw() -> void:
 		var k := _kind[i]
 		if not is_shown(i):
 			continue  # under the water, or not its hours
-		var basis := Basis(Vector3.UP, _yaw[i])
-		match kinds[k].behaviour:
-			&"curler":
-				if _state[i] == State.FLEE:  # curled into a spiky ball
-					basis = basis.scaled(Vector3(0.9, 0.8, 0.62))
-			&"leaper":  # nose up leaving the water, nose down diving back
-				basis = basis * Basis(Vector3.RIGHT, lerpf(0.9, -0.9, _t[i]))
-			&"whistler":  # sits up on its haunches now and then, keeping watch
-				if _state[i] == State.IDLE and fmod(_time + _scale[i] * 40.0, 7.0) < 3.0:
-					basis = basis.scaled(Vector3(0.85, 1.45, 0.8))
-		basis = basis.scaled(Vector3.ONE * _scale[i])
+		var basis := basis_of(i)
 		var at := _position(i)
 		if kinds[k].behaviour == &"swimmer":
 			at.y += sin(_time * 1.8 + _scale[i] * 40.0) * 0.012  # bobbing on the water
@@ -313,6 +305,23 @@ func draw() -> void:
 		_counts[k] += 1
 	for k in kinds.size():
 		_meshes[k].multimesh.visible_instance_count = _counts[k]
+
+
+## Orientation, pose and size of critter [param i] as drawn now.
+func basis_of(i: int) -> Basis:
+	var kind := kinds[_kind[i]]
+	var basis := Basis(Vector3.UP, _yaw[i])
+	match kind.behaviour:
+		&"curler":
+			if _state[i] == State.FLEE:  # curled into a spiky ball
+				basis = basis.scaled(Vector3(0.9, 0.8, 0.62))
+		&"leaper":  # nose up leaving the water, nose down diving back
+			basis = basis * Basis(Vector3.RIGHT, lerpf(0.9, -0.9, _t[i]))
+		&"whistler":  # sits up on its haunches now and then, keeping watch
+			var watching := fmod(_time + _scale[i] * 40.0, 7.0) < 3.0
+			if kind.sits_up and _state[i] == State.IDLE and watching:
+				basis = basis.scaled(Vector3(0.85, 1.45, 0.8))
+	return basis.scaled(Vector3.ONE * _scale[i])
 
 
 ## Critters alive (all kinds).
@@ -529,7 +538,8 @@ func _whistler_tick(i: int, kind: CritterKind, distance: float) -> bool:
 				_run_home(i, kind)
 			return true
 	if _scared(kind, distance):
-		_whistle_at(_position(i))
+		if kind.alarm_call:
+			_whistle_at(_position(i))
 		_state[i] = State.FLEE
 		_run_home(i, kind)
 		return true

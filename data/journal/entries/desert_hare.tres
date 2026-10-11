@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="JournalEntry" format=3]
+
+[ext_resource type="Script" path="res://scripts/journal/journal_entry.gd" id="1_je"]
+[ext_resource type="Resource" path="res://data/critters/desert_hare.tres" id="2_animal"]
+
+[resource]
+script = ExtResource("1_je")
+id = &"desert_hare"
+display_name = "Desert Hare"
+blurb = "All ears and long legs; out at dawn and dusk, when the sand cools."
+source = 1
+animal = ExtResource("2_animal")
+sight_radius = 8.0

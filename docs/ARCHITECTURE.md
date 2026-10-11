@@ -785,6 +785,19 @@ no AnimationTree.
       for 20–40 s
     - it stays in while the fox is within 14 m, then **peeks out** and grazes again
   - A fox standing still beyond 8 m can watch them. Journal `sight_radius` 16 m.
+- **Lizards (Phase 18)** are quiet whistlers (`data/critters/lizard.tres`: `alarm_call` and
+  `sits_up` off; mesh in code: a slim sandy body, a long tapering tail, four splayed legs).
+  - Where and when: desert 3–6 and savanna 1–3, 50 % of chunks, out 8:00–18:30 (the sun).
+  - They bask still and scurry short distances. Approached (the fox moving within 6 m, or
+    anywhere within 3 m), they **dart** in quick 1.2 m dashes, without a sound, and **vanish**
+    under a rock or bush for 8–15 s, coming out once the fox has gone.
+- **Desert hares (Phase 18)** are hoppers (`desert_hare.tres`; a lean sandy hare with very
+  long ears).
+  - Where and when: desert 1–2, savanna 1–3, out from 17:00 to 9:30 (dawn and dusk, and the
+    cool night).
+  - They flee like rabbits in long zig-zag bounds (1.8 m).
+- `CritterSystem.basis_of(i)` is the pose and size of a critter as drawn; `draw()` uses it,
+  and tests read it.
 
 - **Tree life (Phase 15b):** `TreeLife` (in both world scenes; `data/critters/squirrel.tres`,
   `owl.tres`) keeps the critters that live in trees. It uses packed arrays and a MultiMesh per
