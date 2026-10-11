@@ -363,7 +363,7 @@ decisions; ADR-009). A gentle challenge: heat, thirst and cold nights, with rare
 - [x] The desert and savanna bands: dune and mesa layers, cacti and acacias.
 - [x] Oases in the desert: pools ringed with palms.
 - [x] Desert heat and thirst; cold desert nights; no rain over the desert.
-- [ ] Lizards and desert hares.
+- [x] Lizards and desert hares.
 - [ ] Vultures.
 - [ ] Zebras on the savanna.
 - [ ] The fennec (built in code with bpy).
