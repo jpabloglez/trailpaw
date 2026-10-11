@@ -56,6 +56,7 @@ func _at(biome: StringName, hour: float) -> void:
 
 func test_desert_noons_are_hot_and_its_nights_chilly() -> void:
 	var needs := _needs()
+	needs.movement = null  # standing still (idle), whether or not it has landed yet
 	_at(&"desert", 12.0)
 	var desert_noon := needs.felt_warmth()
 	_at(&"meadow", 12.0)
@@ -84,6 +85,7 @@ func test_desert_noons_are_hot_and_its_nights_chilly() -> void:
 
 func test_thirst_drains_faster_in_the_desert_and_savanna() -> void:
 	var needs := _needs()
+	needs.movement = null  # the same activity (idle) in every biome, landed or not
 	var drained := {}
 	for biome: StringName in [&"meadow", &"savanna", &"desert"]:
 		_at(biome, 10.0)
