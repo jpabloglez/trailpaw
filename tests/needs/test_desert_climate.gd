@@ -20,6 +20,7 @@ func before_test() -> void:
 	]
 	GameState.water_level = -INF
 	GameState.snow_line = INF
+	GameState.weather = &"clear"
 
 
 func after_test() -> void:
@@ -92,8 +93,13 @@ func test_thirst_drains_faster_in_the_desert_and_savanna() -> void:
 		needs.set_value(&"thirst", 100.0)
 		needs.tick(60.0)
 		drained[biome] = 100.0 - needs.value(&"thirst")
-	assert_float(drained[&"desert"]).is_equal_approx(drained[&"meadow"] * 1.6, 1e-3)
-	assert_float(drained[&"savanna"]).is_equal_approx(drained[&"meadow"] * 1.2, 1e-3)
+	var report := str(drained)
+	assert_float(drained[&"desert"]).override_failure_message(report).is_equal_approx(
+		drained[&"meadow"] * 1.6, 1e-3
+	)
+	assert_float(drained[&"savanna"]).override_failure_message(report).is_equal_approx(
+		drained[&"meadow"] * 1.2, 1e-3
+	)
 
 
 func test_the_oasis_water_still_cools_and_no_rain_is_felt_in_the_desert() -> void:
