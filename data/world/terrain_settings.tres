@@ -27,3 +27,5 @@ dune_amplitude = 7.0
 dune_warp = 3.5
 dune_sharpness = 1.25
 mesa_amplitude = 20.0
+oasis_radius = 90.0
+oasis_floor = 0.22

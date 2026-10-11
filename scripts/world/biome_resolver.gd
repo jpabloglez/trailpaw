@@ -24,6 +24,7 @@ var _ridged := PackedFloat32Array()
 var _edge := PackedFloat32Array()
 var _dune := PackedFloat32Array()
 var _mesa := PackedFloat32Array()
+var _oasis := PackedFloat32Array()
 var _color_a := PackedColorArray()
 var _color_b := PackedColorArray()
 var _starts := PackedFloat64Array()
@@ -59,6 +60,7 @@ func _init(table: BiomeTable, world_seed: int) -> void:
 		_edge.append(biome.edge_relief)
 		_dune.append(biome.dune_scale)
 		_mesa.append(biome.mesa_scale)
+		_oasis.append(biome.oasis_scale)
 		_color_a.append(biome.ground_color_a)
 		_color_b.append(biome.ground_color_b)
 	_sequence_length = start
@@ -217,6 +219,7 @@ func _fill(
 		out.ridged_scale = _ridged[primary] * relief
 		out.dune_scale = _dune[primary]
 		out.mesa_scale = _mesa[primary]
+		out.oasis_scale = _oasis[primary]
 		out.color_a = _color_a[primary]
 		out.color_b = _color_b[primary]
 		return
@@ -232,8 +235,14 @@ func _fill(
 	)
 	out.dune_scale = lerpf(_dune[primary], _dune[secondary], weight)
 	out.mesa_scale = lerpf(_mesa[primary], _mesa[secondary], weight)
+	out.oasis_scale = lerpf(_oasis[primary], _oasis[secondary], weight)
 	out.color_a = _color_a[primary].lerp(_color_a[secondary], weight)
 	out.color_b = _color_b[primary].lerp(_color_b[secondary], weight)
+
+
+## Whether any biome has oases.
+func has_oases() -> bool:
+	return _oasis.size() > 0 and Array(_oasis).max() > 0.0
 
 
 ## Largest dune and mesa scales among all biomes (for height bounds).

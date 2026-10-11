@@ -8,6 +8,11 @@
 [ext_resource type="Resource" path="res://data/vegetation/rock_largeA.tres" id="13_rock_largeA"]
 [ext_resource type="Resource" path="res://data/vegetation/rock_smallA.tres" id="14_rock_smallA"]
 [ext_resource type="Resource" path="res://data/vegetation/rock_smallFlatA.tres" id="15_rock_smallFlatA"]
+[ext_resource type="Resource" path="res://data/vegetation/tree_palm.tres" id="16_tree_palm"]
+[ext_resource type="Resource" path="res://data/vegetation/tree_palmTall.tres" id="17_tree_palmTall"]
+[ext_resource type="Resource" path="res://data/vegetation/tree_palmShort.tres" id="18_tree_palmShort"]
+[ext_resource type="Resource" path="res://data/vegetation/grass_leafs.tres" id="19_grass_leafs"]
+[ext_resource type="Resource" path="res://data/vegetation/reeds.tres" id="20_reeds"]
 
 [sub_resource type="Resource" id="Resource_cactus_tall"]
 script = ExtResource("2_entry")
@@ -63,6 +68,51 @@ min_height = 0.3
 max_height = 90.0
 cluster = 0.4
 
+[sub_resource type="Resource" id="Resource_tree_palm"]
+script = ExtResource("2_entry")
+type = ExtResource("16_tree_palm")
+density = 0.45
+max_slope_degrees = 30.0
+min_height = 0.5
+max_height = 4.5
+cluster = 0.5
+
+[sub_resource type="Resource" id="Resource_tree_palmTall"]
+script = ExtResource("2_entry")
+type = ExtResource("17_tree_palmTall")
+density = 0.3
+max_slope_degrees = 30.0
+min_height = 0.5
+max_height = 4.5
+cluster = 0.5
+
+[sub_resource type="Resource" id="Resource_tree_palmShort"]
+script = ExtResource("2_entry")
+type = ExtResource("18_tree_palmShort")
+density = 0.2
+max_slope_degrees = 30.0
+min_height = 0.4
+max_height = 3.5
+cluster = 0.5
+
+[sub_resource type="Resource" id="Resource_grass_leafs"]
+script = ExtResource("2_entry")
+type = ExtResource("19_grass_leafs")
+density = 6.0
+max_slope_degrees = 35.0
+min_height = 0.2
+max_height = 3.5
+cluster = 0.4
+
+[sub_resource type="Resource" id="Resource_reeds"]
+script = ExtResource("2_entry")
+type = ExtResource("20_reeds")
+density = 2.0
+max_slope_degrees = 30.0
+min_height = -0.4
+max_height = 0.4
+cluster = 0.5
+
 [resource]
 script = ExtResource("1_def")
 id = &"desert"
@@ -75,7 +125,8 @@ detail_scale = 0.4
 ridged_scale = 0.1
 dune_scale = 1.0
 mesa_scale = 1.0
-vegetation = Array[ExtResource("2_entry")]([SubResource("Resource_cactus_tall"), SubResource("Resource_cactus_short"), SubResource("Resource_dry_bush"), SubResource("Resource_rock_largeA"), SubResource("Resource_rock_smallA"), SubResource("Resource_rock_smallFlatA")])
+oasis_scale = 1.0
+vegetation = Array[ExtResource("2_entry")]([SubResource("Resource_cactus_tall"), SubResource("Resource_cactus_short"), SubResource("Resource_dry_bush"), SubResource("Resource_rock_largeA"), SubResource("Resource_rock_smallA"), SubResource("Resource_rock_smallFlatA"), SubResource("Resource_tree_palm"), SubResource("Resource_tree_palmTall"), SubResource("Resource_tree_palmShort"), SubResource("Resource_grass_leafs"), SubResource("Resource_reeds")])
 ground_color_a = Color(0.92, 0.82, 0.58, 1)
 ground_color_b = Color(0.84, 0.68, 0.46, 1)
 fauna_chance = 0.0
