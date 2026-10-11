@@ -5,7 +5,7 @@ extends GdUnitTestSuite
 const TABLE_PATH: String = "res://data/biomes/biome_table.tres"
 const SEED: int = 12345
 const ORDER: Array[StringName] = [
-	&"meadow", &"forest", &"river_valley", &"wetland", &"hills", &"mountains"
+	&"meadow", &"forest", &"river_valley", &"wetland", &"hills", &"mountains", &"desert", &"savanna"
 ]
 
 var _table: BiomeTable

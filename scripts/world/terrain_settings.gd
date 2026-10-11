@@ -68,6 +68,22 @@ const MAX_OCTAVES: int = 8
 ## Fractal octaves of the ridged layer.
 @export_range(1, 8) var ridged_octaves: int = 0
 
+@export_group("Sand")
+## Frequency of the sand noise (Phase 18): it warps the dunes and raises the mesas.
+@export_range(0.00001, 0.1, 0.00001, "suffix:1/m") var sand_frequency: float = 0.006
+## Dunes: distance between crests, crest height, the direction the crests face (degrees from
+## +X), how much the sand noise bends them (radians) and how sharp the crests are (≥ 1).
+@export_range(5.0, 500.0, 1.0, "suffix:m") var dune_wavelength: float = 60.0
+@export_range(0.0, 50.0, 0.1, "suffix:m") var dune_amplitude: float = 0.0
+@export_range(0.0, 180.0, 1.0, "suffix:°") var dune_direction_degrees: float = 30.0
+@export_range(0.0, 10.0, 0.05) var dune_warp: float = 2.5
+@export_range(1.0, 4.0, 0.05) var dune_sharpness: float = 1.6
+## Mesas: their height, the sand noise value where they start and how soft their edge is (in
+## noise units: small = cliffs).
+@export_range(0.0, 100.0, 0.5, "suffix:m") var mesa_amplitude: float = 0.0
+@export_range(-1.0, 1.0, 0.01) var mesa_threshold: float = 0.4
+@export_range(0.005, 1.0, 0.005) var mesa_softness: float = 0.08
+
 
 ## Returns human-readable problems with the tunables; empty when valid.
 func get_validation_errors() -> PackedStringArray:

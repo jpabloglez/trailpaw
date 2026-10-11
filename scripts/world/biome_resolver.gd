@@ -22,6 +22,8 @@ var _continental := PackedFloat32Array()
 var _detail := PackedFloat32Array()
 var _ridged := PackedFloat32Array()
 var _edge := PackedFloat32Array()
+var _dune := PackedFloat32Array()
+var _mesa := PackedFloat32Array()
 var _color_a := PackedColorArray()
 var _color_b := PackedColorArray()
 var _starts := PackedFloat64Array()
@@ -55,6 +57,8 @@ func _init(table: BiomeTable, world_seed: int) -> void:
 		_detail.append(biome.detail_scale)
 		_ridged.append(biome.ridged_scale)
 		_edge.append(biome.edge_relief)
+		_dune.append(biome.dune_scale)
+		_mesa.append(biome.mesa_scale)
 		_color_a.append(biome.ground_color_a)
 		_color_b.append(biome.ground_color_b)
 	_sequence_length = start
@@ -211,6 +215,8 @@ func _fill(
 		out.continental_scale = _continental[primary] * relief
 		out.detail_scale = _detail[primary]
 		out.ridged_scale = _ridged[primary] * relief
+		out.dune_scale = _dune[primary]
+		out.mesa_scale = _mesa[primary]
 		out.color_a = _color_a[primary]
 		out.color_b = _color_b[primary]
 		return
@@ -224,8 +230,19 @@ func _fill(
 	out.ridged_scale = lerpf(
 		_ridged[primary] * relief, _ridged[secondary] * secondary_relief, weight
 	)
+	out.dune_scale = lerpf(_dune[primary], _dune[secondary], weight)
+	out.mesa_scale = lerpf(_mesa[primary], _mesa[secondary], weight)
 	out.color_a = _color_a[primary].lerp(_color_a[secondary], weight)
 	out.color_b = _color_b[primary].lerp(_color_b[secondary], weight)
+
+
+## Largest dune and mesa scales among all biomes (for height bounds).
+func max_sand() -> Vector2:
+	var bound := Vector2.ZERO
+	for i in _biomes.size():
+		bound.x = maxf(bound.x, _dune[i])
+		bound.y = maxf(bound.y, _mesa[i])
+	return bound
 
 
 ## Largest |height offset| + per-layer scale among all biomes (for height bounds).

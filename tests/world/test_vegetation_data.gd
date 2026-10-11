@@ -47,6 +47,7 @@ func test_procedural_meshes_stand_on_their_origin_and_have_their_size() -> void:
 		&"cattails": Vector2(0.3, 0.9),
 		&"water_lily": Vector2(0.4, 0.6),
 		&"water_lily_flower": Vector2(0.4, 0.6),
+		&"dry_grass": Vector2(0.2, 0.9),
 	}
 	for shape: StringName in ProceduralMeshes.SHAPES:
 		var aabb := ProceduralMeshes.build(shape).get_aabb()
@@ -114,11 +115,12 @@ func test_valley_reeds_only_grow_at_the_waterline() -> void:
 			assert_float(entry.max_height).is_less_equal(2.0)
 
 
-func test_only_trees_and_large_rocks_collide() -> void:
+func test_only_trees_cacti_and_large_rocks_collide() -> void:
 	for file in DirAccess.get_files_at(TYPES_DIR):
 		var type := load(TYPES_DIR.path_join(file)) as VegetationType
+		var id := String(type.id)
 		var should := (
-			String(type.id).begins_with("tree_") or String(type.id).begins_with("rock_large")
+			id.begins_with("tree_") or id.begins_with("rock_large") or id.begins_with("cactus_")
 		)
 		assert_bool(type.has_collision()).override_failure_message(String(type.id)).is_equal(should)
 
@@ -126,9 +128,10 @@ func test_only_trees_and_large_rocks_collide() -> void:
 func test_small_plants_are_near_only_and_trees_are_not() -> void:
 	for file in DirAccess.get_files_at(TYPES_DIR):
 		var type := load(TYPES_DIR.path_join(file)) as VegetationType
-		if String(type.id).begins_with("tree_"):
+		if String(type.id).begins_with("tree_") or String(type.id).begins_with("cactus_"):
 			assert_bool(type.near_only).is_false()  # visible far away: no pop-in
-		if String(type.id).begins_with("grass") or String(type.id).begins_with("flower_"):
+		var id := String(type.id)
+		if id.begins_with("grass") or id.begins_with("flower_") or id == "dry_grass":
 			assert_bool(type.near_only).is_true()
 
 

@@ -84,11 +84,13 @@ static func sample_apron(
 		var cs := blend.continental_scale
 		var ds := blend.detail_scale
 		var rs := blend.ridged_scale
+		var dunes := blend.dune_scale
+		var mesas := blend.mesa_scale
 		for j in side:
 			var z := float(base_z + j) * step
 			for i in side:
 				heights[j * side + i] = sampler.sample_with_modifiers(
-					float(base_x + i) * step, z, offset, cs, ds, rs
+					float(base_x + i) * step, z, offset, cs, ds, rs, dunes, mesas
 				)
 		if data != null:
 			data.colors.fill(_pack_a(blend))

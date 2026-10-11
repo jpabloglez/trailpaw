@@ -6,8 +6,7 @@ extends GdUnitTestSuite
 const SETTINGS: TerrainSettings = preload("res://data/world/terrain_settings.tres")
 const SPECIES: AnimalSpecies = preload("res://data/species/fox.tres")
 const SEEDS: Array[int] = [12345, 777, 2024]
-## Grid step of the crossing search (m).
-const STEP: float = 8.0
+const GridWalk := preload("res://tests/world/grid_walk.gd")
 
 var _band: BiomeDefinition
 
@@ -57,7 +56,7 @@ func test_only_the_mountains_reach_the_snow_line() -> void:
 func test_passes_always_cross_the_band() -> void:
 	# A walk on an 8 m grid, never steeper than the fox can climb, from the foothills to the
 	# meadow beyond, in strips 400 m wide around the band.
-	var rise := STEP * tan(deg_to_rad(SPECIES.max_slope_degrees))
+	var rise := GridWalk.STEP * tan(deg_to_rad(SPECIES.max_slope_degrees))
 	for seed_value in SEEDS:
 		var sampler := HeightSampler.new(SETTINGS, seed_value)
 		var start := _start(sampler.resolver())
@@ -65,7 +64,9 @@ func test_passes_always_cross_the_band() -> void:
 			var angle := strip * TAU / 6.0 + 0.3
 			(
 				assert_bool(
-					_crosses(sampler, angle, start - 60.0, start + _band.band_width + 60.0, rise)
+					GridWalk.crosses(
+						sampler, angle, start - 60.0, start + _band.band_width + 60.0, rise
+					)
 				)
 				. override_failure_message("seed %d strip %d has no pass" % [seed_value, strip])
 				. is_true()
@@ -140,42 +141,3 @@ func test_the_snow_reaches_the_terrain_shader() -> void:
 	var code := (load("res://shaders/terrain.gdshader") as Shader).code
 	assert_str(code).contains("global uniform float snow_line")
 	assert_float(SETTINGS.snow_line).is_between(80.0, 120.0)
-
-
-# Breadth-first search over a strip at [param angle], from effective distance [param from] to
-# [param to], ±200 m to the side, with steps no higher than [param rise].
-func _crosses(sampler: HeightSampler, angle: float, from: float, to: float, rise: float) -> bool:
-	var along := Vector2.from_angle(angle)
-	var side := along.orthogonal()
-	var rows := int((to - from) / STEP) + 1
-	var cols := int(400.0 / STEP) + 1
-	var heights := PackedFloat32Array()
-	heights.resize(rows * cols)
-	for r in rows:
-		for c in cols:
-			var p := along * (from + r * STEP) + side * ((c - cols / 2) * STEP)
-			heights[r * cols + c] = sampler.height_at(p.x, p.y)
-	var seen := PackedByteArray()
-	seen.resize(rows * cols)
-	var queue := PackedInt32Array()
-	for c in cols:
-		queue.append(c)
-		seen[c] = 1
-	var head := 0
-	while head < queue.size():
-		var cell := queue[head]
-		head += 1
-		var r := cell / cols
-		var c := cell % cols
-		if r == rows - 1:
-			return true
-		for step: Vector2i in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
-			var nr := r + step.x
-			var nc := c + step.y
-			if nr < 0 or nr >= rows or nc < 0 or nc >= cols:
-				continue
-			var next := nr * cols + nc
-			if seen[next] == 0 and absf(heights[next] - heights[cell]) <= rise:
-				seen[next] = 1
-				queue.append(next)
-	return false

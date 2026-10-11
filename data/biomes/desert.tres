@@ -1,0 +1,81 @@
+[gd_resource type="Resource" script_class="BiomeDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/world/biome_definition.gd" id="1_def"]
+[ext_resource type="Script" path="res://scripts/world/vegetation_entry.gd" id="2_entry"]
+[ext_resource type="Resource" path="res://data/vegetation/cactus_tall.tres" id="10_cactus_tall"]
+[ext_resource type="Resource" path="res://data/vegetation/cactus_short.tres" id="11_cactus_short"]
+[ext_resource type="Resource" path="res://data/vegetation/dry_bush.tres" id="12_dry_bush"]
+[ext_resource type="Resource" path="res://data/vegetation/rock_largeA.tres" id="13_rock_largeA"]
+[ext_resource type="Resource" path="res://data/vegetation/rock_smallA.tres" id="14_rock_smallA"]
+[ext_resource type="Resource" path="res://data/vegetation/rock_smallFlatA.tres" id="15_rock_smallFlatA"]
+
+[sub_resource type="Resource" id="Resource_cactus_tall"]
+script = ExtResource("2_entry")
+type = ExtResource("10_cactus_tall")
+density = 0.06
+max_slope_degrees = 30.0
+min_height = 1.0
+max_height = 80.0
+cluster = 0.6
+
+[sub_resource type="Resource" id="Resource_cactus_short"]
+script = ExtResource("2_entry")
+type = ExtResource("11_cactus_short")
+density = 0.1
+max_slope_degrees = 32.0
+min_height = 1.0
+max_height = 80.0
+cluster = 0.5
+
+[sub_resource type="Resource" id="Resource_dry_bush"]
+script = ExtResource("2_entry")
+type = ExtResource("12_dry_bush")
+density = 0.25
+max_slope_degrees = 34.0
+min_height = 0.5
+max_height = 80.0
+cluster = 0.5
+
+[sub_resource type="Resource" id="Resource_rock_largeA"]
+script = ExtResource("2_entry")
+type = ExtResource("13_rock_largeA")
+density = 0.04
+max_slope_degrees = 50.0
+min_height = 0.5
+max_height = 90.0
+cluster = 0.5
+
+[sub_resource type="Resource" id="Resource_rock_smallA"]
+script = ExtResource("2_entry")
+type = ExtResource("14_rock_smallA")
+density = 0.4
+max_slope_degrees = 50.0
+min_height = 0.3
+max_height = 90.0
+cluster = 0.4
+
+[sub_resource type="Resource" id="Resource_rock_smallFlatA"]
+script = ExtResource("2_entry")
+type = ExtResource("15_rock_smallFlatA")
+density = 0.2
+max_slope_degrees = 45.0
+min_height = 0.3
+max_height = 90.0
+cluster = 0.4
+
+[resource]
+script = ExtResource("1_def")
+id = &"desert"
+display_name = "Desert"
+band_width = 1000.0
+warmth = 1.5
+height_offset = 6.0
+continental_scale = 0.8
+detail_scale = 0.4
+ridged_scale = 0.1
+dune_scale = 1.0
+mesa_scale = 1.0
+vegetation = Array[ExtResource("2_entry")]([SubResource("Resource_cactus_tall"), SubResource("Resource_cactus_short"), SubResource("Resource_dry_bush"), SubResource("Resource_rock_largeA"), SubResource("Resource_rock_smallA"), SubResource("Resource_rock_smallFlatA")])
+ground_color_a = Color(0.92, 0.82, 0.58, 1)
+ground_color_b = Color(0.84, 0.68, 0.46, 1)
+fauna_chance = 0.0

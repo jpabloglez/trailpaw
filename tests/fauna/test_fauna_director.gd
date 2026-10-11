@@ -124,11 +124,17 @@ func test_the_chunk_chance_is_respected() -> void:
 
 func test_every_biome_hosts_valid_fauna() -> void:
 	var table := (load(TERRAIN) as TerrainSettings).biomes
+	var empty: Array[StringName] = []
 	for biome in table.biomes:
+		if biome.fauna.is_empty():  # no big animals (yet): then none may be rolled
+			assert_float(biome.fauna_chance).is_equal(0.0)
+			empty.append(biome.id)
+			continue
 		assert_float(biome.fauna_chance).is_between(0.05, 0.3)
-		assert_bool(biome.fauna.is_empty()).is_false()
 		for entry in biome.fauna:
 			assert_bool(entry.species.is_valid()).is_true()
+	# Only the desert waits for its animals (the fennec, Phase 18).
+	assert_array(empty).is_equal([&"desert"] as Array[StringName])
 	assert_array(Array(SETTINGS.get_validation_errors())).is_empty()
 
 

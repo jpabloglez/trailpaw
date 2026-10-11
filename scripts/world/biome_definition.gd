@@ -29,11 +29,15 @@ extends Resource
 ## [code]lerp(edge_relief, 1, sin(π · t))[/code], t going 0 → 1 across the band, so a mountain
 ## band rises to a central crest and comes down gently on both sides. 1 = no profile.
 @export_range(0.0, 1.0, 0.01) var edge_relief: float = 1.0
+## Multipliers of the dunes and of the mesas ([TerrainSettings] "Sand" group; Phase 18,
+## ADR-009). 0 = none.
+@export_range(0.0, 5.0, 0.01) var dune_scale: float = 0.0
+@export_range(0.0, 5.0, 0.01) var mesa_scale: float = 0.0
 
 @export_group("Climate")
-## How warm the biome feels (-1 cool … +1 warm). Warm biomes lower temperature comfort, cool
-## ones restore it ([code]NeedsModel[/code]).
-@export_range(-1.0, 1.0, 0.05) var warmth: float = 0.0
+## How warm the biome feels (-1 cool … +1 warm, up to ±2 for the desert). Warm biomes lower
+## temperature comfort, cool ones restore it ([code]NeedsModel[/code]).
+@export_range(-2.0, 2.0, 0.05) var warmth: float = 0.0
 
 @export_group("Vegetation")
 ## What grows in this biome and where (see [VegetationEntry]).
@@ -61,12 +65,18 @@ func get_validation_errors() -> PackedStringArray:
 		errors.append("display_name must not be empty")
 	if band_width <= 0.0:
 		errors.append("band_width must be > 0")
-	if continental_scale < 0.0 or detail_scale < 0.0 or ridged_scale < 0.0:
+	if (
+		continental_scale < 0.0
+		or detail_scale < 0.0
+		or ridged_scale < 0.0
+		or dune_scale < 0.0
+		or mesa_scale < 0.0
+	):
 		errors.append("height scales must be >= 0")
 	if edge_relief < 0.0 or edge_relief > 1.0:
 		errors.append("edge_relief must be within [0, 1]")
-	if warmth < -1.0 or warmth > 1.0:
-		errors.append("warmth must be within [-1, 1]")
+	if warmth < -2.0 or warmth > 2.0:
+		errors.append("warmth must be within [-2, 2]")
 	for i in vegetation.size():
 		if vegetation[i] == null:
 			errors.append("vegetation[%d] is null" % i)

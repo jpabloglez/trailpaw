@@ -27,6 +27,7 @@ Claude Code; one sprint = 2 weeks.
 | 16 | Rural hamlets | 2 | 52 w |
 | 16b | Distant smoke + biome atlas | 1 | 53 w |
 | 17 | Mountains | 2 | 57 w |
+| 18 | Desert and savanna | 2 | 61 w |
 
 Milestones: **M1 "Walk the world"** (end of Phase 3), **M2 "A day in the life"**
 (end of Phase 7), **M3 "Living world"** (end of Phase 10), **M4 Vertical slice** (Phase 12).
@@ -351,6 +352,27 @@ cold on the snow, and mountain animals (user decisions; ADR-008).
 **Tests:** peaks above the snow line, passes crossable on a slope-limited grid, gentle edges,
 plants below the snow; cold only on snow; each animal's behaviour, and the journal covers it.
 **Exit:** the mountains feel high, cold at the top and alive, and are always crossable.
+
+---
+
+## Phase 18 — Desert and savanna
+
+After the mountains: a desert of dunes and mesas, then a savanna back to the meadow (user
+decisions; ADR-009). A gentle challenge: heat, thirst and cold nights, with rare oases.
+
+- [x] The desert and savanna bands: dune and mesa layers, cacti and acacias.
+- [ ] Oases in the desert: pools ringed with palms.
+- [ ] Desert heat and thirst; cold desert nights; no rain over the desert.
+- [ ] Lizards and desert hares.
+- [ ] Vultures.
+- [ ] Zebras on the savanna.
+- [ ] The fennec (built in code with bpy).
+
+**Tests:** dunes rise and fall across the wind; mesas flat-topped and high; the bands always
+crossable; oases only in the desert, with water; heat and thirst only there; each animal's
+behaviour, and the journal covers it.
+**Exit:** the desert is beautiful and a gentle challenge, the savanna its own place, and both
+alive.
 
 ---
 

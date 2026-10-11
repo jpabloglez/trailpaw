@@ -3,7 +3,7 @@ extends GdUnitTestSuite
 
 const TABLE_PATH: String = "res://data/biomes/biome_table.tres"
 const EXPECTED_ORDER: Array[StringName] = [
-	&"meadow", &"forest", &"river_valley", &"wetland", &"hills", &"mountains"
+	&"meadow", &"forest", &"river_valley", &"wetland", &"hills", &"mountains", &"desert", &"savanna"
 ]
 
 var _table: BiomeTable
@@ -31,14 +31,16 @@ func test_every_biome_is_valid_with_a_display_name() -> void:
 		assert_str(biome.display_name).is_not_empty()
 
 
-func test_bands_are_about_800_m_wide_and_the_mountains_wider() -> void:
+func test_bands_are_about_800_m_wide_and_the_mountains_and_desert_wider() -> void:
 	for biome in _table.biomes:
 		if biome.id == &"mountains":
 			assert_float(biome.band_width).is_equal(1200.0)  # room for a crest (ADR-008)
+		elif biome.id == &"desert":
+			assert_float(biome.band_width).is_equal(1000.0)  # room for dunes and oases (ADR-009)
 		else:
 			assert_float(biome.band_width).is_between(600.0, 1000.0)
-	# Five 800 m bands and the 1.2 km mountains (ADR-008): a 5.2 km cycle.
-	assert_float(_table.sequence_length()).is_equal_approx(5200.0, 1.0)
+	# Six 800 m bands, the 1.2 km mountains and the 1 km desert (ADR-009): a 7 km cycle.
+	assert_float(_table.sequence_length()).is_equal_approx(7000.0, 1.0)
 
 
 func test_blend_fits_inside_the_narrowest_band() -> void:
