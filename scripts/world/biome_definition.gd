@@ -33,6 +33,9 @@ extends Resource
 ## ADR-009). 0 = none.
 @export_range(0.0, 5.0, 0.01) var dune_scale: float = 0.0
 @export_range(0.0, 5.0, 0.01) var mesa_scale: float = 0.0
+## How much the oases ([TerrainSettings] "Oases" group) sink the ground here (0 none, 1 full:
+## the desert).
+@export_range(0.0, 1.0, 0.01) var oasis_scale: float = 0.0
 
 @export_group("Climate")
 ## How warm the biome feels (-1 cool … +1 warm, up to ±2 for the desert). Warm biomes lower

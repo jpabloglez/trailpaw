@@ -12,6 +12,8 @@ extends RefCounted
 ## Seed salt per layer so layers are decorrelated but still derived from one world seed
 ## (continental, detail, ridged, sand).
 const LAYER_SALT: Array[int] = [0x1F3A, 0x5C27, 0x9E41, 0x3D17]
+## An oasis needs the sand noise at its centre this far under the mesa threshold.
+const OASIS_MESA_MARGIN: float = 0.15
 
 var _base_height: float
 var _continental_amplitude: float
@@ -31,6 +33,12 @@ var _dune_sharpness: float
 var _mesa_amplitude: float
 var _mesa_threshold: float
 var _mesa_softness: float
+var _world_seed: int
+var _oasis_cell: float
+var _oasis_chance: float
+var _oasis_radius: float
+var _oasis_floor: float
+var _oasis_bottom: float
 
 
 func _init(settings: TerrainSettings, world_seed: int) -> void:
@@ -72,6 +80,12 @@ func _init(settings: TerrainSettings, world_seed: int) -> void:
 	_mesa_amplitude = settings.mesa_amplitude
 	_mesa_threshold = settings.mesa_threshold
 	_mesa_softness = settings.mesa_softness
+	_world_seed = world_seed
+	_oasis_cell = settings.oasis_cell
+	_oasis_chance = settings.oasis_chance
+	_oasis_radius = settings.oasis_radius
+	_oasis_floor = settings.oasis_floor
+	_oasis_bottom = settings.sea_level - settings.oasis_depth
 
 
 ## Terrain height (m) at absolute world position ([param x], [param z]).
@@ -102,7 +116,8 @@ func sample_with_blend(x: float, z: float, blend: BiomeBlend) -> float:
 		blend.detail_scale,
 		blend.ridged_scale,
 		blend.dune_scale,
-		blend.mesa_scale
+		blend.mesa_scale,
+		blend.oasis_scale
 	)
 
 
@@ -116,7 +131,8 @@ func sample_with_modifiers(
 	detail_scale: float,
 	ridged_scale: float,
 	dune_scale: float = 0.0,
-	mesa_scale: float = 0.0
+	mesa_scale: float = 0.0,
+	oasis_scale: float = 0.0
 ) -> float:
 	var continental := _continental.get_noise_2d(x, z)
 	var detail := _detail.get_noise_2d(x, z)
@@ -130,19 +146,75 @@ func sample_with_modifiers(
 		+ detail * _detail_amplitude * detail_scale
 		+ ridged * _ridged_amplitude * ridged_scale
 	)
+	var bowl := _oasis_bowl(x, z) * oasis_scale if oasis_scale > 0.0 else 0.0
 	if dune_scale > 0.0 or mesa_scale > 0.0:
-		height += _sand_layers(x, z, dune_scale, mesa_scale)
+		height += _sand_layers(x, z, dune_scale, mesa_scale, bowl)
+	if bowl > 0.0:
+		height = lerpf(height, minf(height, _oasis_bottom), bowl)
 	return height
+
+
+## The oasis of the cell holding absolute ([param x], [param z]): its centre (x, z) and
+## whether the cell was dealt one (y = 1; see [method is_oasis] for whether it can be there).
+## Deterministic per world seed and cell; no storage.
+func oasis_of(x: float, z: float) -> Vector3:
+	var cell_x := floori(x / _oasis_cell)
+	var cell_z := floori(z / _oasis_cell)
+	var mix := _cell_hash(cell_x, cell_z)
+	var present := float(mix & 0xFFFF) / 65535.0 < _oasis_chance
+	var span := _oasis_cell - 2.0 * _oasis_radius
+	return Vector3(
+		cell_x * _oasis_cell + _oasis_radius + float((mix >> 16) & 0xFF) / 255.0 * span,
+		1.0 if present else 0.0,
+		cell_z * _oasis_cell + _oasis_radius + float((mix >> 24) & 0xFF) / 255.0 * span
+	)
+
+
+## Whether the oasis [param oasis] (from [method oasis_of]) is really there: dealt to its
+## cell, with its centre away from any mesa (an oasis never opens a crater in one; mesas
+## nearby slope down into its bowl instead). One noise lookup.
+func is_oasis(oasis: Vector3) -> bool:
+	if oasis.y == 0.0:
+		return false
+	return _sand.get_noise_2d(oasis.x, oasis.z) < _mesa_threshold - OASIS_MESA_MARGIN
+
+
+# How deep into the bowl of its cell's oasis ([param x], [param z]) lies: 1 on the flat
+# bottom, 0 at and beyond the (wobbly) rim. One integer hash and a distance per sample, plus
+# one noise lookup inside a bowl.
+func _oasis_bowl(x: float, z: float) -> float:
+	var oasis := oasis_of(x, z)
+	if oasis.y == 0.0:
+		return 0.0
+	var offset := Vector2(x - oasis.x, z - oasis.z)
+	var distance := offset.length()
+	if distance >= _oasis_radius or not is_oasis(oasis):
+		return 0.0
+	# A wobbly rim (lobes turned per oasis), so pools are not perfect circles.
+	var angle := offset.angle() + float(floori(oasis.x) % 97)
+	distance *= 1.0 + 0.12 * sin(3.0 * angle) + 0.08 * sin(5.0 * angle + 1.3)
+	return smoothstep(_oasis_radius, _oasis_radius * _oasis_floor, distance)
+
+
+func _cell_hash(cell_x: int, cell_z: int) -> int:
+	var mix := (cell_x * 73856093) ^ (cell_z * 19349663) ^ (_world_seed * 83492791)
+	mix = (mix ^ (mix >> 13)) * 0x5BD1E995
+	mix = mix ^ (mix >> 15)
+	return mix & 0xFFFFFFFF
 
 
 ## Dunes and mesas at ([param x], [param z]) (Phase 18, ADR-009): one sand noise lookup warps
 ## the dune crests and raises flat-topped mesas where it passes the threshold; the dunes stop
-## at a mesa's edge so its top stays flat.
-func _sand_layers(x: float, z: float, dune_scale: float, mesa_scale: float) -> float:
+## at a mesa's edge so its top stays flat. Inside an oasis bowl ([param bowl] > 0) the mesas
+## fade out, so no cliff rises beside the water. Returns the height added.
+func _sand_layers(
+	x: float, z: float, dune_scale: float, mesa_scale: float, bowl: float = 0.0
+) -> float:
 	var sand := _sand.get_noise_2d(x, z)
 	var plateau := 0.0
 	if mesa_scale > 0.0:
 		plateau = smoothstep(_mesa_threshold, _mesa_threshold + _mesa_softness, sand)
+		plateau *= 1.0 - smoothstep(0.0, 0.08, bowl)
 	var out := plateau * _mesa_amplitude * mesa_scale
 	if dune_scale > 0.0:
 		var phase := _dune_k * (x * _dune_dir.x + z * _dune_dir.y) + _dune_warp * sand
@@ -168,6 +240,11 @@ func max_deviation() -> float:
 		+ _ridged_amplitude * m.w
 		+ _dune_amplitude * sand.x
 		+ _mesa_amplitude * sand.y
+		+ (
+			absf(_oasis_bottom - _base_height)
+			if _resolver != null and _resolver.has_oases()
+			else 0.0
+		)
 	)
 
 

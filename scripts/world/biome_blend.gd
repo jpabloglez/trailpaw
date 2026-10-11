@@ -14,6 +14,8 @@ var ridged_scale: float = 0.0
 ## Blended [member BiomeDefinition.dune_scale] and [member BiomeDefinition.mesa_scale].
 var dune_scale: float = 0.0
 var mesa_scale: float = 0.0
+## Blended [member BiomeDefinition.oasis_scale].
+var oasis_scale: float = 0.0
 ## Blended [member BiomeDefinition.ground_color_a].
 var color_a: Color = Color.BLACK
 ## Blended [member BiomeDefinition.ground_color_b].

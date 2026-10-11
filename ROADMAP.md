@@ -361,7 +361,7 @@ After the mountains: a desert of dunes and mesas, then a savanna back to the mea
 decisions; ADR-009). A gentle challenge: heat, thirst and cold nights, with rare oases.
 
 - [x] The desert and savanna bands: dune and mesa layers, cacti and acacias.
-- [ ] Oases in the desert: pools ringed with palms.
+- [x] Oases in the desert: pools ringed with palms.
 - [ ] Desert heat and thirst; cold desert nights; no rain over the desert.
 - [ ] Lizards and desert hares.
 - [ ] Vultures.

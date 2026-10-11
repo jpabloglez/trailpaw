@@ -84,6 +84,17 @@ const MAX_OCTAVES: int = 8
 @export_range(-1.0, 1.0, 0.01) var mesa_threshold: float = 0.4
 @export_range(0.005, 1.0, 0.005) var mesa_softness: float = 0.08
 
+@export_group("Oases")
+## Oases (Phase 18): the world is cut into square cells this wide; each hosts an oasis with
+## [member oasis_chance] (hashed from the seed and the cell), at a random spot inside it.
+@export_range(100.0, 5000.0, 10.0, "suffix:m") var oasis_cell: float = 600.0
+@export_range(0.0, 1.0, 0.01) var oasis_chance: float = 0.6
+## The bowl's radius, the share of it that is a flat bottom, and how far its bottom sits
+## under the water level (m).
+@export_range(5.0, 200.0, 1.0, "suffix:m") var oasis_radius: float = 45.0
+@export_range(0.0, 0.9, 0.01) var oasis_floor: float = 0.35
+@export_range(0.1, 10.0, 0.1, "suffix:m") var oasis_depth: float = 1.5
+
 
 ## Returns human-readable problems with the tunables; empty when valid.
 func get_validation_errors() -> PackedStringArray:

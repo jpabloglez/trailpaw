@@ -19,10 +19,14 @@ func _biome(id: StringName) -> BiomeDefinition:
 
 
 ## Summed density per 100 m² of entries whose type id starts with [param prefix].
+# Total density of [param biome_id]'s plants whose id starts with [param prefix], counting
+# only those that grow across the biome (not in a band a few metres above the water, like the
+# palms of the oases).
 func _density(biome_id: StringName, prefix: String) -> float:
 	var total := 0.0
 	for entry in _biome(biome_id).vegetation:
-		if String(entry.type.id).begins_with(prefix):
+		var widespread := entry.max_height - entry.min_height > 10.0 or entry.max_height < 0.0
+		if String(entry.type.id).begins_with(prefix) and widespread:
 			total += entry.density
 	return total
 

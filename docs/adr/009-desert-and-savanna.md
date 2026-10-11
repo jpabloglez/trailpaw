@@ -51,6 +51,24 @@ This needs two things:
   - **Savanna:** median ≈ 4 m, 0.1 % steep.
   - A slope-limited grid walk crosses both bands in every strip tested (3 seeds × 6 strips).
 
+- **Oases (PR 2):**
+  - **Placement:** the world is cut into 600 m cells, and an integer hash of the seed and
+    the cell gives 85 % of them an oasis at a random spot. Nothing is stored.
+    - An oasis exists only if the sand noise at its centre is 0.15 under the mesa threshold,
+      so it never opens a crater in a mesa.
+  - **The bowl:** 90 m across, with a wobbly rim (two lobed sines) and a flat bottom (22 %
+    of the radius) 1.5 m under the water level.
+    - It is scaled by the biome's `oasis_scale` (desert 1, every other biome 0).
+    - Inside it the mesas fade out (`plateau × (1 − smoothstep(0, 0.08, bowl))`), so a mesa
+      may stand at the rim but never as a cliff beside the water.
+  - **Everything else works unchanged:** the water plane, the shore shader, drinking, the
+    water scent and the map.
+  - **Palms** (Kenney `tree_palm*`), grass and reeds grow only 0.4–4.5 m above the water,
+    which in the desert happens only at oases.
+  - **Results:** ≈ 50–60 oases on the desert ring of each seed. From anywhere in the desert
+    one lies within the water scent's 1.5 km. Cost: one hash and a distance per desert
+    sample, plus one noise lookup inside a bowl.
+
 ## Consequences
 - **The cycle is 7.0 km.** The desert runs from 5.2 to 6.2 km, the savanna from 6.2 to 7.0
   km.
