@@ -1,0 +1,95 @@
+[gd_resource type="Resource" script_class="BiomeDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/world/biome_definition.gd" id="1_def"]
+[ext_resource type="Script" path="res://scripts/world/vegetation_entry.gd" id="2_entry"]
+[ext_resource type="Resource" path="res://data/vegetation/tree_plateau.tres" id="10_tree_plateau"]
+[ext_resource type="Resource" path="res://data/vegetation/tree_plateau_dark.tres" id="11_tree_plateau_dark"]
+[ext_resource type="Resource" path="res://data/vegetation/dry_grass.tres" id="12_dry_grass"]
+[ext_resource type="Resource" path="res://data/vegetation/plant_bushSmall.tres" id="13_plant_bushSmall"]
+[ext_resource type="Resource" path="res://data/vegetation/dry_bush.tres" id="14_dry_bush"]
+[ext_resource type="Resource" path="res://data/vegetation/rock_smallA.tres" id="15_rock_smallA"]
+[ext_resource type="Script" path="res://scripts/fauna/fauna_entry.gd" id="60_fentry"]
+[ext_resource type="Resource" path="res://data/fauna/horse.tres" id="61_horse"]
+[ext_resource type="Resource" path="res://data/fauna/deer.tres" id="62_deer"]
+
+[sub_resource type="Resource" id="Resource_tree_plateau"]
+script = ExtResource("2_entry")
+type = ExtResource("10_tree_plateau")
+density = 0.05
+max_slope_degrees = 25.0
+min_height = 1.0
+max_height = 60.0
+cluster = 0.7
+
+[sub_resource type="Resource" id="Resource_tree_plateau_dark"]
+script = ExtResource("2_entry")
+type = ExtResource("11_tree_plateau_dark")
+density = 0.025
+max_slope_degrees = 25.0
+min_height = 1.0
+max_height = 60.0
+cluster = 0.7
+
+[sub_resource type="Resource" id="Resource_dry_grass"]
+script = ExtResource("2_entry")
+type = ExtResource("12_dry_grass")
+density = 4.0
+max_slope_degrees = 30.0
+min_height = 0.3
+max_height = 60.0
+cluster = 0.4
+
+[sub_resource type="Resource" id="Resource_plant_bushSmall"]
+script = ExtResource("2_entry")
+type = ExtResource("13_plant_bushSmall")
+density = 0.3
+max_slope_degrees = 32.0
+min_height = 0.5
+max_height = 60.0
+cluster = 0.5
+
+[sub_resource type="Resource" id="Resource_dry_bush"]
+script = ExtResource("2_entry")
+type = ExtResource("14_dry_bush")
+density = 0.2
+max_slope_degrees = 34.0
+min_height = 0.5
+max_height = 60.0
+cluster = 0.5
+
+[sub_resource type="Resource" id="Resource_rock_smallA"]
+script = ExtResource("2_entry")
+type = ExtResource("15_rock_smallA")
+density = 0.15
+max_slope_degrees = 45.0
+min_height = 0.3
+max_height = 60.0
+cluster = 0.4
+
+[sub_resource type="Resource" id="Resource_fauna_horse"]
+script = ExtResource("60_fentry")
+species = ExtResource("61_horse")
+weight = 2.0
+
+[sub_resource type="Resource" id="Resource_fauna_deer"]
+script = ExtResource("60_fentry")
+species = ExtResource("62_deer")
+weight = 1.0
+
+[resource]
+script = ExtResource("1_def")
+id = &"savanna"
+display_name = "Savanna"
+band_width = 800.0
+warmth = 0.8
+height_offset = 4.0
+continental_scale = 0.7
+detail_scale = 0.6
+ridged_scale = 0.15
+dune_scale = 0.0
+mesa_scale = 0.0
+vegetation = Array[ExtResource("2_entry")]([SubResource("Resource_tree_plateau"), SubResource("Resource_tree_plateau_dark"), SubResource("Resource_dry_grass"), SubResource("Resource_plant_bushSmall"), SubResource("Resource_dry_bush"), SubResource("Resource_rock_smallA")])
+ground_color_a = Color(0.76, 0.67, 0.37, 1)
+ground_color_b = Color(0.64, 0.6, 0.33, 1)
+fauna_chance = 0.15
+fauna = Array[ExtResource("60_fentry")]([SubResource("Resource_fauna_horse"), SubResource("Resource_fauna_deer")])

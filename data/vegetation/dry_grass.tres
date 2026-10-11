@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="VegetationType" format=3]
+
+[ext_resource type="Script" path="res://scripts/world/vegetation_type.gd" id="1_vtype"]
+
+[resource]
+script = ExtResource("1_vtype")
+id = &"dry_grass"
+procedural_shape = &"dry_grass"
+procedural_color = Color(0.8, 0.68, 0.38, 1)
+scale_min = 0.8
+scale_max = 1.4
+visibility_range = 70.0
+near_only = true
+sway = 0.5

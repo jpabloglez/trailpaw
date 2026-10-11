@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="VegetationType" format=3]
+
+[ext_resource type="Script" path="res://scripts/world/vegetation_type.gd" id="1_vtype"]
+
+[resource]
+script = ExtResource("1_vtype")
+id = &"dry_bush"
+procedural_shape = &"bush"
+procedural_color = Color(0.56, 0.5, 0.32, 1)
+scale_min = 0.5
+scale_max = 0.9
+align_to_ground = 0.5
+visibility_range = 120.0
+sway = 0.1

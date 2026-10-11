@@ -76,14 +76,16 @@ func test_terrain_is_varied() -> void:
 
 ## Golden values: fail loudly if an engine upgrade or code change alters the world a
 ## given seed produces (that would silently break saves). Update deliberately, with an ADR
-## (last change: ADR-008, the mountain band after the hills).
+## (last change: ADR-009, the desert and savanna after the mountains).
 func test_golden_heights_for_reference_seed() -> void:
 	var sampler := HeightSampler.new(_settings, SEED)
 	assert_int(HeightSampler.layer_seed(SEED, HeightSampler.LAYER_SALT[0])).is_equal(1883851918)
 	assert_float(sampler.height_at(0.0, 0.0)).is_equal_approx(4.4, 1e-4)
 	assert_float(sampler.height_at(1234.5, -678.25)).is_equal_approx(5.594238, 1e-4)
-	assert_float(sampler.height_at(-9000.0, 4200.0)).is_equal_approx(144.568619, 1e-4)
+	assert_float(sampler.height_at(-9000.0, 4200.0)).is_equal_approx(-4.267072, 1e-4)
 	assert_float(sampler.height_at(4446.817, -1359.529)).is_equal_approx(194.625998, 1e-4)  # peak
+	assert_float(sampler.height_at(-5737.877, -653.7481)).is_equal_approx(36.666149, 1e-4)  # mesa
+	assert_float(sampler.height_at(-5900.0, -1500.0)).is_equal_approx(8.886734, 1e-4)  # dunes
 
 
 func test_terrain_is_walkable_in_every_biome_bar_the_mountain_cliffs() -> void:
@@ -107,8 +109,10 @@ func test_terrain_is_walkable_in_every_biome_bar_the_mountain_cliffs() -> void:
 				if Vector2(dx, dz).length() > limit:
 					steep += 1
 				total += 1
-		# The mountains have cliffs by design, but passes always cross them (test_mountains).
-		var allowed := 0.15 if _settings.biomes.biomes[b].id == &"mountains" else 0.02
+		# The mountains and the desert's mesas have cliffs by design, but there is always a way
+		# across (test_mountains, test_desert).
+		var id := _settings.biomes.biomes[b].id
+		var allowed := 0.15 if id == &"mountains" else (0.08 if id == &"desert" else 0.02)
 		assert_float(float(steep) / total).is_less(allowed)
 
 

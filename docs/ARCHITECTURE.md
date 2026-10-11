@@ -112,10 +112,10 @@ Scene-tree mutations happen only on the main thread; worker threads produce plai
 
 ### 3.4 Distance-driven biomes
 - Data: `BiomeDefinition` (`data/biomes/{meadow,forest,river_valley,wetland,hills,
-  mountains}.tres`: id, display name, band width, height offset/scales, two-colour ground
-  palette) ordered by `BiomeTable` (`data/biomes/biome_table.tres`).
-  - Bands **repeat in a cycle**: five 800 m bands and the 1.2 km mountains make 5.2 km
-    (ADR-006, ADR-008).
+  mountains,desert,savanna}.tres`: id, display name, band width, height offset/scales,
+  two-colour ground palette) ordered by `BiomeTable` (`data/biomes/biome_table.tres`).
+  - Bands **repeat in a cycle**: six 800 m bands, the 1.2 km mountains and the 1 km desert
+    make 7.0 km (ADR-006, ADR-008, ADR-009).
   - 150 m blend and ±110 m boundary noise, measured from the spawn point.
 - **Wetland (Phase 14, ADR-006):** after the river valley. Its height offset of −5.8 m with
   little relief puts it just under the water level: ≈ 43 % water, 93 % of it shallower than
@@ -129,7 +129,18 @@ Scene-tree mutations happen only on the main thread; worker threads produce plai
     and ≈ 4 % steeper than 45°.
   - **Passes:** a slope-limited grid walk always crosses the band (`test_mountains`).
   - Pines below ≈ 75 m, rocks everywhere, alpacas, deer and stags. Cool (warmth −0.5).
-- `BiomeDefinition` (Resource): name, height params, ground palette, vegetation table,
+- **Desert and savanna (Phase 18, ADR-009):** after the mountains.
+  - **The sand layers** (`TerrainSettings` "Sand" group; a fourth noise, ≈ 170 m) run only
+    where a biome's `dune_scale` or `mesa_scale` is above 0.
+    - **Dunes:** crests 60 m apart across a 30° wind, `(1 − |sin|)^1.25`, bent by the sand
+      noise; their 7 m height varies with it.
+    - **Mesas:** a 20 m flat-topped step where the sand noise passes 0.4. Dunes stop at
+      their edge.
+  - **Desert** (1 km): golden sand, cacti (which collide), dry bushes, rocks. Warmth 1.5,
+    and the warmth range opens to ±2. No big fauna yet.
+  - **Savanna** (800 m): gentle and golden, acacia-like `tree_plateau`, procedural
+    `dry_grass` tufts, horses and deer. Warmth 0.8.
+  - **Crossable:** `tests/world/grid_walk.gd` checks the mountains, desert and savanna.- `BiomeDefinition` (Resource): name, height params, ground palette, vegetation table,
   fauna table, ambient audio, temperature (`warmth`, Phase 6), water frequency.
 - `BiomeResolver` (pure, seeded, one per worker task): noisy distance
   `d' = |pos − spawn| + noise(pos) · amplitude`; the band containing `d'` cross-fades with
@@ -1277,5 +1288,6 @@ Stored in `docs/adr/NNN-title.md`. Initial set:
 - [ADR-006](adr/006-wetland-band.md) A wetland band after the river valley.
 - [ADR-007](adr/007-rural-hamlets.md) Rural hamlets placed on the existing terrain.
 - [ADR-008](adr/008-mountain-band.md) A mountain band after the hills, with a relief profile and snow.
+- [ADR-009](adr/009-desert-and-savanna.md) Desert and savanna after the mountains: dune and mesa layers.
 
 New ADRs start from [`000-template.md`](adr/000-template.md).

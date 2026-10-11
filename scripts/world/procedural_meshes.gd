@@ -1,12 +1,19 @@
 class_name ProceduralMeshes
 extends RefCounted
 ## Low-poly meshes built in code where the CC0 packs have nothing suitable: a round berry bush,
-## berry clusters and fallen fruit. Each is made of spheres, stands on its origin and is about
-## 1 m across (scaled per instance).
+## berry clusters, fallen fruit and tufts of reeds or dry grass. Each stands on its origin and
+## is about 1 m across (scaled per instance).
 
 ## Known shapes (see [member VegetationType.procedural_shape]).
 const SHAPES: Array[StringName] = [
-	&"bush", &"berry_cluster", &"fruit", &"reeds", &"cattails", &"water_lily", &"water_lily_flower"
+	&"bush",
+	&"berry_cluster",
+	&"fruit",
+	&"reeds",
+	&"cattails",
+	&"water_lily",
+	&"water_lily_flower",
+	&"dry_grass",
 ]
 ## Shapes whose colours are in the vertex colours (the foliage material multiplies them in).
 const COLOURED: Array[StringName] = [&"cattails", &"water_lily", &"water_lily_flower"]
@@ -19,6 +26,8 @@ static func build(shape: StringName) -> ArrayMesh:
 			return _tuft(9, Vector2(0.8, 1.3), 0.035, 0.22, Color.WHITE, false)
 		&"cattails":
 			return _tuft(6, Vector2(0.9, 1.4), 0.03, 0.16, Color(0.42, 0.55, 0.3), true)
+		&"dry_grass":  # a knee-high tuft of the savanna (tinted golden by its type)
+			return _tuft(8, Vector2(0.45, 0.8), 0.03, 0.2, Color.WHITE, false)
 		&"water_lily":
 			return _lily_pad(false)
 		&"water_lily_flower":
