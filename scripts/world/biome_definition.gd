@@ -41,6 +41,13 @@ extends Resource
 ## How warm the biome feels (-1 cool … +1 warm, up to ±2 for the desert). Warm biomes lower
 ## temperature comfort, cool ones restore it ([code]NeedsModel[/code]).
 @export_range(-2.0, 2.0, 0.05) var warmth: float = 0.0
+## How much colder it feels at midnight than at noon here (eased with the hour, like the
+## global day warmth; Phase 18: the desert's chilly nights). 0 = no difference.
+@export_range(0.0, 6.0, 0.05) var night_drop: float = 0.0
+## Need id → rate multiplier while in this biome (e.g. thirst ×1.6 in the desert).
+@export var need_multipliers: Dictionary[StringName, float] = {}
+## No rain falls here (the desert): the weather's rain is not shown, heard or felt.
+@export var dry: bool = false
 
 @export_group("Vegetation")
 ## What grows in this biome and where (see [VegetationEntry]).

@@ -171,6 +171,7 @@ script = ExtResource("48_wth")
 settings = ExtResource("49_wthset")
 day_night = NodePath("../DayNightCycle")
 wind = ExtResource("50_wind")
+terrain = ExtResource("3_u18in")
 
 [node name="AmbienceDirector" type="Node" parent="." node_paths=PackedStringArray("day_night", "weather", "birds")]
 script = ExtResource("51_amb")

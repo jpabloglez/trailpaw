@@ -69,6 +69,20 @@ This needs two things:
     one lies within the water scent's 1.5 km. Cost: one hash and a distance per desert
     sample, plus one noise lookup inside a bowl.
 
+- **Desert climate (PR 3):** three new `BiomeDefinition` fields.
+  - `night_drop`: the desert is 3.6 colder at midnight than at noon, eased with the hour (the
+    savanna 1.0). Its warmth runs from 1.5 at noon (+0.2 global) to ≈ −2.4 at midnight.
+    - Noon is hot: comfort turns critical in ≈ 6 minutes of trotting.
+    - Midnight, standing still, crosses the Phase 17 cold knee a little: a faint frost
+      vignette. Running warms the fox up.
+  - `need_multipliers`: thirst ×1.6 in the desert, ×1.2 on the savanna.
+  - `dry`: the weather stays global, but in a dry biome `Weather.shelter` eases to 1.
+    `rain_here` (the particles, the wind and the ambience) is then 0, the ground dries and
+    the needs don't count the rain.
+  - **Ambience:** the mountains (missed in Phase 17), desert and savanna get their sounds:
+    wind, savanna birds by day, crickets at night. A test now checks that no biome is
+    silent.
+
 ## Consequences
 - **The cycle is 7.0 km.** The desert runs from 5.2 to 6.2 km, the savanna from 6.2 to 7.0
   km.

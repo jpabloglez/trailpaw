@@ -72,8 +72,13 @@ func multiplier(need_id: StringName, activity: int) -> float:
 ## Warmth the time of day adds at [param hour] (0…24): [member night_warmth] at midnight,
 ## [member noon_warmth] at noon, eased with a cosine in between.
 func time_warmth(hour: float) -> float:
-	var t := (cos((hour - 12.0) / 24.0 * TAU) + 1.0) * 0.5
-	return lerpf(night_warmth, noon_warmth, t)
+	return lerpf(night_warmth, noon_warmth, day_fraction(hour))
+
+
+## How far the day is from midnight to noon at [param hour] (0…24): 0 at midnight, 1 at noon,
+## eased with a cosine.
+static func day_fraction(hour: float) -> float:
+	return (cos((hour - 12.0) / 24.0 * TAU) + 1.0) * 0.5
 
 
 ## Warmth the weather adds ([code]&"clear"[/code], [code]&"cloudy"[/code], [code]&"rain"[/code]).

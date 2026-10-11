@@ -43,6 +43,9 @@ var _since_tick: float = 0.0
 var _speed_multiplier: float = 1.0
 var _tiredness: float = 0.0
 var _warmth: Dictionary[StringName, float] = {}
+var _night_drop: Dictionary[StringName, float] = {}
+var _multipliers: Dictionary[StringName, Dictionary] = {}
+var _dry: Dictionary[StringName, bool] = {}
 
 
 func _ready() -> void:
@@ -53,6 +56,9 @@ func _ready() -> void:
 	if biomes != null:
 		for biome in biomes.biomes:
 			_warmth[biome.id] = biome.warmth
+			_night_drop[biome.id] = biome.night_drop
+			_multipliers[biome.id] = biome.need_multipliers
+			_dry[biome.id] = biome.dry
 	add_to_group(WorldStreamer.DEBUG_LINES_GROUP)
 
 
@@ -72,7 +78,14 @@ func _unhandled_input(event: InputEvent) -> void:
 
 ## Advances the needs by [param delta] seconds with the current conditions.
 func tick(delta: float) -> void:
-	model.tick(delta, activity(), felt_warmth(), in_water(), is_raining())
+	model.tick(
+		delta,
+		activity(),
+		felt_warmth(),
+		in_water(),
+		is_raining(),
+		_multipliers.get(GameState.current_biome, {})
+	)
 
 
 ## Current movement speed multiplier from critical needs (eased; 1 = normal).
@@ -106,9 +119,12 @@ func activity() -> NeedsModel.Activity:
 	return NeedsModel.Activity.TROT
 
 
-## Warmth of the current biome (0 when unknown).
+## Warmth of the current biome at this hour (0 when unknown): its warmth, less its
+## [member BiomeDefinition.night_drop] towards midnight.
 func biome_warmth() -> float:
-	return _warmth.get(GameState.current_biome, 0.0)
+	var biome := GameState.current_biome
+	var night := 1.0 - NeedModifiers.day_fraction(GameState.time_of_day() / 60.0)
+	return _warmth.get(biome, 0.0) - _night_drop.get(biome, 0.0) * night
 
 
 ## Warmth the animal feels: its biome's, plus the time of day, the weather and the snow.
@@ -133,7 +149,7 @@ func is_cold() -> bool:
 
 ## Whether it rains (less thirst, see [member NeedModifiers.rain]).
 func is_raining() -> bool:
-	return GameState.weather == &"rain"
+	return GameState.weather == &"rain" and not _dry.get(GameState.current_biome, false)
 
 
 ## Whether the animal stands or swims in water (it cools off).

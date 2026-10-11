@@ -443,6 +443,13 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
   Since Phase 9 the felt warmth also follows the **time of day** (−0.3 at midnight … +0.2 at
   noon, cosine) and the **weather** (cloudy −0.1, rain −0.5): `NeedsComponent.felt_warmth()`.
   While it rains thirst drains ×0.7 (`NeedModifiers.rain`).
+- **Desert climate (Phase 18):**
+  - `BiomeDefinition.night_drop` makes the biome warmth fall towards midnight
+    (`NeedModifiers.day_fraction`; desert 3.6, savanna 1.0).
+  - `need_multipliers` scale needs per biome (thirst ×1.6 in the desert, ×1.2 on the
+    savanna).
+  - `dry` biomes feel no rain.
+  - Desert noons are hot, and its midnights slightly cold when standing still.
 - **Cold on the snow (Phase 17):** above `GameState.snow_line` (set by `WorldStreamer` from
   `TerrainSettings`), the felt warmth gets `snow_warmth` (−2.2).
   - Comfort reacts to `NeedModifiers.comfort_warmth(felt)`. That is the felt warmth itself
@@ -1091,6 +1098,10 @@ the critter layer (packed arrays, one MultiMesh, chunk-driven, origin-shifted), 
   (`DayNightCycle.sunlight_factor`, down to 45 %) and feeds the sky's `cloud_cover`,
   strengthens the `wind` global in rain, and drives one camera-following `GPUParticles3D`
   (3000 streak drops, `amount_ratio` = rain). F3 shows the weather.
+  **Dry biomes (Phase 18):** the weather stays global.
+  - `Weather.terrain` lets it find the current biome. In a `dry` one (the desert) `shelter`
+    eases to 1, and `rain_here = rain × (1 − shelter)` drives the particles, the wind and the
+    ambience; the ground dries there.
 - Ambient audio layered per biome with cross-fades on biome transitions; footsteps by surface.
 - **Audio buses** (`default_bus_layout.tres`): Master → Music, SFX, Ambience. `Settings.volumes`
   holds a linear 0…1 volume per bus; `Settings.set_volume(bus, linear)` applies it in dB, mutes
@@ -1100,7 +1111,7 @@ the critter layer (packed arrays, one MultiMesh, chunk-driven, origin-shifted), 
   river, wind, night crickets and rain (CC0, OpenGameArt; long recordings cut to 40 s mono loops
   by `tools/ambience_loop.py`). Each layer's volume comes from the biome
   (`GameState.current_biome`), the daylight (inverse of the sky's stars track) and the rain
-  (`Weather.rain`: birds and crickets drowned out, the rain layer rises), and cross-fades over
+  (`Weather.rain_here`: birds and crickets drowned out, the rain layer rises), and cross-fades over
   3 s. Silent layers are stopped. The birdsong is soft and **intermittent**
   (`AmbienceLayer.spells` / `pauses`): it comes in spells of 6–20 s separated by 15–70 s of
   quiet, gated by an RNG seeded from the world seed, each spell starting at a random point of

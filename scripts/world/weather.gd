@@ -8,6 +8,10 @@ extends Node3D
 ## shader uniform (terrain darker and glossier, foliage darker), stronger wind in rain and rain
 ## particles that follow the camera.
 ## [br][br]
+## In a [member BiomeDefinition.dry] biome (the desert, Phase 18) the weather stays global, but
+## [member shelter] eases to 1 and hides it there: [member rain_here] (particles, wind, sound)
+## is 0 and the ground dries.
+## [br][br]
 ## Budget: a few float ops and property writes per frame; one GPUParticles3D whose amount ratio
 ## follows the rain (no particles when dry).
 
@@ -26,6 +30,8 @@ const NAMES: Array[StringName] = [&"clear", &"cloudy", &"rain"]
 @export var day_night: DayNightCycle
 ## Base wind (strengthened in rain; optional).
 @export var wind: WindSettings
+## Terrain whose biomes may be dry (optional; without it it rains everywhere).
+@export var terrain: TerrainSettings
 
 ## Current cloud cover (0…1).
 var cloudiness: float = 0.0
@@ -33,6 +39,10 @@ var cloudiness: float = 0.0
 var rain: float = 0.0
 ## Current ground wetness (0…1).
 var wetness: float = 0.0
+## How sheltered from the rain the current place is (0 … 1 in a dry biome; eased).
+var shelter: float = 0.0
+## Rain where the player is: [member rain] less the [member shelter].
+var rain_here: float = 0.0
 
 var _model: WeatherModel
 var _state: WeatherModel.Kind = WeatherModel.Kind.CLEAR
@@ -68,11 +78,14 @@ func advance(game_minutes: float) -> void:
 		_started = true
 		cloudiness = target_cloud
 		rain = target_rain
-		wetness = rain
+		shelter = 1.0 if _is_dry_here() else 0.0
+		wetness = rain * (1.0 - shelter)
 	var step := settings.ease_per_minute * game_minutes
 	cloudiness = move_toward(cloudiness, target_cloud, step)
 	rain = move_toward(rain, target_rain, step)
-	if rain > RAIN_WETS:
+	shelter = move_toward(shelter, 1.0 if _is_dry_here() else 0.0, step)
+	rain_here = rain * (1.0 - shelter)
+	if rain_here > RAIN_WETS:
 		wetness = minf(1.0, wetness + settings.wet_per_minute * game_minutes)
 	else:
 		wetness = maxf(0.0, wetness - settings.dry_per_minute * game_minutes)
@@ -87,7 +100,12 @@ func state() -> WeatherModel.Kind:
 ## Lines for the F3 overlay.
 func get_debug_lines() -> PackedStringArray:
 	return PackedStringArray(
-		["weather %s  clouds %.2f rain %.2f wet %.2f" % [NAMES[_state], cloudiness, rain, wetness]]
+		[
+			(
+				"weather %s  clouds %.2f rain %.2f (here %.2f) wet %.2f"
+				% [NAMES[_state], cloudiness, rain, rain_here, wetness]
+			)
+		]
 	)
 
 
@@ -102,10 +120,19 @@ func _apply() -> void:
 		day_night.sunlight_factor = lerpf(1.0, settings.overcast_sun, cloudiness)
 	if wind != null:
 		var packed := wind.as_uniform()
-		packed.z *= 1.0 + rain * settings.rain_wind
+		packed.z *= 1.0 + rain_here * settings.rain_wind
 		RenderingServer.global_shader_parameter_set(WIND_PARAM, packed)
-	_particles.emitting = rain > 0.02
-	_particles.amount_ratio = rain
+	_particles.emitting = rain_here > 0.02
+	_particles.amount_ratio = rain_here
+
+
+func _is_dry_here() -> bool:
+	if terrain == null or terrain.biomes == null:
+		return false
+	for biome in terrain.biomes.biomes:
+		if biome.id == GameState.current_biome:
+			return biome.dry
+	return false
 
 
 func _make_rain() -> GPUParticles3D:
