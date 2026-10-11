@@ -103,13 +103,16 @@ func refill_all() -> void:
 
 ## Signed rate of [param need_id] per minute (negative = losing) for [param activity] with a
 ## felt warmth of [param warmth] (biome + time of day + weather); [param in_water] replaces the
-## warmth with the water's; [param raining] applies [member NeedModifiers.rain] (less thirst).
+## warmth with the water's; [param raining] applies [member NeedModifiers.rain] (less thirst);
+## [param biome_multipliers] (need id → factor) are the biome's
+## ([member BiomeDefinition.need_multipliers]; temperature follows the warmth instead).
 func rate_for(
 	need_id: StringName,
 	activity: Activity,
 	warmth: float,
 	in_water: bool = false,
-	raining: bool = false
+	raining: bool = false,
+	biome_multipliers: Dictionary = {}
 ) -> float:
 	var need := definition(need_id)
 	if need_id == _modifiers.warmth_need:
@@ -120,15 +123,22 @@ func rate_for(
 	var rate := -need.decay_per_minute * _modifiers.multiplier(need_id, activity)
 	if raining:
 		rate *= _modifiers.rain.get(need_id, 1.0)
-	return rate
+	return rate * float(biome_multipliers.get(need_id, 1.0))
 
 
 ## Advances every need by [param delta] seconds.
 func tick(
-	delta: float, activity: Activity, warmth: float, in_water: bool = false, raining: bool = false
+	delta: float,
+	activity: Activity,
+	warmth: float,
+	in_water: bool = false,
+	raining: bool = false,
+	biome_multipliers: Dictionary = {}
 ) -> void:
 	for i in _definitions.size():
-		var rate := rate_for(_definitions[i].id, activity, warmth, in_water, raining)
+		var rate := rate_for(
+			_definitions[i].id, activity, warmth, in_water, raining, biome_multipliers
+		)
 		_apply(i, _values[i] + rate * delta / 60.0)
 
 

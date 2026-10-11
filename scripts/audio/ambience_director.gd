@@ -52,7 +52,7 @@ func advance(delta: float) -> void:
 	var step := delta / settings.fade_seconds
 	var biome := GameState.current_biome
 	var light := daylight()
-	var rain := weather.rain if weather != null else 0.0
+	var rain := weather.rain_here if weather != null else 0.0
 	for i in _players.size():
 		var layer := settings.layers[i]
 		var target := layer.volume_for(biome, light, rain)

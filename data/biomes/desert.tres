@@ -119,6 +119,11 @@ id = &"desert"
 display_name = "Desert"
 band_width = 1000.0
 warmth = 1.5
+night_drop = 3.6
+need_multipliers = Dictionary[StringName, float]({
+&"thirst": 1.6
+})
+dry = true
 height_offset = 6.0
 continental_scale = 0.8
 detail_scale = 0.4

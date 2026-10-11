@@ -152,3 +152,39 @@ func test_the_ambience_loops_are_small_and_credited() -> void:
 		assert_str(credits).contains(path.trim_prefix("res://"))
 		var bytes := FileAccess.get_file_as_bytes(path).size()
 		assert_int(bytes).override_failure_message(path).is_less(2_500_000)
+
+
+func test_no_biome_is_silent_by_day_or_night() -> void:
+	var table: BiomeTable = load("res://data/biomes/biome_table.tres")
+	for biome in table.biomes:
+		for light: float in [1.0, 0.0]:
+			var loudest := 0.0
+			for layer in SETTINGS.layers:
+				loudest = maxf(loudest, layer.volume_for(biome.id, light, 0.0))
+			assert_float(loudest).override_failure_message(String(biome.id)).is_greater(0.1)
+
+
+func test_no_rain_is_heard_in_the_desert() -> void:
+	var weather_settings: WeatherSettings = load("res://data/world/weather.tres")
+	GameState.world_seed = 12345
+	var model := WeatherModel.new(12345, weather_settings.transitions())
+	var slot := 10
+	while model.state_at(slot) != WeatherModel.Kind.RAIN:
+		slot += 1
+	GameState.game_minutes = slot * weather_settings.slot_minutes
+	var weather: Weather = auto_free(Weather.new())
+	weather.settings = weather_settings
+	weather.terrain = load("res://data/world/terrain_settings.tres")
+	add_child(weather)
+	weather.set_process(false)
+	var director := _director()
+	director.weather = weather
+	GameState.current_biome = &"meadow"
+	weather.advance(0.0)
+	director.advance(SETTINGS.fade_seconds * 2.0)
+	assert_float(director.volume(RAIN)).is_greater(0.5)
+	GameState.current_biome = &"desert"
+	for t in 200:
+		weather.advance(0.1)
+	director.advance(SETTINGS.fade_seconds * 2.0)
+	assert_float(director.volume(RAIN)).is_equal(0.0)
