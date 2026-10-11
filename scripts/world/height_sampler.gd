@@ -13,7 +13,7 @@ extends RefCounted
 ## (continental, detail, ridged, sand).
 const LAYER_SALT: Array[int] = [0x1F3A, 0x5C27, 0x9E41, 0x3D17]
 ## An oasis needs the sand noise at its centre this far under the mesa threshold.
-const OASIS_MESA_MARGIN: float = 0.2
+const OASIS_MESA_MARGIN: float = 0.15
 
 var _base_height: float
 var _continental_amplitude: float
@@ -146,13 +146,11 @@ func sample_with_modifiers(
 		+ detail * _detail_amplitude * detail_scale
 		+ ridged * _ridged_amplitude * ridged_scale
 	)
-	var plateau := 0.0
+	var bowl := _oasis_bowl(x, z) * oasis_scale if oasis_scale > 0.0 else 0.0
 	if dune_scale > 0.0 or mesa_scale > 0.0:
-		var sand := _sand_layers(x, z, dune_scale, mesa_scale)
-		height += sand.x
-		plateau = sand.y
-	if oasis_scale > 0.0:
-		height = _oasis(x, z, height, oasis_scale * (1.0 - plateau))
+		height += _sand_layers(x, z, dune_scale, mesa_scale, bowl)
+	if bowl > 0.0:
+		height = lerpf(height, minf(height, _oasis_bottom), bowl)
 	return height
 
 
@@ -173,29 +171,29 @@ func oasis_of(x: float, z: float) -> Vector3:
 
 
 ## Whether the oasis [param oasis] (from [method oasis_of]) is really there: dealt to its
-## cell and with its centre well away from any mesa (an oasis never sits on one).
+## cell, with its centre away from any mesa (an oasis never opens a crater in one; mesas
+## nearby slope down into its bowl instead). One noise lookup.
 func is_oasis(oasis: Vector3) -> bool:
 	if oasis.y == 0.0:
 		return false
 	return _sand.get_noise_2d(oasis.x, oasis.z) < _mesa_threshold - OASIS_MESA_MARGIN
 
 
-# Sinks [param height] towards the oasis bottom inside the bowl of the cell's oasis (a smooth
-# rim, a flat bottom under the water), by [param strength] (the biome's oasis scale, 0 on a
-# mesa). One integer hash and a distance per sample, plus one noise lookup inside a bowl.
-func _oasis(x: float, z: float, height: float, strength: float) -> float:
+# How deep into the bowl of its cell's oasis ([param x], [param z]) lies: 1 on the flat
+# bottom, 0 at and beyond the (wobbly) rim. One integer hash and a distance per sample, plus
+# one noise lookup inside a bowl.
+func _oasis_bowl(x: float, z: float) -> float:
 	var oasis := oasis_of(x, z)
 	if oasis.y == 0.0:
-		return height
+		return 0.0
 	var offset := Vector2(x - oasis.x, z - oasis.z)
 	var distance := offset.length()
 	if distance >= _oasis_radius or not is_oasis(oasis):
-		return height
+		return 0.0
 	# A wobbly rim (lobes turned per oasis), so pools are not perfect circles.
-	var angle := offset.angle() + oasis.y * float(floori(oasis.x) % 97)
+	var angle := offset.angle() + float(floori(oasis.x) % 97)
 	distance *= 1.0 + 0.12 * sin(3.0 * angle) + 0.08 * sin(5.0 * angle + 1.3)
-	var bowl := smoothstep(_oasis_radius, _oasis_radius * _oasis_floor, distance)
-	return lerpf(height, minf(height, _oasis_bottom), bowl * strength)
+	return smoothstep(_oasis_radius, _oasis_radius * _oasis_floor, distance)
 
 
 func _cell_hash(cell_x: int, cell_z: int) -> int:
@@ -207,20 +205,23 @@ func _cell_hash(cell_x: int, cell_z: int) -> int:
 
 ## Dunes and mesas at ([param x], [param z]) (Phase 18, ADR-009): one sand noise lookup warps
 ## the dune crests and raises flat-topped mesas where it passes the threshold; the dunes stop
-## at a mesa's edge so its top stays flat. Returns the height added (x) and how much of a
-## mesa this is (y, 0…1; oases stay off mesas).
-func _sand_layers(x: float, z: float, dune_scale: float, mesa_scale: float) -> Vector2:
+## at a mesa's edge so its top stays flat. Inside an oasis bowl ([param bowl] > 0) the mesas
+## fade out, so no cliff rises beside the water. Returns the height added.
+func _sand_layers(
+	x: float, z: float, dune_scale: float, mesa_scale: float, bowl: float = 0.0
+) -> float:
 	var sand := _sand.get_noise_2d(x, z)
 	var plateau := 0.0
 	if mesa_scale > 0.0:
 		plateau = smoothstep(_mesa_threshold, _mesa_threshold + _mesa_softness, sand)
+		plateau *= 1.0 - smoothstep(0.0, 0.08, bowl)
 	var out := plateau * _mesa_amplitude * mesa_scale
 	if dune_scale > 0.0:
 		var phase := _dune_k * (x * _dune_dir.x + z * _dune_dir.y) + _dune_warp * sand
 		var crest := pow(1.0 - absf(sin(phase)), _dune_sharpness)
 		var size := 0.55 + 0.45 * sand  # big and small dunes, not a regular washboard
 		out += crest * size * _dune_amplitude * dune_scale * (1.0 - plateau)
-	return Vector2(out, plateau)
+	return out
 
 
 ## The biome resolver used by this sampler, or [code]null[/code] without a biome table.

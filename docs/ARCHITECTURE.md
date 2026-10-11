@@ -140,7 +140,15 @@ Scene-tree mutations happen only on the main thread; worker threads produce plai
     and the warmth range opens to ±2. No big fauna yet.
   - **Savanna** (800 m): gentle and golden, acacia-like `tree_plateau`, procedural
     `dry_grass` tufts, horses and deer. Warmth 0.8.
-  - **Crossable:** `tests/world/grid_walk.gd` checks the mountains, desert and savanna.- `BiomeDefinition` (Resource): name, height params, ground palette, vegetation table,
+  - **Crossable:** `tests/world/grid_walk.gd` checks the mountains, desert and savanna.
+  - **Oases (Phase 18):** `HeightSampler.oasis_of()` / `is_oasis()` give each 600 m cell
+    (85 %, hashed per seed; never on a mesa) a 90 m bowl.
+    - The bowl has a wobbly rim and a flat bottom 1.5 m under the water. It is scaled by
+      `BiomeDefinition.oasis_scale`, which is 1 only in the desert.
+    - Mesas fade out inside the bowl.
+    - The existing water plane, shore, drinking, scent and map work unchanged.
+    - Palms, grass and reeds ring the pool: entries just above the water, a height that
+      happens only at oases there.- `BiomeDefinition` (Resource): name, height params, ground palette, vegetation table,
   fauna table, ambient audio, temperature (`warmth`, Phase 6), water frequency.
 - `BiomeResolver` (pure, seeded, one per worker task): noisy distance
   `d' = |pos − spawn| + noise(pos) · amplitude`; the band containing `d'` cross-fades with

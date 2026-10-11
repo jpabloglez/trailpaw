@@ -71,8 +71,8 @@ func test_every_full_oasis_holds_drinkable_water() -> void:
 		for centre in oases:
 			var bottom := sampler.height_at(centre.x, centre.y)
 			assert_float(bottom).is_less_equal(SETTINGS.sea_level - 1.0)  # deep enough to drink
-			# and the fox can walk down to the water from most sides (a mesa may stand beside
-			# an oasis, but the bowl itself is gentle)
+			# and the fox can walk down to the water from at least half the directions (a mesa
+			# may stand at the rim, but inside the bowl the mesas fade out)
 			var climb := 4.0 * tan(deg_to_rad(FOX.max_slope_degrees))
 			var open := 0
 			for side in 8:
@@ -85,7 +85,7 @@ func test_every_full_oasis_holds_drinkable_water() -> void:
 					walkable = walkable and absf(h - previous) <= climb
 					previous = h
 				open += int(walkable)
-			assert_int(open).override_failure_message(str(centre)).is_greater_equal(5)
+			assert_int(open).override_failure_message(str(centre)).is_greater_equal(4)
 
 
 func test_from_anywhere_in_the_desert_an_oasis_is_within_scent() -> void:
@@ -141,3 +141,59 @@ func test_palms_grow_around_the_oases_and_nowhere_else() -> void:
 					stray += 1
 	assert_int(near).is_greater(8)
 	assert_int(stray).is_less_equal(maxi(1, near / 20))
+
+
+func test_no_oasis_opens_a_crater_in_a_mesa_and_the_bound_counts_them() -> void:
+	var sampler := HeightSampler.new(SETTINGS, SEEDS[0])
+	var start := sampler.resolver().band_start(SETTINGS.biomes.biomes.find(_desert))
+	var checked := 0
+	for a in 720:
+		var p := Vector2.from_angle(a * TAU / 720.0) * (start + 500.0)
+		var oasis := sampler.oasis_of(p.x, p.y)
+		if oasis.y == 0.0:
+			continue
+		var on_mesa: bool = (
+			sampler._sand.get_noise_2d(oasis.x, oasis.z)
+			>= SETTINGS.mesa_threshold - HeightSampler.OASIS_MESA_MARGIN
+		)
+		assert_bool(sampler.is_oasis(oasis)).is_equal(not on_mesa)
+		if on_mesa:
+			checked += 1
+			assert_float(sampler.height_at(oasis.x, oasis.z)).is_greater(SETTINGS.sea_level)
+	assert_int(checked).is_greater(0)  # some cells were dealt one on a mesa, and kept dry
+	var bowl_bound := absf(SETTINGS.sea_level - SETTINGS.oasis_depth - SETTINGS.base_height)
+	var flat: TerrainSettings = SETTINGS.duplicate()
+	flat.oasis_depth = SETTINGS.oasis_depth + 3.0
+	(
+		assert_float(HeightSampler.new(flat, SEEDS[0]).max_deviation() - sampler.max_deviation())
+		. is_equal_approx(
+			absf(SETTINGS.sea_level - flat.oasis_depth - SETTINGS.base_height) - bowl_bound, 1e-4
+		)
+	)
+
+
+func test_inside_the_bowl_no_cliff_and_the_shore_is_not_a_circle() -> void:
+	var climb := 4.0 * tan(deg_to_rad(FOX.max_slope_degrees))
+	for seed_value in SEEDS:
+		var sampler := HeightSampler.new(SETTINGS, seed_value)
+		for centre in _full_oases(sampler):
+			var shores := PackedFloat32Array()
+			for side in 16:
+				var ray := Vector2.from_angle(side * TAU / 16.0)
+				var previous := sampler.height_at(centre.x, centre.y)
+				var shore := -1.0
+				for step in range(1, int(SETTINGS.oasis_radius * 0.7 / 4.0) + 1):
+					var p := centre + ray * step * 4.0
+					var h := sampler.height_at(p.x, p.y)
+					(
+						assert_float(absf(h - previous))
+						. override_failure_message(str(centre))
+						. is_less_equal(climb)
+					)
+					if shore < 0.0 and h >= SETTINGS.sea_level:
+						shore = step * 4.0
+					previous = h
+				shores.append(shore)
+			var low := Array(shores).min() as float
+			var high := Array(shores).max() as float
+			assert_float(high - low).is_greater_equal(4.0)  # lobed, not round
