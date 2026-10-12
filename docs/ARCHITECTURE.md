@@ -863,6 +863,11 @@ the critter layer (packed arrays, one MultiMesh, chunk-driven, origin-shifted), 
     seen from far below); the tracker reads `count()` / `position_of()`.
   - **Budget:** decisions at 4 Hz (≤ 2 height and 2 biome samples each); per frame one
     transform per eagle. Measured under 0.3 ms per tick and 0.05 ms per frame.
+- **Vultures (Phase 18):** a second `Soarers` node, "Vultures" (`data/critters/vulture.tres`).
+  - Over the desert and savanna, up to 3, lower than the eagles (25–40 m), in wider (50–90 m)
+    and slower (7 m/s) circles. Dark plumage.
+  - Silent: `cry_seconds` (0, 0) means they never call.
+  - `EncounterTracker.soarers` is now a list (eagles, vultures); a journal entry each.
 
 ### 7.z Butterflies, dragonflies and fireflies (Phases 13–14)
 - **`Flitters`** (one node per `FlitterKind`; `data/critters/butterflies.tres`,

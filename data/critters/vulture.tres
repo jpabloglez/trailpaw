@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="SoarerSettings" format=3]
+
+[ext_resource type="Script" path="res://scripts/critters/soarer_settings.gd" id="1_ss"]
+
+[resource]
+script = ExtResource("1_ss")
+biomes = Array[StringName]([&"desert", &"savanna"])
+max_soarers = 3
+appear_chance = 0.06
+appear_distance = Vector2(50, 150)
+leave_distance = 450.0
+circle_radius = Vector2(50, 90)
+soar_height = Vector2(25, 40)
+speed = 7.0
+drift = 0.8
+bank_degrees = 14.0
+scale = 6.5
+tint = Color(0.16, 0.13, 0.11, 1)
+cry_seconds = Vector2(0, 0)
+cry_radius = 250.0

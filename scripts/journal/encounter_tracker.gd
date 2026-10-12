@@ -9,9 +9,9 @@ extends Node
 ## [br][br]
 ## Budget: [member JournalSettings.check_hz] checks per second; each looks only at entries not
 ## yet seen, with a distance test (and a frustum test when close) per animal of their system —
-## ≈ 10 agents, 120 critters (plus a few dozen in the trees), 60 birds, 2 eagles and 24 fliers;
-## no allocations. Measured in the
-## world at the spawn with nothing met yet (the worst case): p50 0.07 ms, p99 0.23 ms per check.
+## ≈ 10 agents, 120 critters (plus a few dozen in the trees), 60 birds, 5 birds of prey and
+## 24 fliers; no allocations. Measured in the world at the spawn with nothing met yet (the
+## worst case): p50 0.07 ms, p99 0.23 ms per check.
 
 ## Entries and what counts as an encounter.
 @export var settings: JournalSettings
@@ -23,7 +23,7 @@ extends Node
 @export var tree_life: TreeLife
 @export var farm: FarmLife
 @export var birds: BirdFlocks
-@export var soarers: Soarers
+@export var soarers: Array[Soarers] = []
 @export var flitters: Array[Flitters] = []
 @export var fireflies: Fireflies
 ## The camera that must see them; defaults to the viewport's.
@@ -131,10 +131,13 @@ func _sees_aloft(entry: JournalEntry, at: Vector3, reach: float, eye: Camera3D) 
 			for b in birds.count():
 				if _in_view(birds.to_global(birds.position_of(b)), at, reach, eye):
 					return true
-	elif soarers != null and soarers.settings == entry.animal:
-		for s in soarers.count():
-			if _in_view(soarers.position_of(s), at, reach, eye):
-				return true
+	else:
+		for flock in soarers:
+			if flock == null or flock.settings != entry.animal:
+				continue
+			for s in flock.count():
+				if _in_view(flock.position_of(s), at, reach, eye):
+					return true
 	return false
 
 

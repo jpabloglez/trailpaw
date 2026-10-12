@@ -364,7 +364,7 @@ decisions; ADR-009). A gentle challenge: heat, thirst and cold nights, with rare
 - [x] Oases in the desert: pools ringed with palms.
 - [x] Desert heat and thirst; cold desert nights; no rain over the desert.
 - [x] Lizards and desert hares.
-- [ ] Vultures.
+- [x] Vultures.
 - [ ] Zebras on the savanna.
 - [ ] The fennec (built in code with bpy).
 

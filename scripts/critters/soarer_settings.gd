@@ -24,6 +24,7 @@ extends Resource
 ## Size (× the songbird mesh) and plumage colour.
 @export_range(1.0, 20.0, 0.1) var scale: float = 7.0
 @export var tint: Color = Color(0.3, 0.21, 0.12)
-## Seconds between cries (min, max), heard within [member cry_radius] of the fox.
+## Seconds between cries (min, max), heard within [member cry_radius] of the fox; zero: they
+## never call (vultures).
 @export var cry_seconds: Vector2 = Vector2(12.0, 35.0)
 @export_range(10.0, 1000.0, 10.0, "suffix:m") var cry_radius: float = 250.0

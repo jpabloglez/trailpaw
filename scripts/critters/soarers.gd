@@ -76,6 +76,8 @@ func _ready() -> void:
 	_cry.top_level = true
 	add_child(_cry)
 	_cry_timer = _rng.randf_range(settings.cry_seconds.x, settings.cry_seconds.y)
+	if settings.cry_seconds.y <= 0.0:
+		_cry_timer = INF  # silent birds
 	add_to_group(WorldStreamer.DEBUG_LINES_GROUP)
 
 

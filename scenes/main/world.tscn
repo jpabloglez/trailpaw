@@ -70,6 +70,7 @@
 [ext_resource type="Resource" path="res://data/critters/birds.tres" id="75_birdset"]
 [ext_resource type="Script" path="res://scripts/critters/soarers.gd" id="75_soarers"]
 [ext_resource type="Resource" path="res://data/critters/eagle.tres" id="75_eagle"]
+[ext_resource type="Resource" path="res://data/critters/vulture.tres" id="75_vulture"]
 [ext_resource type="Script" path="res://scripts/critters/flitters.gd" id="77_bflies"]
 [ext_resource type="Resource" path="res://data/critters/butterflies.tres" id="80_bkind"]
 [ext_resource type="Resource" path="res://data/critters/dragonflies.tres" id="81_dkind"]
@@ -232,6 +233,13 @@ terrain = ExtResource("3_u18in")
 player = NodePath("../Animal")
 day_night = NodePath("../DayNightCycle")
 
+[node name="Vultures" type="Node3D" parent="." node_paths=PackedStringArray("player", "day_night")]
+script = ExtResource("75_soarers")
+settings = ExtResource("75_vulture")
+terrain = ExtResource("3_u18in")
+player = NodePath("../Animal")
+day_night = NodePath("../DayNightCycle")
+
 [node name="Butterflies" type="Node3D" parent="." node_paths=PackedStringArray("streamer", "player", "day_night")]
 script = ExtResource("77_bflies")
 kind = ExtResource("80_bkind")
@@ -269,7 +277,7 @@ critters = NodePath("../CritterSystem")
 tree_life = NodePath("../TreeLife")
 farm = NodePath("../FarmLife")
 birds = NodePath("../BirdFlocks")
-soarers = NodePath("../Soarers")
+soarers = [NodePath("../Soarers"), NodePath("../Vultures")]
 flitters = [NodePath("../Butterflies"), NodePath("../Dragonflies")]
 fireflies = NodePath("../Fireflies")
 
