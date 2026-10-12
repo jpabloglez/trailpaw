@@ -9,6 +9,7 @@ const SPECIES_PATHS: Array[String] = [
 	"res://data/species/shiba_inu.tres",
 	"res://data/species/alpaca.tres",
 	"res://data/species/ibex.tres",
+	"res://data/species/zebra.tres",
 	"res://data/species/horse.tres",
 	"res://data/species/donkey.tres",
 ]
@@ -87,9 +88,9 @@ func test_clip_ground_speeds_match_the_animation() -> void:
 			assert_float(_species.clip_ground_speeds[clip]).is_equal_approx(
 				measured, measured * 0.1
 			)
-		assert_float(_species.clip_ground_speeds["Gallop"]).is_greater(
-			_species.clip_ground_speeds["Walk"]
-		)
+		var run: String = _species.animations[&"run"]
+		var walk: String = _species.animations[&"walk"]
+		assert_float(_species.clip_ground_speeds[run]).is_greater(_species.clip_ground_speeds[walk])
 
 
 func test_placeholder_species_without_model_stays_valid() -> void:

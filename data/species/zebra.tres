@@ -1,0 +1,59 @@
+[gd_resource type="Resource" script_class="AnimalSpecies" format=3]
+
+[ext_resource type="PackedScene" path="res://assets/animals/zebra/zebra.glb" id="1_model"]
+[ext_resource type="Script" path="res://scripts/player/animal_species.gd" id="2_species"]
+
+[resource]
+script = ExtResource("2_species")
+display_name = "Zebra"
+model_scene = ExtResource("1_model")
+model_scale = 0.33
+model_yaw_degrees = 180.0
+animations = Dictionary[StringName, String]({
+&"drink": "Armature|Idle",
+&"eat": "Armature|Idle",
+&"fall": "Armature|Jump",
+&"idle": "Armature|Idle",
+&"jump": "Armature|Jump",
+&"lie_down": "Armature|Idle",
+&"run": "Armature|Run",
+&"sniff": "Armature|Idle",
+&"swim": "Armature|Walk",
+&"tired_idle": "Armature|Idle",
+&"trot": "Armature|Run",
+&"walk": "Armature|Walk"
+})
+looping = Array[StringName]([&"idle", &"walk", &"trot", &"run", &"swim", &"tired_idle"])
+animation_fallbacks = Dictionary[StringName, String]({
+&"drink": "No drinking clip (Farm Animal Pack): Idle.",
+&"eat": "No grazing clip (Farm Animal Pack): Idle.",
+&"fall": "No airborne loop: Jump.",
+&"lie_down": "No lying clip: Idle.",
+&"sniff": "No sniffing clip: Idle.",
+&"swim": "Does not swim (fauna avoid water); Walk as a placeholder.",
+&"tired_idle": "No tired clip: Idle looped.",
+&"trot": "No trot clip: the run, played slower (matched to trot speed)."
+})
+clip_ground_speeds = Dictionary[String, float]({
+"Armature|Run": 4.302,
+"Armature|Walk": 0.541
+})
+max_animation_time_scale = 2.5
+paw_bones = PackedStringArray("FrontFoot.L", "FrontFoot.R", "BackFoot.L", "BackFoot.R")
+max_tilt_degrees = 20.0
+tilt_smoothing = 8.0
+paw_half_length = 0.7
+paw_half_width = 0.2
+body_radius = 0.3
+body_length = 2.0
+walk_speed = 1.2
+trot_speed = 3.6
+run_speed = 9.5
+acceleration = 8.0
+deceleration = 10.0
+turn_rate_slow = 4.0
+turn_rate_fast = 1.8
+turn_slowdown = 0.6
+jump_height = 0.8
+air_control = 0.3
+max_slope_degrees = 40.0
