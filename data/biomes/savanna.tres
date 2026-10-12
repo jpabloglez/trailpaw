@@ -9,8 +9,9 @@
 [ext_resource type="Resource" path="res://data/vegetation/dry_bush.tres" id="14_dry_bush"]
 [ext_resource type="Resource" path="res://data/vegetation/rock_smallA.tres" id="15_rock_smallA"]
 [ext_resource type="Script" path="res://scripts/fauna/fauna_entry.gd" id="60_fentry"]
-[ext_resource type="Resource" path="res://data/fauna/horse.tres" id="61_horse"]
-[ext_resource type="Resource" path="res://data/fauna/deer.tres" id="62_deer"]
+[ext_resource type="Resource" path="res://data/fauna/zebra.tres" id="61_zebra"]
+[ext_resource type="Resource" path="res://data/fauna/horse.tres" id="62_horse"]
+[ext_resource type="Resource" path="res://data/fauna/deer.tres" id="63_deer"]
 
 [sub_resource type="Resource" id="Resource_tree_plateau"]
 script = ExtResource("2_entry")
@@ -66,14 +67,19 @@ min_height = 0.3
 max_height = 60.0
 cluster = 0.4
 
+[sub_resource type="Resource" id="Resource_fauna_zebra"]
+script = ExtResource("60_fentry")
+species = ExtResource("61_zebra")
+weight = 3.0
+
 [sub_resource type="Resource" id="Resource_fauna_horse"]
 script = ExtResource("60_fentry")
-species = ExtResource("61_horse")
-weight = 2.0
+species = ExtResource("62_horse")
+weight = 1.0
 
 [sub_resource type="Resource" id="Resource_fauna_deer"]
 script = ExtResource("60_fentry")
-species = ExtResource("62_deer")
+species = ExtResource("63_deer")
 weight = 1.0
 
 [resource]
@@ -96,4 +102,4 @@ vegetation = Array[ExtResource("2_entry")]([SubResource("Resource_tree_plateau")
 ground_color_a = Color(0.76, 0.67, 0.37, 1)
 ground_color_b = Color(0.64, 0.6, 0.33, 1)
 fauna_chance = 0.15
-fauna = Array[ExtResource("60_fentry")]([SubResource("Resource_fauna_horse"), SubResource("Resource_fauna_deer")])
+fauna = Array[ExtResource("60_fentry")]([SubResource("Resource_fauna_zebra"), SubResource("Resource_fauna_horse"), SubResource("Resource_fauna_deer")])

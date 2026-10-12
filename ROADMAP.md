@@ -365,7 +365,7 @@ decisions; ADR-009). A gentle challenge: heat, thirst and cold nights, with rare
 - [x] Desert heat and thirst; cold desert nights; no rain over the desert.
 - [x] Lizards and desert hares.
 - [x] Vultures.
-- [ ] Zebras on the savanna.
+- [x] Zebras on the savanna.
 - [ ] The fennec (built in code with bpy).
 
 **Tests:** dunes rise and fall across the wind; mesas flat-topped and high; the bands always

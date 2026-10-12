@@ -635,6 +635,16 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
     - `data/fauna/wolf.tres`: **shy**, packs of 1–3, wanders 24 m, quiet.
     - Forest and hills at weight 1, the rarest of each. The hills' `fauna_chance` went from
       0.18 to 0.19, so their animal density stays ≥ 0.4 per chunk.
+  - **Zebra (Phase 18):** from the Quaternius *Farm Animal Pack* (Poly Pizza `iclPBR6SBZ`,
+    CC0), as a wild species.
+    - Its clips only exist with the `Armature|` prefix, so `data/species/zebra.tres` names
+      them in full. It has no grazing or drinking clip: Idle is a documented fallback.
+    - Scale 0.33 (a little smaller than the horse). Measured `clip_ground_speeds`: Walk 0.541,
+      Run 4.302.
+    - `data/fauna/zebra.tres`: **calm**, herds of 4–7, wanders 20 m. Savanna only, at weight 3,
+      with horses and deer (1 each).
+    - The species animation test now compares the clips mapped to run and walk, not fixed
+      names.
   - **Ibex (Phase 17):** `tools/make_ibex.py` (bpy, run locally; ADR-008) builds
     `assets/animals/ibex/ibex.glb` from the CC0 alpaca.
     - It keeps the rig and every clip, so `data/species/ibex.tres` is the alpaca's with the
