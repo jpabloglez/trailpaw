@@ -138,7 +138,7 @@ func test_the_journal_meets_an_eagle_seen_overhead() -> void:
 	tracker.settings = JOURNAL
 	tracker.player = player
 	tracker.camera = camera
-	tracker.soarers = soarers
+	tracker.soarers = [soarers] as Array[Soarers]
 	add_child(tracker)
 	tracker.set_process(false)
 	player.global_position = soarers.position_of(0) - Vector3(30.0, 50.0, 0.0)  # well below
@@ -169,3 +169,46 @@ func test_they_fit_their_budget() -> void:
 	var frame_ms := (Time.get_ticks_usec() - start) / 200.0 / 1000.0
 	assert_float(tick_ms).is_less(0.3)  # 4 Hz: a few height and biome samples
 	assert_float(frame_ms).is_less(0.05)
+
+
+func test_vultures_wheel_low_over_the_desert_and_never_call() -> void:
+	var vulture: SoarerSettings = load("res://data/critters/vulture.tres")
+	assert_array(vulture.biomes).contains([&"desert", &"savanna"])
+	assert_bool(vulture.biomes.has(&"mountains")).is_false()
+	assert_float(vulture.soar_height.y).is_less(EAGLE.soar_height.x)  # lower than eagles
+	var eager: SoarerSettings = vulture.duplicate()
+	eager.appear_chance = 1.0
+	var player: Node3D = auto_free(Node3D.new())
+	add_child(player)
+	player.global_position = GameState.local_position(Vector3(-5900.0, 9.0, -1500.0))  # dunes
+	var vultures: Soarers = auto_free(Soarers.new())
+	vultures.settings = eager
+	vultures.terrain = TERRAIN
+	vultures.player = player
+	add_child(vultures)
+	vultures.set_physics_process(false)
+	vultures.set_process(false)
+	_fly(vultures, 600.0)
+	assert_int(vultures.count()).is_between(1, vulture.max_soarers)
+	for s in vultures.count():
+		assert_float(vultures.height_above_ground(s)).is_between(15.0, vulture.soar_height.y + 30.0)
+	assert_int(vultures.cries).is_equal(0)  # silent
+	var entry := JOURNAL.entry(&"vulture")
+	assert_int(entry.source).is_equal(JournalEntry.Source.SOARER)
+	# the tracker knows both flocks
+	var tracker: EncounterTracker = auto_free(EncounterTracker.new())
+	tracker.settings = JOURNAL
+	tracker.player = player
+	tracker.soarers = [null, vultures] as Array[Soarers]
+	vultures.settings = vulture
+	var camera: Camera3D = auto_free(Camera3D.new())
+	add_child(camera)
+	tracker.camera = camera
+	add_child(tracker)
+	tracker.set_process(false)
+	player.global_position = vultures.position_of(0) - Vector3(20.0, 35.0, 0.0)
+	camera.global_position = player.global_position + Vector3.UP
+	camera.look_at(vultures.position_of(0))
+	for t in 8:
+		tracker.check(0.25)
+	assert_bool(tracker.journal.is_seen(&"vulture")).is_true()
