@@ -21,6 +21,9 @@ enum Temperament { SHY, CURIOUS, FRIENDLY, CALM }
 @export var herd_size: Vector2i = Vector2i(1, 1)
 ## How far from home it wanders (m).
 @export_range(1.0, 200.0, 0.5, "suffix:m") var wander_radius: float = 12.0
+## Hours of the day its herds appear (from, to; game hours, wrapping past midnight, e.g.
+## 18 → 7; Phase 18: the fennec). Zero: always. Herds already out stay until they leave.
+@export var hours: Vector2 = Vector2.ZERO
 ## Seconds a friendly animal follows after playing.
 @export_range(0.0, 600.0, 1.0, "suffix:s") var follow_seconds: float = 75.0
 
@@ -81,3 +84,12 @@ func get_validation_errors() -> PackedStringArray:
 ## Returns [code]true[/code] when [method get_validation_errors] finds no problems.
 func is_valid() -> bool:
 	return get_validation_errors().is_empty()
+
+
+## Whether its herds appear at [param hour] (0…24).
+func is_out(hour: float) -> bool:
+	if hours == Vector2.ZERO:
+		return true
+	if hours.x <= hours.y:
+		return hour >= hours.x and hour < hours.y
+	return hour >= hours.x or hour < hours.y

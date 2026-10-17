@@ -10,6 +10,7 @@ const SPECIES_PATHS: Array[String] = [
 	"res://data/species/alpaca.tres",
 	"res://data/species/ibex.tres",
 	"res://data/species/zebra.tres",
+	"res://data/species/fennec.tres",
 	"res://data/species/horse.tres",
 	"res://data/species/donkey.tres",
 ]

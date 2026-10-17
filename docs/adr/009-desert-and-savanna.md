@@ -83,6 +83,14 @@ This needs two things:
     wind, savanna birds by day, crickets at night. A test now checks that no biome is
     silent.
 
+- **Fauna (PRs 4–7):**
+  - lizards and desert hares (critters in code)
+  - vultures (a second `Soarers`)
+  - the zebra (the Quaternius Farm Animal Pack model, CC0)
+  - the fennec, built by `tools/make_fennec.py` from the fox like the ibex (bpy stays an
+    optional tool, ADR-008)
+  - `FaunaSpecies.hours` lets the fennec come out only at dusk and night.
+
 ## Consequences
 - **The cycle is 7.0 km.** The desert runs from 5.2 to 6.2 km, the savanna from 6.2 to 7.0
   km.
