@@ -118,8 +118,13 @@ func sync(lod0_coords: Array[Vector2i]) -> void:
 		var spawns := FaunaPlan.roll(
 			coord, terrain.chunk_size, _biome_at(coord), GameState.world_seed, settings.herd_spread
 		)
-		if not spawns.is_empty():
-			_queue.append([spawns, coord])
+		if spawns.is_empty():
+			continue
+		var species: FaunaSpecies = spawns[0][0]
+		if not species.is_out(GameState.time_of_day() / 60.0):
+			_rolled.erase(coord)  # its herd is not out yet: roll this chunk again later
+			continue
+		_queue.append([spawns, coord])
 
 
 ## Applies the AI LOD and removes animals that wandered too far from the player.

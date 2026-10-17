@@ -13,6 +13,8 @@
 [ext_resource type="Resource" path="res://data/vegetation/tree_palmShort.tres" id="18_tree_palmShort"]
 [ext_resource type="Resource" path="res://data/vegetation/grass_leafs.tres" id="19_grass_leafs"]
 [ext_resource type="Resource" path="res://data/vegetation/reeds.tres" id="20_reeds"]
+[ext_resource type="Script" path="res://scripts/fauna/fauna_entry.gd" id="60_fentry"]
+[ext_resource type="Resource" path="res://data/fauna/fennec.tres" id="61_fennec"]
 
 [sub_resource type="Resource" id="Resource_cactus_tall"]
 script = ExtResource("2_entry")
@@ -113,6 +115,11 @@ min_height = -0.4
 max_height = 0.4
 cluster = 0.5
 
+[sub_resource type="Resource" id="Resource_fauna_fennec"]
+script = ExtResource("60_fentry")
+species = ExtResource("61_fennec")
+weight = 1.0
+
 [resource]
 script = ExtResource("1_def")
 id = &"desert"
@@ -134,4 +141,5 @@ oasis_scale = 1.0
 vegetation = Array[ExtResource("2_entry")]([SubResource("Resource_cactus_tall"), SubResource("Resource_cactus_short"), SubResource("Resource_dry_bush"), SubResource("Resource_rock_largeA"), SubResource("Resource_rock_smallA"), SubResource("Resource_rock_smallFlatA"), SubResource("Resource_tree_palm"), SubResource("Resource_tree_palmTall"), SubResource("Resource_tree_palmShort"), SubResource("Resource_grass_leafs"), SubResource("Resource_reeds")])
 ground_color_a = Color(0.92, 0.82, 0.58, 1)
 ground_color_b = Color(0.84, 0.68, 0.46, 1)
-fauna_chance = 0.0
+fauna_chance = 0.08
+fauna = Array[ExtResource("60_fentry")]([SubResource("Resource_fauna_fennec")])

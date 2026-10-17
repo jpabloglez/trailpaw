@@ -645,6 +645,20 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
       with horses and deer (1 each).
     - The species animation test now compares the clips mapped to run and walk, not fixed
       names.
+  - **Fennec (Phase 18):** `tools/make_fennec.py` (bpy, like the ibex) builds
+    `assets/animals/fennec/fennec.glb` from the CC0 fox.
+    - It keeps the rig and every clip. Its ears grow ×1.9 from their base (×1.25 wider),
+      blended by each vertex's ear-bone weight. The body is slimmer, and the coat pale sand
+      with a cream chest and tan legs.
+    - `data/species/fennec.tres` is the fox's at scale 0.21 (75 %). Measured clip speeds: Walk
+      0.300, Gallop 1.695.
+    - `data/fauna/fennec.tres`: **shy**, alone or in pairs, out 18:00–7:30. It is the
+      desert's only big animal (`fauna_chance` 0.08); every biome now has big fauna again.
+  - **Activity hours (Phase 18):** `FaunaSpecies.hours` (from → to, wrapping past midnight;
+    zero means always).
+    - A chunk whose herd is out of its hours spawns nothing and is rolled again on the next
+      sync. Rolls are deterministic, so the same herd appears once its hours begin.
+    - Herds already out stay until they leave.
   - **Ibex (Phase 17):** `tools/make_ibex.py` (bpy, run locally; ADR-008) builds
     `assets/animals/ibex/ibex.glb` from the CC0 alpaca.
     - It keeps the rig and every clip, so `data/species/ibex.tres` is the alpaca's with the

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="FaunaSpecies" format=3]
+
+[ext_resource type="Script" path="res://scripts/fauna/fauna_species.gd" id="1_fauna"]
+[ext_resource type="Resource" path="res://data/species/fennec.tres" id="2_animal"]
+[ext_resource type="Resource" path="res://data/fauna/temperaments/shy.tres" id="3_profile"]
+
+[resource]
+script = ExtResource("1_fauna")
+id = &"fennec"
+display_name = "Fennec"
+animal = ExtResource("2_animal")
+temperament = 0
+profile = ExtResource("3_profile")
+herd_size = Vector2i(1, 2)
+wander_radius = 14.0
+hours = Vector2(18, 7.5)

@@ -133,8 +133,7 @@ func test_every_biome_hosts_valid_fauna() -> void:
 		assert_float(biome.fauna_chance).is_between(0.05, 0.3)
 		for entry in biome.fauna:
 			assert_bool(entry.species.is_valid()).is_true()
-	# Only the desert waits for its animals (the fennec, Phase 18).
-	assert_array(empty).is_equal([&"desert"] as Array[StringName])
+	assert_array(empty).is_empty()  # every biome has its big animals
 	assert_array(Array(SETTINGS.get_validation_errors())).is_empty()
 
 
@@ -217,3 +216,21 @@ func test_no_spawns_on_water_or_where_nothing_is_loaded() -> void:
 	director.sync(_coords_around(Vector2i(8, 8), 1))
 	await _drain(director)
 	assert_int(director.agents().size()).is_equal(0)
+
+
+func test_herds_only_appear_in_their_hours_and_come_when_they_begin() -> void:
+	_floor()
+	var saved_minutes := GameState.game_minutes
+	GameState.game_minutes = 12.0 * 60.0  # noon: the fennecs sleep in their dens
+	var director := _director(_busy_biome("fennec"), Vector3(544, 0, 544))
+	var coords: Array[Vector2i] = [Vector2i(8, 10)]
+	director.sync(coords)
+	await _drain(director)
+	assert_int(director.agents().size()).is_equal(0)
+	GameState.game_minutes = 19.0 * 60.0  # dusk: the same chunk, still loaded, rolled again
+	director.sync(coords)
+	await _drain(director)
+	assert_int(director.agents().size()).is_greater(0)
+	for agent in director.agents():
+		assert_str(String(agent.fauna.id)).is_equal("fennec")
+	GameState.game_minutes = saved_minutes
