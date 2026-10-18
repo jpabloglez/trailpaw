@@ -118,7 +118,7 @@ func test_the_journal_records_each_biome_visited_once_and_saves() -> void:
 	assert_bool(journal.visit_biome(&"forest", 2000.0, Vector3(820, 4, 3))).is_true()
 	assert_int(journal.visited_count()).is_equal(2)
 	var data := journal.to_dict()
-	assert_int(int(data["version"])).is_equal(2)
+	assert_int(int(data["version"])).is_equal(AnimalJournal.VERSION)
 	var copy := AnimalJournal.new()
 	copy.from_dict(JSON.parse_string(JSON.stringify(data)))
 	assert_bool(copy.has_visited(&"forest")).is_true()

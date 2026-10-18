@@ -383,7 +383,7 @@ clear turquoise lakes with beaches, wooded islands and shallow lagoons, and isla
 swimming to.
 
 - [x] The lake band: the island layer and clear water per chunk.
-- [ ] Island treasures: an ancient tree, rare flowers, an otter den.
+- [x] Island treasures: an ancient tree, rare flowers, an otter den.
 - [ ] Otters.
 - [ ] Beavers and their lodges.
 - [ ] Swans.

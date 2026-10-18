@@ -7,7 +7,15 @@ extends CanvasLayer
 ## map) it hides and its timing stops. Built in code.
 ## [br][br]
 ## A first visit to a biome ([code]EventBus.biome_discovered[/code], Phase 16b) gets the same
-## card with a swatch of its ground colours instead of a figure, and "New biome!".
+## card with a swatch of its ground colours instead of a figure, and "New biome!". So does an
+## island treasure found ([code]EventBus.island_discovered[/code], Phase 19): a golden swatch
+## and "Island treasure!".
+
+## What a queued card shows.
+enum Card { ANIMAL, BIOME, ISLAND }
+
+## Swatch of an island treasure's card.
+const ISLAND_SWATCH: Color = Color(0.95, 0.78, 0.3)
 
 ## Timings and look.
 @export var settings: DiscoveryCardSettings
@@ -20,9 +28,11 @@ extends CanvasLayer
 var showing: StringName = &""
 ## Whether the card out is a biome's.
 var showing_biome: bool = false
+## Whether the card out is an island treasure's.
+var showing_island: bool = false
 
 var _queue: Array[StringName] = []
-var _biome_queued: Array[bool] = []  # per queued id: a biome's card
+var _cards: Array[Card] = []  # per queued id: what its card shows
 var _new: Label
 var _hint: Label
 var _figure: Control
@@ -41,6 +51,7 @@ func _ready() -> void:
 	_panel.visible = false
 	EventBus.animal_discovered.connect(enqueue)
 	EventBus.biome_discovered.connect(enqueue_biome)
+	EventBus.island_discovered.connect(enqueue_island)
 
 
 func _process(_delta: float) -> void:
@@ -52,7 +63,7 @@ func enqueue(id: StringName) -> void:
 	if journal.entry(id) == null:
 		return
 	_queue.append(id)
-	_biome_queued.append(false)
+	_cards.append(Card.ANIMAL)
 	if showing == &"":
 		_next()
 
@@ -62,7 +73,18 @@ func enqueue_biome(id: StringName) -> void:
 	if _biome(id) == null:
 		return
 	_queue.append(id)
-	_biome_queued.append(true)
+	_cards.append(Card.BIOME)
+	if showing == &"":
+		_next()
+
+
+## Shows the card of an island treasure of [param kind] ([enum IslandPlan.Treasure]) now, or
+## after the cards already waiting.
+func enqueue_island(kind: int) -> void:
+	if kind < 0 or kind >= IslandPlan.NAMES.size():
+		return
+	_queue.append(StringName(str(kind)))
+	_cards.append(Card.ISLAND)
 	if showing == &"":
 		_next()
 
@@ -81,15 +103,22 @@ func _next() -> void:
 	if _queue.is_empty():
 		showing = &""
 		showing_biome = false
+		showing_island = false
 		_studio.show_entry(null)
 		return
 	showing = _queue.pop_front()
-	showing_biome = _biome_queued.pop_front()
-	_figure.visible = not showing_biome
-	_swatch.visible = showing_biome
-	_new.text = "New biome!" if showing_biome else "New!"
-	_hint.text = "Added to your atlas" if showing_biome else "Added to your journal"
-	if showing_biome:
+	var card: Card = _cards.pop_front()
+	showing_biome = card == Card.BIOME
+	showing_island = card == Card.ISLAND
+	_figure.visible = card == Card.ANIMAL
+	_swatch.visible = card != Card.ANIMAL
+	_new.text = ["New!", "New biome!", "Island treasure!"][card]
+	_hint.text = ["Added to your journal", "Added to your atlas", "Marked on your map"][card]
+	if showing_island:
+		_name.text = IslandPlan.NAMES[int(String(showing))]
+		_swatch.color = ISLAND_SWATCH
+		_studio.show_entry(null)
+	elif showing_biome:
 		var biome := _biome(showing)
 		_name.text = biome.display_name
 		_swatch.color = biome.ground_color_a

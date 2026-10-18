@@ -6,7 +6,8 @@ extends Node
 ##
 ## Where it rests matters ([enum Place]): in the open, in a tree's shade (asked to the
 ## [WorldStreamer] found through [constant WorldStreamer.GROUP], or to [member shade_source])
-## or by a den (the [Interactor]'s current target is a REST target).
+## or by a den (the [Interactor]'s current target is a REST target, or a cosy spot of
+## [constant COSY_GROUP] says so: the rare flowers of an island, Phase 19).
 ## [br][br]
 ## Budget: a state check per physics frame; the place is recomputed by the Rest state 4×/s.
 
@@ -15,6 +16,8 @@ enum Place { OPEN, SHADE, DEN }
 
 ## State that performs resting.
 const REST_STATE: StringName = &"Rest"
+## Group of nodes with [code]is_cosy(global_position) -> bool[/code]: places as restful as a den.
+const COSY_GROUP: StringName = &"cosy_spots"
 ## States from which resting may start.
 const START_STATES: Array[StringName] = [&"Idle", &"Locomotion"]
 
@@ -59,6 +62,10 @@ func place() -> Place:
 	var target := interactor.current_target() if interactor != null else null
 	if target != null and target.definition.type == InteractionDefinition.Type.REST:
 		return Place.DEN
+	if is_inside_tree():
+		for spot in get_tree().get_nodes_in_group(COSY_GROUP):  # 4×/s while resting
+			if spot.call(&"is_cosy", body.global_position):
+				return Place.DEN
 	var shade := _shade()
 	if shade != null and shade.call(&"is_shaded", body.global_position):
 		return Place.SHADE

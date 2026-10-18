@@ -220,6 +220,8 @@ func _draw_markers() -> void:
 	var at := _player_absolute()
 	for centre in hamlet_marks():
 		_house(_shown.pixel_of(centre.x, centre.z) * scale, r)
+	for centre in island_marks():
+		_star(_shown.pixel_of(centre.x, centre.z) * scale, r)
 	var tip := _shown.pixel_of(at.x, at.z) * scale
 	var forward := player_direction()
 	var side := Vector2(-forward.y, forward.x)
@@ -245,6 +247,26 @@ func hamlet_marks() -> PackedVector3Array:
 		if world.exploration.explored.is_explored(hamlet.centre.x, hamlet.centre.z):
 			out.append(hamlet.centre)
 	return out
+
+
+## Island treasures found (absolute positions; Phase 19), from the journal.
+func island_marks() -> PackedVector3Array:
+	if world == null or world.encounters == null:
+		return PackedVector3Array()
+	return world.encounters.journal.island_positions()
+
+
+# A five-pointed star.
+func _star(at: Vector2, r: float) -> void:
+	var inside := Rect2(Vector2.ZERO, _overlay.size).grow(-r)
+	if not inside.has_point(at):
+		return
+	var shape := PackedVector2Array()
+	for i in 10:
+		var reach := r * (0.85 if i % 2 == 0 else 0.38)
+		shape.append(at + Vector2.from_angle(-PI * 0.5 + i * PI / 5.0) * reach)
+	_overlay.draw_colored_polygon(shape, SETTINGS.island_color)
+	_overlay.draw_polyline(shape + PackedVector2Array([shape[0]]), Color.BLACK, 2.0, true)
 
 
 # A little house: a square with a roof.

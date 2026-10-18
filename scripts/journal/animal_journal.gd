@@ -1,14 +1,17 @@
 class_name AnimalJournal
 extends RefCounted
 ## The animals the player has met: for each, when (game minutes) and where (biome) it was first
-## seen; and the biomes visited (the atlas, Phase 16b): when and where (absolute X, Z) each was
-## first entered. Saved through [method to_dict] / [method from_dict].
+## seen; the biomes visited (the atlas, Phase 16b): when and where (absolute X, Z) each was
+## first entered; and the island treasures found (Phase 19): when, what and where. Saved
+## through [method to_dict] / [method from_dict].
 
-## Format version of [method to_dict] (2 adds the biomes; version 1 loads without them).
-const VERSION: int = 2
+## Format version of [method to_dict] (2 adds the biomes, 3 the islands; older ones load without
+## them).
+const VERSION: int = 3
 
 var _seen: Dictionary[StringName, Dictionary] = {}
 var _biomes: Dictionary[StringName, Dictionary] = {}
+var _islands: Dictionary[String, Dictionary] = {}
 
 
 ## Records [param id] as seen at [param game_minutes] in [param biome]. True only the first
@@ -59,10 +62,41 @@ func first_visit(id: StringName) -> float:
 	return float(_biomes.get(id, {}).get("minutes", -1.0))
 
 
+## Records the island treasure [param key] ([method IslandTreasure.key]) of [param kind] at
+## [param absolute] as found at [param game_minutes]. True only the first time.
+func find_island(key: String, kind: int, game_minutes: float, absolute: Vector3) -> bool:
+	if _islands.has(key):
+		return false
+	_islands[key] = {
+		"minutes": game_minutes, "kind": kind, "x": absolute.x, "y": absolute.y, "z": absolute.z
+	}
+	return true
+
+
+## Whether the island treasure [param key] has been found.
+func has_island(key: String) -> bool:
+	return _islands.has(key)
+
+
+## How many island treasures have been found.
+func island_count() -> int:
+	return _islands.size()
+
+
+## Where the island treasures found are (absolute), in the order they were found.
+func island_positions() -> PackedVector3Array:
+	var out := PackedVector3Array()
+	for key: String in _islands:
+		var record := _islands[key]
+		out.append(Vector3(record.x, record.y, record.z))
+	return out
+
+
 ## Forgets everything.
 func clear() -> void:
 	_seen.clear()
 	_biomes.clear()
+	_islands.clear()
 
 
 ## Plain, JSON-friendly copy.
@@ -73,7 +107,10 @@ func to_dict() -> Dictionary:
 	var biomes := {}
 	for id: StringName in _biomes:
 		biomes[String(id)] = _biomes[id].duplicate()
-	return {"version": VERSION, "seen": seen, "biomes": biomes}
+	var islands := {}
+	for key: String in _islands:
+		islands[key] = _islands[key].duplicate()
+	return {"version": VERSION, "seen": seen, "biomes": biomes, "islands": islands}
 
 
 ## Replaces the contents with [param data] (from [method to_dict]; empty is an empty journal).
@@ -92,4 +129,14 @@ func from_dict(data: Dictionary) -> void:
 			"minutes": float(visit.get("minutes", 0.0)),
 			"x": float(visit.get("x", 0.0)),
 			"z": float(visit.get("z", 0.0)),
+		}
+	var islands: Dictionary = data.get("islands", {})  # absent before version 3
+	for key: String in islands:
+		var found: Dictionary = islands[key] if islands[key] is Dictionary else {}
+		_islands[key] = {
+			"minutes": float(found.get("minutes", 0.0)),
+			"kind": int(found.get("kind", 0)),
+			"x": float(found.get("x", 0.0)),
+			"y": float(found.get("y", 0.0)),
+			"z": float(found.get("z", 0.0)),
 		}

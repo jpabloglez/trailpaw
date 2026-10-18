@@ -71,3 +71,13 @@ signal fox_shooed(from: Vector3)
 ## The fox came near a hamlet's food for the first time this session (Phase 16: onboarding).
 @warning_ignore("unused_signal")
 signal hamlet_food_seen
+
+## The fox reached an island treasure (Phase 19): [param key] identifies it
+## ([method IslandTreasure.key]), [param kind] is an [enum IslandPlan.Treasure], [param at] its
+## absolute position. Sent every time; the journal records the first.
+@warning_ignore("unused_signal")
+signal island_reached(key: String, kind: int, at: Vector3)
+
+## An island treasure was found for the first time ([param kind]: [enum IslandPlan.Treasure]).
+@warning_ignore("unused_signal")
+signal island_discovered(kind: int)

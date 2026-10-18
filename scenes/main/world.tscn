@@ -82,6 +82,7 @@
 [ext_resource type="Resource" path="res://data/ui/discovery_card.tres" id="88_cardset"]
 [ext_resource type="Script" path="res://scripts/critters/fireflies.gd" id="78_ffly"]
 [ext_resource type="Resource" path="res://data/critters/small_life.tres" id="79_small"]
+[ext_resource type="Script" path="res://scripts/world/island_director.gd" id="200_islands"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_k7oal"]
 
@@ -300,6 +301,11 @@ script = ExtResource("94_hamlets")
 terrain = ExtResource("3_u18in")
 player = NodePath("../Animal")
 day_night = NodePath("../DayNightCycle")
+
+[node name="IslandDirector" type="Node3D" parent="." node_paths=PackedStringArray("player")]
+script = ExtResource("200_islands")
+terrain = ExtResource("3_u18in")
+player = NodePath("../Animal")
 
 [node name="FarmLife" type="Node" parent="." node_paths=PackedStringArray("director", "player")]
 script = ExtResource("95_farm")
