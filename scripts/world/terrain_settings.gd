@@ -28,6 +28,8 @@ const MAX_OCTAVES: int = 8
 @export var biomes: BiomeTable
 ## Rural hamlets (Phase 16, ADR-007); none when null.
 @export var hamlets: HamletSettings
+## Island treasures (Phase 19); none when null.
+@export var islands: IslandSettings
 
 @export_group("Water")
 ## Absolute height of the water surface. Chunks with ground below it get a water plane

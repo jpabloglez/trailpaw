@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="IslandSettings" format=3]
+
+[ext_resource type="Script" path="res://scripts/world/island_settings.gd" id="1_isl"]
+[ext_resource type="Resource" path="res://data/vegetation/tree_oak.tres" id="2_oak"]
+
+[resource]
+script = ExtResource("1_isl")
+tree_type = ExtResource("2_oak")
+tree_scale = 13.0
+chance = 0.7

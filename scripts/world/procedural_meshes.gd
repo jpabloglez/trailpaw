@@ -60,6 +60,20 @@ static func build(shape: StringName) -> ArrayMesh:
 	return spheres([Vector4(0.0, 0.46, 0.0, 0.5)], Vector3(1.0, 0.9, 1.0), 8, 4)
 
 
+## A rare island flower (Phase 19): a slender stem with a star of five petals round a pale heart,
+## ≈ 0.3 m tall. The petals are white in the vertex colours (the instance colour tints them);
+## stem and heart keep their own colours under it.
+static func rare_flower() -> ArrayMesh:
+	var parts: Array = [
+		[Vector3(0.0, 0.13, 0.0), Vector3(0.02, 0.13, 0.02), Color(0.3, 0.5, 0.25)],
+		[Vector3(0.0, 0.27, 0.0), Vector3(0.045, 0.035, 0.045), Color(1.0, 0.95, 0.7)],
+	]
+	for i in 5:
+		var out := Vector3.FORWARD.rotated(Vector3.UP, i * TAU / 5.0)
+		parts.append([out * 0.09 + Vector3.UP * 0.26, Vector3(0.075, 0.02, 0.075), Color.WHITE])
+	return ellipsoids(parts, 6, 3)
+
+
 ## One surface made of spheres (centre xyz, radius w), each scaled by [param squash], with flat
 ## faces (low-poly look).
 static func spheres(

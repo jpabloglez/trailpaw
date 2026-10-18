@@ -235,3 +235,36 @@ func test_explored_hamlets_show_on_the_map() -> void:
 	flow.world().exploration.explored.reveal(centre, EXPLORATION.reveal_radius)
 	assert_bool(map.hamlet_marks().has(centre)).is_true()
 	map.close()
+
+
+## Shade caster double (an ancient tree's shade everywhere).
+class FakeCaster:
+	extends Node
+
+	func is_shaded(_where: Vector3) -> bool:
+		return true
+
+
+func test_island_treasures_found_are_starred_and_the_world_hosts_their_director() -> void:
+	var flow := await _playing()
+	var world := flow.world()
+	var map := flow.map_screen()
+	var at := GameState.absolute_position(world.animal.global_position)
+	var found := at + Vector3(120, 0, 40)
+	assert_array(Array(map.island_marks())).is_empty()
+	world.encounters.journal.find_island("9,9", 0, 600.0, found)
+	assert_array(Array(map.island_marks())).contains([found])
+	map.open()
+	map.close()
+	var director: IslandDirector = world.find_child("IslandDirector", true, false)
+	assert_object(director).is_not_null()
+	assert_object(director.terrain.islands).is_not_null()
+	# The streamer asks shade casters such as the director after its own trees.
+	var open := world.animal.global_position + Vector3(0, 0, 3)
+	var shaded_before := world.streamer.is_shaded(open)
+	var caster: FakeCaster = auto_free(FakeCaster.new())
+	caster.add_to_group(WorldStreamer.SHADE_GROUP)
+	add_child(caster)
+	assert_bool(world.streamer.is_shaded(open)).is_true()
+	caster.remove_from_group(WorldStreamer.SHADE_GROUP)
+	assert_bool(world.streamer.is_shaded(open)).is_equal(shaded_before)

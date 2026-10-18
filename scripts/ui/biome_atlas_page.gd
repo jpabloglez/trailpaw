@@ -3,7 +3,8 @@ extends VBoxContainer
 ## The journal's Biomes tab (Phase 16b): how many biomes have been visited and the area
 ## explored, then a card per biome of the table. Visited biomes show a swatch of their ground
 ## colours, their name, the day of the first visit and how many of their animals have been met;
-## the others a grey swatch and "???". Built in code; [method refresh] fills it.
+## the others a grey swatch and "???". Built in code; [method refresh] fills it. Below the area,
+## the island treasures found (Phase 19).
 
 ## Size of a card and of its swatch (px).
 const CARD_WIDTH: float = 238.0
@@ -13,6 +14,7 @@ const UNSEEN: Color = Color(0.32, 0.33, 0.32)
 
 var _counter: Label
 var _explored: Label
+var _islands: Label
 var _grid: GridContainer
 var _cards: Dictionary[StringName, Dictionary] = {}  # id → {swatch_a, swatch_b, name, visit, met}
 
@@ -24,6 +26,8 @@ func _init() -> void:
 	add_child(_counter)
 	_explored = MenuStyle.label("", 16, "Explored")
 	add_child(_explored)
+	_islands = MenuStyle.label("", 16, "Islands")
+	add_child(_islands)
 	_grid = GridContainer.new()
 	_grid.columns = 5
 	_grid.add_theme_constant_override(&"h_separation", 12)
@@ -61,11 +65,18 @@ func refresh(
 	_counter.text = "%d / %d biomes" % [visited, table.biomes.size()]
 	var km2 := explored.area() / 1.0e6 if explored != null else 0.0
 	_explored.text = "Explored: %.2f km²" % km2
+	var found := journal.island_count() if journal != null else 0
+	_islands.text = "Island treasures found: %d" % found
 
 
 ## The counter's text ("N / M biomes").
 func counter_text() -> String:
 	return _counter.text
+
+
+## The island treasures' text.
+func islands_text() -> String:
+	return _islands.text
 
 
 ## The explored area's text.

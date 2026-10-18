@@ -21,6 +21,9 @@ signal chunks_changed
 
 ## Group of the streamer (found by gameplay queries such as shade, without node paths).
 const GROUP: StringName = &"world_streamer"
+## Group of other shade casters ([code]is_shaded(global_position) -> bool[/code]; Phase 19: the
+## ancient trees of the islands), asked by [method is_shaded] after the chunk's trees.
+const SHADE_GROUP: StringName = &"shade_casters"
 ## Group of nodes providing [code]get_debug_lines()[/code] for the F3 overlay.
 const DEBUG_LINES_GROUP: StringName = &"debug_lines"
 
@@ -90,6 +93,7 @@ func _ready() -> void:
 		# Immutable snapshot of the vegetation tables, shared read-only by every job.
 		_scatterer = VegetationScatterer.new(terrain.biomes)
 		_scatterer.hamlets = terrain.hamlets
+		_scatterer.islands = terrain.islands
 		_library = VegetationLibrary.new(terrain.biomes, vegetation_palette)
 	if wind != null:
 		RenderingServer.global_shader_parameter_set(WIND_PARAM, wind.as_uniform())
@@ -183,11 +187,24 @@ func deltas() -> ChunkDeltaStore:
 	return _deltas
 
 
+## The mesh every instance of vegetation type [param id] shares (foliage materials, palette
+## colours), or null before the streamer is ready or for an unknown type.
+func vegetation_mesh(id: StringName) -> Mesh:
+	return _library.mesh_for(id) if _library != null else null
+
+
 ## Whether the local (scene) [param local_position] lies in a tree's shade (false where no chunk
-## is loaded).
+## is loaded), or in the shade of a [constant SHADE_GROUP] caster.
 func is_shaded(local_position: Vector3) -> bool:
 	var chunk: TerrainChunk = _loaded.get(_chunk_for_local(local_position))
-	return chunk != null and chunk.is_shaded(chunk.to_local(local_position))
+	if chunk != null and chunk.is_shaded(chunk.to_local(local_position)):
+		return true
+	if not is_inside_tree():
+		return false
+	for caster in get_tree().get_nodes_in_group(SHADE_GROUP):  # a few calls a second
+		if caster.call(&"is_shaded", local_position):
+			return true
+	return false
 
 
 ## Food kinds that get interaction targets: the diet of the [member target]'s species when

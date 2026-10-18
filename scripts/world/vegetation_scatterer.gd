@@ -32,6 +32,9 @@ const DROP_DRY_MARGIN: float = 0.05
 ## Rural hamlets (Phase 16): no plant grows on their pieces, and no tall one near their well
 ## ([method HamletPlan.circles_in]). Optional; set by the [WorldStreamer].
 var hamlets: HamletSettings
+## Island treasures (Phase 19): no tall plant grows near one ([method IslandPlan.circles_in]).
+## Optional; set by the [WorldStreamer].
+var islands: IslandSettings
 
 var _type_ids: Array[StringName] = []
 var _scale_min := PackedFloat32Array()
@@ -128,6 +131,12 @@ func scatter(
 	if hamlets != null:
 		cleared = HamletPlan.circles_in(
 			Rect2(origin, Vector2(size, size)), hamlets, sampler, world_seed, water_level
+		)
+	if islands != null:
+		cleared.append_array(
+			IslandPlan.circles_in(
+				Rect2(origin, Vector2(size, size)), islands, sampler, world_seed, water_level
+			)
 		)
 	for t in _type_ids.size():
 		if _near_only[t] and data.lod != 0:

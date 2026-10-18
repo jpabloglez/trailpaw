@@ -130,6 +130,33 @@ Scene-tree mutations happen only on the main thread; worker threads produce plai
     beaches, grass, bushes and reeds. Deer and stags. Fresh (warmth −0.3).
   - **Clear water:** see Water below (`water_clarity` 0.85).
   - Tests that need a place in a band find it from the layout (`tests/world/places.gd`).
+  - **Island treasures (Phase 19):** `IslandPlan` (pure, cached per seed and cell under a
+    mutex, like `HamletPlan`; `data/world/islands.tres`).
+    - **Placement:** the world is cut into 300 m cells, and 70 % of them try 10 random spots
+      in the lakes. A spot above the water climbs to the top of its land. That top is an
+      island when all 32 rays reach water within 150 m, none closer than 14 m; 16 rays let
+      peninsula necks slip through.
+    - The top must lie in its cell, so an island gets one treasure at most.
+    - **Results:** ≈ 23–28 treasures on the lake ring of each seed (≈ 40 m islands), in all
+      three kinds. A cell costs ≤ 8 ms once, usually on a chunk worker (the scatterer clears
+      tall plants within 10 m of a treasure).
+    - **`IslandDirector`** builds each treasure within 260 m (frees beyond 340 m), working out
+      at most one new cell per 1 Hz lookup:
+      - **an ancient tree:** the oak's foliage mesh from `WorldStreamer.vegetation_mesh()`
+        at ×13 (about 2.5× a big oak), a trunk collider, shade over 7 m, and motes of light
+        from 19:00 to 6:00 (not on Low)
+      - **rare flowers:** 90 procedural `rare_flower`s in violet, gold and turquoise, in a
+        6 m ring (`flower_layout()`, deterministic per treasure)
+      - **an otter den:** 7 logs leaning into a heap with a gap for the way in
+    - **Hooks:**
+      - `WorldStreamer.is_shaded()` also asks `SHADE_GROUP` casters (the tree)
+      - `Rester.place()` counts `COSY_GROUP` spots (the flowers) as a den
+    - **Discovery:**
+      - Within 12 m, `EventBus.island_reached` fires. The `EncounterTracker` records it in
+        the journal (v3: `find_island`, `island_count`, `island_positions`; older saves load
+        with none).
+      - The first time, `island_discovered` fires. A golden "Island treasure!" card shows,
+        the map draws a star, and the atlas counts "Island treasures found: N".
 - **Mountains (Phase 17, ADR-008):** after the lakes, 1.2 km wide; offset 85 m, continental
   ×5, ridged ×3.5.
   - **Relief profile:** `edge_relief` (0.15) scales the band's offset and its continental and

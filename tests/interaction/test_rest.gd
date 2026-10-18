@@ -16,6 +16,14 @@ class FakeShade:
 		return shaded
 
 
+## Cosy spot double (rare flowers everywhere).
+class FakeCosy:
+	extends Node
+
+	func is_cosy(_where: Vector3) -> bool:
+		return true
+
+
 var _saved_scale: float
 
 
@@ -170,3 +178,19 @@ func test_no_rest_in_the_air() -> void:
 	_rester(animal).rest_held = true
 	await _frames(2)
 	assert_str(_state(animal)).is_not_equal("Rest")
+
+
+func test_a_cosy_spot_is_as_restful_as_a_den() -> void:
+	var animal := _animal()
+	await _frames(5)
+	assert_int(_rester(animal).place()).is_equal(Rester.Place.OPEN)
+	var cosy: FakeCosy = auto_free(FakeCosy.new())
+	cosy.add_to_group(Rester.COSY_GROUP)
+	add_child(cosy)
+	assert_int(_rester(animal).place()).is_equal(Rester.Place.DEN)
+	var rester := _rester(animal)
+	assert_float(rester.energy_rate(rester.place())).is_equal(
+		SETTINGS.energy_per_second * SETTINGS.den_multiplier
+	)
+	cosy.remove_from_group(Rester.COSY_GROUP)
+	assert_int(_rester(animal).place()).is_equal(Rester.Place.OPEN)

@@ -3,6 +3,7 @@
 [ext_resource type="Resource" path="res://data/biomes/biome_table.tres" id="1_2mfl4"]
 [ext_resource type="Script" path="res://scripts/world/terrain_settings.gd" id="1_amsa7"]
 [ext_resource type="Resource" path="res://data/hamlets/hamlets.tres" id="9_hamlets"]
+[ext_resource type="Resource" path="res://data/world/islands.tres" id="10_islands"]
 
 [resource]
 script = ExtResource("1_amsa7")
@@ -11,6 +12,7 @@ lod_resolutions = PackedInt32Array(65, 17)
 skirt_depth = 2.0
 biomes = ExtResource("1_2mfl4")
 hamlets = ExtResource("9_hamlets")
+islands = ExtResource("10_islands")
 sea_level = -6.0
 snow_line = 90.0
 snow_blend = 8.0

@@ -6,6 +6,8 @@ extends Node
 ## The first time, [code]EventBus.animal_discovered[/code] fires.
 ## It also records the biomes entered ([code]EventBus.biome_entered[/code]); a first visit
 ## fires [code]EventBus.biome_discovered[/code] (not for the biome where the journal starts).
+## Island treasures reached ([code]EventBus.island_reached[/code], Phase 19) are recorded too;
+## the first time, [code]EventBus.island_discovered[/code] fires.
 ## [br][br]
 ## Budget: [member JournalSettings.check_hz] checks per second; each looks only at entries not
 ## yet seen, with a distance test (and a frustum test when close) per animal of their system —
@@ -39,6 +41,7 @@ var _in_sight := PackedFloat32Array()  # per entry: seconds in sight so far
 func _ready() -> void:
 	_in_sight.resize(settings.entries.size())
 	EventBus.biome_entered.connect(_on_biome_entered)
+	EventBus.island_reached.connect(_on_island_reached)
 
 
 func _process(delta: float) -> void:
@@ -79,6 +82,12 @@ func _on_biome_entered(id: StringName, _display_name: String) -> void:
 	var first := journal.visited_count() == 0
 	if journal.visit_biome(id, GameState.game_minutes, at) and not first:
 		EventBus.biome_discovered.emit(id)
+
+
+# Records an island treasure reached; not while disabled (the main menu's world).
+func _on_island_reached(key: String, kind: int, at: Vector3) -> void:
+	if can_process() and journal.find_island(key, kind, GameState.game_minutes, at):
+		EventBus.island_discovered.emit(kind)
 
 
 # Whether an animal of [param entry] is close to [param at] and on screen now.
