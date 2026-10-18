@@ -1,0 +1,115 @@
+[gd_resource type="Resource" script_class="BiomeDefinition" format=3]
+
+[ext_resource type="Script" path="res://scripts/world/biome_definition.gd" id="1_def"]
+[ext_resource type="Script" path="res://scripts/world/vegetation_entry.gd" id="2_entry"]
+[ext_resource type="Resource" path="res://data/vegetation/tree_pineTallA.tres" id="10_tree_pineTallA"]
+[ext_resource type="Resource" path="res://data/vegetation/tree_pineSmallA.tres" id="11_tree_pineSmallA"]
+[ext_resource type="Resource" path="res://data/vegetation/tree_thin.tres" id="12_tree_thin"]
+[ext_resource type="Resource" path="res://data/vegetation/rock_smallFlatA.tres" id="13_rock_smallFlatA"]
+[ext_resource type="Resource" path="res://data/vegetation/rock_smallA.tres" id="14_rock_smallA"]
+[ext_resource type="Resource" path="res://data/vegetation/grass_leafs.tres" id="15_grass_leafs"]
+[ext_resource type="Resource" path="res://data/vegetation/plant_bushSmall.tres" id="16_plant_bushSmall"]
+[ext_resource type="Resource" path="res://data/vegetation/reeds.tres" id="17_reeds"]
+[ext_resource type="Script" path="res://scripts/fauna/fauna_entry.gd" id="60_fentry"]
+[ext_resource type="Resource" path="res://data/fauna/deer.tres" id="61_deer"]
+[ext_resource type="Resource" path="res://data/fauna/stag.tres" id="62_stag"]
+
+[sub_resource type="Resource" id="Resource_tree_pineTallA"]
+script = ExtResource("2_entry")
+type = ExtResource("10_tree_pineTallA")
+density = 0.12
+max_slope_degrees = 30.0
+min_height = 1.0
+max_height = 60.0
+cluster = 0.6
+
+[sub_resource type="Resource" id="Resource_tree_pineSmallA"]
+script = ExtResource("2_entry")
+type = ExtResource("11_tree_pineSmallA")
+density = 0.14
+max_slope_degrees = 32.0
+min_height = 0.8
+max_height = 60.0
+cluster = 0.5
+
+[sub_resource type="Resource" id="Resource_tree_thin"]
+script = ExtResource("2_entry")
+type = ExtResource("12_tree_thin")
+density = 0.12
+max_slope_degrees = 30.0
+min_height = 0.8
+max_height = 60.0
+cluster = 0.6
+
+[sub_resource type="Resource" id="Resource_rock_smallFlatA"]
+script = ExtResource("2_entry")
+type = ExtResource("13_rock_smallFlatA")
+density = 0.8
+max_slope_degrees = 40.0
+min_height = 0.0
+max_height = 2.0
+cluster = 0.4
+
+[sub_resource type="Resource" id="Resource_rock_smallA"]
+script = ExtResource("2_entry")
+type = ExtResource("14_rock_smallA")
+density = 0.3
+max_slope_degrees = 45.0
+min_height = 0.2
+max_height = 40.0
+cluster = 0.4
+
+[sub_resource type="Resource" id="Resource_grass_leafs"]
+script = ExtResource("2_entry")
+type = ExtResource("15_grass_leafs")
+density = 2.5
+max_slope_degrees = 35.0
+min_height = 0.4
+max_height = 40.0
+cluster = 0.4
+
+[sub_resource type="Resource" id="Resource_plant_bushSmall"]
+script = ExtResource("2_entry")
+type = ExtResource("16_plant_bushSmall")
+density = 0.3
+max_slope_degrees = 32.0
+min_height = 0.6
+max_height = 40.0
+cluster = 0.5
+
+[sub_resource type="Resource" id="Resource_reeds"]
+script = ExtResource("2_entry")
+type = ExtResource("17_reeds")
+density = 1.5
+max_slope_degrees = 25.0
+min_height = -0.5
+max_height = 0.3
+cluster = 0.5
+
+[sub_resource type="Resource" id="Resource_fauna_deer"]
+script = ExtResource("60_fentry")
+species = ExtResource("61_deer")
+weight = 2.0
+
+[sub_resource type="Resource" id="Resource_fauna_stag"]
+script = ExtResource("60_fentry")
+species = ExtResource("62_stag")
+weight = 1.0
+
+[resource]
+script = ExtResource("1_def")
+id = &"lakes"
+display_name = "Lakes"
+band_width = 800.0
+warmth = -0.3
+height_offset = -12.0
+continental_scale = 1.8
+detail_scale = 0.8
+ridged_scale = 0.3
+island_scale = 1.1
+water_clarity = 0.85
+vegetation = Array[ExtResource("2_entry")]([SubResource("Resource_tree_pineTallA"), SubResource("Resource_tree_pineSmallA"), SubResource("Resource_tree_thin"), SubResource("Resource_rock_smallFlatA"), SubResource("Resource_rock_smallA"), SubResource("Resource_grass_leafs"), SubResource("Resource_plant_bushSmall"), SubResource("Resource_reeds")])
+ground_color_a = Color(0.56, 0.64, 0.4, 1)
+ground_color_b = Color(0.78, 0.74, 0.6, 1)
+fauna_chance = 0.14
+fauna = Array[ExtResource("60_fentry")]([SubResource("Resource_fauna_deer"), SubResource("Resource_fauna_stag")])

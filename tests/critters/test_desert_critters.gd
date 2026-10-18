@@ -8,10 +8,14 @@ const SETTINGS: CritterSettings = preload("res://data/critters/system.tres")
 const LIZARD: CritterKind = preload("res://data/critters/lizard.tres")
 const HARE: CritterKind = preload("res://data/critters/desert_hare.tres")
 const SEED: int = 12345
-## Open dunes in the desert (seed 12345, test_height_sampler).
-const DUNES := Vector2(-5900.0, -1500.0)
+const Places := preload("res://tests/world/places.gd")
 
 var _saved: Array = []
+var _dunes: Vector2  # the middle of the desert (found, not fixed)
+
+
+func before() -> void:
+	_dunes = Places.point_in(TERRAIN, HeightSampler.new(TERRAIN, SEED), &"desert", 0.5)
 
 
 func before_test() -> void:
@@ -44,7 +48,7 @@ func _system(kind: CritterKind) -> Array:
 	system.set_physics_process(false)
 	system.set_process(false)
 	var chunks: Array[Vector2i] = []
-	var centre := Vector2i((DUNES / TERRAIN.chunk_size).floor())
+	var centre := Vector2i((_dunes / TERRAIN.chunk_size).floor())
 	for x in range(-5, 6):
 		for z in range(-5, 6):
 			chunks.append(centre + Vector2i(x, z))

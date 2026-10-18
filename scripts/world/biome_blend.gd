@@ -16,6 +16,11 @@ var dune_scale: float = 0.0
 var mesa_scale: float = 0.0
 ## Blended [member BiomeDefinition.oasis_scale].
 var oasis_scale: float = 0.0
+## Blended [member BiomeDefinition.island_scale].
+var island_scale: float = 0.0
+## Blended [member BiomeDefinition.water_clarity] and [member BiomeDefinition.water_tint].
+var water_clarity: float = 0.0
+var water_tint: Color = Color.WHITE
 ## Blended [member BiomeDefinition.ground_color_a].
 var color_a: Color = Color.BLACK
 ## Blended [member BiomeDefinition.ground_color_b].

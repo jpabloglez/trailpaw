@@ -84,6 +84,12 @@ const MAX_OCTAVES: int = 8
 @export_range(-1.0, 1.0, 0.01) var mesa_threshold: float = 0.4
 @export_range(0.005, 1.0, 0.005) var mesa_softness: float = 0.08
 
+## Islands (Phase 19): soft, rounded bumps of this height where the sand noise passes the
+## threshold, with a gentle shore over the softness (noise units).
+@export_range(0.0, 50.0, 0.5, "suffix:m") var island_amplitude: float = 0.0
+@export_range(-1.0, 1.0, 0.01) var island_threshold: float = 0.2
+@export_range(0.01, 1.0, 0.01) var island_softness: float = 0.3
+
 @export_group("Oases")
 ## Oases (Phase 18): the world is cut into square cells this wide; each hosts an oasis with
 ## [member oasis_chance] (hashed from the seed and the cell), at a random spot inside it.

@@ -31,6 +31,9 @@ var indices := PackedInt32Array()
 var min_height: float = INF
 ## Water surface height copied from the settings (m, absolute).
 var water_level: float = 0.0
+## How clear the chunk's water looks and its clear colour (its biome at the centre; Phase 19).
+var water_clarity: float = 0.0
+var water_tint: Color = Color.WHITE
 ## Closed outline of the chunk surface border (local positions), for debug gizmos.
 var border := PackedVector3Array()
 ## Vegetation instances: type id → [PackedFloat32Array] in [member MultiMesh.buffer]

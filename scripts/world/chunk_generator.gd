@@ -45,6 +45,12 @@ static func generate_with(
 	var heights := sample_apron(sampler, coord, res, step, data)
 	_build_surface(data, heights)
 	data.water_level = settings.sea_level
+	if sampler.resolver() != null:  # the water's look comes from the biome at the centre
+		var centre := (Vector2(coord) + Vector2(0.5, 0.5)) * step * float(res - 1)
+		var blend := BiomeBlend.new()
+		sampler.resolver().blend_into(centre.x, centre.y, blend)
+		data.water_clarity = blend.water_clarity
+		data.water_tint = blend.water_tint
 	for v in data.vertices.size():
 		data.min_height = minf(data.min_height, data.vertices[v].y)
 	_build_skirt(data, settings.skirt_depth)
@@ -87,11 +93,12 @@ static func sample_apron(
 		var dunes := blend.dune_scale
 		var mesas := blend.mesa_scale
 		var oases := blend.oasis_scale
+		var isles := blend.island_scale
 		for j in side:
 			var z := float(base_z + j) * step
 			for i in side:
 				heights[j * side + i] = sampler.sample_with_modifiers(
-					float(base_x + i) * step, z, offset, cs, ds, rs, dunes, mesas, oases
+					float(base_x + i) * step, z, offset, cs, ds, rs, dunes, mesas, oases, isles
 				)
 		if data != null:
 			data.colors.fill(_pack_a(blend))

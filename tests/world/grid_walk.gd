@@ -8,8 +8,9 @@ const STEP: float = 8.0
 
 ## Breadth-first search over a strip at [param angle], from effective distance [param from] to
 ## [param to], ±200 m to the side, with steps no higher than [param rise] (m per [constant STEP]).
+## With a [param water] level, ground under it counts as the water's flat surface (swimming).
 static func crosses(
-	sampler: HeightSampler, angle: float, from: float, to: float, rise: float
+	sampler: HeightSampler, angle: float, from: float, to: float, rise: float, water: float = -INF
 ) -> bool:
 	var along := Vector2.from_angle(angle)
 	var side := along.orthogonal()
@@ -20,7 +21,7 @@ static func crosses(
 	for r in rows:
 		for c in cols:
 			var p := along * (from + r * STEP) + side * ((c - cols / 2) * STEP)
-			heights[r * cols + c] = sampler.height_at(p.x, p.y)
+			heights[r * cols + c] = maxf(sampler.height_at(p.x, p.y), water)
 	var seen := PackedByteArray()
 	seen.resize(rows * cols)
 	var queue := PackedInt32Array()

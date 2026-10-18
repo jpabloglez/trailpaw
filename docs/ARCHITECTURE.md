@@ -112,15 +112,25 @@ Scene-tree mutations happen only on the main thread; worker threads produce plai
 
 ### 3.4 Distance-driven biomes
 - Data: `BiomeDefinition` (`data/biomes/{meadow,forest,river_valley,wetland,hills,
-  mountains,desert,savanna}.tres`: id, display name, band width, height offset/scales,
+  lakes,mountains,desert,savanna}.tres`: id, display name, band width, height offset/scales,
   two-colour ground palette) ordered by `BiomeTable` (`data/biomes/biome_table.tres`).
-  - Bands **repeat in a cycle**: six 800 m bands, the 1.2 km mountains and the 1 km desert
-    make 7.0 km (ADR-006, ADR-008, ADR-009).
+  - Bands **repeat in a cycle**: seven 800 m bands, the 1.2 km mountains and the 1 km desert
+    make 7.8 km (ADR-006, ADR-008, ADR-009, ADR-010).
   - 150 m blend and ±110 m boundary noise, measured from the spawn point.
 - **Wetland (Phase 14, ADR-006):** after the river valley. Its height offset of −5.8 m with
   little relief puts it just under the water level: ≈ 43 % water, 93 % of it shallower than
   1.2 m (pools, channels and islets to wade). Muddy ground, cool.
-- **Mountains (Phase 17, ADR-008):** after the hills, 1.2 km wide; offset 85 m, continental
+- **Lakes (Phase 19, ADR-010):** after the hills, 800 m wide; offset −12 m, continental ×1.8.
+  - **The island layer** (in the sand layers): where the sand noise passes 0.05, a
+    `smoothstep` over 0.6 noise units raises the ground up to 16 m. The result is rounded
+    islands with gentle shores, scaled by `island_scale` (lakes 1.1, elsewhere 0).
+  - **Shape (3 seeds):** ≈ 58 % water, ≈ 88 % of it deeper than 2 m, islands, 0.9 % of the
+    land steeper than 45°. Crossable by swimming (`grid_walk.gd` with a water level).
+  - **Vegetation:** pines and `tree_thin` on the shores and islands, flat pebbles on the
+    beaches, grass, bushes and reeds. Deer and stags. Fresh (warmth −0.3).
+  - **Clear water:** see Water below (`water_clarity` 0.85).
+  - Tests that need a place in a band find it from the layout (`tests/world/places.gd`).
+- **Mountains (Phase 17, ADR-008):** after the lakes, 1.2 km wide; offset 85 m, continental
   ×5, ridged ×3.5.
   - **Relief profile:** `edge_relief` (0.15) scales the band's offset and its continental and
     ridged scales by `lerp(edge_relief, 1, sin(π·t))` across the band. The range rises from
@@ -147,8 +157,9 @@ Scene-tree mutations happen only on the main thread; worker threads produce plai
       `BiomeDefinition.oasis_scale`, which is 1 only in the desert.
     - Mesas fade out inside the bowl.
     - The existing water plane, shore, drinking, scent and map work unchanged.
-    - Palms, grass and reeds ring the pool: entries just above the water, a height that
-      happens only at oases there.- `BiomeDefinition` (Resource): name, height params, ground palette, vegetation table,
+    - Palms, grass and reeds ring the pool: entries just above the water (palms 0.5–3 m,
+      ADR-010), a height that happens only at oases there.
+- `BiomeDefinition` (Resource): name, height params, ground palette, vegetation table,
   fauna table, ambient audio, temperature (`warmth`, Phase 6), water frequency.
 - `BiomeResolver` (pure, seeded, one per worker task): noisy distance
   `d' = |pos − spawn| + noise(pos) · amplitude`; the band containing `d'` cross-fades with
@@ -192,6 +203,11 @@ Scene-tree mutations happen only on the main thread; worker threads produce plai
   band and darken the bed with depth; semi-transparent water then shows light shallows and
   dark deeps without a depth texture.
   Swimming since Phase 5 (see §4.2); drinking in Phase 7.
+  - **Clear water (Phase 19, ADR-010):** `BiomeDefinition.water_clarity` / `water_tint`
+    (blended) are taken at each chunk's centre into `ChunkData`. `TerrainChunk` sets them as
+    the water plane's **instance uniforms** `clarity` / `clear_tint`, so the material stays
+    shared. Clarity mixes the colours towards the tint and lowers the opacity looking down.
+    Only the lakes have it (0.85, turquoise); elsewhere 0 is the usual water.
   **Known issue (M2 playtest):** water only forms under the global sea level, so the spawn
   meadow has none (0 of 52 sampled chunks; forest 8/54, valley 21/48, hills 1/46) and the
   nearest lake is ≈ 770 m from the spawn. Deferred until the map/navigation aid (ROADMAP
@@ -1350,5 +1366,6 @@ Stored in `docs/adr/NNN-title.md`. Initial set:
 - [ADR-007](adr/007-rural-hamlets.md) Rural hamlets placed on the existing terrain.
 - [ADR-008](adr/008-mountain-band.md) A mountain band after the hills, with a relief profile and snow.
 - [ADR-009](adr/009-desert-and-savanna.md) Desert and savanna after the mountains: dune and mesa layers.
+- [ADR-010](adr/010-lake-band.md) Alpine lakes between the hills and the mountains: islands, clear water.
 
 New ADRs start from [`000-template.md`](adr/000-template.md).

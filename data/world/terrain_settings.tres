@@ -30,3 +30,6 @@ mesa_amplitude = 20.0
 oasis_chance = 0.85
 oasis_radius = 90.0
 oasis_floor = 0.22
+island_amplitude = 16.0
+island_threshold = 0.05
+island_softness = 0.6

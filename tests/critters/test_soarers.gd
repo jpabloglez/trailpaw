@@ -9,9 +9,19 @@ const EAGLE: SoarerSettings = preload("res://data/critters/eagle.tres")
 const JOURNAL: JournalSettings = preload("res://data/journal/journal.tres")
 const SEED: int = 12345
 ## On the mountain slope (seed 12345) and at the spawn meadow.
-const MOUNTAIN := Vector3(4200.0, 60.0, -1290.0)
+const Places := preload("res://tests/world/places.gd")
 
 var _saved: Array = []
+var _mountain: Vector3  # a point on the mountain slopes (found, not fixed)
+var _desert: Vector3  # a point in the desert
+
+
+func before() -> void:
+	var sampler := HeightSampler.new(TERRAIN, SEED)
+	var at := Places.point_in(TERRAIN, sampler, &"mountains", 0.3)
+	_mountain = Vector3(at.x, sampler.height_at(at.x, at.y), at.y)
+	at = Places.point_in(TERRAIN, sampler, &"desert", 0.5)
+	_desert = Vector3(at.x, sampler.height_at(at.x, at.y), at.y)
 
 
 func before_test() -> void:
@@ -56,7 +66,7 @@ func test_none_over_the_meadow() -> void:
 
 
 func test_over_the_mountains_they_soar_in_high_wide_circles() -> void:
-	var soarers: Soarers = _soarers(MOUNTAIN)[0]
+	var soarers: Soarers = _soarers(_mountain)[0]
 	_fly(soarers, 10.0)
 	assert_int(soarers.count()).is_between(1, EAGLE.max_soarers)
 	for s in soarers.count():
@@ -71,7 +81,7 @@ func test_over_the_mountains_they_soar_in_high_wide_circles() -> void:
 
 
 func test_their_circles_stay_over_the_mountains() -> void:
-	var soarers: Soarers = _soarers(MOUNTAIN)[0]
+	var soarers: Soarers = _soarers(_mountain)[0]
 	soarers.settings.leave_distance = 5000.0  # keep the same birds all along
 	for minute in 30:  # ≈ 2 km of drift: far more than the band is wide
 		_fly(soarers, 60.0)
@@ -82,10 +92,10 @@ func test_their_circles_stay_over_the_mountains() -> void:
 
 
 func test_at_the_edge_of_the_mountains_they_appear_over_the_mountains_only() -> void:
-	var made := _soarers(MOUNTAIN)
+	var made := _soarers(_mountain)
 	var soarers: Soarers = made[0]
 	var player: Node3D = made[1]
-	var ray := Vector2(MOUNTAIN.x, MOUNTAIN.z).normalized()
+	var ray := Vector2(_mountain.x, _mountain.z).normalized()
 	var d := 3800.0
 	while not soarers.is_their_sky(ray.x * d, ray.y * d):
 		d += 5.0
@@ -102,15 +112,15 @@ func test_at_the_edge_of_the_mountains_they_appear_over_the_mountains_only() -> 
 
 
 func test_they_leave_at_night_and_when_the_fox_goes_far() -> void:
-	var made := _soarers(MOUNTAIN)
+	var made := _soarers(_mountain)
 	var soarers: Soarers = made[0]
 	var player: Node3D = made[1]
 	_fly(soarers, 5.0)
 	assert_int(soarers.count()).is_greater(0)
-	player.global_position = GameState.local_position(MOUNTAIN + Vector3(2000, 0, 0))
+	player.global_position = GameState.local_position(_mountain + Vector3(2000, 0, 0))
 	_fly(soarers, 1.0)
 	assert_int(soarers.count()).is_equal(0)
-	player.global_position = GameState.local_position(MOUNTAIN)
+	player.global_position = GameState.local_position(_mountain)
 	_fly(soarers, 5.0)
 	assert_int(soarers.count()).is_greater(0)
 	var cycle: DayNightCycle = auto_free(DayNightCycle.new())
@@ -127,7 +137,7 @@ func test_the_journal_meets_an_eagle_seen_overhead() -> void:
 	assert_object(entry).is_not_null()
 	assert_int(entry.source).is_equal(JournalEntry.Source.SOARER)
 	assert_array(entry.biome_ids(TERRAIN.biomes)).is_equal([&"mountains"] as Array[StringName])
-	var made := _soarers(MOUNTAIN)
+	var made := _soarers(_mountain)
 	var soarers: Soarers = made[0]
 	var player: Node3D = made[1]
 	_fly(soarers, 5.0)
@@ -155,7 +165,7 @@ func test_the_cry_is_high_and_falls() -> void:
 
 
 func test_they_fit_their_budget() -> void:
-	var soarers: Soarers = _soarers(MOUNTAIN)[0]
+	var soarers: Soarers = _soarers(_mountain)[0]
 	_fly(soarers, 5.0)
 	assert_int(soarers.count()).is_equal(EAGLE.max_soarers)
 	var start := Time.get_ticks_usec()
@@ -180,7 +190,7 @@ func test_vultures_wheel_low_over_the_desert_and_never_call() -> void:
 	eager.appear_chance = 1.0
 	var player: Node3D = auto_free(Node3D.new())
 	add_child(player)
-	player.global_position = GameState.local_position(Vector3(-5900.0, 9.0, -1500.0))  # dunes
+	player.global_position = GameState.local_position(_desert)
 	var vultures: Soarers = auto_free(Soarers.new())
 	vultures.settings = eager
 	vultures.terrain = TERRAIN

@@ -7,10 +7,14 @@ const TERRAIN: TerrainSettings = preload("res://data/world/terrain_settings.tres
 const SETTINGS: CritterSettings = preload("res://data/critters/system.tres")
 const MARMOT: CritterKind = preload("res://data/critters/marmot.tres")
 const SEED: int = 12345
-## The foothills-to-crest slope below the peak at (4446.8, −1359.5) (seed 12345).
-const SLOPE := Vector2(4200.0, -1290.0)
+const Places := preload("res://tests/world/places.gd")
 
 var _saved: Array = []
+var _slope: Vector2  # the mountains' lower slopes (found, not fixed)
+
+
+func before() -> void:
+	_slope = Places.point_in(TERRAIN, HeightSampler.new(TERRAIN, SEED), &"mountains", 0.2)
 
 
 func before_test() -> void:
@@ -43,7 +47,7 @@ func _system(kind: CritterKind = MARMOT) -> Array:
 	system.set_physics_process(false)
 	system.set_process(false)
 	var chunks: Array[Vector2i] = []
-	var centre := Vector2i((SLOPE / TERRAIN.chunk_size).floor())
+	var centre := Vector2i((_slope / TERRAIN.chunk_size).floor())
 	for x in range(-6, 7):
 		for z in range(-6, 7):
 			chunks.append(centre + Vector2i(x, z))

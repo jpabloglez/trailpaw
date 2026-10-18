@@ -7,14 +7,16 @@ const SETTINGS: TerrainSettings = preload("res://data/world/terrain_settings.tre
 const SPECIES: AnimalSpecies = preload("res://data/species/fox.tres")
 const GridWalk := preload("res://tests/world/grid_walk.gd")
 const SEEDS: Array[int] = [12345, 777, 2024]
-## A mesa top (seed 12345, test_height_sampler).
-const MESA := Vector2(-5737.877, -653.7481)
+const Places := preload("res://tests/world/places.gd")
 
 var _desert: BiomeDefinition
 var _savanna: BiomeDefinition
+var _mesa: Vector2  # the desert's highest point: a mesa (found, not fixed)
 
 
 func before() -> void:
+	var top := Places.highest_in(SETTINGS, HeightSampler.new(SETTINGS, SEEDS[0]), &"desert")
+	_mesa = Vector2(top.x, top.z)
 	for biome in SETTINGS.biomes.biomes:
 		if biome.id == &"desert":
 			_desert = biome
@@ -37,7 +39,7 @@ func test_the_desert_follows_the_mountains_and_the_savanna_closes_the_cycle() ->
 func test_dunes_rise_and_fall_across_the_wind() -> void:
 	var sampler := HeightSampler.new(SETTINGS, SEEDS[0])
 	var wind := Vector2.from_angle(deg_to_rad(SETTINGS.dune_direction_degrees))
-	var at := Vector2(-5900.0, -1500.0)  # dunes, no mesa (test_height_sampler)
+	var at := _open_dunes(sampler, wind)
 	var lows := 0
 	var highs := 0
 	var previous := sampler.height_at(at.x, at.y)
@@ -63,7 +65,7 @@ func test_mesas_are_flat_topped_and_stand_well_above_the_sand() -> void:
 	var top := -INF
 	for gx in range(-15, 16):
 		for gz in range(-15, 16):
-			var c := MESA + Vector2(gx, gz) * 4.0
+			var c := _mesa + Vector2(gx, gz) * 4.0
 			var h := sampler.height_at(c.x, c.y)
 			var flat := true
 			for a in 8:
@@ -74,7 +76,7 @@ func test_mesas_are_flat_topped_and_stand_well_above_the_sand() -> void:
 	assert_float(top).is_greater(-INF)
 	var sand := INF
 	for a in 16:
-		var p := MESA + Vector2.from_angle(a * TAU / 16.0) * 160.0
+		var p := _mesa + Vector2.from_angle(a * TAU / 16.0) * 160.0
 		sand = minf(sand, sampler.height_at(p.x, p.y))
 	assert_float(top - sand).is_greater(12.0)
 
@@ -185,3 +187,19 @@ func test_the_bound_counts_the_sand_layers_and_the_scales_blend_across_borders()
 			var desert_weight := resolver.weights_at(p.x, p.y).get(&"desert", 0.0) as float
 			assert_float(blend.dune_scale).is_equal_approx(desert_weight * _desert.dune_scale, 1e-4)
 			assert_float(blend.mesa_scale).is_equal_approx(desert_weight * _desert.mesa_scale, 1e-4)
+
+
+# A desert point whose 240 m line across the wind crosses only dunes (no mesa on it).
+func _open_dunes(sampler: HeightSampler, wind: Vector2) -> Vector2:
+	for angle in 72:
+		var at := Places.point_in(SETTINGS, sampler, &"desert", 0.5, angle * TAU / 72.0)
+		var low := INF
+		var high := -INF
+		for step in range(0, 240, 4):
+			var p := at + wind * step
+			var h := sampler.height_at(p.x, p.y)
+			low = minf(low, h)
+			high = maxf(high, h)
+		if high - low < SETTINGS.dune_amplitude * 2.5:
+			return at
+	return Vector2.INF
