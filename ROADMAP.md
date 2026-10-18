@@ -376,6 +376,26 @@ alive.
 
 ---
 
+## Phase 19 — Lakes
+
+An alpine lake district between the hills and the mountains (user decisions; ADR-010): large,
+clear turquoise lakes with beaches, wooded islands and shallow lagoons, and islands worth
+swimming to.
+
+- [x] The lake band: the island layer and clear water per chunk.
+- [ ] Island treasures: an ancient tree, rare flowers, an otter den.
+- [ ] Otters.
+- [ ] Beavers and their lodges.
+- [ ] Swans.
+
+**Tests:** mostly deep water with islands on every seed; the band crossable by swimming;
+only the lakes have clear water; treasures only on true islands; each animal's behaviour, and
+the journal covers it.
+**Exit:** the lakes look clear and inviting with the peaks behind them, swimming to an island
+pays off, and the shores are alive.
+
+---
+
 ## Backlog (post-slice ideas)
 
 Gamepad support · more species selectable at start · seasons · photo mode · collectible

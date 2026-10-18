@@ -76,7 +76,7 @@ type = ExtResource("16_tree_palm")
 density = 0.45
 max_slope_degrees = 30.0
 min_height = 0.5
-max_height = 4.5
+max_height = 3.0
 cluster = 0.5
 
 [sub_resource type="Resource" id="Resource_tree_palmTall"]
@@ -85,7 +85,7 @@ type = ExtResource("17_tree_palmTall")
 density = 0.3
 max_slope_degrees = 30.0
 min_height = 0.5
-max_height = 4.5
+max_height = 3.0
 cluster = 0.5
 
 [sub_resource type="Resource" id="Resource_tree_palmShort"]
@@ -94,7 +94,7 @@ type = ExtResource("18_tree_palmShort")
 density = 0.2
 max_slope_degrees = 30.0
 min_height = 0.4
-max_height = 3.5
+max_height = 2.5
 cluster = 0.5
 
 [sub_resource type="Resource" id="Resource_grass_leafs"]

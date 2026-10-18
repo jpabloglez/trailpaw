@@ -36,6 +36,8 @@ extends Resource
 ## How much the oases ([TerrainSettings] "Oases" group) sink the ground here (0 none, 1 full:
 ## the desert).
 @export_range(0.0, 1.0, 0.01) var oasis_scale: float = 0.0
+## Multiplier of the islands ([TerrainSettings] "Sand" group; Phase 19: the lakes). 0 = none.
+@export_range(0.0, 5.0, 0.01) var island_scale: float = 0.0
 
 @export_group("Climate")
 ## How warm the biome feels (-1 cool … +1 warm, up to ±2 for the desert). Warm biomes lower
@@ -48,6 +50,12 @@ extends Resource
 @export var need_multipliers: Dictionary[StringName, float] = {}
 ## No rain falls here (the desert): the weather's rain is not shown, heard or felt.
 @export var dry: bool = false
+
+@export_group("Water")
+## How clear its water looks (0 the usual murky water … 1 crystal; Phase 19: the lakes), and
+## the colour clear water takes.
+@export_range(0.0, 1.0, 0.01) var water_clarity: float = 0.0
+@export var water_tint: Color = Color(0.2, 0.67, 0.65)
 
 @export_group("Vegetation")
 ## What grows in this biome and where (see [VegetationEntry]).
@@ -81,6 +89,7 @@ func get_validation_errors() -> PackedStringArray:
 		or ridged_scale < 0.0
 		or dune_scale < 0.0
 		or mesa_scale < 0.0
+		or island_scale < 0.0
 	):
 		errors.append("height scales must be >= 0")
 	if edge_relief < 0.0 or edge_relief > 1.0:

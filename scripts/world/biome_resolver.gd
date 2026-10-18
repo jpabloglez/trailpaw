@@ -25,6 +25,9 @@ var _edge := PackedFloat32Array()
 var _dune := PackedFloat32Array()
 var _mesa := PackedFloat32Array()
 var _oasis := PackedFloat32Array()
+var _clarity := PackedFloat32Array()
+var _island := PackedFloat32Array()
+var _tint := PackedColorArray()
 var _color_a := PackedColorArray()
 var _color_b := PackedColorArray()
 var _starts := PackedFloat64Array()
@@ -61,6 +64,9 @@ func _init(table: BiomeTable, world_seed: int) -> void:
 		_dune.append(biome.dune_scale)
 		_mesa.append(biome.mesa_scale)
 		_oasis.append(biome.oasis_scale)
+		_clarity.append(biome.water_clarity)
+		_island.append(biome.island_scale)
+		_tint.append(biome.water_tint)
 		_color_a.append(biome.ground_color_a)
 		_color_b.append(biome.ground_color_b)
 	_sequence_length = start
@@ -220,6 +226,9 @@ func _fill(
 		out.dune_scale = _dune[primary]
 		out.mesa_scale = _mesa[primary]
 		out.oasis_scale = _oasis[primary]
+		out.water_clarity = _clarity[primary]
+		out.island_scale = _island[primary]
+		out.water_tint = _tint[primary]
 		out.color_a = _color_a[primary]
 		out.color_b = _color_b[primary]
 		return
@@ -236,6 +245,9 @@ func _fill(
 	out.dune_scale = lerpf(_dune[primary], _dune[secondary], weight)
 	out.mesa_scale = lerpf(_mesa[primary], _mesa[secondary], weight)
 	out.oasis_scale = lerpf(_oasis[primary], _oasis[secondary], weight)
+	out.water_clarity = lerpf(_clarity[primary], _clarity[secondary], weight)
+	out.island_scale = lerpf(_island[primary], _island[secondary], weight)
+	out.water_tint = _tint[primary].lerp(_tint[secondary], weight)
 	out.color_a = _color_a[primary].lerp(_color_a[secondary], weight)
 	out.color_b = _color_b[primary].lerp(_color_b[secondary], weight)
 
@@ -251,6 +263,14 @@ func max_sand() -> Vector2:
 	for i in _biomes.size():
 		bound.x = maxf(bound.x, _dune[i])
 		bound.y = maxf(bound.y, _mesa[i])
+	return bound
+
+
+## Largest island scale among all biomes (for height bounds).
+func max_island() -> float:
+	var bound := 0.0
+	for i in _biomes.size():
+		bound = maxf(bound, _island[i])
 	return bound
 
 

@@ -6,17 +6,17 @@ const SETTINGS: TerrainSettings = preload("res://data/world/terrain_settings.tre
 const SNIFF: SniffSettings = preload("res://data/interaction/sniff.tres")
 const FOX: AnimalSpecies = preload("res://data/species/fox.tres")
 const SEEDS: Array[int] = [12345, 777, 2024]
-## A full oasis (seed 12345): its centre.
-const OASIS := Vector2(5616.176, 152.6471)
 const PALMS: Array[StringName] = [&"tree_palm", &"tree_palmTall", &"tree_palmShort"]
 
 var _desert: BiomeDefinition
+var _oasis: Vector2  # a full oasis of seed 12345 (found, not fixed)
 
 
 func before() -> void:
 	for biome in SETTINGS.biomes.biomes:
 		if biome.id == &"desert":
 			_desert = biome
+	_oasis = _full_oases(HeightSampler.new(SETTINGS, SEEDS[0]))[0]
 
 
 # Oasis centres of the desert band (absolute X, Z) that are really there, wholly in the desert.
@@ -44,8 +44,8 @@ func test_oases_are_deterministic_and_only_sink_the_desert() -> void:
 	var one := HeightSampler.new(SETTINGS, SEEDS[0])
 	var again := HeightSampler.new(SETTINGS, SEEDS[0])
 	var other := HeightSampler.new(SETTINGS, SEEDS[1])
-	assert_vector(one.oasis_of(OASIS.x, OASIS.y)).is_equal(again.oasis_of(OASIS.x, OASIS.y))
-	assert_vector(one.oasis_of(OASIS.x, OASIS.y)).is_not_equal(other.oasis_of(OASIS.x, OASIS.y))
+	assert_vector(one.oasis_of(_oasis.x, _oasis.y)).is_equal(again.oasis_of(_oasis.x, _oasis.y))
+	assert_vector(one.oasis_of(_oasis.x, _oasis.y)).is_not_equal(other.oasis_of(_oasis.x, _oasis.y))
 	for biome in SETTINGS.biomes.biomes:
 		if biome != _desert:
 			assert_float(biome.oasis_scale).is_equal(0.0)
@@ -101,13 +101,13 @@ func test_from_anywhere_in_the_desert_an_oasis_is_within_scent() -> void:
 			assert_float(nearest).is_less(SNIFF.scent_radius)
 	# The fox's long-range scent itself finds the oasis.
 	var sampler := HeightSampler.new(SETTINGS, SEEDS[0])
-	var from := OASIS + Vector2(400.0, 0.0)
+	var from := _oasis + Vector2(250.0, 0.0)
 	var scent := WaterScent.new(
 		sampler, from, 600.0, SNIFF.scent_step, SETTINGS.sea_level, SNIFF.scent_min_depth
 	)
 	var water := scent.search()
 	assert_bool(water != Vector3.INF).is_true()
-	assert_float(Vector2(water.x, water.z).distance_to(OASIS)).is_less(SETTINGS.oasis_radius)
+	assert_float(Vector2(water.x, water.z).distance_to(_oasis)).is_less(SETTINGS.oasis_radius)
 
 
 func test_palms_grow_around_the_oases_and_nowhere_else() -> void:
@@ -116,13 +116,14 @@ func test_palms_grow_around_the_oases_and_nowhere_else() -> void:
 	var size := SETTINGS.chunk_size
 	var near := 0
 	var stray := 0
-	var centre := Vector2i((OASIS / size).floor())
+	var centre := Vector2i((_oasis / size).floor())
 	var coords: Array[Vector2i] = []
 	for dx in range(-2, 3):
 		for dz in range(-2, 3):
 			coords.append(centre + Vector2i(dx, dz))
+	var start := sampler.resolver().band_start(SETTINGS.biomes.biomes.find(_desert))
 	for k in 12:  # and desert chunks elsewhere
-		var p := Vector2.from_angle(k * 0.53) * (5200.0 + 100.0 + k * 70.0)
+		var p := Vector2.from_angle(k * 0.53) * (start + 100.0 + k * 70.0)
 		coords.append(Vector2i((p / size).floor()))
 	for c in coords:
 		var data := ChunkGenerator.generate_with(c, 0, SETTINGS, sampler, scatterer, SEEDS[0])

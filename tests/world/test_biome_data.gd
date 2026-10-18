@@ -3,7 +3,15 @@ extends GdUnitTestSuite
 
 const TABLE_PATH: String = "res://data/biomes/biome_table.tres"
 const EXPECTED_ORDER: Array[StringName] = [
-	&"meadow", &"forest", &"river_valley", &"wetland", &"hills", &"mountains", &"desert", &"savanna"
+	&"meadow",
+	&"forest",
+	&"river_valley",
+	&"wetland",
+	&"hills",
+	&"lakes",
+	&"mountains",
+	&"desert",
+	&"savanna",
 ]
 
 var _table: BiomeTable
@@ -39,8 +47,8 @@ func test_bands_are_about_800_m_wide_and_the_mountains_and_desert_wider() -> voi
 			assert_float(biome.band_width).is_equal(1000.0)  # room for dunes and oases (ADR-009)
 		else:
 			assert_float(biome.band_width).is_between(600.0, 1000.0)
-	# Six 800 m bands, the 1.2 km mountains and the 1 km desert (ADR-009): a 7 km cycle.
-	assert_float(_table.sequence_length()).is_equal_approx(7000.0, 1.0)
+	# Seven 800 m bands, the 1.2 km mountains and the 1 km desert (ADR-010): a 7.8 km cycle.
+	assert_float(_table.sequence_length()).is_equal_approx(7800.0, 1.0)
 
 
 func test_blend_fits_inside_the_narrowest_band() -> void:

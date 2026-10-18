@@ -72,7 +72,10 @@ func test_draws_fog_land_and_water() -> void:
 
 
 func test_the_peaks_above_the_snow_line_are_white() -> void:
-	var peak := Vector2(4446.817, -1359.529)  # 195 m, seed 12345 (test_height_sampler)
+	var top: Vector3 = preload("res://tests/world/places.gd").highest_in(
+		TERRAIN, HeightSampler.new(TERRAIN, 12345), &"mountains", 0.3, 0.7, 8, 180
+	)
+	var peak := Vector2(top.x, top.z)  # the mountains' highest point (found, not fixed)
 	var explored := ExploredMap.new(EXPLORATION)
 	explored.reveal(Vector3(peak.x, 0, peak.y), EXPLORATION.reveal_radius)
 	var renderer := MapRenderer.new(

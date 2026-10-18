@@ -33,6 +33,9 @@ var _dune_sharpness: float
 var _mesa_amplitude: float
 var _mesa_threshold: float
 var _mesa_softness: float
+var _island_amplitude: float
+var _island_threshold: float
+var _island_softness: float
 var _world_seed: int
 var _oasis_cell: float
 var _oasis_chance: float
@@ -80,6 +83,9 @@ func _init(settings: TerrainSettings, world_seed: int) -> void:
 	_mesa_amplitude = settings.mesa_amplitude
 	_mesa_threshold = settings.mesa_threshold
 	_mesa_softness = settings.mesa_softness
+	_island_amplitude = settings.island_amplitude
+	_island_threshold = settings.island_threshold
+	_island_softness = settings.island_softness
 	_world_seed = world_seed
 	_oasis_cell = settings.oasis_cell
 	_oasis_chance = settings.oasis_chance
@@ -117,7 +123,8 @@ func sample_with_blend(x: float, z: float, blend: BiomeBlend) -> float:
 		blend.ridged_scale,
 		blend.dune_scale,
 		blend.mesa_scale,
-		blend.oasis_scale
+		blend.oasis_scale,
+		blend.island_scale
 	)
 
 
@@ -132,7 +139,8 @@ func sample_with_modifiers(
 	ridged_scale: float,
 	dune_scale: float = 0.0,
 	mesa_scale: float = 0.0,
-	oasis_scale: float = 0.0
+	oasis_scale: float = 0.0,
+	island_scale: float = 0.0
 ) -> float:
 	var continental := _continental.get_noise_2d(x, z)
 	var detail := _detail.get_noise_2d(x, z)
@@ -147,8 +155,8 @@ func sample_with_modifiers(
 		+ ridged * _ridged_amplitude * ridged_scale
 	)
 	var bowl := _oasis_bowl(x, z) * oasis_scale if oasis_scale > 0.0 else 0.0
-	if dune_scale > 0.0 or mesa_scale > 0.0:
-		height += _sand_layers(x, z, dune_scale, mesa_scale, bowl)
+	if dune_scale > 0.0 or mesa_scale > 0.0 or island_scale > 0.0:
+		height += _sand_layers(x, z, dune_scale, mesa_scale, bowl, island_scale)
 	if bowl > 0.0:
 		height = lerpf(height, minf(height, _oasis_bottom), bowl)
 	return height
@@ -208,9 +216,18 @@ func _cell_hash(cell_x: int, cell_z: int) -> int:
 ## at a mesa's edge so its top stays flat. Inside an oasis bowl ([param bowl] > 0) the mesas
 ## fade out, so no cliff rises beside the water. Returns the height added.
 func _sand_layers(
-	x: float, z: float, dune_scale: float, mesa_scale: float, bowl: float = 0.0
+	x: float,
+	z: float,
+	dune_scale: float,
+	mesa_scale: float,
+	bowl: float = 0.0,
+	island_scale: float = 0.0
 ) -> float:
 	var sand := _sand.get_noise_2d(x, z)
+	var isle := 0.0
+	if island_scale > 0.0:  # rounded, soft-shored islands (the lakes)
+		isle = smoothstep(_island_threshold, _island_threshold + _island_softness, sand)
+		isle *= _island_amplitude * island_scale
 	var plateau := 0.0
 	if mesa_scale > 0.0:
 		plateau = smoothstep(_mesa_threshold, _mesa_threshold + _mesa_softness, sand)
@@ -221,7 +238,7 @@ func _sand_layers(
 		var crest := pow(1.0 - absf(sin(phase)), _dune_sharpness)
 		var size := 0.55 + 0.45 * sand  # big and small dunes, not a regular washboard
 		out += crest * size * _dune_amplitude * dune_scale * (1.0 - plateau)
-	return out
+	return out + isle
 
 
 ## The biome resolver used by this sampler, or [code]null[/code] without a biome table.
@@ -240,6 +257,7 @@ func max_deviation() -> float:
 		+ _ridged_amplitude * m.w
 		+ _dune_amplitude * sand.x
 		+ _mesa_amplitude * sand.y
+		+ (_island_amplitude * _resolver.max_island() if _resolver != null else 0.0)
 		+ (
 			absf(_oasis_bottom - _base_height)
 			if _resolver != null and _resolver.has_oases()

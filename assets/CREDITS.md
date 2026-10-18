@@ -26,6 +26,7 @@ Every third-party asset in `assets/` must be listed here (see CLAUDE.md §1).
 | `tree_default` | `assets/environment/nature/tree_default.glb` | Kenney (kenney.nl), Nature Kit 2.1 | CC0 1.0 | https://kenney.nl/assets/nature-kit |
 | `tree_detailed` | `assets/environment/nature/tree_detailed.glb` | Kenney (kenney.nl), Nature Kit 2.1 | CC0 1.0 | https://kenney.nl/assets/nature-kit |
 | `tree_oak` | `assets/environment/nature/tree_oak.glb` | Kenney (kenney.nl), Nature Kit 2.1 | CC0 1.0 | https://kenney.nl/assets/nature-kit |
+| `tree_thin` | `assets/environment/nature/tree_thin.glb` | Kenney (kenney.nl), Nature Kit 2.1 | CC0 1.0 | https://kenney.nl/assets/nature-kit |
 | `cactus_tall` | `assets/environment/nature/cactus_tall.glb` | Kenney (kenney.nl), Nature Kit 2.1 | CC0 1.0 | https://kenney.nl/assets/nature-kit |
 | `cactus_short` | `assets/environment/nature/cactus_short.glb` | Kenney (kenney.nl), Nature Kit 2.1 | CC0 1.0 | https://kenney.nl/assets/nature-kit |
 | `tree_plateau` | `assets/environment/nature/tree_plateau.glb` | Kenney (kenney.nl), Nature Kit 2.1 | CC0 1.0 | https://kenney.nl/assets/nature-kit |
