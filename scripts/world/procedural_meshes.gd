@@ -198,6 +198,30 @@ static func critter(shape: StringName) -> ArrayMesh:
 					[Vector3(0.038, 0.23, -0.16), Vector3(0.01, 0.01, 0.01), eye],
 				]
 			)
+		&"otter":  # long and sleek, a thick tapering tail, a small round head, pale throat
+			var fur := Color(0.36, 0.25, 0.16)
+			var throat := Color(0.68, 0.58, 0.46)
+			var dark := Color(0.08, 0.06, 0.05)
+			return ellipsoids(
+				[
+					[Vector3(0, 0.12, 0.0), Vector3(0.09, 0.08, 0.26), fur],
+					[Vector3(0, 0.13, -0.24), Vector3(0.07, 0.07, 0.1), fur],  # the neck
+					[Vector3(0, 0.11, -0.22), Vector3(0.055, 0.05, 0.09), throat],
+					[Vector3(0, 0.16, -0.33), Vector3(0.06, 0.055, 0.065), fur],  # the head
+					[Vector3(0, 0.145, -0.39), Vector3(0.035, 0.03, 0.035), throat],  # muzzle
+					[Vector3(0, 0.15, -0.425), Vector3(0.012, 0.01, 0.01), dark],  # the nose
+					[Vector3(-0.03, 0.18, -0.37), Vector3(0.009, 0.009, 0.009), dark],
+					[Vector3(0.03, 0.18, -0.37), Vector3(0.009, 0.009, 0.009), dark],
+					[Vector3(-0.05, 0.2, -0.31), Vector3(0.014, 0.012, 0.008), fur],  # ears
+					[Vector3(0.05, 0.2, -0.31), Vector3(0.014, 0.012, 0.008), fur],
+					[Vector3(0, 0.1, 0.3), Vector3(0.05, 0.045, 0.12), fur],  # the tail, thick…
+					[Vector3(0, 0.085, 0.43), Vector3(0.025, 0.022, 0.08), fur],  # …tapering
+					[Vector3(-0.06, 0.04, -0.14), Vector3(0.025, 0.04, 0.03), dark],  # paws
+					[Vector3(0.06, 0.04, -0.14), Vector3(0.025, 0.04, 0.03), dark],
+					[Vector3(-0.06, 0.04, 0.14), Vector3(0.028, 0.04, 0.035), dark],
+					[Vector3(0.06, 0.04, 0.14), Vector3(0.028, 0.04, 0.035), dark],
+				]
+			)
 		&"marmot":  # chubby, brown with a paler belly and a dark short tail
 			var fur := Color(0.52, 0.4, 0.27)
 			var belly := Color(0.72, 0.6, 0.44)

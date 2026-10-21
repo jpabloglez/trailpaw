@@ -19,7 +19,9 @@ extends Resource
 ## scared, it whistles and runs into the burrow, [member flee_hop] being its dash, hides there
 ## for [member dive_seconds] and peeks out once the fox has gone; never above the snow line;
 ## a lizard is a quiet whistler that does not sit up, see [member alarm_call] and
-## [member sits_up]).
+## [member sits_up]) or [code]&"otter"[/code] (Phase 19: glides on the water, dives and comes
+## up elsewhere, floats on its back, climbs out on a bank to roll about; curious, it watches the
+## fox from [member keep_distance] instead of fleeing; startled, it dives).
 @export var behaviour: StringName = &"hopper"
 ## Amphibians live on ground up to this high above the water (m).
 @export_range(0.0, 5.0, 0.05, "suffix:m") var bank_height: float = 0.8
@@ -45,6 +47,14 @@ extends Resource
 @export var alarm_call: bool = true
 ## Whistlers: whether they sit up on their haunches now and then to keep watch.
 @export var sits_up: bool = true
+
+@export_group("Otters")
+## The fox within this distance (and not rushing at it) is watched with curiosity (m).
+@export_range(0.0, 50.0, 0.5, "suffix:m") var curious_radius: float = 0.0
+## A watching otter swims back to keep the fox at least this far (m).
+@export_range(0.0, 20.0, 0.5, "suffix:m") var keep_distance: float = 0.0
+## A family of this many (min, max) lives at each otter den of the islands (Phase 19).
+@export var den_family: Vector2i = Vector2i.ZERO
 
 @export_group("Moving")
 ## They graze within this distance of their home (m).

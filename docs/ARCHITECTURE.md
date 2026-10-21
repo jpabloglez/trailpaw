@@ -759,6 +759,10 @@ no AnimationTree.
   (`data/critters/<id>.tres`: biome counts, chance, hops, flee values). It is deterministic
   from (world seed, chunk, kind), so a chunk always brings back the same ones.
 - **`CritterSystem`** (in `world.tscn` and the terrain sandbox, `data/critters/system.tres`):
+  - Since Phase 19 it extends **`CritterCore`**, which holds the kinds, settings and packed
+    arrays and the shared low-level moves and checks: hops, splashes and plops, valid spots,
+    ground heights. `CritterSystem` keeps the behaviours and the public queries. The split
+    keeps both files under the 1000-line lint limit.
   - Keeps every critter in packed arrays: kind, chunk, home, hop from/to/progress/length/
     height, state (IDLE / HOP / FLEE), timer, yaw, scale, zig-zag sign. Removal swaps with the
     last entry, written out per array, because packed arrays are values in GDScript.
@@ -863,6 +867,24 @@ no AnimationTree.
   - Where and when: desert 1–2, savanna 1–3, out from 17:00 to 9:30 (dawn and dusk, and the
     cool night).
   - They flee like rabbits in long zig-zag bounds (1.8 m).
+- **Otters (Phase 19)** have their own `otter` behaviour (`otter.tres`; a long, sleek
+  procedural otter about 1 m from nose to tail tip).
+  - **Where:** lakes 1–3 and the river valley 1, in 25 % of chunks, in water at least 0.6 m
+    deep. Each island **otter den** gets a family of 3–4 when its chunk rolls (`den_family`).
+    They spawn in the water nearest the den, found on rings round it (≤ 256 samples, once).
+  - **Left alone**, between moves (2–5 s) an otter:
+    - glides about its home (14 m) in 2 m strokes
+    - dives (hidden 4–9 s) and comes up 3–10 m away, homeward if it has strayed
+    - floats on its back (`Pose.ON_BACK`: flipped and raised)
+    - swims to the nearest low, gentle bank (8 rays to 20 m), climbs out and rolls about
+      (`Pose.ROLLING`)
+    - from the bank, slides back in with a plop
+  - **Curious:** a fox within 12 m that isn't rushing is watched (the otter faces it). Within
+    5 m the otter backs off, swimming away or sliding into the water.
+  - **Startled** (within 2.5 m, or within 7 m with the fox faster than 3 m/s), it dives and
+    comes up beyond the fox's reach.
+  - It is drawn low in the water (−0.08 m), or raised on its back (+0.17 m) because the flipped
+    body hangs below its origin. `CritterSystem.pose_of()` and `is_swimming()` are for tests.
 - `CritterSystem.basis_of(i)` is the pose and size of a critter as drawn; `draw()` uses it,
   and tests read it.
 
