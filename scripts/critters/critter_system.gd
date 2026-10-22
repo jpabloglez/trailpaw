@@ -87,6 +87,8 @@ func _ready() -> void:
 		_whistle.unit_size = 8.0  # a sharp call that carries across the slope
 		_whistle.top_level = true
 		add_child(_whistle)
+	if kinds.any(func(kind: CritterKind) -> bool: return kind.behaviour == &"beaver"):
+		_beaver_parts()
 	EventBus.origin_shifted.connect(_on_origin_shifted)
 	if streamer != null:
 		streamer.chunks_changed.connect(sync_from_streamer)
@@ -126,6 +128,8 @@ func sync(lod0_coords: Array[Vector2i]) -> void:
 		if not available.has(_chunk[i]):
 			_remove(i)
 		i -= 1
+	if _lodges != null:
+		_lodges.keep_only(available)
 	for coord: Vector2i in _rolled.keys():
 		if not available.has(coord):
 			_rolled.erase(coord)  # rolls again (identically) when it comes back
@@ -153,13 +157,27 @@ func _roll(coord: Vector2i, amphibians: bool) -> void:
 		var tries := CritterPlan.CENTRE_TRIES
 		if kinds[k].behaviour in PLOPPING:
 			tries = 24
-		var spots := CritterPlan.roll(
+		if kinds[k].builds_lodge:  # the waterline is a thin strip: look harder
+			accept = _lodge_site.bind(kinds[k])
+			tries = 64
+		var group := CritterPlan.roll_group(
 			coord, terrain.chunk_size, biome, kinds[k], GameState.world_seed, accept, tries
 		)
+		var lodge := Vector3.INF
+		if kinds[k].builds_lodge and group[0] != Vector2.INF:
+			lodge = _build_lodge(coord, group[0])
+		var spots: PackedVector2Array = group[1]
 		for xz in spots:
 			if _kind.size() >= settings.max_total:
 				return
+			var before := _kind.size()
 			_spawn(k, coord, xz)
+			if lodge == Vector3.INF:
+				continue
+			if _kind.size() == before:  # the shallows by the lodge: in its deep water instead
+				_spawn(k, coord, _water_by(lodge, xz, kinds[k]))
+			if _kind.size() > before:
+				_home[before] = lodge
 		if not amphibians and kinds[k].den_family != Vector2i.ZERO:
 			_den_families(k, coord)
 
@@ -197,6 +215,9 @@ func tick(elapsed: float) -> void:
 			continue
 		if kind.behaviour == &"otter":
 			_otter_tick(i, kind, distance, at)
+			continue
+		if kind.behaviour == &"beaver":
+			_beaver_tick(i, kind, distance, at)
 			continue
 		if focus != null and _scared(kind, distance):
 			if _state[i] != State.FLEE:
@@ -238,7 +259,7 @@ func draw() -> void:
 		var at := _position(i)
 		if kinds[k].behaviour == &"swimmer":
 			at.y += sin(_time * 1.8 + _scale[i] * 40.0) * 0.012  # bobbing on the water
-		elif kinds[k].behaviour == &"otter" and is_swimming(i):
+		elif kinds[k].behaviour in SWIM_AND_WALK and is_swimming(i):
 			# Low in the water; on its back the flipped body hangs below its origin, so it rises.
 			at.y += (0.17 if _pose[i] == Pose.ON_BACK else -0.08) * _scale[i]
 		_meshes[k].multimesh.set_instance_transform(_counts[k], Transform3D(basis, at))
@@ -251,6 +272,8 @@ func draw() -> void:
 		_counts[k] += 1
 	for k in kinds.size():
 		_meshes[k].multimesh.visible_instance_count = _counts[k]
+	if _sticks != null:
+		_draw_sticks()
 
 
 ## Orientation, pose and size of critter [param i] as drawn now.
@@ -702,7 +725,8 @@ func _otter_slide(i: int, kind: CritterKind) -> void:
 			spot.y = GameState.water_level
 			if not _deep(spot, kind):
 				continue
-			_pose[i] = Pose.NONE
+			if _pose[i] != Pose.CARRYING:  # a beaver keeps its stick
+				_pose[i] = Pose.NONE
 			_from[i] = from
 			_to[i] = spot
 			_t[i] = 0.0
@@ -712,6 +736,206 @@ func _otter_slide(i: int, kind: CritterKind) -> void:
 			_state[i] = State.HOP
 			_plop_at(spot)
 			return
+
+
+## The beavers' lodges (null without beavers).
+func lodges() -> BeaverLodges:
+	return _lodges
+
+
+# A beaver's tick: inside the lodge it waits (longer while the fox is about); startled it slaps
+# its tail and dives into the lodge; otherwise, between moves, it swims to the shore, gnaws,
+# carries a stick home and goes in.
+func _beaver_tick(i: int, kind: CritterKind, distance: float, threat: Vector3) -> void:
+	match _state[i]:
+		State.DIVE:
+			if _t[i] >= 1.0:
+				_slap_at(_to[i])
+				_beaver_inside(i, kind)
+			return
+		State.UNDER:
+			if _timer[i] <= 0.0:
+				if distance < kind.flee_radius:
+					_timer[i] = 2.0  # the fox is still about: it stays in
+				else:
+					_beaver_out(i, kind)
+			return
+	if _scared(kind, distance):
+		_pose[i] = Pose.NONE  # it drops the stick
+		if is_swimming(i):
+			_slap_at(_to[i])
+			_beaver_inside(i, kind)
+		elif not _dive(i, kind, threat):  # into the water nearby, else a dash on land
+			_flee_hop(i, kind, threat)
+		return
+	if _t[i] >= 1.0:
+		_beaver_next(i, kind)
+
+
+# Between moves: a move just ended, it waits (gnawing on the bank), or it picks what is next.
+func _beaver_next(i: int, kind: CritterKind) -> void:
+	var home := _home[i]
+	var near_home := Vector2(_to[i].x - home.x, _to[i].z - home.z).length() < 4.0
+	if _state[i] == State.HOP:
+		_state[i] = State.IDLE
+		_timer[i] = _rng.randf_range(kind.idle_seconds.x, kind.idle_seconds.y)
+		if not is_swimming(i):
+			_timer[i] *= 2.0  # gnawing at a sapling
+		elif _pose[i] == Pose.CARRYING and near_home:
+			_beaver_inside(i, kind)  # the stick goes into the lodge
+		return
+	if _timer[i] > 0.0:
+		return
+	_timer[i] = _rng.randf_range(kind.idle_seconds.x, kind.idle_seconds.y)
+	if not is_swimming(i):
+		_pose[i] = Pose.CARRYING  # gnawed off a stick: back to the water with it
+		_otter_slide(i, kind)
+	elif _pose[i] == Pose.CARRYING:
+		if near_home:
+			_beaver_inside(i, kind)
+		else:
+			_otter_swim(i, kind, home)
+			if _state[i] != State.HOP:  # shallows ahead: a stroke round them
+				var angle := _rng.randf() * TAU
+				_otter_swim(i, kind, _to[i] + Vector3(cos(angle), 0.0, sin(angle)) * 2.0)
+	else:
+		var roll := _rng.randf()
+		if roll < 0.5:
+			_beaver_forage(i, kind)
+		elif roll < 0.8:
+			var angle := _rng.randf() * TAU
+			_otter_swim(i, kind, home + Vector3(cos(angle), 0.0, sin(angle)) * 4.0)
+		else:
+			_beaver_inside(i, kind)
+
+
+# Swims to a bank within [member CritterKind.home_radius] of the lodge and climbs out.
+func _beaver_forage(i: int, kind: CritterKind) -> void:
+	var from := _to[i]
+	_otter_climb_out(i, kind)
+	var home := _home[i]
+	var reach := Vector2(_to[i].x - home.x, _to[i].z - home.z).length()
+	if _state[i] == State.HOP and reach > kind.home_radius:
+		_to[i] = from  # too far from home
+		_t[i] = 1.0
+		_state[i] = State.IDLE
+
+
+# Into the lodge: hidden for [member CritterKind.dive_seconds].
+func _beaver_inside(i: int, kind: CritterKind) -> void:
+	_pose[i] = Pose.NONE
+	_from[i] = _to[i]
+	_t[i] = 1.0
+	_state[i] = State.UNDER
+	_timer[i] = _rng.randf_range(kind.dive_seconds.x, kind.dive_seconds.y)
+
+
+# Out of the lodge: in water deep enough 1.5–5 m from it (≤ 12 height samples).
+func _beaver_out(i: int, kind: CritterKind) -> void:
+	var home := _home[i]
+	for attempt in 12:
+		var angle := _rng.randf() * TAU
+		var spot := home + Vector3(cos(angle), 0.0, sin(angle)) * _rng.randf_range(1.5, 5.0)
+		spot.y = GameState.water_level
+		if not _deep(spot, kind):
+			continue
+		_from[i] = spot
+		_to[i] = spot
+		_t[i] = 1.0
+		_state[i] = State.IDLE
+		_timer[i] = _rng.randf_range(kind.idle_seconds.x, kind.idle_seconds.y)
+		return
+	_timer[i] = 1.0
+
+
+func _slap_at(at: Vector3) -> void:
+	slaps += 1
+	_splash(at)
+	if _slap != null and _slap.is_inside_tree():
+		_slap.global_position = at
+		_slap.pitch_scale = _rng.randf_range(0.9, 1.1)
+		_slap.play()
+
+
+# Whether absolute X/Z [param xz] suits a lodge: on the waterline (0.7 m under to 0.4 m above),
+# gentle, with water deep enough for [param kind] within 4 m (≤ 19 height samples).
+func _lodge_site(xz: Vector2, kind: CritterKind) -> bool:
+	if is_inf(GameState.water_level):
+		return false
+	var local := GameState.local_position(Vector3(xz.x, 0.0, xz.y))
+	local.y = _ground(local)
+	var height := local.y - GameState.water_level
+	if height < -0.7 or height > 0.4 or not _gentle(local, kind):
+		return false
+	for reach: float in [2.0, 4.0]:
+		for d in 8:
+			var spot := local + Vector3.FORWARD.rotated(Vector3.UP, d * TAU / 8.0) * reach
+			if _deep(spot, kind):
+				return true
+	return false
+
+
+# Absolute X/Z of water deep enough for [param kind] 2–4 m from the lodge at local [param lodge],
+# starting towards [param towards] (absolute; ≤ 16 height samples).
+func _water_by(lodge: Vector3, towards: Vector2, kind: CritterKind) -> Vector2:
+	var at := GameState.absolute_position(lodge)
+	var first := atan2(towards.y - at.z, towards.x - at.x)
+	for d in 8:
+		for reach: float in [2.0, 4.0]:
+			var spot := Vector2(at.x, at.z) + Vector2.from_angle(first + d * TAU / 8.0) * reach
+			if _deep(GameState.local_position(Vector3(spot.x, 0.0, spot.y)), kind):
+				return spot
+	return towards
+
+
+# Builds the lodge of a group of chunk [param coord] at absolute [param xz]; its local place.
+func _build_lodge(coord: Vector2i, xz: Vector2) -> Vector3:
+	var local := GameState.local_position(Vector3(xz.x, 0.0, xz.y))
+	local.y = _ground(local)
+	var yaw := float(absi(hash(coord)) % 628) / 100.0
+	_lodges.add(coord, local, yaw)
+	return local
+
+
+func _beaver_parts() -> void:
+	_lodges = BeaverLodges.new()
+	_lodges.name = "Lodges"
+	add_child(_lodges)
+	_sticks = MultiMeshInstance3D.new()
+	_sticks.name = "Sticks"
+	var multimesh := MultiMesh.new()
+	multimesh.transform_format = MultiMesh.TRANSFORM_3D
+	multimesh.mesh = ProceduralMeshes.stick()
+	multimesh.instance_count = 16
+	multimesh.visible_instance_count = 0
+	_sticks.multimesh = multimesh
+	var look := StandardMaterial3D.new()
+	look.vertex_color_use_as_albedo = true
+	look.roughness = 0.9
+	_sticks.material_override = look
+	add_child(_sticks)
+	_slap = AudioStreamPlayer3D.new()
+	_slap.stream = SynthSounds.slap()
+	_slap.bus = &"SFX"
+	_slap.unit_size = 10.0  # a crack that carries across the water
+	_slap.top_level = true
+	add_child(_slap)
+
+
+# The sticks in the teeth of the beavers carrying one.
+func _draw_sticks() -> void:
+	var multimesh := _sticks.multimesh
+	var n := 0
+	for i in _kind.size():
+		if n >= multimesh.instance_count or _pose[i] != Pose.CARRYING or not is_shown(i):
+			continue
+		var at := _position(i)
+		if is_swimming(i):
+			at.y -= 0.08 * _scale[i]
+		var mouth := Transform3D(basis_of(i), at) * Vector3(0.0, 0.15, -0.3)
+		multimesh.set_instance_transform(n, Transform3D(basis_of(i), mouth))
+		n += 1
+	multimesh.visible_instance_count = n
 
 
 # The family of each otter den (an island treasure) in chunk [param coord]: in the water

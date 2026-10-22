@@ -385,7 +385,7 @@ swimming to.
 - [x] The lake band: the island layer and clear water per chunk.
 - [x] Island treasures: an ancient tree, rare flowers, an otter den.
 - [x] Otters.
-- [ ] Beavers and their lodges.
+- [x] Beavers and their lodges.
 - [ ] Swans.
 
 **Tests:** mostly deep water with islands on every seed; the band crossable by swimming;

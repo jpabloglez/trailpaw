@@ -22,14 +22,28 @@ static func roll(
 	accept: Callable = Callable(),
 	tries: int = CENTRE_TRIES
 ) -> PackedVector2Array:
+	return roll_group(coord, chunk_size, biome_id, kind, world_seed, accept, tries)[1]
+
+
+## Like [method roll], with the group's centre: [code][centre: Vector2 (INF when none),
+## members: PackedVector2Array][/code] (a beaver group's lodge stands at its centre).
+static func roll_group(
+	coord: Vector2i,
+	chunk_size: float,
+	biome_id: StringName,
+	kind: CritterKind,
+	world_seed: int,
+	accept: Callable = Callable(),
+	tries: int = CENTRE_TRIES
+) -> Array:
 	var out := PackedVector2Array()
 	if not kind.biome_counts.has(biome_id) or kind.chance <= 0.0:
-		return out
+		return [Vector2.INF, out]
 	var rng := RandomNumberGenerator.new()
 	var chunk_seed := HeightSampler.layer_seed(world_seed, coord.x * 73856093 ^ coord.y * 19349663)
 	rng.seed = HeightSampler.layer_seed(chunk_seed, SALT ^ hash(kind.id))
 	if rng.randf() >= kind.chance:
-		return out
+		return [Vector2.INF, out]
 	var counts: Vector2i = kind.biome_counts[biome_id]
 	var count := rng.randi_range(counts.x, counts.y)
 	var margin := minf(kind.group_spread, chunk_size * 0.4)
@@ -46,9 +60,9 @@ static func roll(
 			centre = candidate
 			break
 	if centre == Vector2.INF:
-		return out
+		return [Vector2.INF, out]
 	for i in count:
 		var angle := rng.randf() * TAU
 		var distance := sqrt(rng.randf()) * kind.group_spread
 		out.append(centre + Vector2(cos(angle), sin(angle)) * distance)
-	return out
+	return [centre, out]

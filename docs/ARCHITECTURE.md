@@ -885,6 +885,29 @@ no AnimationTree.
     comes up beyond the fox's reach.
   - It is drawn low in the water (−0.08 m), or raised on its back (+0.17 m) because the flipped
     body hangs below its origin. `CritterSystem.pose_of()` and `is_swimming()` are for tests.
+- **Beavers (Phase 19)** have their own `beaver` behaviour (`beaver.tres`; a stout procedural
+  beaver with a flat paddle of a tail).
+  - **The lodge:** each group (`builds_lodge`) lives at a lodge on the waterline at its centre.
+    - `CritterPlan.roll_group()` gives the centre. The site must be 0.7 m under to 0.4 m above
+      the water, gentle, with water deep enough within 4 m; up to 64 tries, because the
+      waterline is thin.
+    - `BeaverLodges` (a child node) draws the lodges with one MultiMesh
+      (`ProceduralMeshes.lodge()`: a mud dome under 64 crossing sticks, ≈ 3 m across). Each
+      lodge has a cylinder collider on the world layer and follows rebases.
+    - Lodges come and go with their chunks.
+    - Group members that fall in the shallows spawn in the lodge's deep water instead.
+  - **Where:** lakes 2–3, wetland and river valley 1–2, in 50 % of chunks. That is ≈ 46 lodges
+    per 300 lake chunks, so a few round the fox in the lakes.
+  - **Left alone**, between moves (2–5 s):
+    - forage: swim to a bank within 15 m of the lodge and gnaw there
+    - come back with a stick (`Pose.CARRYING`; a second MultiMesh draws it in the teeth)
+    - go into the lodge (hidden 8–18 s)
+    - or swim about near it
+  - **Startled** (within 4 m, or within 9 m with the fox faster than 2 m/s): it **slaps its
+    tail** (`SynthSounds.slap()`: a crack over a 95 Hz thump and falling spray, with a splash)
+    and dives into the lodge. It stays in while the fox is within 9 m, then comes out
+    1.5–5 m from it.
+  - `CritterSystem.lodges()` and `slaps` are for tests.
 - `CritterSystem.basis_of(i)` is the pose and size of a critter as drawn; `draw()` uses it,
   and tests read it.
 

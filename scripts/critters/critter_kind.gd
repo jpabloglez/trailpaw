@@ -21,7 +21,10 @@ extends Resource
 ## a lizard is a quiet whistler that does not sit up, see [member alarm_call] and
 ## [member sits_up]) or [code]&"otter"[/code] (Phase 19: glides on the water, dives and comes
 ## up elsewhere, floats on its back, climbs out on a bank to roll about; curious, it watches the
-## fox from [member keep_distance] instead of fleeing; startled, it dives).
+## fox from [member keep_distance] instead of fleeing; startled, it dives) or
+## [code]&"beaver"[/code] (Phase 19: lives at its group's lodge, swims to the shore within
+## [member home_radius], gnaws, carries a stick back and goes into the lodge; startled, it
+## slaps its tail on the water and dives).
 @export var behaviour: StringName = &"hopper"
 ## Amphibians live on ground up to this high above the water (m).
 @export_range(0.0, 5.0, 0.05, "suffix:m") var bank_height: float = 0.8
@@ -55,6 +58,8 @@ extends Resource
 @export_range(0.0, 20.0, 0.5, "suffix:m") var keep_distance: float = 0.0
 ## A family of this many (min, max) lives at each otter den of the islands (Phase 19).
 @export var den_family: Vector2i = Vector2i.ZERO
+## Its group builds a lodge on the waterline at the group's centre (beavers, Phase 19).
+@export var builds_lodge: bool = false
 
 @export_group("Moving")
 ## They graze within this distance of their home (m).
