@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="CritterKind" format=3]
+
+[ext_resource type="Script" path="res://scripts/critters/critter_kind.gd" id="1_ck"]
+
+[resource]
+script = ExtResource("1_ck")
+id = &"beaver"
+shape = &"beaver"
+behaviour = &"beaver"
+bank_height = 1.0
+dive_seconds = Vector2(8, 18)
+min_depth = 0.6
+biome_counts = Dictionary[StringName, Vector2i]({
+&"lakes": Vector2i(2, 3),
+&"wetland": Vector2i(1, 2),
+&"river_valley": Vector2i(1, 2)
+})
+chance = 0.5
+scale_range = Vector2(0.9, 1.1)
+group_spread = 3.0
+builds_lodge = true
+home_radius = 15.0
+idle_seconds = Vector2(2, 5)
+graze_hop = Vector3(1.6, 0.08, 1.4)
+flee_hop = Vector3(1.4, 0.2, 0.35)
+zigzag = 20.0
+max_slope = 25.0
+flee_radius = 9.0
+flee_trigger_speed = 2.0
+startle_radius = 4.0
+calm_seconds = 4.0

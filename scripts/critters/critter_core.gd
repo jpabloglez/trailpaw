@@ -11,13 +11,16 @@ extends Node3D
 ## in its burrow).
 enum State { IDLE, HOP, FLEE, DIVE, UNDER, LEAP }
 
-## Poses an otter can hold ([method CritterSystem.pose_of]).
-enum Pose { NONE, ON_BACK, ROLLING }
+## Poses an otter or a beaver can hold ([method CritterSystem.pose_of]; CARRYING: a beaver with
+## a stick in its teeth).
+enum Pose { NONE, ON_BACK, ROLLING, CARRYING }
 
 ## Behaviours of dry land (no splashes, no water checks when rolling).
 const DRY: Array[StringName] = [&"hopper", &"curler", &"whistler"]
 ## Behaviours that plop into the water.
-const PLOPPING: Array[StringName] = [&"amphibian", &"leaper", &"otter"]
+const PLOPPING: Array[StringName] = [&"amphibian", &"leaper", &"otter", &"beaver"]
+## Behaviours that swim at the surface over water and walk on the banks.
+const SWIM_AND_WALK: Array[StringName] = [&"otter", &"beaver"]
 ## Directions a scared amphibian looks for water in (radians from straight away from the fox,
 ## nearest first; 12 around).
 const DIVE_TURNS: Array[float] = [
@@ -41,6 +44,8 @@ var splashes: int = 0
 var plops: int = 0
 ## Alarm whistles (a scared marmot) so far (tests and tools).
 var whistles: int = 0
+## Tail slaps (a startled beaver) so far (tests and tools).
+var slaps: int = 0
 
 var _sampler: HeightSampler
 var _sampler_seed: int = -1
@@ -74,6 +79,9 @@ var _next_splash: int = 0
 var _time: float = 0.0
 var _plop: AudioStreamPlayer3D
 var _whistle: AudioStreamPlayer3D
+var _slap: AudioStreamPlayer3D
+var _lodges: BeaverLodges
+var _sticks: MultiMeshInstance3D
 var _out := PackedByteArray()  # per kind: 1 while it is in its hours
 
 
@@ -187,7 +195,7 @@ func _surface(local: Vector3, kind: CritterKind) -> float:
 	if kind.behaviour == &"swimmer" or kind.behaviour == &"leaper":
 		return GameState.water_level
 	var ground := _ground(local)
-	if kind.behaviour == &"otter" and ground < GameState.water_level:
+	if kind.behaviour in SWIM_AND_WALK and ground < GameState.water_level:
 		return GameState.water_level  # swimming
 	return ground
 
@@ -198,10 +206,10 @@ func _valid_spot(local: Vector3, kind: CritterKind) -> bool:
 	if is_inf(GameState.water_level):
 		return false  # every other kind needs water
 	match kind.behaviour:
-		&"swimmer", &"leaper":
-			return _ground(local) <= GameState.water_level - kind.min_depth
-		&"otter":
+		&"swimmer", &"leaper", &"otter":
 			return _deep(local, kind)
+		&"beaver":
+			return _deep(local, kind) or _on_a_bank(local, kind)
 		&"wader":
 			return _wading(local, kind)
 	return _on_a_bank(local, kind)

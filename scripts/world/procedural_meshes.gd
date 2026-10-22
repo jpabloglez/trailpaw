@@ -60,6 +60,67 @@ static func build(shape: StringName) -> ArrayMesh:
 	return spheres([Vector4(0.0, 0.46, 0.0, 0.5)], Vector3(1.0, 0.9, 1.0), 8, 4)
 
 
+## A beaver lodge (Phase 19): a dome of sticks and mud ≈ 3 m across and 1.3 m high, standing
+## on its origin (set on the waterline, its foot under the water). Vertex coloured.
+static func lodge() -> ArrayMesh:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 0x10D6E
+	var sticks: Array = []
+	var mud := Color(0.3, 0.22, 0.15)
+	sticks.append([Vector3(0, 0.35, 0), Vector3(1.35, 0.85, 1.35), Basis.IDENTITY, mud])
+	for i in 64:
+		var around := rng.randf() * TAU
+		var up := rng.randf_range(0.0, 1.25)  # from the foot to near the top of the dome
+		var reach := 1.4 * cos(up)
+		var at := Vector3(cos(around) * reach, 0.35 + 0.85 * sin(up), sin(around) * reach)
+		var along := Vector3(-sin(around), 0.0, cos(around)).rotated(
+			at.normalized(), rng.randf_range(-1.2, 1.2)
+		)
+		var basis := Basis.looking_at(along, Vector3.UP if absf(along.y) < 0.95 else Vector3.RIGHT)
+		var shade := rng.randf_range(0.75, 1.15)
+		var colour := Color(0.42 * shade, 0.31 * shade, 0.2 * shade)
+		sticks.append([at, Vector3(0.035, 0.035, rng.randf_range(0.5, 0.9)), basis, colour])
+	return turned_ellipsoids(sticks, 6, 3)
+
+
+## A stick carried in a beaver's teeth (Phase 19): ≈ 0.7 m long along X, no material.
+static func stick() -> ArrayMesh:
+	return turned_ellipsoids(
+		[
+			[Vector3.ZERO, Vector3(0.35, 0.02, 0.02), Basis.IDENTITY, Color(0.45, 0.33, 0.2)],
+			[
+				Vector3(0.12, 0.03, 0.0),
+				Vector3(0.05, 0.03, 0.03),
+				Basis.IDENTITY,
+				Color(0.3, 0.45, 0.22)
+			],
+		],
+		6,
+		3
+	)
+
+
+## Like [method ellipsoids], each part also turned: [code][centre, radii, basis, colour][/code].
+static func turned_ellipsoids(parts: Array, radial_segments: int = 7, rings: int = 5) -> ArrayMesh:
+	var sphere := SphereMesh.new()
+	sphere.radial_segments = radial_segments
+	sphere.rings = rings
+	var source := sphere.get_mesh_arrays()
+	var unit_vertices: PackedVector3Array = source[Mesh.ARRAY_VERTEX]
+	var unit_indices: PackedInt32Array = source[Mesh.ARRAY_INDEX]
+	var tool := SurfaceTool.new()
+	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for part: Array in parts:
+		var centre: Vector3 = part[0]
+		var radii: Vector3 = part[1]
+		var basis: Basis = part[2]
+		tool.set_color(part[3])
+		for index in unit_indices:
+			tool.add_vertex(centre + basis * (unit_vertices[index] * 2.0 * radii))
+	tool.generate_normals()
+	return tool.commit()
+
+
 ## A rare island flower (Phase 19): a slender stem with a star of five petals round a pale heart,
 ## ≈ 0.3 m tall. The petals are white in the vertex colours (the instance colour tints them);
 ## stem and heart keep their own colours under it.
@@ -220,6 +281,30 @@ static func critter(shape: StringName) -> ArrayMesh:
 					[Vector3(0.06, 0.04, -0.14), Vector3(0.025, 0.04, 0.03), dark],
 					[Vector3(-0.06, 0.04, 0.14), Vector3(0.028, 0.04, 0.035), dark],
 					[Vector3(0.06, 0.04, 0.14), Vector3(0.028, 0.04, 0.035), dark],
+				]
+			)
+		&"beaver":  # stout and brown, a flat dark paddle of a tail, little ears, orange teeth
+			var fur := Color(0.4, 0.27, 0.16)
+			var pale := Color(0.55, 0.42, 0.3)
+			var dark := Color(0.12, 0.09, 0.07)
+			var teeth := Color(0.9, 0.55, 0.2)
+			return ellipsoids(
+				[
+					[Vector3(0, 0.15, 0.0), Vector3(0.13, 0.12, 0.2), fur],
+					[Vector3(0, 0.12, -0.05), Vector3(0.1, 0.09, 0.15), pale],
+					[Vector3(0, 0.18, -0.21), Vector3(0.08, 0.075, 0.08), fur],  # the head
+					[Vector3(0, 0.16, -0.28), Vector3(0.045, 0.04, 0.04), pale],  # the muzzle
+					[Vector3(0, 0.135, -0.31), Vector3(0.018, 0.016, 0.008), teeth],
+					[Vector3(0, 0.175, -0.315), Vector3(0.014, 0.01, 0.01), dark],  # the nose
+					[Vector3(-0.04, 0.21, -0.27), Vector3(0.01, 0.01, 0.01), dark],
+					[Vector3(0.04, 0.21, -0.27), Vector3(0.01, 0.01, 0.01), dark],
+					[Vector3(-0.06, 0.25, -0.18), Vector3(0.016, 0.014, 0.01), fur],  # ears
+					[Vector3(0.06, 0.25, -0.18), Vector3(0.016, 0.014, 0.01), fur],
+					[Vector3(0, 0.06, 0.3), Vector3(0.08, 0.018, 0.15), dark],  # the paddle
+					[Vector3(-0.08, 0.04, -0.1), Vector3(0.03, 0.04, 0.035), dark],  # paws
+					[Vector3(0.08, 0.04, -0.1), Vector3(0.03, 0.04, 0.035), dark],
+					[Vector3(-0.09, 0.04, 0.1), Vector3(0.035, 0.04, 0.045), dark],
+					[Vector3(0.09, 0.04, 0.1), Vector3(0.035, 0.04, 0.045), dark],
 				]
 			)
 		&"marmot":  # chubby, brown with a paler belly and a dark short tail

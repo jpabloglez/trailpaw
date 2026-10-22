@@ -12,6 +12,7 @@ static var _chime: AudioStreamWAV
 static var _hoot: AudioStreamWAV
 static var _whistle: AudioStreamWAV
 static var _cry: AudioStreamWAV
+static var _slap: AudioStreamWAV
 
 
 ## A small dog's friendly "yip": two quick chirps gliding down (~0.25 s). Synthesised once
@@ -52,6 +53,30 @@ static func cry() -> AudioStreamWAV:
 	if _cry == null:
 		_cry = _make_cry()
 	return _cry
+
+
+## A beaver's tail slap on the water: a sharp crack over a low thump, then the spray falling
+## back (~0.45 s). Synthesised once and shared.
+static func slap() -> AudioStreamWAV:
+	if _slap == null:
+		_slap = _make_slap()
+	return _slap
+
+
+static func _make_slap() -> AudioStreamWAV:
+	var samples := PackedFloat32Array()
+	var length := int(RATE * 0.45)
+	var noise := RandomNumberGenerator.new()
+	noise.seed = 11
+	var spray := 0.0
+	for i in length:
+		var t := float(i) / RATE
+		var crack := noise.randf_range(-1.0, 1.0) * exp(-t * 180.0)
+		var thump := sin(TAU * 95.0 * t) * exp(-t * 35.0)
+		spray = lerpf(spray, noise.randf_range(-1.0, 1.0), 0.35)  # a soft, low-passed hiss
+		var fall := spray * exp(-pow((t - 0.12) / 0.12, 2.0)) * 0.5
+		samples.append((crack * 0.9 + thump * 0.7 + fall) * 0.7)
+	return to_wav(samples)
 
 
 static func _make_cry() -> AudioStreamWAV:
