@@ -362,6 +362,8 @@ func get_debug_lines() -> PackedStringArray:
 func _graze_hop(i: int, kind: CritterKind) -> void:
 	var angle := _rng.randf() * TAU
 	var wanted := _home[i] + Vector3(cos(angle), 0.0, sin(angle)) * _rng.randf() * kind.home_radius
+	if kind.keeps_pair:
+		wanted = _beside_partner(i, wanted, angle)
 	var from := _to[i]
 	var offset := Vector3(wanted.x - from.x, 0.0, wanted.z - from.z)
 	if offset.length() < 0.05:

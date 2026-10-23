@@ -386,7 +386,7 @@ swimming to.
 - [x] Island treasures: an ancient tree, rare flowers, an otter den.
 - [x] Otters.
 - [x] Beavers and their lodges.
-- [ ] Swans.
+- [x] Swans.
 
 **Tests:** mostly deep water with islands on every seed; the band crossable by swimming;
 only the lakes have clear water; treasures only on true islands; each animal's behaviour, and

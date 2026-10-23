@@ -408,6 +408,26 @@ static func critter(shape: StringName) -> ArrayMesh:
 					[Vector3(0.042, 0.02, 0.03), Vector3(0.018, 0.014, 0.04), skin],
 				]
 			)
+		&"swan":  # large and white, a long curving neck, an orange beak with a black knob
+			var white := Color(0.97, 0.97, 0.95)
+			var orange := Color(0.95, 0.5, 0.15)
+			var black := Color(0.06, 0.05, 0.05)
+			return ellipsoids(
+				[
+					[Vector3(0, 0.14, 0.05), Vector3(0.24, 0.15, 0.42), white],
+					[Vector3(0, 0.24, 0.33), Vector3(0.14, 0.1, 0.16), white],  # the raised tail
+					[Vector3(-0.17, 0.2, 0.08), Vector3(0.07, 0.08, 0.3), white],  # folded wings
+					[Vector3(0.17, 0.2, 0.08), Vector3(0.07, 0.08, 0.3), white],
+					[Vector3(0, 0.27, -0.3), Vector3(0.06, 0.1, 0.06), white],  # the neck, rising…
+					[Vector3(0, 0.42, -0.36), Vector3(0.05, 0.1, 0.05), white],
+					[Vector3(0, 0.57, -0.36), Vector3(0.045, 0.09, 0.045), white],  # …curving
+					[Vector3(0, 0.69, -0.33), Vector3(0.05, 0.05, 0.06), white],  # the head
+					[Vector3(0, 0.67, -0.41), Vector3(0.022, 0.018, 0.05), orange],  # the beak
+					[Vector3(0, 0.69, -0.37), Vector3(0.02, 0.022, 0.018), black],  # its knob
+					[Vector3(-0.035, 0.7, -0.35), Vector3(0.008, 0.008, 0.008), black],
+					[Vector3(0.035, 0.7, -0.35), Vector3(0.008, 0.008, 0.008), black],
+				]
+			)
 		&"duck":
 			var eye := Color(0.05, 0.05, 0.05)
 			return ellipsoids(
