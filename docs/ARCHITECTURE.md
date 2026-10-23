@@ -908,6 +908,15 @@ no AnimationTree.
     and dives into the lodge. It stays in while the fox is within 9 m, then comes out
     1.5–5 m from it.
   - `CritterSystem.lodges()` and `slaps` are for tests.
+- **Swans (Phase 19)** are swimmers (`swan.tres`; a large white procedural swan with a long,
+  curving neck, about 1 m long).
+  - **Where:** pairs in the lakes and the wetland, in 35 % of chunks, on water at least 0.6 m
+    deep.
+  - **Pairs:** `keeps_pair` makes a calm swan glide to a spot 1.4 m from its partner, the
+    nearest of its kind in its chunk (`CritterCore._beside_partner()`). The two stay together,
+    and find each other again after fleeing.
+  - **Shy:** within 14 m with the fox faster than 1.2 m/s (so even walking), or within 6 m, they
+    glide away over the water and never fly.
 - `CritterSystem.basis_of(i)` is the pose and size of a critter as drawn; `draw()` uses it,
   and tests read it.
 

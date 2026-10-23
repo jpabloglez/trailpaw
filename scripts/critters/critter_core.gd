@@ -19,6 +19,8 @@ enum Pose { NONE, ON_BACK, ROLLING, CARRYING }
 const DRY: Array[StringName] = [&"hopper", &"curler", &"whistler"]
 ## Behaviours that plop into the water.
 const PLOPPING: Array[StringName] = [&"amphibian", &"leaper", &"otter", &"beaver"]
+## How far apart the two of a pair glide (m).
+const PAIR_GAP: float = 1.4
 ## Behaviours that swim at the surface over water and walk on the banks.
 const SWIM_AND_WALK: Array[StringName] = [&"otter", &"beaver"]
 ## Directions a scared amphibian looks for water in (radians from straight away from the fox,
@@ -188,6 +190,23 @@ func _plop_at(at: Vector3) -> void:
 		_plop.global_position = at
 		_plop.pitch_scale = _rng.randf_range(0.85, 1.2)
 		_plop.play()
+
+
+# A spot about [constant PAIR_GAP] from the partner of critter [param i] (the nearest of its kind
+# in its chunk; swans keep in pairs), or [param wanted] when it has none. ≤ the chunk's critters.
+func _beside_partner(i: int, wanted: Vector3, angle: float) -> Vector3:
+	var partner := -1
+	var best := INF
+	for j in _kind.size():
+		if j == i or _kind[j] != _kind[i] or _chunk[j] != _chunk[i]:
+			continue
+		var d := _to[j].distance_squared_to(_to[i])
+		if d < best:
+			best = d
+			partner = j
+	if partner < 0:
+		return wanted
+	return _to[partner] + Vector3(cos(angle), 0.0, sin(angle)) * PAIR_GAP
 
 
 # Where a critter of [param kind] at [param local] sits: the ground, or the water surface.

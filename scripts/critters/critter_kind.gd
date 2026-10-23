@@ -60,6 +60,9 @@ extends Resource
 @export var den_family: Vector2i = Vector2i.ZERO
 ## Its group builds a lodge on the waterline at the group's centre (beavers, Phase 19).
 @export var builds_lodge: bool = false
+## Calm, it glides to the side of its partner (the nearest of its kind in its chunk): swans
+## live in pairs (Phase 19).
+@export var keeps_pair: bool = false
 
 @export_group("Moving")
 ## They graze within this distance of their home (m).
