@@ -1256,6 +1256,26 @@ the critter layer (packed arrays, one MultiMesh, chunk-driven, origin-shifted), 
   quiet, gated by an RNG seeded from the world seed, each spell starting at a random point of
   its loop. A low continuous wind bed sits under every biome, so the pauses are never dead
   silence. There are no visible birds yet, which is why the birdsong stays sparse.
+- **Music** (Phase 20, ADR-011): `MusicDirector` in `world.tscn`, `data/audio/music.tres`
+  (`MusicSettings` with `MusicTheme`s). The music is original and all rights reserved
+  (`assets/audio/music/LICENSE.md`). It is composed and mastered outside the repo, to
+  −19 LUFS (night −22.5).
+  - **Themes:** one per biome, each with its day, dawn, dusk and night streams; a missing
+    moment plays the day's. The moments by hour are dawn 5–8, day 8–18, dusk 18–21 and
+    night 21–5. Only the meadow has one so far.
+  - **Spells:** a whole theme, then 120–300 s of silence (×0.4 with `Settings.music_frequency`
+    "often"; "never" is silent). The first theme of a game comes within 20–60 s, with a 4 s
+    fade-in.
+  - **Changes:** if the wanted theme changes mid-play, it fades out over 6 s and the new one
+    may start after 6–12 s. Changes are a biome held for 8 s (so borders don't flicker) or a
+    new moment.
+  - **Silence:** in the rain (`Weather.rain_here` > 0.3), while resting (`clock_scale` > 1)
+    and in a biome without a theme.
+  - **Title screen:** the attract world (`WorldController.music.title_mode`) plays the meadow
+    day theme at once and again after 20 s.
+  - The director counts the time left itself, so `advance(delta)` is testable headless.
+  - **Adding a theme:** master the OGGs with the music project's `tools/master.sh`, copy them
+    to `assets/audio/music/`, and add a `MusicTheme` to `music.tres`.
 - **Footsteps** (`FootstepAudio` on the Animal, `data/audio/footsteps.tres`): each
   `AnimationController.footstep` plays a random clip of the surface — water when wading
   (> 2 cm), bare ground in the hills, grass elsewhere — at a higher pitch (small paws) from a pool
@@ -1448,5 +1468,6 @@ Stored in `docs/adr/NNN-title.md`. Initial set:
 - [ADR-008](adr/008-mountain-band.md) A mountain band after the hills, with a relief profile and snow.
 - [ADR-009](adr/009-desert-and-savanna.md) Desert and savanna after the mountains: dune and mesa layers.
 - [ADR-010](adr/010-lake-band.md) Alpine lakes between the hills and the mountains: islands, clear water.
+- [ADR-011](adr/011-original-music.md) Original music in its own licence; the music director.
 
 New ADRs start from [`000-template.md`](adr/000-template.md).

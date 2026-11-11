@@ -32,6 +32,8 @@ const NEW_GAME_POSITION: Vector3 = Vector3(32.0, 30.0, 32.0)
 @export var encounters: EncounterTracker
 ## Builds the rural hamlets nearby (optional; the map marks those explored).
 @export var hamlets: HamletDirector
+## Plays the music (optional; the title theme behind the main menu).
+@export var music: MusicDirector
 
 ## Game to restore on start (null = new game with [member world_seed]).
 var pending_save: SaveData
@@ -144,6 +146,8 @@ func _place_animal(absolute: Vector3, yaw: float) -> void:
 
 func _enter_attract_mode() -> void:
 	saving_enabled = false
+	if music != null:
+		music.title_mode = true
 	spawner.auto_release = false
 	animal.visible = false
 	for child in get_children():

@@ -396,6 +396,22 @@ pays off, and the shores are alive.
 
 ---
 
+## Phase 20 — Music
+
+Original ambient music (composed in SuperCollider outside the repo; ADR-011), in spells
+between silences, by biome and moment of the day.
+
+- [x] The music director, the frequency setting and the meadow theme (also the title theme).
+- [ ] Themes for the other biomes, as the user renders them: forest, river valley, wetland,
+      hills, lakes, mountains, desert, savanna. Each is its OGGs and a `MusicTheme` line in
+      `data/audio/music.tres`.
+
+**Tests:** spells, fades on a change of biome or moment, settled biomes, silence in the rain
+and while resting, the frequency setting, the title screen.
+**Exit:** the music accompanies without tiring: it comes, it goes, and it is welcome.
+
+---
+
 ## Backlog (post-slice ideas)
 
 Gamepad support · more species selectable at start · seasons · photo mode · collectible
