@@ -86,6 +86,8 @@
 [ext_resource type="Script" path="res://scripts/critters/fireflies.gd" id="78_ffly"]
 [ext_resource type="Resource" path="res://data/critters/small_life.tres" id="79_small"]
 [ext_resource type="Script" path="res://scripts/world/island_director.gd" id="200_islands"]
+[ext_resource type="Script" path="res://scripts/audio/music_director.gd" id="204_music"]
+[ext_resource type="Resource" path="res://data/audio/music.tres" id="205_musicset"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_k7oal"]
 
@@ -105,7 +107,7 @@ fog_depth_curve = 1.6
 fog_depth_begin = 90.0
 fog_depth_end = 200.0
 
-[node name="World" type="Node3D" node_paths=PackedStringArray("streamer", "animal", "spawner", "biome_tracker", "exploration", "encounters", "hamlets")]
+[node name="World" type="Node3D" node_paths=PackedStringArray("streamer", "animal", "spawner", "biome_tracker", "exploration", "encounters", "hamlets", "music")]
 script = ExtResource("56_world")
 autosave = ExtResource("57_auto")
 streamer = NodePath("WorldStreamer")
@@ -115,6 +117,7 @@ biome_tracker = NodePath("BiomeTracker")
 exploration = NodePath("ExplorationTracker")
 encounters = NodePath("EncounterTracker")
 hamlets = NodePath("HamletDirector")
+music = NodePath("MusicDirector")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_atku0")
@@ -179,6 +182,11 @@ settings = ExtResource("49_wthset")
 day_night = NodePath("../DayNightCycle")
 wind = ExtResource("50_wind")
 terrain = ExtResource("3_u18in")
+
+[node name="MusicDirector" type="Node" parent="." node_paths=PackedStringArray("weather")]
+script = ExtResource("204_music")
+settings = ExtResource("205_musicset")
+weather = NodePath("../Weather")
 
 [node name="AmbienceDirector" type="Node" parent="." node_paths=PackedStringArray("day_night", "weather", "birds")]
 script = ExtResource("51_amb")

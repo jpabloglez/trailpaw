@@ -30,6 +30,8 @@ const QUALITY_PATHS: Dictionary[StringName, String] = {
 ## Audio buses in [code]default_bus_layout.tres[/code] order: everything goes through Master;
 ## the others are the groups players can set apart.
 const BUSES: Array[StringName] = [&"Master", &"Music", &"SFX", &"Ambience"]
+## How often music plays ([MusicDirector], Phase 20), in the menu's order.
+const MUSIC_FREQUENCIES: Array[StringName] = [&"often", &"sometimes", &"never"]
 ## Gameplay actions the player may rebind (debug keys are fixed).
 const REMAPPABLE: Array[StringName] = [
 	&"move_forward",
@@ -76,6 +78,8 @@ var mouse_sensitivity: float = 1.0
 var invert_y: bool = false
 ## A subtle camera shake on hard landings.
 var camera_shake: bool = true
+## How often music plays: one of [constant MUSIC_FREQUENCIES].
+var music_frequency: StringName = &"sometimes"
 ## Sprint: press once to run, again (or stop) to walk — instead of holding the key.
 var sprint_toggle: bool = false
 ## Rest: press once to lie down, again (or move) to get up — instead of holding the key.
@@ -191,6 +195,14 @@ func set_camera_shake(value: bool) -> void:
 	changed.emit(&"camera_shake")
 
 
+## How often music plays (one of [constant MUSIC_FREQUENCIES]; others are ignored).
+func set_music_frequency(value: StringName) -> void:
+	if value not in MUSIC_FREQUENCIES:
+		return
+	music_frequency = value
+	changed.emit(&"music_frequency")
+
+
 ## Binds [param action] to [param event] (a key, by physical keycode, or a mouse button) in
 ## place of its current bindings. Returns the action that already uses it (and changes nothing),
 ## or an empty name on success.
@@ -257,6 +269,7 @@ func save_settings() -> Error:
 	config.set_value("graphics", "fov", fov)
 	for bus in BUSES:
 		config.set_value("audio", String(bus), volume(bus))
+	config.set_value("audio", "music_frequency", String(music_frequency))
 	config.set_value("controls", "mouse_sensitivity", mouse_sensitivity)
 	config.set_value("controls", "invert_y", invert_y)
 	config.set_value("controls", "camera_shake", camera_shake)
@@ -288,6 +301,8 @@ func load_settings() -> void:
 	fov = clampf(float(config.get_value("graphics", "fov", fov)), 50.0, 100.0)
 	for bus in BUSES:
 		volumes[bus] = clampf(float(config.get_value("audio", String(bus), 1.0)), 0.0, 1.0)
+	var frequency := StringName(str(config.get_value("audio", "music_frequency", "sometimes")))
+	music_frequency = frequency if frequency in MUSIC_FREQUENCIES else &"sometimes"
 	mouse_sensitivity = clampf(
 		float(config.get_value("controls", "mouse_sensitivity", 1.0)), 0.2, 3.0
 	)

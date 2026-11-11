@@ -145,6 +145,9 @@ func _refresh() -> void:
 	(control("Sensitivity") as HSlider).set_value_no_signal(Settings.mouse_sensitivity)
 	(control("InvertY") as CheckBox).set_pressed_no_signal(Settings.invert_y)
 	(control("CameraShake") as CheckBox).set_pressed_no_signal(Settings.camera_shake)
+	(control("MusicFrequency") as OptionButton).select(
+		Settings.MUSIC_FREQUENCIES.find(Settings.music_frequency)
+	)
 	(control("SprintMode") as OptionButton).select(1 if Settings.sprint_toggle else 0)
 	(control("RestMode") as OptionButton).select(1 if Settings.rest_toggle else 0)
 	(control("ShowHints") as CheckBox).set_pressed_no_signal(Settings.hints.enabled)
@@ -197,6 +200,14 @@ func _audio_tab() -> Control:
 			func(v: float) -> void: Settings.set_volume(bus, v)
 		)
 		_row(grid, String(bus), slider)
+	var music := OptionButton.new()
+	music.name = "MusicFrequency"
+	for choice in ["Often", "Sometimes", "Never"]:
+		music.add_item(choice)
+	music.item_selected.connect(
+		func(i: int) -> void: Settings.set_music_frequency(Settings.MUSIC_FREQUENCIES[i])
+	)
+	_row(grid, "Music plays", music)
 	return grid.get_parent()
 
 

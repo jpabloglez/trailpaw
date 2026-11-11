@@ -101,5 +101,6 @@ Every third-party asset in `assets/` must be listed here (see CLAUDE.md §1).
 | `pluck_002` | `assets/audio/ui/pluck_002.ogg` | Kenney (kenney.nl), Interface Sounds | CC0 1.0 | https://kenney.nl/assets/interface-sounds |
 | `glass_002` | `assets/audio/ui/glass_002.ogg` | Kenney (kenney.nl), Interface Sounds | CC0 1.0 | https://kenney.nl/assets/interface-sounds |
 | `drop_002` | `assets/audio/ui/drop_002.ogg` | Kenney (kenney.nl), Interface Sounds | CC0 1.0 | https://kenney.nl/assets/interface-sounds |
+| Music (`music_*`) | `assets/audio/music/` | Juan Pablo G. González, original (SuperCollider) | **All rights reserved**, see `assets/audio/music/LICENSE.md` | — |
 
 The Nature Kit licence text is kept next to the models in `assets/environment/nature/License.txt`. Only a curated subset of the pack's 329 models is committed; add new ones here in the same pull request.
