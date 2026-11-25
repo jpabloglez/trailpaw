@@ -1389,6 +1389,10 @@ quadratic response); `restore_default_bindings()` reads the project InputMap. Wi
 headless. The `SettingsMenu` (Graphics / Audio / Controls tabs, built in code) opens from the
 main menu and the pause menu; changes apply at once; to rebind, click the action and press a key
 or mouse button (Esc cancels).
+Controls shows two binding buttons per action, keyboard/mouse and gamepad. A pad capture takes
+every pad event (so B can be bound rather than cancel); Esc, or Menu unless binding pause,
+cancels it; a stick or trigger counts past half way. `Settings.RESERVED` (the right stick's
+`camera_look_*`) cannot be taken ("Already used by Camera").
 **Without a mouse (gamepad backlog item):** `ui_accept` / `ui_cancel` add the pad's A / B to
 Godot's defaults (in `project.godot`). Every menu gives its first visible button the focus
 (`MenuStyle.focus_first`; pause and main menu also when shown again, deferred because a

@@ -2,8 +2,10 @@ class_name SettingsMenu
 extends CanvasLayer
 ## Settings with four tabs — Graphics, Audio, Controls, Interface — shared by the main menu and the
 ## pause menu. Every change applies at once through the [code]Settings[/code] autoload; closing
-## saves them. Controls lists every remappable action: click its button, then press a key or mouse
-## button (Esc cancels); a key used by another action is refused with a note. Built in code.
+## saves them. Controls lists every remappable action with two buttons, keyboard/mouse and
+## gamepad: click one, then press a key or mouse button (Esc cancels) or a pad button, trigger or
+## stick direction (Esc or Menu cancels); an input used by another action is refused with a
+## note. Built in code.
 ## [br][br]
 ## Without a mouse: the first control of the tab takes the focus, LB / RB switch tabs, and
 ## Esc or B cancels a capture or closes the menu.
@@ -28,6 +30,13 @@ const ACTION_NAMES: Dictionary[StringName, String] = {
 	&"journal": "Journal",
 	&"pause": "Pause",
 }
+## Names of the fixed actions a rebinding may clash with.
+const RESERVED_NAMES: Dictionary[StringName, String] = {
+	&"camera_look_left": "Camera",
+	&"camera_look_right": "Camera",
+	&"camera_look_up": "Camera",
+	&"camera_look_down": "Camera",
+}
 ## Quality preset ids in menu order.
 const QUALITY_IDS: Array[StringName] = [&"low", &"medium", &"high"]
 ## Text sizes offered (interface scale).
@@ -37,7 +46,9 @@ var _root: Control
 var _tabs: TabContainer
 var _status: Label
 var _capturing: StringName = &""
+var _capturing_pad: bool = false
 var _binding_buttons: Dictionary[StringName, Button] = {}
+var _pad_buttons: Dictionary[StringName, Button] = {}
 
 
 func _ready() -> void:
@@ -67,6 +78,9 @@ func _ready() -> void:
 
 func _input(event: InputEvent) -> void:
 	if _capturing == &"" or not visible:
+		return
+	if _capturing_pad:
+		_capture_pad_input(event)
 		return
 	var key := event as InputEventKey
 	var mouse := event as InputEventMouseButton
@@ -119,11 +133,19 @@ func close() -> void:
 	closed.emit()
 
 
-## Waits for the next key or mouse button for [param action].
-func begin_capture(action: StringName) -> void:
+## Waits for the next key or mouse button for [param action] or, with [param gamepad], the
+## next pad button, trigger or stick direction.
+func begin_capture(action: StringName, gamepad: bool = false) -> void:
+	_end_capture("")
 	_capturing = action
-	_binding_buttons[action].text = "Press a key…"
-	_status.text = "Press a key or mouse button for %s (Esc cancels)" % ACTION_NAMES[action]
+	_capturing_pad = gamepad
+	if gamepad:
+		_pad_buttons[action].text = "Press a button…"
+		var cancel := "Esc or Menu cancels" if action != &"pause" else "Esc cancels"
+		_status.text = "Press a gamepad button for %s (%s)" % [ACTION_NAMES[action], cancel]
+	else:
+		_binding_buttons[action].text = "Press a key…"
+		_status.text = "Press a key or mouse button for %s (Esc cancels)" % ACTION_NAMES[action]
 
 
 ## Binds the action being captured to [param event] (refused when another action uses it).
@@ -136,7 +158,8 @@ func capture(event: InputEvent) -> void:
 	elif conflict == &"?":
 		_end_capture("That input cannot be used")
 	else:
-		_end_capture("Already used by %s" % ACTION_NAMES.get(conflict, String(conflict)))
+		var who: String = ACTION_NAMES.get(conflict, RESERVED_NAMES.get(conflict, String(conflict)))
+		_end_capture("Already used by %s" % who)
 
 
 ## The control named [param node_name] (tests and tools).
@@ -151,9 +174,40 @@ func status_text() -> String:
 
 func _end_capture(note: String) -> void:
 	if _capturing != &"" and _binding_buttons.has(_capturing):
-		_binding_buttons[_capturing].text = InputBinding.action_text(_capturing)
+		_show_bindings(_capturing)
 	_capturing = &""
+	_capturing_pad = false
 	_status.text = note
+
+
+# While waiting for a pad input every pad event is taken here (so B can be bound rather than
+# cancel, and the sticks do not move the focus); Esc, or Menu (unless binding pause), cancels.
+func _capture_pad_input(event: InputEvent) -> void:
+	var key := event as InputEventKey
+	if key != null:
+		if key.pressed and not key.echo and key.physical_keycode == KEY_ESCAPE:
+			get_viewport().set_input_as_handled()
+			_end_capture("")
+		return
+	if not InputBinding.is_gamepad(event):
+		return
+	get_viewport().set_input_as_handled()
+	var button := event as InputEventJoypadButton
+	if button != null and button.pressed:
+		if button.button_index == JOY_BUTTON_START and _capturing != &"pause":
+			_end_capture("")
+		else:
+			capture(event)
+		return
+	var motion := event as InputEventJoypadMotion
+	if motion != null and absf(motion.axis_value) >= 0.5:
+		capture(event)
+
+
+func _show_bindings(action: StringName) -> void:
+	_binding_buttons[action].text = InputBinding.action_text(action)
+	var pad := InputBinding.action_text(action, true)
+	_pad_buttons[action].text = pad if pad != "" else "—"
 
 
 func _refresh() -> void:
@@ -181,7 +235,7 @@ func _refresh() -> void:
 		maxi(0, UI_SCALES.find(snappedf(Settings.ui_scale, 0.1)))
 	)
 	for action: StringName in _binding_buttons:
-		_binding_buttons[action].text = InputBinding.action_text(action)
+		_show_bindings(action)
 
 
 func _graphics_tab() -> Control:
@@ -259,13 +313,18 @@ func _controls_tab() -> Control:
 	_row(grid, "Camera shake", shake)
 	_row(grid, "Run", _hold_or_toggle("SprintMode", Settings.set_sprint_toggle))
 	_row(grid, "Rest", _hold_or_toggle("RestMode", Settings.set_rest_toggle))
+	var heads := HBoxContainer.new()
+	for title in ["Keyboard / mouse", "Gamepad"]:
+		var head := Label.new()
+		head.text = title
+		head.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		heads.add_child(head)
+	_row(grid, "", heads)
 	for action: StringName in ACTION_NAMES:
-		var b := Button.new()
-		b.name = "Bind_" + String(action)
-		b.custom_minimum_size = Vector2(200, 32)
-		b.pressed.connect(begin_capture.bind(action))
-		_binding_buttons[action] = b
-		_row(grid, ACTION_NAMES[action], b)
+		var pair := HBoxContainer.new()
+		_binding_buttons[action] = _bind_button(pair, "Bind_" + String(action), action, false)
+		_pad_buttons[action] = _bind_button(pair, "PadBind_" + String(action), action, true)
+		_row(grid, ACTION_NAMES[action], pair)
 	var restore := Button.new()
 	restore.name = "RestoreDefaults"
 	restore.text = "Restore defaults"
@@ -300,6 +359,17 @@ func _interface_tab() -> Control:
 	)
 	_row(grid, "", again)
 	return grid.get_parent()
+
+
+func _bind_button(parent: Control, node_name: String, action: StringName, pad: bool) -> Button:
+	var b := Button.new()
+	b.name = node_name
+	b.custom_minimum_size = Vector2(150, 32)
+	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	b.clip_text = true
+	b.pressed.connect(begin_capture.bind(action, pad))
+	parent.add_child(b)
+	return b
 
 
 func _hold_or_toggle(node_name: String, on_change: Callable) -> OptionButton:

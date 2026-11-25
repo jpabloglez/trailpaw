@@ -51,6 +51,10 @@ const REMAPPABLE: Array[StringName] = [
 	&"journal",
 	&"pause",
 ]
+## Fixed actions whose inputs a rebinding may not take (the right stick looks around).
+const RESERVED: Array[StringName] = [
+	&"camera_look_left", &"camera_look_right", &"camera_look_up", &"camera_look_down"
+]
 ## Where settings are kept (tests point it elsewhere).
 const DEFAULT_PATH: String = "user://settings.cfg"
 ## Window sizes offered (windowed mode).
@@ -221,7 +225,7 @@ func rebind(action: StringName, event: InputEvent) -> StringName:
 	var normal := InputBinding.normalise(event)
 	if normal == null or not REMAPPABLE.has(action):
 		return &"?"
-	for other in REMAPPABLE:
+	for other in REMAPPABLE + RESERVED:
 		if other != action and InputMap.action_has_event(other, normal):
 			return other
 	_erase_kind(action, InputBinding.is_gamepad(normal))

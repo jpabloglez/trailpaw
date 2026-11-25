@@ -73,6 +73,56 @@ func test_escape_cancels_a_capture() -> void:
 	assert_bool(InputMap.action_has_event(&"jump", _key(KEY_SPACE))).is_true()
 
 
+func _pad(button: JoyButton) -> InputEventJoypadButton:
+	var event := InputEventJoypadButton.new()
+	event.button_index = button
+	event.pressed = true
+	return event
+
+
+func test_the_gamepad_column_shows_and_captures_pad_inputs() -> void:
+	var menu := _menu()
+	var pad_jump := menu.control("PadBind_jump") as Button
+	assert_str(pad_jump.text).is_equal("A")
+	assert_str((menu.control("Bind_jump") as Button).text).is_equal("Space")
+	menu.begin_capture(&"jump", true)
+	assert_str(pad_jump.text).is_equal("Press a button…")
+	menu._input(_key(KEY_K))  # keys are not taken while waiting for a pad input
+	assert_str(pad_jump.text).is_equal("Press a button…")
+	var trigger := InputEventJoypadMotion.new()
+	trigger.axis = JOY_AXIS_TRIGGER_LEFT
+	trigger.axis_value = 0.2  # not pushed far enough yet
+	menu._input(trigger)
+	assert_str(pad_jump.text).is_equal("Press a button…")
+	trigger.axis_value = 0.9
+	menu._input(trigger)
+	assert_str(pad_jump.text).is_equal("LT")
+	assert_str((menu.control("Bind_jump") as Button).text).is_equal("Space")  # untouched
+	assert_str(menu.status_text()).is_empty()
+
+
+func test_b_can_be_bound_and_menu_cancels_a_pad_capture() -> void:
+	var menu := _menu()
+	menu.begin_capture(&"sniff", true)
+	menu._input(_pad(JOY_BUTTON_B))  # rest's button: refused, but not a cancel
+	assert_str(menu.status_text()).is_equal("Already used by Rest")
+	menu.begin_capture(&"sniff", true)
+	menu._input(_pad(JOY_BUTTON_START))
+	assert_str((menu.control("PadBind_sniff") as Button).text).is_equal("Y")
+	assert_str(menu.status_text()).is_empty()
+
+
+func test_the_right_stick_is_kept_for_the_camera() -> void:
+	var menu := _menu()
+	menu.begin_capture(&"jump", true)
+	var stick := InputEventJoypadMotion.new()
+	stick.axis = JOY_AXIS_RIGHT_X
+	stick.axis_value = 1.0
+	menu._input(stick)
+	assert_str(menu.status_text()).is_equal("Already used by Camera")
+	assert_str((menu.control("PadBind_jump") as Button).text).is_equal("A")
+
+
 func test_closing_saves_the_settings() -> void:
 	var menu := _menu()
 	var closed: Array[int] = [0]
