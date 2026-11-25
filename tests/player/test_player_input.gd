@@ -17,6 +17,7 @@ func before_test() -> void:
 
 
 func after_test() -> void:
+	InputDevice.set_gamepad(false)  # pad events in other suites switch it
 	for action: StringName in [&"move_forward", &"move_right", &"sprint", &"jump", &"rest"]:
 		Input.action_release(action)
 	Settings.set_sprint_toggle(false)

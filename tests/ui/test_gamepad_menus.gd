@@ -13,6 +13,7 @@ func before_test() -> void:
 
 
 func after_test() -> void:
+	InputDevice.set_gamepad(false)  # pad events in other suites switch it
 	get_tree().paused = false
 	Settings.config_path = _saved_path
 	if FileAccess.file_exists(TEST_PATH):

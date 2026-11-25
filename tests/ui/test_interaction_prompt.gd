@@ -5,6 +5,10 @@ const ANIMAL_SCENE: String = "res://scenes/player/animal.tscn"
 const PROMPT_SCENE: String = "res://scenes/ui/interaction_prompt.tscn"
 
 
+func before_test() -> void:
+	InputDevice.set_gamepad(false)  # pad events in other suites switch it
+
+
 func _setup() -> Array:
 	var floor_body: StaticBody3D = auto_free(StaticBody3D.new())
 	var shape := CollisionShape3D.new()
