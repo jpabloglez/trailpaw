@@ -5,6 +5,8 @@
 [resource]
 script = ExtResource("1_d5fbo")
 mouse_sensitivity = 0.003
+stick_yaw_speed = 2.5
+stick_pitch_speed = 1.5
 pitch_min_degrees = -70.0
 pitch_max_degrees = 20.0
 default_pitch_degrees = -18.0

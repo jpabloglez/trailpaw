@@ -10,7 +10,11 @@ extends Resource
 @export_group("Look")
 ## Orbit speed per pixel of mouse motion.
 @export_range(0.0001, 0.02, 0.0001, "suffix:rad/px") var mouse_sensitivity: float = 0.0
-## Invert vertical mouse look.
+## Orbit speed with the right stick fully pushed sideways.
+@export_range(0.1, 10.0, 0.1, "suffix:rad/s") var stick_yaw_speed: float = 2.5
+## Orbit speed with the right stick fully pushed up or down.
+@export_range(0.1, 10.0, 0.1, "suffix:rad/s") var stick_pitch_speed: float = 1.5
+## Invert vertical look (mouse and right stick).
 @export var invert_y: bool = false
 ## Lowest pitch (looking down). Negative values look down.
 @export_range(-89.0, 0.0, 1.0, "suffix:°") var pitch_min_degrees: float = 0.0

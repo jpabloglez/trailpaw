@@ -1,8 +1,9 @@
 class_name CameraRig
 extends Node3D
-## Third-person orbit camera: follows a target with lag, orbits with the captured mouse,
-## zooms with the wheel, avoids walls with a [SpringArm3D] and swings back behind the
-## target while it moves and the player is not looking around.
+## Third-person orbit camera: follows a target with lag, orbits with the captured mouse or the
+## right stick ([code]camera_look_*[/code] actions), zooms with the wheel or the shoulder
+## buttons, avoids walls with a [SpringArm3D] and swings back behind the target while it moves
+## and the player is not looking around.
 ##
 ## Runs in [method _process] on the target's interpolated transform (physics
 ## interpolation is on project-wide) so the camera stays smooth above 60 Hz.
@@ -87,6 +88,12 @@ func _process(delta: float) -> void:
 	var target_speed := Vector2(goal.x - _previous_goal.x, goal.z - _previous_goal.z).length()
 	target_speed /= maxf(delta, 1e-5)
 	_previous_goal = goal
+	apply_stick_look(
+		Input.get_vector(
+			&"camera_look_left", &"camera_look_right", &"camera_look_up", &"camera_look_down"
+		),
+		delta
+	)
 	global_position = global_position.lerp(goal, smoothing_weight(settings.follow_smoothing, delta))
 	_arm.spring_length = lerpf(
 		_arm.spring_length, _zoom_target, smoothing_weight(settings.zoom_smoothing, delta)
@@ -141,6 +148,21 @@ func apply_look(relative: Vector2) -> void:
 	var vertical := relative.y * (-1.0 if inverted else 1.0)
 	var speed := settings.mouse_sensitivity * Settings.mouse_sensitivity
 	_yaw.rotation.y = wrapf(_yaw.rotation.y - relative.x * speed, -PI, PI)
+	_pitch.rotation.x = clamp_pitch(_pitch.rotation.x - vertical * speed, settings)
+	_time_since_look = 0.0
+
+
+## Orbits for [param delta] seconds with the right stick at [param stick] (each axis −1…1,
+## past the dead zone). The response is quadratic so small pushes aim finely. Resets the
+## auto-recentre timer while the stick is pushed.
+func apply_stick_look(stick: Vector2, delta: float) -> void:
+	if stick == Vector2.ZERO:
+		return
+	var shaped := stick * stick.length()
+	var inverted := settings.invert_y != Settings.invert_y
+	var speed := Settings.stick_sensitivity * delta
+	var vertical := shaped.y * (-1.0 if inverted else 1.0) * settings.stick_pitch_speed
+	_yaw.rotation.y = wrapf(_yaw.rotation.y - shaped.x * settings.stick_yaw_speed * speed, -PI, PI)
 	_pitch.rotation.x = clamp_pitch(_pitch.rotation.x - vertical * speed, settings)
 	_time_since_look = 0.0
 

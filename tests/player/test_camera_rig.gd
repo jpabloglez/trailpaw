@@ -123,6 +123,47 @@ func test_look_orbits_and_respects_pitch_limit() -> void:
 	assert_float(rig.pitch()).is_equal_approx(deg_to_rad(_settings.pitch_min_degrees), EPSILON)
 
 
+func test_stick_look_orbits_by_speed_and_time_with_a_gentle_centre() -> void:
+	var rig := _make_rig(_make_target())
+	rig.apply_stick_look(Vector2(1.0, 0.0), 0.1)
+	assert_float(rig.yaw()).is_equal_approx(-_settings.stick_yaw_speed * 0.1, EPSILON)
+	var yaw_before := rig.yaw()
+	rig.apply_stick_look(Vector2(0.5, 0.0), 0.1)  # half push turns a quarter as fast
+	assert_float(rig.yaw() - yaw_before).is_equal_approx(
+		-_settings.stick_yaw_speed * 0.1 * 0.25, EPSILON
+	)
+	var pitch_before := rig.pitch()
+	rig.apply_stick_look(Vector2(0.0, -1.0), 0.1)  # stick up looks up
+	assert_float(rig.pitch() - pitch_before).is_equal_approx(
+		_settings.stick_pitch_speed * 0.1, EPSILON
+	)
+	for i in 100:
+		rig.apply_stick_look(Vector2(0.0, 1.0), 0.1)
+	assert_float(rig.pitch()).is_equal_approx(deg_to_rad(_settings.pitch_min_degrees), EPSILON)
+
+
+func test_stick_look_follows_the_player_sensitivity_and_invert_y() -> void:
+	var rig := _make_rig(_make_target())
+	Settings.set_stick_sensitivity(2.0)
+	rig.apply_stick_look(Vector2(1.0, 0.0), 0.1)
+	assert_float(rig.yaw()).is_equal_approx(-_settings.stick_yaw_speed * 0.2, EPSILON)
+	Settings.set_stick_sensitivity(1.0)
+	Settings.set_invert_y(true)
+	var pitch_before := rig.pitch()
+	rig.apply_stick_look(Vector2(0.0, -1.0), 0.1)
+	Settings.set_invert_y(false)
+	assert_float(rig.pitch()).is_less(pitch_before)
+
+
+func test_a_centred_stick_changes_nothing() -> void:
+	var rig := _make_rig(_make_target())
+	var yaw_before := rig.yaw()
+	var pitch_before := rig.pitch()
+	rig.apply_stick_look(Vector2.ZERO, 0.1)
+	assert_float(rig.yaw()).is_equal(yaw_before)
+	assert_float(rig.pitch()).is_equal(pitch_before)
+
+
 func test_auto_recentre_swings_behind_moving_target_after_delay() -> void:
 	var target := _make_target()
 	var rig := _make_rig(target)

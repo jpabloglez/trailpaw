@@ -99,7 +99,7 @@ func test_rebinding_to_a_mouse_button_and_its_name() -> void:
 	var middle := InputEventMouseButton.new()
 	middle.button_index = MOUSE_BUTTON_MIDDLE
 	assert_str(String(Settings.rebind(&"sniff", middle))).is_empty()
-	assert_str(Settings.binding_text(&"sniff")).is_equal("Middle Click")
+	assert_str(InputBinding.action_text(&"sniff")).is_equal("Middle Click")
 
 
 func test_debug_actions_cannot_be_rebound() -> void:

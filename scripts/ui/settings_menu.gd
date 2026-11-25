@@ -126,7 +126,7 @@ func status_text() -> String:
 
 func _end_capture(note: String) -> void:
 	if _capturing != &"" and _binding_buttons.has(_capturing):
-		_binding_buttons[_capturing].text = Settings.binding_text(_capturing)
+		_binding_buttons[_capturing].text = InputBinding.action_text(_capturing)
 	_capturing = &""
 	_status.text = note
 
@@ -143,6 +143,7 @@ func _refresh() -> void:
 	for bus in Settings.BUSES:
 		(control("Volume" + String(bus)) as HSlider).set_value_no_signal(Settings.volume(bus))
 	(control("Sensitivity") as HSlider).set_value_no_signal(Settings.mouse_sensitivity)
+	(control("StickSensitivity") as HSlider).set_value_no_signal(Settings.stick_sensitivity)
 	(control("InvertY") as CheckBox).set_pressed_no_signal(Settings.invert_y)
 	(control("CameraShake") as CheckBox).set_pressed_no_signal(Settings.camera_shake)
 	(control("MusicFrequency") as OptionButton).select(
@@ -155,7 +156,7 @@ func _refresh() -> void:
 		maxi(0, UI_SCALES.find(snappedf(Settings.ui_scale, 0.1)))
 	)
 	for action: StringName in _binding_buttons:
-		_binding_buttons[action].text = Settings.binding_text(action)
+		_binding_buttons[action].text = InputBinding.action_text(action)
 
 
 func _graphics_tab() -> Control:
@@ -217,6 +218,11 @@ func _controls_tab() -> Control:
 		grid,
 		"Mouse sensitivity",
 		_slider("Sensitivity", 0.2, 3.0, 0.05, Settings.set_mouse_sensitivity)
+	)
+	_row(
+		grid,
+		"Stick sensitivity",
+		_slider("StickSensitivity", 0.2, 3.0, 0.05, Settings.set_stick_sensitivity)
 	)
 	var invert := CheckBox.new()
 	invert.name = "InvertY"

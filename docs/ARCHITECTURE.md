@@ -11,7 +11,7 @@ Status: living document. Update it whenever a system's contract changes.
 | Frame budget | 16.6 ms total; main-thread world streaming ≤ 2 ms/frame; AI ≤ 1.5 ms/frame |
 | Memory | ≤ 3 GB RAM, ≤ 1.5 GB VRAM on Medium |
 | World | Effectively endless, seeded, deterministic; biomes change with travelled distance |
-| Input | Keyboard + mouse first, fully remappable; gamepad later |
+| Input | Keyboard + mouse and gamepad, fully remappable |
 | Art direction | Stylized / low-poly with soft lighting and fog — cheap to render, readable, cozy |
 
 The art direction is a technical decision: flat-shaded or lightly textured assets, vertex
@@ -437,21 +437,23 @@ Phase 11 polish item.
 
 ### 4.5 Default input map
 
-| Action | Default |
-|---|---|
-| `move_forward/back/left/right` | W / S / A / D |
-| `sprint` | Shift (hold) |
-| `jump` | Space |
-| `interact` | E / left click on highlighted target |
-| `sniff` (highlight nearby resources) | Q |
-| `rest` | R (hold) |
-| `camera_zoom_in` / `camera_zoom_out` | Mouse wheel up / down |
-| `map` (Phase 10b) | M |
-| `pause` | Esc |
-| `toggle_debug_overlay` (debug) | F3 |
-| `toggle_free_fly` (debug) | F4 |
-| `debug_refill_needs` (debug) | F5 |
-| *camera orbit* | Mouse move (captured) — not an action, see below |
+| Action | Keyboard / mouse | Gamepad (Xbox names) |
+|---|---|---|
+| `move_forward/back/left/right` | W / S / A / D | Left stick |
+| `sprint` | Shift (hold) | RT |
+| `jump` | Space | A |
+| `interact` | E / left click on highlighted target | X |
+| `sniff` (highlight nearby resources) | Q | Y |
+| `rest` | R (hold) | B |
+| `camera_zoom_in` / `camera_zoom_out` | Mouse wheel up / down | RB / LB |
+| `map` (Phase 10b) | M | View |
+| `journal` (Phase 15) | J | D-pad left |
+| `pause` | Esc | Menu (Start) |
+| `camera_look_left/right/up/down` | — | Right stick (not remappable) |
+| `toggle_debug_overlay` (debug) | F3 | — |
+| `toggle_free_fly` (debug) | F4 | — |
+| `debug_refill_needs` (debug) | F5 | — |
+| *camera orbit* | Mouse move (captured) — not an action, see below | Right stick |
 
 All actions are defined in `project.godot` `InputMap` and remappable at runtime. Keys are
 bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZERTY).
@@ -1376,9 +1378,13 @@ quality preset, fullscreen, window size (1280×720 … 2560×1440), render scale
 `scaling_3d_scale`), V-Sync, field of view (50–100°), mouse sensitivity multiplier (0.2–3) and
 invert Y (the `CameraRig` multiplies its tuned sensitivity and follows FOV through
 `Settings.changed`), volumes per bus, and **key bindings** for the gameplay actions in
-`Settings.REMAPPABLE` (debug keys stay fixed): stored by physical key or mouse button;
-`rebind()` refuses an input already used by another action and replaces all of the action's
-bindings; `restore_default_bindings()` reads the project InputMap. Window and V-Sync are skipped
+`Settings.REMAPPABLE` (debug keys stay fixed): stored by physical key, mouse button, gamepad
+button or gamepad axis direction (gamepad events use device −1, any pad); `rebind()` refuses an
+input already used by another action and replaces only the action's bindings of the same kind
+(keyboard/mouse or gamepad), and a file without gamepad entries keeps the default pad bindings;
+`InputBinding` (`scripts/util/`) names inputs (`action_text(action, gamepad)`: "W", "RT");
+right-stick sensitivity (0.2–3) scales `CameraRigSettings.stick_yaw/pitch_speed` (rad/s,
+quadratic response); `restore_default_bindings()` reads the project InputMap. Window and V-Sync are skipped
 headless. The `SettingsMenu` (Graphics / Audio / Controls tabs, built in code) opens from the
 main menu and the pause menu; changes apply at once; to rebind, click the action and press a key
 or mouse button (Esc cancels). Note: tests share the project's `user://` folder, so a
@@ -1418,7 +1424,7 @@ or mouse button (Esc cancels). Note: tests share the project's `user://` folder,
 ### Onboarding (Phase 12)
 `HintDirector` (a CanvasLayer in `world.tscn`, so the attract world drops it) teaches the first
 minutes with **one short hint at a time** at the bottom centre. Texts and triggers live in
-`data/ui/hints.tres`. Each hint uses the player's own keys (`Settings.binding_text`) and says
+`data/ui/hints.tres`. Each hint uses the player's own keys (`InputBinding.action_text`) and says
 "Hold" or "Press" following the hold-or-toggle settings. The rules are checked 4× a second; a
 hint fades in while useful and is gone for good once learnt.
 
