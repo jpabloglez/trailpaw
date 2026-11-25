@@ -412,8 +412,25 @@ and while resting, the frequency setting, the title screen.
 
 ---
 
+## Gamepad support (backlog item)
+
+Play and use every menu with a gamepad (Xbox-style names; Godot's SDL mapping covers other pads).
+
+- [x] Default pad bindings, right-stick camera with its own sensitivity, rebinding per kind of
+      device, pad bindings saved.
+- [x] Menu navigation: focus, B to go back or close, LB / RB for tabs, journal scrolling.
+- [x] Prompts and hints name the inputs of the device in use (`InputDevice`).
+- [x] Gamepad column in Settings → Controls to rebind pad inputs.
+
+**Tests:** default bindings, stick look, rebinding and persistence, menu focus and B / LB / RB,
+device switching, pad capture.
+**Exit (needs a real pad):** the game can be played start to finish without touching the
+keyboard or mouse, and the camera and stick feel comfortable.
+
+---
+
 ## Backlog (post-slice ideas)
 
-Gamepad support · more species selectable at start · seasons · photo mode · collectible
+More species selectable at start · seasons · photo mode · collectible
 discoveries journal · companion system · more biomes (wetlands, coast, snow) · Steam Deck profile.
 
