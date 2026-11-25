@@ -56,7 +56,10 @@ func test_each_step_plays_a_clip_of_its_surface_on_the_sfx_bus() -> void:
 	assert_bool(FOOTSTEPS.grass.has(player.stream)).is_true()
 	assert_str(String(player.bus)).is_equal("SFX")
 	assert_float(player.pitch_scale).is_between(FOOTSTEPS.pitch.x, FOOTSTEPS.pitch.y)
-	await get_tree().create_timer(FOOTSTEPS.min_interval + 0.02).timeout
+	# The interval is counted in physics frames: wait for those, not wall time (a slow runner
+	# can fall behind on physics frames).
+	for i in int(FOOTSTEPS.min_interval * Engine.physics_ticks_per_second) + 1:
+		await get_tree().physics_frame
 	GameState.current_biome = &"hills"
 	assert_bool(FOOTSTEPS.ground.has(steps.step().stream)).is_true()
 
