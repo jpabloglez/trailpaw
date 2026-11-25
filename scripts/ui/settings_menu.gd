@@ -158,9 +158,7 @@ func capture(event: InputEvent) -> void:
 	elif conflict == &"?":
 		_end_capture("That input cannot be used")
 	else:
-		var who: String = ACTION_NAMES.get(
-			conflict, RESERVED_NAMES.get(conflict, String(conflict))
-		)
+		var who: String = ACTION_NAMES.get(conflict, RESERVED_NAMES.get(conflict, String(conflict)))
 		_end_capture("Already used by %s" % who)
 
 
