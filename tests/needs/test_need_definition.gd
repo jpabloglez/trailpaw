@@ -69,6 +69,16 @@ func test_thresholds_must_leave_room_for_recovery() -> void:
 	assert_bool(need.is_valid()).is_false()
 
 
+func test_empty_margin_must_sit_between_zero_and_the_threshold() -> void:
+	var need := _need(&"thirst").duplicate() as NeedDefinition
+	need.empty_recover_margin = 0.0
+	assert_bool(need.is_valid()).is_false()
+	need.empty_recover_margin = need.critical_threshold
+	assert_bool(need.is_valid()).is_false()
+	need.empty_recover_margin = 8.0
+	assert_bool(need.is_valid()).is_true()
+
+
 func test_speed_factor_must_be_a_slowdown() -> void:
 	var need := _need(&"energy").duplicate() as NeedDefinition
 	need.critical_speed_factor = 0.0

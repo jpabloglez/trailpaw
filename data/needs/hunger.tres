@@ -12,4 +12,5 @@ max_value = 100.0
 decay_per_minute = 6.25
 critical_threshold = 25.0
 recover_margin = 10.0
+empty_recover_margin = 8.0
 critical_speed_factor = 0.85

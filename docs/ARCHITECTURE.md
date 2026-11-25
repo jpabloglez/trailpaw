@@ -521,6 +521,27 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
   critical need and full for two or more, fading at 0.25/s.
   While the animal is too cold, its edges ease to a frosty blue (`cold_tint`) at no less
   than `cold_intensity` (0.6).
+- **Need effects by tier (ADR-012, in progress):** `NeedsModel.tier()` is NORMAL, LOW (critical)
+  or EMPTY (at 0, until above `NeedDefinition.empty_recover_margin`, 8); `tier_changed` fires
+  once per change. Each need has its own `NeedEffect` per tier (`data/needs/effects/`, listed in
+  `data/needs/need_effects.tres`, a `NeedEffectTable`): speed / jump / rest factors, sprint
+  FULL / BURSTS / NONE, drain multipliers on other needs, sniff range factors and a cue. Heat
+  effects (`warmth` HOT, `lifted_in_shade`) pause in shade or water; cold ones answer to
+  `is_cold()`. The pure `NeedEffects` combines the active ones (lowest factors, strictest
+  sprint, drains multiplied per need and capped at ×2, widest sniff, cues without duplicates),
+  the feeling-well bonus (every need ≥ 70 %: speed ×1.05) and the intensity setting (Off keeps
+  only cues and sniff help; Gentle keeps half of each effect and turns "no sprint" into bursts).
+
+  | Need | Low | Empty | Cue |
+  |---|---|---|---|
+  | Thirst | sprint in bursts, comfort drains ×1.3, water sniff ×1.5 | no sprint, comfort ×1.6 | pant |
+  | Hunger | energy ×1.3, rest ×0.75, food sniff ×1.5 | energy ×1.6, rest ×0.5 | growl |
+  | Energy | sprint in bursts, jump ×0.75 | no sprint, jump ×0.5, speed ×0.9 | tired |
+  | Comfort (hot, in the sun) | speed ×0.9, thirst ×1.3 | no sprint, thirst ×1.6 | pant |
+  | Comfort (cold) | energy ×1.3 | energy ×1.6, jump ×0.75 | shiver |
+
+  Not wired into gameplay yet: movement, drains, sniffing and cues read it in the next steps
+  (ROADMAP "Need effects").
 - HUD (`NeedsHud`, `scenes/ui/needs_hud.tscn`, `data/ui/needs_hud.tres`): bottom left, one
   `NeedMeter` per need, an icon inside a ring that empties with the need (ring colour
   `NeedDefinition.color`). Icons are silhouettes drawn in code by `NeedIcon`: a drop (thirst), an
