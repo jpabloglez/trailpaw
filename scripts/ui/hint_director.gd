@@ -140,19 +140,19 @@ func text_for(id: StringName) -> String:
 	var text: String = settings.texts.get(id, "")
 	var moves := PackedStringArray()
 	for action: StringName in [&"move_forward", &"move_left", &"move_back", &"move_right"]:
-		moves.append(Settings.binding_text(action).get_slice(",", 0).strip_edges())
+		moves.append(InputBinding.action_text(action).get_slice(",", 0).strip_edges())
 	return (
 		text
 		. format(
 			{
 				"move":
 				"".join(moves) if moves.size() == 4 and moves[0].length() == 1 else " ".join(moves),
-				"sprint": Settings.binding_text(&"sprint"),
-				"sniff": Settings.binding_text(&"sniff"),
-				"interact": Settings.binding_text(&"interact"),
-				"map": Settings.binding_text(&"map"),
-				"journal": Settings.binding_text(&"journal"),
-				"rest": Settings.binding_text(&"rest"),
+				"sprint": InputBinding.action_text(&"sprint"),
+				"sniff": InputBinding.action_text(&"sniff"),
+				"interact": InputBinding.action_text(&"interact"),
+				"map": InputBinding.action_text(&"map"),
+				"journal": InputBinding.action_text(&"journal"),
+				"rest": InputBinding.action_text(&"rest"),
 				"hold_sprint": "Press" if Settings.sprint_toggle else "Hold",
 				"hold_rest": "Press" if Settings.rest_toggle else "Hold",
 			}

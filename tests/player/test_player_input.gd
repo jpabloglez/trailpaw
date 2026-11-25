@@ -40,6 +40,27 @@ func test_released_actions_clear_intent() -> void:
 	assert_bool(_movement.sprint).is_false()
 
 
+func test_the_left_stick_and_right_trigger_move_and_run() -> void:
+	_motion(JOY_AXIS_LEFT_X, 1.0)
+	_motion(JOY_AXIS_TRIGGER_RIGHT, 1.0)
+	_input._physics_process(0.016)
+	assert_vector(_movement.move_input).is_equal_approx(Vector2(1, 0), Vector2.ONE * 1e-4)
+	assert_bool(_movement.sprint).is_true()
+	_motion(JOY_AXIS_LEFT_X, 0.05)  # inside the dead zone
+	_motion(JOY_AXIS_TRIGGER_RIGHT, 0.0)
+	_input._physics_process(0.016)
+	assert_vector(_movement.move_input).is_equal(Vector2.ZERO)
+	assert_bool(_movement.sprint).is_false()
+
+
+func _motion(axis: JoyAxis, value: float) -> void:
+	var event := InputEventJoypadMotion.new()
+	event.axis = axis
+	event.axis_value = value
+	Input.parse_input_event(event)
+	Input.flush_buffered_events()
+
+
 func test_input_runs_before_other_physics_callbacks() -> void:
 	assert_int(_input.process_physics_priority).is_less(0)
 

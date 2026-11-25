@@ -4,8 +4,10 @@
 ## back on start.
 ##
 ## Key remapping covers the gameplay actions in [constant REMAPPABLE] (not the debug keys);
-## bindings are stored by physical key or mouse button, a key already used by another action is
-## refused, and [method restore_default_bindings] goes back to the project's InputMap.
+## bindings are stored by physical key, mouse button, gamepad button or gamepad axis direction,
+## an input already used by another action is refused, and [method restore_default_bindings]
+## goes back to the project's InputMap. Keyboard/mouse and gamepad bindings are independent:
+## rebinding one never drops the other.
 ## [br][br]
 ## Autoload name: [code]Settings[/code]. No [code]class_name[/code]: it would hide the
 ## autoload singleton.
@@ -74,7 +76,9 @@ var vsync: bool = true
 var fov: float = 70.0
 ## Mouse look speed multiplier (1 = the camera's tuned default).
 var mouse_sensitivity: float = 1.0
-## Invert vertical mouse look.
+## Right-stick look speed multiplier (1 = the camera's tuned default).
+var stick_sensitivity: float = 1.0
+## Invert vertical look (mouse and right stick).
 var invert_y: bool = false
 ## A subtle camera shake on hard landings.
 var camera_shake: bool = true
@@ -164,7 +168,13 @@ func set_mouse_sensitivity(value: float) -> void:
 	changed.emit(&"mouse_sensitivity")
 
 
-## Invert vertical mouse look.
+## Right-stick look speed multiplier (clamped to 0.2…3).
+func set_stick_sensitivity(value: float) -> void:
+	stick_sensitivity = clampf(value, 0.2, 3.0)
+	changed.emit(&"stick_sensitivity")
+
+
+## Invert vertical look (mouse and right stick).
 func set_invert_y(value: bool) -> void:
 	invert_y = value
 	changed.emit(&"invert_y")
@@ -203,17 +213,18 @@ func set_music_frequency(value: StringName) -> void:
 	changed.emit(&"music_frequency")
 
 
-## Binds [param action] to [param event] (a key, by physical keycode, or a mouse button) in
-## place of its current bindings. Returns the action that already uses it (and changes nothing),
-## or an empty name on success.
+## Binds [param action] to [param event] (a key, by physical keycode, a mouse button, a gamepad
+## button or a gamepad axis direction) in place of its current bindings of the same kind
+## (keyboard/mouse or gamepad; the other kind is kept). Returns the action that already uses it
+## (and changes nothing), [code]&"?"[/code] for an unusable input, or an empty name on success.
 func rebind(action: StringName, event: InputEvent) -> StringName:
-	var normal := normalise_event(event)
+	var normal := InputBinding.normalise(event)
 	if normal == null or not REMAPPABLE.has(action):
 		return &"?"
 	for other in REMAPPABLE:
 		if other != action and InputMap.action_has_event(other, normal):
 			return other
-	InputMap.action_erase_events(action)
+	_erase_kind(action, InputBinding.is_gamepad(normal))
 	InputMap.action_add_event(action, normal)
 	changed.emit(&"bindings")
 	return &""
@@ -229,35 +240,6 @@ func restore_default_bindings() -> void:
 	changed.emit(&"bindings")
 
 
-## Human-readable binding of [param action] (e.g. "W", "Mouse Wheel Up").
-func binding_text(action: StringName) -> String:
-	var parts := PackedStringArray()
-	for event in InputMap.action_get_events(action):
-		var key := event as InputEventKey
-		if key != null:
-			parts.append(OS.get_keycode_string(key.physical_keycode))
-			continue
-		var mouse := event as InputEventMouseButton
-		if mouse != null:
-			parts.append(_mouse_name(mouse.button_index))
-	return ", ".join(parts)
-
-
-## A clean copy of [param event] for binding (physical key or mouse button), or null.
-static func normalise_event(event: InputEvent) -> InputEvent:
-	var key := event as InputEventKey
-	if key != null:
-		var copy := InputEventKey.new()
-		copy.physical_keycode = key.physical_keycode if key.physical_keycode != 0 else key.keycode
-		return copy if copy.physical_keycode != 0 else null
-	var mouse := event as InputEventMouseButton
-	if mouse != null:
-		var copy := InputEventMouseButton.new()
-		copy.button_index = mouse.button_index
-		return copy
-	return null
-
-
 ## Writes every setting to [member config_path].
 func save_settings() -> Error:
 	var config := ConfigFile.new()
@@ -271,6 +253,7 @@ func save_settings() -> Error:
 		config.set_value("audio", String(bus), volume(bus))
 	config.set_value("audio", "music_frequency", String(music_frequency))
 	config.set_value("controls", "mouse_sensitivity", mouse_sensitivity)
+	config.set_value("controls", "stick_sensitivity", stick_sensitivity)
 	config.set_value("controls", "invert_y", invert_y)
 	config.set_value("controls", "camera_shake", camera_shake)
 	config.set_value("controls", "sprint_toggle", sprint_toggle)
@@ -305,6 +288,9 @@ func load_settings() -> void:
 	music_frequency = frequency if frequency in MUSIC_FREQUENCIES else &"sometimes"
 	mouse_sensitivity = clampf(
 		float(config.get_value("controls", "mouse_sensitivity", 1.0)), 0.2, 3.0
+	)
+	stick_sensitivity = clampf(
+		float(config.get_value("controls", "stick_sensitivity", 1.0)), 0.2, 3.0
 	)
 	invert_y = bool(config.get_value("controls", "invert_y", false))
 	camera_shake = bool(config.get_value("controls", "camera_shake", true))
@@ -373,6 +359,12 @@ func _serialise(action: StringName) -> Array:
 		var mouse := event as InputEventMouseButton
 		if mouse != null:
 			out.append({"mouse": mouse.button_index})
+		var button := event as InputEventJoypadButton
+		if button != null:
+			out.append({"pad_button": button.button_index})
+		var motion := event as InputEventJoypadMotion
+		if motion != null:
+			out.append({"pad_axis": motion.axis, "dir": signf(motion.axis_value)})
 	return out
 
 
@@ -390,23 +382,23 @@ func _deserialise(action: StringName, stored: Array) -> void:
 			var mouse := InputEventMouseButton.new()
 			mouse.button_index = int(d["mouse"]) as MouseButton
 			events.append(mouse)
-	if events.is_empty():
-		return
-	InputMap.action_erase_events(action)
+		elif d.has("pad_button"):
+			events.append(InputBinding.gamepad_button(int(d["pad_button"])))
+		elif d.has("pad_axis") and float(d.get("dir", 0.0)) != 0.0:
+			events.append(InputBinding.gamepad_axis(int(d["pad_axis"]), signf(float(d["dir"]))))
+	# Replace only the kinds that were stored: files from before gamepad support keep the
+	# project's default gamepad bindings.
+	var has_pad := events.any(InputBinding.is_gamepad)
+	var has_keys := events.any(func(e: InputEvent) -> bool: return not InputBinding.is_gamepad(e))
+	if has_keys:
+		_erase_kind(action, false)
+	if has_pad:
+		_erase_kind(action, true)
 	for event in events:
 		InputMap.action_add_event(action, event)
 
 
-static func _mouse_name(button: MouseButton) -> String:
-	match button:
-		MOUSE_BUTTON_LEFT:
-			return "Left Click"
-		MOUSE_BUTTON_RIGHT:
-			return "Right Click"
-		MOUSE_BUTTON_MIDDLE:
-			return "Middle Click"
-		MOUSE_BUTTON_WHEEL_UP:
-			return "Wheel Up"
-		MOUSE_BUTTON_WHEEL_DOWN:
-			return "Wheel Down"
-	return "Mouse %d" % button
+func _erase_kind(action: StringName, gamepad: bool) -> void:
+	for event in InputMap.action_get_events(action):
+		if InputBinding.is_gamepad(event) == gamepad:
+			InputMap.action_erase_event(action, event)

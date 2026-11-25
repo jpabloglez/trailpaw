@@ -219,7 +219,7 @@ func test_no_map_in_the_main_menu() -> void:
 
 func test_the_map_key_is_remappable() -> void:
 	assert_bool(Settings.REMAPPABLE.has(&"map")).is_true()
-	assert_str(Settings.binding_text(&"map")).is_equal("M")
+	assert_str(InputBinding.action_text(&"map")).is_equal("M")
 	assert_bool(SettingsMenu.ACTION_NAMES.has(&"map")).is_true()
 
 
