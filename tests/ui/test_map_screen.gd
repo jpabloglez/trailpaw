@@ -24,6 +24,7 @@ func before_test() -> void:
 
 
 func after_test() -> void:
+	InputDevice.set_gamepad(false)  # pad events in other suites switch it
 	get_tree().paused = false
 	if _flow != null and is_instance_valid(_flow):
 		_flow.free()

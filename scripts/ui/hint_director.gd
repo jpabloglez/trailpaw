@@ -138,26 +138,35 @@ func complete(id: StringName) -> void:
 ## The text of hint [param id] with the player's keys filled in.
 func text_for(id: StringName) -> String:
 	var text: String = settings.texts.get(id, "")
-	var moves := PackedStringArray()
-	for action: StringName in [&"move_forward", &"move_left", &"move_back", &"move_right"]:
-		moves.append(InputBinding.action_text(action).get_slice(",", 0).strip_edges())
 	return (
 		text
 		. format(
 			{
-				"move":
-				"".join(moves) if moves.size() == 4 and moves[0].length() == 1 else " ".join(moves),
-				"sprint": InputBinding.action_text(&"sprint"),
-				"sniff": InputBinding.action_text(&"sniff"),
-				"interact": InputBinding.action_text(&"interact"),
-				"map": InputBinding.action_text(&"map"),
-				"journal": InputBinding.action_text(&"journal"),
-				"rest": InputBinding.action_text(&"rest"),
+				"move": move_text(),
+				"sprint": InputDevice.action_text(&"sprint"),
+				"sniff": InputDevice.action_text(&"sniff"),
+				"interact": InputDevice.action_text(&"interact"),
+				"map": InputDevice.action_text(&"map"),
+				"journal": InputDevice.action_text(&"journal"),
+				"rest": InputDevice.action_text(&"rest"),
 				"hold_sprint": "Press" if Settings.sprint_toggle else "Hold",
 				"hold_rest": "Press" if Settings.rest_toggle else "Hold",
 			}
 		)
 	)
+
+
+## The four move inputs for the device in use, short: "WASD", "Left Stick", or each one.
+static func move_text() -> String:
+	var moves := PackedStringArray()
+	for action: StringName in [&"move_forward", &"move_left", &"move_back", &"move_right"]:
+		moves.append(InputDevice.action_text(action).get_slice(",", 0).strip_edges())
+	for stick in ["Left Stick", "Right Stick"]:
+		if Array(moves).all(func(m: String) -> bool: return m.begins_with(stick + " ")):
+			return stick
+	if moves.size() == 4 and Array(moves).all(func(m: String) -> bool: return m.length() == 1):
+		return "".join(moves)
+	return " ".join(moves)
 
 
 ## The hint showing now (empty when none).

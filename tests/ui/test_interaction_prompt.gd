@@ -5,6 +5,10 @@ const ANIMAL_SCENE: String = "res://scenes/player/animal.tscn"
 const PROMPT_SCENE: String = "res://scenes/ui/interaction_prompt.tscn"
 
 
+func before_test() -> void:
+	InputDevice.set_gamepad(false)  # pad events in other suites switch it
+
+
 func _setup() -> Array:
 	var floor_body: StaticBody3D = auto_free(StaticBody3D.new())
 	var shape := CollisionShape3D.new()
@@ -65,3 +69,15 @@ func test_shows_the_key_and_prompt_for_a_target_then_fades_out() -> void:
 	assert_float(prompt.opacity()).is_between(0.0, 0.99)  # fading, not snapping
 	prompt.advance(1.0)
 	assert_float(prompt.opacity()).is_equal(0.0)
+
+
+func test_the_prompt_follows_a_switch_to_the_gamepad() -> void:
+	var prompt: InteractionPrompt = _setup()[1]
+	_interactable(Vector3(0, 0.3, -1.0))
+	for i in 20:
+		await get_tree().physics_frame
+	assert_str(prompt.text()).is_equal("E  ·  Eat berries")
+	InputDevice.set_gamepad(true)
+	assert_str(prompt.text()).is_equal("X  ·  Eat berries")
+	InputDevice.set_gamepad(false)
+	assert_str(prompt.text()).is_equal("E  ·  Eat berries")

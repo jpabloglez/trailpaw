@@ -23,6 +23,7 @@ GameState="*res://scripts/autoload/game_state.gd"
 Settings="*res://scripts/autoload/settings.gd"
 SaveSystem="*res://scripts/autoload/save_system.gd"
 FloatingOrigin="*res://scripts/autoload/floating_origin.gd"
+InputDevice="*res://scripts/autoload/input_device.gd"
 
 [display]
 

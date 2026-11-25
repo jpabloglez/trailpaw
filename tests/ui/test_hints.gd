@@ -13,6 +13,7 @@ var _saved_done: Array[StringName]
 
 
 func before_test() -> void:
+	InputDevice.set_gamepad(false)  # pad events in other suites switch it
 	_saved_path = Settings.config_path
 	_saved_enabled = Settings.hints.enabled
 	_saved_done = Settings.hints.done()
