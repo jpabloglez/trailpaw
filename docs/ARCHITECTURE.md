@@ -50,6 +50,7 @@ are CanvasLayers inside `world.tscn`.
 | `Settings` | Graphics presets, input remaps, audio volumes; persisted in `user://settings.cfg` via `ConfigFile`. |
 | `SaveSystem` | Serialises/deserialises a `SaveData` resource to `user://saves/`. Versioned schema. |
 | `FloatingOrigin` | Re-centres the world when the player exceeds a threshold distance from the origin. |
+| `InputDevice` | Whether the player is on keyboard/mouse or a gamepad (last deliberate input); `action_text()` names an action's inputs for that device, so prompts and hints follow it. |
 
 Autoload scripts live in `scripts/autoload/` and are the one exception to the "every script
 declares `class_name`" rule: a `class_name` equal to the autoload name would hide the
@@ -1434,7 +1435,8 @@ journal, navigation wins over the `journal` action (its pad default, D-pad left,
 ### Onboarding (Phase 12)
 `HintDirector` (a CanvasLayer in `world.tscn`, so the attract world drops it) teaches the first
 minutes with **one short hint at a time** at the bottom centre. Texts and triggers live in
-`data/ui/hints.tres`. Each hint uses the player's own keys (`InputBinding.action_text`) and says
+`data/ui/hints.tres`. Each hint uses the player's own inputs for the device in use
+(`InputDevice.action_text`; the four moves read "WASD" or "Left Stick") and says
 "Hold" or "Press" following the hold-or-toggle settings. The rules are checked 4× a second; a
 hint fades in while useful and is gone for good once learnt.
 

@@ -1,7 +1,8 @@
 class_name InteractionPrompt
 extends CanvasLayer
-## Discreet prompt at the bottom centre ("E · Eat berries") for the [Interactor]'s current
-## target. Fades in when a target is in reach and out when it goes or while interacting.
+## Discreet prompt at the bottom centre ("E · Eat berries", or "X · Eat berries" on a gamepad)
+## for the [Interactor]'s current target; it follows a switch of device at once. Fades in
+## when a target is in reach and out when it goes or while interacting.
 ## [br][br]
 ## Budget: a couple of comparisons per frame; the text changes only with the target.
 
@@ -18,6 +19,7 @@ func _ready() -> void:
 	if interactor != null:
 		interactor.target_changed.connect(_on_target_changed)
 		_on_target_changed(interactor.current_target())
+		InputDevice.changed.connect(_on_device_changed)
 
 
 func _process(delta: float) -> void:
@@ -46,16 +48,17 @@ func opacity() -> float:
 	return _label.modulate.a
 
 
-## Key bound to [code]interact[/code] as shown to the player (e.g. "E"). Named after the
-## physical (QWERTY-position) key; layout-aware labels come with key remapping (Phase 10).
+## The first input bound to [code]interact[/code] on the device in use, as shown to the
+## player (e.g. "E", or "X" on a gamepad).
 static func interact_key() -> String:
-	for event in InputMap.action_get_events(&"interact"):
-		var key := event as InputEventKey
-		if key != null:
-			return OS.get_keycode_string(key.physical_keycode)
-	return "?"
+	var text := InputDevice.action_text(&"interact").get_slice(",", 0).strip_edges()
+	return text if text != "" else "?"
 
 
 func _on_target_changed(target: InteractionTarget) -> void:
 	if target != null:
 		_label.text = interact_key() + settings.separator + target.definition.prompt
+
+
+func _on_device_changed(_gamepad: bool) -> void:
+	_on_target_changed(interactor.current_target())
