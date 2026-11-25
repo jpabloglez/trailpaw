@@ -3,6 +3,7 @@ extends CanvasLayer
 ## In-game pause (the [code]pause[/code] action, Esc): the world stops
 ## ([code]get_tree().paused[/code]) and this menu — which keeps running — offers Resume, Save,
 ## Map, Journal, Settings, Main menu and Quit, and shows the world seed so it can be shared.
+## Whenever it shows, Resume takes the keyboard/gamepad focus; Esc, Menu (Start) or B resumes.
 ## Built in code.
 
 ## Save now (the menu shows "Saved" when [method show_saved] is called).
@@ -57,6 +58,7 @@ func _ready() -> void:
 	_seed = MenuStyle.label("", 18, "Seed")
 	box.add_child(_seed)
 	visible = false
+	visibility_changed.connect(_on_visibility_changed)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -65,6 +67,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			close()
 		else:
 			open()
+		get_viewport().set_input_as_handled()
+	elif enabled and visible and event.is_action_pressed(&"ui_cancel"):
+		close()
 		get_viewport().set_input_as_handled()
 
 
@@ -79,6 +84,7 @@ func open() -> void:
 	_seed.text = "World seed %d" % GameState.world_seed
 	visible = true
 	MenuStyle.fade_in(_root)
+	MenuStyle.focus_first(_root)
 	get_tree().paused = true
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
@@ -103,3 +109,9 @@ func button(node_name: String) -> Button:
 ## The seed text shown.
 func seed_text() -> String:
 	return _seed.text
+
+
+# Shown again after the settings: CanvasLayer emits this before its controls count as visible.
+func _on_visibility_changed() -> void:
+	if visible:
+		MenuStyle.focus_first.call_deferred(_root)

@@ -175,6 +175,15 @@ func test_esc_closes_the_map_without_opening_the_pause_menu() -> void:
 	assert_bool(get_tree().paused).is_false()
 
 
+func test_b_closes_the_map() -> void:
+	var flow := await _playing()
+	await _press(&"map")
+	await _press(&"ui_cancel")
+	assert_bool(flow.map_screen().visible).is_false()
+	assert_bool(flow.pause_menu().visible).is_false()
+	assert_bool(get_tree().paused).is_false()
+
+
 func test_the_wheel_zooms_out_and_in() -> void:
 	var flow := await _playing()
 	var map := flow.map_screen()

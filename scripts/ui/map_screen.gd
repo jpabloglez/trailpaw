@@ -2,9 +2,9 @@ class_name MapScreen
 extends CanvasLayer
 ## The map (the [code]map[/code] action, M): what the player has explored around them, with
 ## water, the player as an arrow, the start point and the water sniffed from far away. Opening
-## it pauses the world; M or Esc closes it, and the camera zoom inputs (mouse wheel) change the
-## scale. The image is drawn by a [MapRenderer] on a worker thread and kept while nothing
-## changed. Built in code.
+## it pauses the world; M, Esc or the gamepad's View, Menu or B close it, and the camera zoom
+## inputs (mouse wheel, LB / RB) change the scale. The image is drawn by a [MapRenderer] on a
+## worker thread and kept while nothing changed. Built in code.
 ## [br][br]
 ## Budget: on open, one worker task (see [MapRenderer]); while open, a few draw calls for the
 ## markers. Nothing while closed.
@@ -69,7 +69,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		else:
 			open()
 		get_viewport().set_input_as_handled()
-	elif visible and event.is_action_pressed(&"pause"):
+	elif visible and (event.is_action_pressed(&"pause") or event.is_action_pressed(&"ui_cancel")):
 		close()
 		get_viewport().set_input_as_handled()
 	elif visible and event.is_action_pressed(&"camera_zoom_in"):
