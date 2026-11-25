@@ -156,6 +156,37 @@ func test_q_e_and_the_arrows_switch_tabs() -> void:
 	journal.close()
 
 
+func test_gamepad_tabs_scroll_and_b_closes() -> void:
+	var flow := await _playing()
+	var journal := flow.journal_screen()
+	journal.open()
+	await _pad(JOY_BUTTON_RIGHT_SHOULDER)
+	assert_int(journal.current_tab()).is_equal(1)
+	await _pad(JOY_BUTTON_DPAD_LEFT)  # also the journal button: while open it is "previous tab"
+	assert_bool(journal.visible).is_true()
+	assert_int(journal.current_tab()).is_equal(0)
+	var scroll := journal.find_child("Cards", true, false) as ScrollContainer
+	await _pad(JOY_BUTTON_DPAD_DOWN)
+	await get_tree().process_frame
+	assert_int(scroll.scroll_vertical).is_greater(0)
+	await _pad(JOY_BUTTON_B)
+	assert_bool(journal.visible).is_false()
+	assert_bool(get_tree().paused).is_false()
+	assert_bool(flow.pause_menu().visible).is_false()
+
+
+func _pad(button: JoyButton) -> void:
+	var event := InputEventJoypadButton.new()
+	event.button_index = button
+	event.pressed = true
+	Input.parse_input_event(event)
+	var release := event.duplicate() as InputEventJoypadButton
+	release.pressed = false
+	Input.parse_input_event(release)
+	await get_tree().process_frame
+	await get_tree().process_frame
+
+
 func test_the_pause_menu_opens_it_and_the_main_menu_does_not() -> void:
 	var flow := await _playing()
 	await _press(&"pause")

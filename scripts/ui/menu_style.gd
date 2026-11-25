@@ -53,6 +53,37 @@ static func centred_box(parent: Control, node_name: String) -> VBoxContainer:
 	return box
 
 
+## Gives keyboard/gamepad focus to the first visible, enabled button (or other focusable
+## control) inside [param root], depth first, so a menu can be used without the mouse. Returns
+## whether something took the focus.
+static func focus_first(root: Control) -> bool:
+	for child in root.get_children():
+		var control := child as Control
+		if control == null or not control.is_visible_in_tree():
+			continue
+		var button := control as BaseButton
+		var usable := control.focus_mode == Control.FOCUS_ALL and not (button and button.disabled)
+		if usable and not control is ScrollContainer and not control is LineEdit:
+			control.grab_focus()
+			return true
+		if focus_first(control):
+			return true
+	return false
+
+
+## −1 / +1 when [param event] is a gamepad shoulder press (LB / RB: previous / next tab in
+## menus), else 0.
+static func shoulder_step(event: InputEvent) -> int:
+	var pad := event as InputEventJoypadButton
+	if pad == null or not pad.pressed:
+		return 0
+	if pad.button_index == JOY_BUTTON_LEFT_SHOULDER:
+		return -1
+	if pad.button_index == JOY_BUTTON_RIGHT_SHOULDER:
+		return 1
+	return 0
+
+
 ## Fades [param control] in from transparent (also while the game is paused).
 static func fade_in(control: Control) -> Tween:
 	control.modulate.a = 0.0

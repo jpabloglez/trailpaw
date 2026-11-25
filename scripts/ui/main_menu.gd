@@ -2,7 +2,8 @@ class_name MainMenu
 extends CanvasLayer
 ## Title screen over the living world: Continue (only when a game is saved), New game (a random
 ## seed that can be edited, and a confirmation before replacing the saved game), Settings and
-## Quit. Built in code.
+## Quit. Each page gives its first button the keyboard/gamepad focus, and Esc or B goes back
+## to the first page. Built in code.
 
 ## Continue the saved game.
 signal continue_requested
@@ -48,6 +49,13 @@ func _ready() -> void:
 	_rng.randomize()
 	show_main()
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	visibility_changed.connect(_on_visibility_changed)
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if visible and page() != "main" and event.is_action_pressed(&"ui_cancel"):
+		show_main()
+		get_viewport().set_input_as_handled()
 
 
 ## Back to the first page (Continue shows only when a game is saved).
@@ -153,6 +161,26 @@ func _show(box: VBoxContainer) -> void:
 	for page_box in [_main, _new_game, _confirm]:
 		(page_box.get_parent().get_parent() as Control).visible = page_box == box
 	MenuStyle.fade_in(box.get_parent().get_parent() as Control)
+	if box == _new_game:
+		(_new_game.get_node("Start") as Button).grab_focus()
+	else:
+		MenuStyle.focus_first(box)
+
+
+# Shown again (after the settings or a game): CanvasLayer emits this before its controls count
+# as visible.
+func _on_visibility_changed() -> void:
+	if visible:
+		_show.call_deferred(_page_box())
+
+
+func _page_box() -> VBoxContainer:
+	match page():
+		"new_game":
+			return _new_game
+		"confirm":
+			return _confirm
+	return _main
 
 
 func _keep_digits(text: String) -> void:

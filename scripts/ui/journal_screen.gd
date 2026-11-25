@@ -3,11 +3,12 @@ extends CanvasLayer
 ## The animal journal (the [code]journal[/code] action, J): a card per animal of the world, in
 ## journal order, under a count of those met. Met animals show their figure, name, the biomes
 ## they live in and a short line; the others a dark silhouette, "???" and where to look for them.
-## Opening it pauses the world; J or Esc closes it. Portraits are rendered by a
+## Opening it pauses the world; J, Esc or the gamepad's Menu or B close it, and up / down
+## (arrows, D-pad, left stick) scroll the cards. Portraits are rendered by a
 ## [PortraitStudio] one at a time on the first opening and kept for the session. Built in code.
 ## [br][br]
 ## Two tabs: Animals (the cards above) and Biomes (a [BiomeAtlasPage], Phase 16b), switched by
-## their buttons, Q / E or the left and right arrows.
+## their buttons, Q / E, the left and right arrows (D-pad, left stick) or LB / RB.
 ## [br][br]
 ## Budget: nothing while closed; on the first opening one portrait render per frame.
 
@@ -20,6 +21,8 @@ const PORTRAIT: int = 132
 const COLUMNS: int = 5
 ## Tint of an animal not met yet (its figure as a silhouette).
 const SILHOUETTE: Color = Color(0.0, 0.0, 0.0, 0.75)
+## Pixels the cards scroll per up / down press.
+const SCROLL_STEP: int = 160
 ## The tabs, in order.
 const TABS: PackedStringArray = ["Animals", "Biomes"]
 
@@ -38,6 +41,7 @@ var _scroll: ScrollContainer
 var _cards: Dictionary[StringName, Dictionary] = {}  # id → {portrait, name, biomes, blurb}
 var _studio: PortraitStudio
 var _loading: bool = false
+var _stick := StickPress.new()
 
 
 func _ready() -> void:
@@ -80,17 +84,24 @@ func _ready() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if not enabled:
 		return
-	if event.is_action_pressed(&"journal"):
+	# While open, navigation wins over the journal action: its default pad button (D-pad left)
+	# is also "previous tab".
+	var tab_step := _tab_step(event) if visible else 0
+	var scroll_step := _scroll_step(event) if visible else 0
+	if tab_step != 0:
+		show_tab(posmod(_tab + tab_step, TABS.size()))
+		get_viewport().set_input_as_handled()
+	elif scroll_step != 0:
+		_scroll.scroll_vertical += scroll_step * SCROLL_STEP
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed(&"journal"):
 		if visible:
 			close()
 		else:
 			open()
 		get_viewport().set_input_as_handled()
-	elif visible and event.is_action_pressed(&"pause"):
+	elif visible and (event.is_action_pressed(&"pause") or event.is_action_pressed(&"ui_cancel")):
 		close()
-		get_viewport().set_input_as_handled()
-	elif visible and _tab_step(event) != 0:
-		show_tab(posmod(_tab + _tab_step(event), TABS.size()))
 		get_viewport().set_input_as_handled()
 
 
@@ -209,7 +220,8 @@ func _tab_bar() -> Control:
 	return bar
 
 
-# −1 / +1 when [param event] asks for the previous / next tab (Q / E, left / right), else 0.
+# −1 / +1 when [param event] asks for the previous / next tab (Q / E, left / right, LB / RB),
+# else 0.
 func _tab_step(event: InputEvent) -> int:
 	var key := event as InputEventKey
 	if key != null and key.pressed and not key.echo:
@@ -217,9 +229,18 @@ func _tab_step(event: InputEvent) -> int:
 			return -1
 		if key.physical_keycode == KEY_E:
 			return 1
-	if event.is_action_pressed(&"ui_left"):
+	if _stick.pressed(event, &"ui_left"):
 		return -1
-	if event.is_action_pressed(&"ui_right"):
+	if _stick.pressed(event, &"ui_right"):
+		return 1
+	return MenuStyle.shoulder_step(event)
+
+
+# −1 / +1 when [param event] asks to scroll the cards up / down, else 0.
+func _scroll_step(event: InputEvent) -> int:
+	if _stick.pressed(event, &"ui_up"):
+		return -1
+	if _stick.pressed(event, &"ui_down"):
 		return 1
 	return 0
 

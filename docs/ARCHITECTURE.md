@@ -1387,7 +1387,17 @@ right-stick sensitivity (0.2–3) scales `CameraRigSettings.stick_yaw/pitch_spee
 quadratic response); `restore_default_bindings()` reads the project InputMap. Window and V-Sync are skipped
 headless. The `SettingsMenu` (Graphics / Audio / Controls tabs, built in code) opens from the
 main menu and the pause menu; changes apply at once; to rebind, click the action and press a key
-or mouse button (Esc cancels). Note: tests share the project's `user://` folder, so a
+or mouse button (Esc cancels).
+**Without a mouse (gamepad backlog item):** `ui_accept` / `ui_cancel` add the pad's A / B to
+Godot's defaults (in `project.godot`). Every menu gives its first visible button the focus
+(`MenuStyle.focus_first`; pause and main menu also when shown again, deferred because a
+`CanvasLayer` emits `visibility_changed` before its controls count as visible); B (`ui_cancel`)
+goes back a page, cancels a capture or closes; LB / RB (`MenuStyle.shoulder_step`) switch the
+settings and journal tabs; settings tabs scroll to follow the focus. Godot's GUI already turns a
+held stick into one focus move, but `_unhandled_input` sees a "pressed" event per stick motion,
+so screens that read `ui_*` there (journal tabs and scrolling) go through `StickPress`. In the
+journal, navigation wins over the `journal` action (its pad default, D-pad left, is also
+"previous tab"). Note: tests share the project's `user://` folder, so a
 `settings.cfg` saved by playing in the same environment is loaded when the tests start.
 
 - **Accessibility (Phase 11):**

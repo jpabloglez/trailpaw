@@ -4,6 +4,9 @@ extends CanvasLayer
 ## pause menu. Every change applies at once through the [code]Settings[/code] autoload; closing
 ## saves them. Controls lists every remappable action: click its button, then press a key or mouse
 ## button (Esc cancels); a key used by another action is refused with a note. Built in code.
+## [br][br]
+## Without a mouse: the first control of the tab takes the focus, LB / RB switch tabs, and
+## Esc or B cancels a capture or closes the menu.
 
 ## The menu was closed (settings saved).
 signal closed
@@ -31,6 +34,7 @@ const QUALITY_IDS: Array[StringName] = [&"low", &"medium", &"high"]
 const UI_SCALES: Array[float] = [1.0, 1.1, 1.2, 1.3, 1.4, 1.5]
 
 var _root: Control
+var _tabs: TabContainer
 var _status: Label
 var _capturing: StringName = &""
 var _binding_buttons: Dictionary[StringName, Button] = {}
@@ -45,14 +49,14 @@ func _ready() -> void:
 	add_child(_root)
 	var box := MenuStyle.centred_box(_root, "SettingsPage")
 	box.add_child(MenuStyle.label("Settings", 36))
-	var tabs := TabContainer.new()
-	tabs.name = "Tabs"
-	tabs.custom_minimum_size = Vector2(620, 420)
-	box.add_child(tabs)
-	tabs.add_child(_graphics_tab())
-	tabs.add_child(_audio_tab())
-	tabs.add_child(_controls_tab())
-	tabs.add_child(_interface_tab())
+	_tabs = TabContainer.new()
+	_tabs.name = "Tabs"
+	_tabs.custom_minimum_size = Vector2(620, 420)
+	box.add_child(_tabs)
+	_tabs.add_child(_graphics_tab())
+	_tabs.add_child(_audio_tab())
+	_tabs.add_child(_controls_tab())
+	_tabs.add_child(_interface_tab())
 	_status = MenuStyle.label("", 18, "Status")
 	box.add_child(_status)
 	var done := MenuStyle.button("Done", "Done")
@@ -78,12 +82,33 @@ func _input(event: InputEvent) -> void:
 	capture(event)
 
 
+func _unhandled_input(event: InputEvent) -> void:
+	if not visible:
+		return
+	if event.is_action_pressed(&"ui_cancel"):
+		if _capturing != &"":
+			_end_capture("")
+		else:
+			close()
+		get_viewport().set_input_as_handled()
+	elif _capturing == &"" and MenuStyle.shoulder_step(event) != 0:
+		show_tab(posmod(_tabs.current_tab + MenuStyle.shoulder_step(event), _tabs.get_tab_count()))
+		get_viewport().set_input_as_handled()
+
+
 ## Shows the menu with the current values.
 func open() -> void:
 	_refresh()
 	_status.text = ""
 	visible = true
 	MenuStyle.fade_in(_root)
+	show_tab(_tabs.current_tab)
+
+
+## Shows tab [param index] (0 Graphics … 3 Interface) and focuses its first control.
+func show_tab(index: int) -> void:
+	_tabs.current_tab = index
+	MenuStyle.focus_first(_tabs.get_current_tab_control())
 
 
 ## Saves the settings and hides the menu.
@@ -289,6 +314,7 @@ func _hold_or_toggle(node_name: String, on_change: Callable) -> OptionButton:
 func _tab(title: String) -> GridContainer:
 	var scroll := ScrollContainer.new()
 	scroll.name = title
+	scroll.follow_focus = true
 	var grid := GridContainer.new()
 	grid.columns = 2
 	grid.add_theme_constant_override(&"h_separation", 24)
