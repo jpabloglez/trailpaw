@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="NeedEffect" format=3]
+
+[ext_resource type="Script" path="res://scripts/needs/need_effect.gd" id="1_effect"]
+
+[resource]
+script = ExtResource("1_effect")
+need_id = &"thirst"
+tier = 2
+sprint = 2
+rate_multipliers = Dictionary[StringName, float]({
+&"temperature": 1.6
+})
+sniff_factors = Dictionary[StringName, float]({
+&"water": 1.5
+})
+cue = &"pant"

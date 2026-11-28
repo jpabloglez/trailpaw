@@ -7,6 +7,10 @@ extends RefCounted
 ## critical at or below its threshold and recovers only above threshold + recover margin, so
 ## [signal critical_entered] and [signal critical_exited] fire once per crossing.
 ## [br][br]
+## Each need also has a [enum Tier] (ADR-012): [constant NORMAL], [constant LOW] while critical
+## and [constant EMPTY] at 0, until it rises above
+## [member NeedDefinition.empty_recover_margin]. [signal tier_changed] fires once per change.
+## [br][br]
 ## Budget: O(needs) float ops per [method tick]; no allocations.
 
 ## A need's value changed.
@@ -15,9 +19,13 @@ signal value_changed(need_id: StringName, value: float)
 signal critical_entered(need_id: StringName)
 ## A critical need rose above threshold + recover margin.
 signal critical_exited(need_id: StringName)
+## A need's [enum Tier] changed.
+signal tier_changed(need_id: StringName, tier: Tier)
 
 ## What the animal is doing, as far as needs are concerned.
 enum Activity { IDLE, WALK, TROT, RUN, SWIM }
+## How depleted a need is: fine, low (critical) or empty (at 0). Effects key on it (ADR-012).
+enum Tier { NORMAL, LOW, EMPTY }
 
 ## [enum Activity] names used as keys in [NeedModifiers] data.
 const ACTIVITY_NAMES: Array[StringName] = [&"idle", &"walk", &"trot", &"run", &"swim"]
@@ -27,6 +35,7 @@ var _modifiers: NeedModifiers
 var _index: Dictionary[StringName, int] = {}
 var _values: PackedFloat32Array = PackedFloat32Array()
 var _critical: Array[bool] = []
+var _empty: Array[bool] = []
 
 
 func _init(definitions: Array[NeedDefinition], modifiers: NeedModifiers) -> void:
@@ -36,6 +45,7 @@ func _init(definitions: Array[NeedDefinition], modifiers: NeedModifiers) -> void
 		_index[definitions[i].id] = i
 		_values.append(definitions[i].max_value)
 		_critical.append(false)
+		_empty.append(false)
 
 
 ## Need ids in definition order.
@@ -65,6 +75,19 @@ func fraction(need_id: StringName) -> float:
 ## Whether [param need_id] is critical.
 func is_critical(need_id: StringName) -> bool:
 	return _critical[_index[need_id]]
+
+
+## [enum Tier] of [param need_id].
+func tier(need_id: StringName) -> Tier:
+	return _tier(_index[need_id])
+
+
+## Whether every need is at or above [param min_fraction] of its maximum.
+func all_at_least(min_fraction: float) -> bool:
+	for i in _definitions.size():
+		if _values[i] < min_fraction * _definitions[i].max_value:
+			return false
+	return true
 
 
 ## Number of critical needs.
@@ -145,6 +168,7 @@ func tick(
 func _apply(i: int, new_value: float) -> void:
 	var need := _definitions[i]
 	var clamped := clampf(new_value, 0.0, need.max_value)
+	var before := _tier(i)
 	if clamped != _values[i]:
 		_values[i] = clamped
 		value_changed.emit(need.id, clamped)
@@ -154,3 +178,18 @@ func _apply(i: int, new_value: float) -> void:
 	elif _critical[i] and clamped > need.critical_threshold + need.recover_margin:
 		_critical[i] = false
 		critical_exited.emit(need.id)
+	if not _empty[i] and clamped <= 0.0:
+		_empty[i] = true
+	elif _empty[i] and clamped > need.empty_recover_margin:
+		_empty[i] = false
+	var after := _tier(i)
+	if after != before:
+		tier_changed.emit(need.id, after)
+
+
+func _tier(i: int) -> Tier:
+	if _empty[i]:
+		return Tier.EMPTY
+	if _critical[i]:
+		return Tier.LOW
+	return Tier.NORMAL

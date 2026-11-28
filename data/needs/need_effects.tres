@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="NeedEffectTable" format=3]
+
+[ext_resource type="Script" path="res://scripts/needs/need_effect_table.gd" id="1_table"]
+[ext_resource type="Script" path="res://scripts/needs/need_effect.gd" id="2_effect"]
+[ext_resource type="Resource" path="res://data/needs/effects/thirst_low.tres" id="e0"]
+[ext_resource type="Resource" path="res://data/needs/effects/thirst_empty.tres" id="e1"]
+[ext_resource type="Resource" path="res://data/needs/effects/hunger_low.tres" id="e2"]
+[ext_resource type="Resource" path="res://data/needs/effects/hunger_empty.tres" id="e3"]
+[ext_resource type="Resource" path="res://data/needs/effects/energy_low.tres" id="e4"]
+[ext_resource type="Resource" path="res://data/needs/effects/energy_empty.tres" id="e5"]
+[ext_resource type="Resource" path="res://data/needs/effects/comfort_hot_low.tres" id="e6"]
+[ext_resource type="Resource" path="res://data/needs/effects/comfort_hot_empty.tres" id="e7"]
+[ext_resource type="Resource" path="res://data/needs/effects/comfort_cold_low.tres" id="e8"]
+[ext_resource type="Resource" path="res://data/needs/effects/comfort_cold_empty.tres" id="e9"]
+
+[resource]
+script = ExtResource("1_table")
+effects = Array[ExtResource("2_effect")]([ExtResource("e0"), ExtResource("e1"), ExtResource("e2"), ExtResource("e3"), ExtResource("e4"), ExtResource("e5"), ExtResource("e6"), ExtResource("e7"), ExtResource("e8"), ExtResource("e9")])
+rate_cap = 2.0
+burst_seconds = 4.0
+burst_rest_seconds = 3.0
+bonus_fraction = 0.7
+bonus_speed_factor = 1.05
+gentle_strength = 0.5

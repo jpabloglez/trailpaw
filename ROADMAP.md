@@ -429,6 +429,26 @@ keyboard or mouse, and the camera and stick feel comfortable.
 
 ---
 
+## Need effects (backlog item)
+
+Needs that run low or empty change what the animal can do, each in its own way, without ever
+taking away control (ADR-012, extends ADR-003).
+
+- [x] Tiers (normal / low / empty) and per-need effects as data (`NeedEffect`,
+      `NeedEffectTable`), combined by the pure `NeedEffects`.
+- [ ] Abilities: sprint bursts / no sprint, jump height and speed per need; a blocked action
+      pulses its meter with a soft sound (replaces `critical_speed_factor`).
+- [ ] Drains between needs (capped) and the nose helping with the remedy.
+- [ ] Body language and audio: pant, growl, tired, shiver; first-time hints.
+- [ ] Setting Off / Gentle / Normal, the feeling-well bonus, balancing pass.
+
+**Tests:** tiers and hysteresis, effect validation, combination rules, cap, intensity modes,
+sprint bursts, blocked feedback, drains between needs.
+**Exit (playtest):** low needs are felt and understood from the animal itself, the remedy is
+always close, and the game never feels punishing.
+
+---
+
 ## Backlog (post-slice ideas)
 
 More species selectable at start · seasons · photo mode · collectible

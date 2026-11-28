@@ -8,6 +8,8 @@ extends Resource
 ## trotting in neutral conditions; activity and biome modifiers scale it ([code]NeedsModel[/code]).
 ## At or below [member critical_threshold] the need is critical and soft consequences apply
 ## (ADR-003: no death); it stops being critical only above threshold + [member recover_margin].
+## At 0 it is empty, and stays so until it rises above [member empty_recover_margin]
+## ([enum NeedsModel.Tier]; ADR-012).
 ## [br][br]
 ## Defaults are neutral: values come from data (see [method get_validation_errors]).
 
@@ -27,6 +29,8 @@ extends Resource
 @export_range(0.0, 1000.0, 0.5) var critical_threshold: float = 0.0
 ## A critical need recovers only above threshold + this (hysteresis: no flicker).
 @export_range(0.0, 1000.0, 0.5) var recover_margin: float = 0.0
+## An empty need (value 0) stops being empty only above this value (hysteresis: no flicker).
+@export_range(0.0, 1000.0, 0.5) var empty_recover_margin: float = 0.0
 
 @export_group("Effects when critical")
 ## Movement speed multiplier while this need is critical (1 = no slowdown).
@@ -59,6 +63,8 @@ func get_validation_errors() -> PackedStringArray:
 		errors.append("thresholds must satisfy 0 < critical_threshold + recover_margin < max")
 	if recover_margin <= 0.0:
 		errors.append("recover_margin must be > 0")
+	if empty_recover_margin <= 0.0 or empty_recover_margin >= critical_threshold:
+		errors.append("empty_recover_margin must satisfy 0 < empty_recover_margin < threshold")
 	if critical_speed_factor <= 0.0 or critical_speed_factor > 1.0:
 		errors.append("critical_speed_factor must be within (0, 1]")
 	return errors
