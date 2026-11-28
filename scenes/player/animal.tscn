@@ -196,7 +196,7 @@ movement = NodePath("../MovementComponent")
 state_machine = NodePath("../StateMachine")
 interactor = NodePath("../Interactor")
 
-[node name="Sniffer" type="Node3D" parent="." node_paths=PackedStringArray("body", "movement", "interactor", "animation")]
+[node name="Sniffer" type="Node3D" parent="." node_paths=PackedStringArray("body", "movement", "interactor", "animation", "needs")]
 unique_name_in_owner = true
 script = ExtResource("41_sniff")
 settings = ExtResource("42_ssett")
@@ -205,6 +205,7 @@ body = NodePath("..")
 movement = NodePath("../MovementComponent")
 interactor = NodePath("../Interactor")
 animation = NodePath("../AnimationController")
+needs = NodePath("../NeedsComponent")
 
 [node name="FootstepAudio" type="Node3D" parent="." node_paths=PackedStringArray("animation", "movement")]
 unique_name_in_owner = true

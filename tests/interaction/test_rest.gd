@@ -135,6 +135,21 @@ func test_shade_doubles_the_recovery() -> void:
 	assert_float(shade_gain / open_gain).is_between(1.7, 2.3)
 
 
+func test_hunger_makes_resting_slower() -> void:
+	var animal := _animal()
+	await _frames(10)
+	var needs := _needs(animal)
+	var fed := await _rest_gain(animal, 1.0)
+	_rester(animal).rest_held = false
+	await _frames(5)
+	needs.set_value(&"hunger", 0.0)
+	needs.update_effects()
+	var hungry := await _rest_gain(animal, 1.0)
+	assert_float(needs.effects.rest_factor).is_equal(0.5)
+	assert_float(hungry).is_less(fed * 0.6)
+	assert_float(hungry).is_greater(fed * 0.4)
+
+
 func test_resting_at_a_den_with_e() -> void:
 	var animal := _animal()
 	var den: Interactable = auto_free(Interactable.new())

@@ -1,7 +1,8 @@
 class_name PlayerRestState
 extends PlayerState
 ## Lying down to rest: the animal stops, recovers energy at the [Rester]'s rate for where it is
-## (open, shade, den) and the game clock runs [member ClockSettings.rest_scale] times faster.
+## (open, shade, den) — slower when hungry ([member NeedEffects.rest_factor], ADR-012) — and the
+## game clock runs [member ClockSettings.rest_scale] times faster.
 ## It gets up when the rest (or interact, at a den) action is released or on move input.
 
 ## Seconds between place checks (open / shade / den).
@@ -50,7 +51,7 @@ func physics_update(delta: float) -> void:
 		_since_place = 0.0
 		_place = rester.place()
 	if needs != null:
-		needs.add(&"energy", rester.energy_rate(_place) * delta)
+		needs.add(&"energy", rester.energy_rate(_place) * needs.effects.rest_factor * delta)
 
 
 ## Where the animal is resting (as last checked).

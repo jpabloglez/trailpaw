@@ -438,7 +438,7 @@ taking away control (ADR-012, extends ADR-003).
       `NeedEffectTable`), combined by the pure `NeedEffects`.
 - [x] Abilities: sprint bursts / no sprint, jump height and speed per need; a blocked action
       pulses its meter with a soft sound (replaces `critical_speed_factor`).
-- [ ] Drains between needs (capped) and the nose helping with the remedy.
+- [x] Drains between needs (capped) and the nose helping with the remedy.
 - [ ] Body language and audio: pant, growl, tired, shiver; first-time hints.
 - [ ] Setting Off / Gentle / Normal, the feeling-well bonus, balancing pass.
 

@@ -131,19 +131,23 @@ func rate_for(
 	return rate * float(biome_multipliers.get(need_id, 1.0))
 
 
-## Advances every need by [param delta] seconds.
+## Advances every need by [param delta] seconds. With [param drains], a need that is dropping
+## drops [method NeedEffects.rate_multiplier] times faster (other needs low or empty, ADR-012);
+## recovery is never slowed.
 func tick(
 	delta: float,
 	activity: Activity,
 	warmth: float,
 	in_water: bool = false,
 	raining: bool = false,
-	biome_multipliers: Dictionary = {}
+	biome_multipliers: Dictionary = {},
+	drains: NeedEffects = null
 ) -> void:
 	for i in _definitions.size():
-		var rate := rate_for(
-			_definitions[i].id, activity, warmth, in_water, raining, biome_multipliers
-		)
+		var id := _definitions[i].id
+		var rate := rate_for(id, activity, warmth, in_water, raining, biome_multipliers)
+		if rate < 0.0 and drains != null:
+			rate *= drains.rate_multiplier(id)
 		_apply(i, _values[i] + rate * delta / 60.0)
 
 
