@@ -98,6 +98,7 @@ Every third-party asset in `assets/` must be listed here (see CLAUDE.md §1).
 | `hamlets/moo` | `assets/audio/hamlets/moo.wav` | Synthesised for Trailpaw by `tools/farm_sounds.py` (seed 16): a cow's moo | CC0 1.0 | (this repository) |
 | `needs/pant_loop` | `assets/audio/needs/pant_loop.wav` | Synthesised for Trailpaw by `tools/need_cue_sounds.py` (seed 12): the fox panting, a 2 s seamless loop | CC0 1.0 | (this repository) |
 | `needs/growl` | `assets/audio/needs/growl.wav` | Synthesised for Trailpaw by `tools/need_cue_sounds.py` (seed 12): a hungry tummy rumble | CC0 1.0 | (this repository) |
+| `icon` | `icon.svg` | Drawn for Trailpaw (a paw print on a fox-orange tile; the app and window icon) | CC0 1.0 | (this repository) |
 | `hamlets/grunt` | `assets/audio/hamlets/grunt.wav` | Synthesised for Trailpaw by `tools/farm_sounds.py` (seed 16): a pig's grunts | CC0 1.0 | (this repository) |
 | `hamlets/claps` | `assets/audio/hamlets/claps.wav` | Synthesised for Trailpaw by `tools/farm_sounds.py` (seed 16): two hand claps (a villager shooing) | CC0 1.0 | (this repository) |
 | `pluck_002` | `assets/audio/ui/pluck_002.ogg` | Kenney (kenney.nl), Interface Sounds | CC0 1.0 | https://kenney.nl/assets/interface-sounds |

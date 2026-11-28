@@ -6,14 +6,16 @@ A cozy open-world nature game where you roam as a small animal through a landsca
 changes the farther you wander. Forage, drink, cool off, rest and meet other animals.
 Made with Godot 4.
 
-> **Status:** vertical slice (v0.12.0, Phase 12). See [ROADMAP.md](ROADMAP.md).
+> **Status:** v0.13.0 — a growing world with gamepad support and needs that matter. See
+> [ROADMAP.md](ROADMAP.md).
 
 ## Play
 
 **Download:** the latest build for Windows or Linux is on the
 [Releases](https://github.com/jpabloglez/trailpaw/releases) page. It is a single zip with one
-executable inside; unzip it and run `Trailpaw.exe` (Windows) or `Trailpaw.x86_64` (Linux; make
-it executable first). Every push to `main` also produces `trailpaw-windows` and `trailpaw-linux`
+executable inside (plus the licences and credits); unzip it anywhere and run `Trailpaw.exe`
+(Windows) or `Trailpaw.x86_64` (Linux; if it does not start, `chmod +x Trailpaw.x86_64`). There
+is nothing to install: delete the folder to remove it. macOS is not built yet. Every push to `main` also produces `trailpaw-windows` and `trailpaw-linux`
 builds under [Actions](https://github.com/jpabloglez/trailpaw/actions/workflows/ci.yml); you
 need to be logged in to GitHub to download them.
 
@@ -23,26 +25,35 @@ Windows may warn that the app is from an unknown publisher (it is not code-signe
 **System:** a GPU with Vulkan support is recommended (older GPUs fall back to OpenGL). The target is 60 FPS at 1080p "Medium" on a GTX 1050.
 Lower *Quality* or *Render scale* in Settings if it stutters.
 
-**You are a small fox.** Wander a landscape that changes the farther you go: meadow, forest,
-river valley, hills. Keep an eye on thirst, hunger, warmth and energy. Sniff out food and
-water, rest in the shade, meet the other animals. Nothing can kill you, but neglect slows you
-down. The game saves as you go: quit anywhere and *Continue* puts you back where you were.
+**Saves and settings** live in your user folder, not next to the game, so a new version
+keeps them: `%APPDATA%\Godot\app_userdata\Trailpaw` on Windows,
+`~/.local/share/godot/app_userdata/Trailpaw` on Linux. Copy that folder to take your game to
+another computer.
 
-| Action | Keys |
-|---|---|
-| Move | W A S D |
-| Run | Shift (hold, or toggle in Settings) |
-| Jump | Space |
-| Look around | Click to capture the mouse, then move it |
-| Zoom | Mouse wheel |
-| Eat · drink · greet · play | E (hold to drink) |
-| Sniff for food and water | Q |
-| Rest | R (hold, or toggle in Settings) |
-| Map | M |
-| Pause · menu | Esc |
+**You are a small fox.** Wander a landscape that changes the farther you go: meadows, forests,
+river valleys, wetlands, hills, alpine lakes, mountains, desert and savanna. Keep an eye on
+thirst, hunger, warmth and energy: when they run low the fox pants, shivers or tires, and can
+no longer sprint or jump as high until you drink, eat, cool off or rest. Sniff out food and
+water, rest in the shade, meet the other animals and fill your journal. Nothing can kill you.
+The game saves as you go: quit anywhere and *Continue* puts you back where you were.
 
-Every key can be changed in *Settings → Controls*. *Settings → Interface* has text size and
-the onboarding hints.
+| Action | Keys | Gamepad |
+|---|---|---|
+| Move | W A S D | Left stick |
+| Run | Shift (hold, or toggle in Settings) | RT |
+| Jump | Space | A |
+| Look around | Click to capture the mouse, then move it | Right stick |
+| Zoom | Mouse wheel | LB / RB |
+| Eat · drink · greet · play | E (hold to drink) | X |
+| Sniff for food and water | Q | Y |
+| Rest | R (hold, or toggle in Settings) | B |
+| Map | M | View |
+| Journal | J | D-pad left |
+| Pause · menu | Esc | Menu |
+
+Every key and button can be changed in *Settings → Controls*. *Settings → Interface* has text
+size and the onboarding hints; *Settings → Gameplay* sets how much the needs hold you back
+(Normal, Gentle or Off).
 
 ## Build from source
 
@@ -186,7 +197,9 @@ notes in [assets/audio/LICENSE.md](assets/audio/LICENSE.md)).
 
 ## Licence
 
-The project's source code and original content are released under the [MIT Licence](LICENSE).
+The project's source code and original content are released under the [MIT Licence](LICENSE),
+**except the music**: it is © the author, all rights reserved, and may only be played as part
+of the game ([`assets/audio/music/LICENSE.md`](assets/audio/music/LICENSE.md)).
 Third-party components keep their own licences:
 - Godot Engine (MIT), embedded in the exported builds
 - gdUnit4 (MIT, development only, not in the builds): `addons/gdUnit4/LICENSE`

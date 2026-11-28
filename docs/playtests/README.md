@@ -7,7 +7,7 @@ checks exactly that, with 3–5 people who have never seen the game.
 
 - Use a **release build** (the [Releases](https://github.com/jpabloglez/trailpaw/releases) page,
   or the `trailpaw-windows` / `trailpaw-linux` artifact of the latest `main` run). Write its
-  version, shown at the bottom right of the main menu (e.g. `v0.12.0`), in the notes.
+  version, shown at the bottom right of the main menu (e.g. `v0.13.0`), in the notes.
 - Start from a clean state, so the onboarding hints show: delete
   `%APPDATA%\Godot\app_userdata\Trailpaw\` (Windows) or `~/.local/share/godot/app_userdata/Trailpaw/`
   (Linux), or use *Settings → Interface → Teach me again* and a *New game*.

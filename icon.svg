@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!-- Trailpaw app icon: a cream paw print on a warm fox-orange tile. Original, CC0. -->
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f08a3c"/>
+      <stop offset="1" stop-color="#c95a22"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="240" height="240" rx="56" fill="url(#tile)"/>
+  <g fill="#fff4e2">
+    <ellipse cx="128" cy="166" rx="50" ry="42"/>
+    <ellipse cx="70" cy="112" rx="21" ry="27" transform="rotate(-24 70 112)"/>
+    <ellipse cx="106" cy="76" rx="21" ry="28" transform="rotate(-8 106 76)"/>
+    <ellipse cx="150" cy="76" rx="21" ry="28" transform="rotate(8 150 76)"/>
+    <ellipse cx="186" cy="112" rx="21" ry="27" transform="rotate(24 186 112)"/>
+  </g>
+</svg>
