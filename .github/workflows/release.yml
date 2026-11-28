@@ -24,8 +24,11 @@ jobs:
         run: |
           set -euo pipefail
           tag="${GITHUB_REF_NAME}"
-          cp LICENSE README.md export/windows/
-          cp LICENSE README.md export/linux/
+          for dir in export/windows export/linux; do
+            cp LICENSE README.md "$dir/"
+            cp assets/CREDITS.md "$dir/CREDITS.md"
+            cp assets/audio/music/LICENSE.md "$dir/MUSIC-LICENSE.md"
+          done
           (cd export/windows && zip -q -r "../../Trailpaw-${tag}-windows.zip" .)
           (cd export/linux && zip -q -r "../../Trailpaw-${tag}-linux.zip" .)
 

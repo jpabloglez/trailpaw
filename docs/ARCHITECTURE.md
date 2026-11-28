@@ -1514,11 +1514,15 @@ a new game does not teach them again. Settings → Interface → "Show hints" tu
   2. Exports both presets and fails on export errors.
   3. Smoke-tests the Linux build by running it headless for 600 frames (no script errors).
   4. Uploads `trailpaw-windows` and `trailpaw-linux` as artifacts (14 days).
-- `application/config/version` (0.12.0) is shown in a corner of the main menu, so playtest
+- `application/config/version` (0.13.0) is shown in a corner of the main menu, so playtest
   reports name their build.
 - The export steps live in a composite action (`.github/actions/export-builds`), shared by CI
   and by **`release.yml`**. Pushing a `v*` tag builds both platforms, zips each with the
-  README and LICENSE, and publishes them as a GitHub Release.
+  README, LICENSE, `CREDITS.md` and `MUSIC-LICENSE.md` (the music is all rights reserved,
+  ADR-011), and publishes them as a GitHub Release.
+- `icon.svg` (a paw print, `application/config/icon`) is the window and taskbar icon. The
+  Windows `.exe` file keeps Godot's icon: embedding it needs rcedit (`modify_resources`), which
+  the Linux CI does not have.
 - Playtests follow `docs/playtests/README.md` (protocol) and `TEMPLATE.md` (notes).
 
 ## 12. Architecture Decision Records
