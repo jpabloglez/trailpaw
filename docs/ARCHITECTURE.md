@@ -552,8 +552,14 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
   `NeedEffects.rate_multiplier()` only while it is dropping (recovery is never slowed); the
   component passes its `effects`. The Rest state scales the energy it adds by `rest_factor`.
   The `Sniffer` (`needs`) widens `food_radius()` / `water_radius()` by the `food` / `water`
-  sniff factors (the long-range water scent keeps its own range). Cues other than `tired`
-  are not wired yet.
+  sniff factors (the long-range water scent keeps its own range).
+  **Cues (wired):** `NeedCues` (on the Animal, `data/needs/need_cues.tres`) shows the active
+  cues on the species model under `Model`, fading at 1.5/s: `pant` raises the chest 2.5 % at
+  3 Hz and plays a breathy loop, `growl` rumbles 4 s after hunger turns low and then every
+  25–45 s, `shiver` rolls the body ±1.8° at 12 Hz. Both sounds are synthesised by
+  `tools/need_cue_sounds.py` (`assets/audio/needs/`). `tired` stays the tired idle.
+  **First-time hints:** the first time thirst, energy or heat stops a sprint, the
+  `HintDirector` explains it (`too_thirsty`, `too_tired`, `too_hot`) until that need recovers.
 - HUD (`NeedsHud`, `scenes/ui/needs_hud.tscn`, `data/ui/needs_hud.tres`): bottom left, one
   `NeedMeter` per need, an icon inside a ring that empties with the need (ring colour
   `NeedDefinition.color`). Icons are silhouettes drawn in code by `NeedIcon`: a drop (thirst), an

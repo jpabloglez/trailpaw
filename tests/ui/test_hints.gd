@@ -179,3 +179,23 @@ func test_hamlet_food_is_hinted_once_seen_and_learnt_by_eating_it() -> void:
 	assert_bool(Settings.hints.is_done(&"hamlet_food")).is_false()  # berries don't count
 	EventBus.interaction_performed.emit(InteractionDefinition.Type.EAT, &"eggs")
 	assert_bool(Settings.hints.is_done(&"hamlet_food")).is_true()
+
+
+func test_a_blocked_sprint_explains_why_until_the_need_recovers() -> void:
+	var hints := _director()
+	for id: StringName in HintDirector.ORDER:
+		if not HintDirector.BLOCK_HINTS.values().has(id):
+			Settings.hints.mark(id)
+	await _wait(SETTINGS.first_delay + 0.4)
+	assert_str(String(hints.current())).is_equal("")
+	EventBus.need_effect_blocked.emit(&"thirst", &"sprint")
+	await _wait(0.4)
+	assert_str(String(hints.current())).is_equal("too_thirsty")
+	assert_str(hints.text_for(&"too_thirsty")).contains("Q")
+	EventBus.need_recovered.emit(&"thirst")
+	assert_bool(Settings.hints.is_done(&"too_thirsty")).is_true()
+	await _wait(0.4)
+	assert_str(String(hints.current())).is_equal("")
+	EventBus.need_effect_blocked.emit(&"energy", &"sprint")
+	await _wait(0.4)
+	assert_str(String(hints.current())).is_equal("too_tired")

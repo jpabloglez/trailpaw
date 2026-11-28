@@ -7,6 +7,9 @@ script = ExtResource("1_hint")
 texts = Dictionary[StringName, String]({
 &"move": "{move} to explore",
 &"run": "{hold_sprint} {sprint} to run",
+&"too_thirsty": "Too thirsty to run — find water ({sniff} to sniff it out)",
+&"too_tired": "Too tired to run — {hold_rest} {rest} to rest",
+&"too_hot": "Too hot to run — rest in the shade or wade into water",
 &"sniff": "Thirsty or hungry? {sniff} to sniff around",
 &"water": "Follow the blue sparkles to water",
 &"eat": "Walk up to food and press {interact}",

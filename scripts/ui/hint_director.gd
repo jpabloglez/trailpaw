@@ -10,8 +10,24 @@ extends CanvasLayer
 
 ## Order the hints are taught in.
 const ORDER: Array[StringName] = [
-	&"move", &"run", &"sniff", &"water", &"eat", &"map", &"rest", &"journal", &"hamlet_food"
+	&"move",
+	&"run",
+	&"too_thirsty",
+	&"too_tired",
+	&"too_hot",
+	&"sniff",
+	&"water",
+	&"eat",
+	&"map",
+	&"rest",
+	&"journal",
+	&"hamlet_food",
 ]
+## Need → the hint shown the first time that need stops a sprint (ADR-012); it is learnt once
+## the need recovers.
+const BLOCK_HINTS: Dictionary[StringName, StringName] = {
+	&"thirst": &"too_thirsty", &"energy": &"too_tired", &"temperature": &"too_hot"
+}
 ## Seconds between rule checks.
 const CHECK_INTERVAL: float = 0.25
 
@@ -42,6 +58,7 @@ var _ran: float = 0.0
 var _met_animal: bool = false
 var _seen_hamlet_food: bool = false
 var _water_scented: bool = false
+var _blocked: Dictionary[StringName, bool] = {}
 
 
 func _ready() -> void:
@@ -67,6 +84,8 @@ func _ready() -> void:
 	EventBus.animal_discovered.connect(func(_id: StringName) -> void: _met_animal = true)
 	EventBus.journal_opened.connect(func() -> void: complete(&"journal"))
 	EventBus.hamlet_food_seen.connect(func() -> void: _seen_hamlet_food = true)
+	EventBus.need_effect_blocked.connect(_on_need_effect_blocked)
+	EventBus.need_recovered.connect(_on_need_recovered)
 
 
 func _process(delta: float) -> void:
@@ -123,7 +142,19 @@ func is_due(id: StringName) -> bool:
 			due = _met_animal  # once the first animal is in it
 		&"hamlet_food":
 			due = _seen_hamlet_food
+		&"too_thirsty", &"too_tired", &"too_hot":
+			due = _blocked.has(BLOCK_HINTS.find_key(id))
 	return due
+
+
+func _on_need_effect_blocked(need_id: StringName, _ability: StringName) -> void:
+	if BLOCK_HINTS.has(need_id):
+		_blocked[need_id] = true
+
+
+func _on_need_recovered(need_id: StringName) -> void:
+	if _blocked.erase(need_id):
+		complete(BLOCK_HINTS[need_id])
 
 
 ## Marks hint [param id] as done (it never shows again) and saves the settings.
