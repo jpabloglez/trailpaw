@@ -13,3 +13,6 @@ full_hold = 2.0
 fade_per_second = 1.5
 pulse_amount = 0.4
 pulse_hz = 0.6
+flash_seconds = 0.8
+flash_amount = 0.7
+flash_count = 2

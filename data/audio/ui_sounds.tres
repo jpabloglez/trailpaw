@@ -9,6 +9,8 @@
 script = ExtResource("1_ui")
 prompt = ExtResource("2_prompt")
 need_critical = ExtResource("3_chime")
+need_blocked = ExtResource("3_chime")
+need_blocked_pitch = 0.6
 sniff = ExtResource("4_sniff")
 volume_db = -12.0
 bus = &"SFX"

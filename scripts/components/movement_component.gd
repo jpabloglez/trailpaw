@@ -30,9 +30,13 @@ var move_input: Vector2 = Vector2.ZERO
 var sprint: bool = false
 ## Whether the body is swimming (set by the swim state).
 var swimming: bool = false
-## Multiplier on every target speed (soft consequences of critical needs, set by
-## [code]NeedsComponent[/code]; 1 = normal).
+## Multiplier on every target speed (need effects, set by [code]NeedsComponent[/code];
+## 1 = normal, above 1 while feeling well).
 var speed_multiplier: float = 1.0
+## Whether [member sprint] may run now (need effects: bursts or no sprint; ADR-012).
+var sprint_allowed: bool = true
+## Multiplier on the jump height (need effects; 1 = normal).
+var jump_multiplier: float = 1.0
 
 var _body: CharacterBody3D
 var _gravity: float = 0.0
@@ -72,6 +76,11 @@ func consume_jump_request() -> bool:
 ## Whether the controller is asking to move.
 func has_move_input() -> bool:
 	return move_input.length_squared() > INPUT_DEADZONE_SQ
+
+
+## Whether the controller asks to run while moving (whether or not it may now).
+func wants_sprint() -> bool:
+	return sprint and has_move_input()
 
 
 ## Whether the body stood on a floor after the last [method move].
@@ -138,9 +147,10 @@ func apply_gravity(delta: float) -> void:
 		_body.velocity.y -= _gravity * delta
 
 
-## Launches the body upwards to reach the species' jump height.
+## Launches the body upwards to reach the species' jump height × [member jump_multiplier].
 func perform_jump() -> void:
-	_body.velocity.y = LocomotionModel.jump_velocity(species.jump_height, _gravity)
+	var height := species.jump_height * jump_multiplier
+	_body.velocity.y = LocomotionModel.jump_velocity(height, _gravity)
 
 
 ## Moves the body and keeps the tracked speed honest after collisions (walls stop you).
@@ -162,11 +172,11 @@ func _step_horizontal(delta: float, control: float, speed_factor: float = 1.0) -
 	_body.rotation.y = yaw
 	var error := LocomotionModel.heading_error(yaw, desired)
 	var target := (
-		LocomotionModel.target_speed(desired.length(), sprint, error, species)
+		LocomotionModel.target_speed(desired.length(), sprint and sprint_allowed, error, species)
 		* speed_factor
 		* speed_multiplier
 	)
-	_speed = LocomotionModel.step_speed(_speed, target, species, delta, control)
+	_speed = LocomotionModel.step_speed(_speed, target, species, delta, control, speed_multiplier)
 	var velocity := LocomotionModel.forward_for_yaw(yaw) * _speed
 	_body.velocity.x = velocity.x
 	_body.velocity.z = velocity.z

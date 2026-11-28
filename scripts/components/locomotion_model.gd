@@ -83,13 +83,19 @@ static func target_speed(
 
 
 ## Moves [param current] towards [param target] using the species' acceleration or
-## deceleration. The result is always within [0, run_speed].
+## deceleration. The result is always within [0, run_speed × [param cap]] ([param cap] above 1
+## lets a speed bonus reach past the run speed).
 static func step_speed(
-	current: float, target: float, species: AnimalSpecies, delta: float, control: float = 1.0
+	current: float,
+	target: float,
+	species: AnimalSpecies,
+	delta: float,
+	control: float = 1.0,
+	cap: float = 1.0
 ) -> float:
 	var rate := species.acceleration if target > current else species.deceleration
 	var next := move_toward(current, target, rate * control * delta)
-	return clampf(next, 0.0, species.run_speed)
+	return clampf(next, 0.0, species.run_speed * maxf(cap, 1.0))
 
 
 ## Gait for a horizontal speed. Boundaries sit halfway between the gait speeds so the

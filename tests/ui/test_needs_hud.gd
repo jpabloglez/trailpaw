@@ -117,3 +117,22 @@ func test_icon_outlines_are_valid_polygons() -> void:
 		assert_bool(Geometry2D.triangulate_polygon(points).is_empty()).is_false()
 		for p: Vector2 in points:
 			assert_float(p.length()).is_less_equal(10.0 + 1e-3)
+
+
+func test_a_blocked_need_flashes_its_meter() -> void:
+	var setup := _setup()
+	var needs: NeedsComponent = setup[0]
+	var hud: NeedsHud = setup[1]
+	var meter := hud.meter(&"energy")
+	needs.effect_blocked.emit(&"energy", &"sprint")
+	assert_bool(meter.is_flashing()).is_true()
+	assert_float(meter.opacity()).is_equal(1.0)  # shown even if it had faded
+	assert_bool(hud.meter(&"thirst").is_flashing()).is_false()
+	var seen := 0.0
+	for i in 8:
+		meter.advance(0.1)
+		seen = maxf(seen, meter.pulse())
+	assert_float(seen).is_greater(0.5)
+	_advance(meter, 1.0)
+	assert_bool(meter.is_flashing()).is_false()
+	assert_float(meter.pulse()).is_equal(0.0)
