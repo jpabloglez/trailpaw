@@ -23,6 +23,7 @@
 [ext_resource type="Resource" path="res://data/needs/temperature.tres" id="27_temp"]
 [ext_resource type="Resource" path="res://data/needs/energy.tres" id="28_energy"]
 [ext_resource type="Resource" path="res://data/needs/need_modifiers.tres" id="29_mods"]
+[ext_resource type="Resource" path="res://data/needs/need_effects.tres" id="60_effects"]
 [ext_resource type="Resource" path="res://data/biomes/biome_table.tres" id="30_biomes"]
 
 [ext_resource type="Script" path="res://scripts/interaction/interactor.gd" id="32_inter"]
@@ -166,6 +167,7 @@ needs = Array[ExtResource("31_needdef")]([ExtResource("25_hunger"), ExtResource(
 modifiers = ExtResource("29_mods")
 movement = NodePath("../MovementComponent")
 biomes = ExtResource("30_biomes")
+effect_table = ExtResource("60_effects")
 
 [node name="Interactor" type="Node3D" parent="." node_paths=PackedStringArray("body", "movement", "state_machine")]
 unique_name_in_owner = true

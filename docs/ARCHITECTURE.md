@@ -479,7 +479,7 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
   the base rate while trotting in neutral conditions. User-chosen "moderate" pacing, full →
   critical at a trot: thirst 8 min, hunger 12 min, energy 15 min, comfort 10 min in a fully
   warm biome. Critical at ≤ 25, recovered only above 35 (`recover_margin`, no flicker).
-  Effects when critical: speed × 0.85 (energy × 0.8, and only energy looks tired).
+  What low and empty needs do is a `NeedEffect` (ADR-012, below).
 - Modifiers (`NeedModifiers`, `data/needs/need_modifiers.tres`): hunger, thirst and energy change
   at `−decay × multiplier` of the activity (idle / walk / trot / run / swim; missing = 1, negative
   = recovery: energy recovers while idle, 15 min from empty to full). Temperature comfort follows
@@ -512,10 +512,11 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
   and water depth; it emits `need_changed(id, value)` and relays crossings to
   `EventBus.need_critical` / `need_recovered`. F3 shows the values; F5
   (`debug_refill_needs`) refills them until eating and drinking exist (Phase 7).
-- Soft consequences (ADR-003), all eased so nothing snaps: `NeedsComponent` moves
-  `MovementComponent.speed_multiplier` (multiplies every target speed) towards the lowest
-  `critical_speed_factor` of the critical needs at 0.1/s; `tiredness()` eases to 1 (0.5/s) while a
-  `tired_when_critical` need (energy) is critical and drives the tired idle blend (§4.4);
+- Soft consequences (ADR-003, ADR-012), eased so nothing snaps: every tick `NeedsComponent`
+  recomputes `effects` (`NeedEffects` from its `effect_table`) and moves
+  `MovementComponent.speed_multiplier` (multiplies every target speed; above 1 it also lifts the
+  run-speed cap) towards its speed factor at 0.1/s; `tiredness()` eases to 1 (0.5/s) while the
+  `tired` cue is active (energy low or empty) and drives the tired idle blend (§4.4);
   `NeedsVignette` (`scenes/ui/needs_vignette.tscn`, `shaders/needs_vignette.gdshader`,
   `data/ui/needs_vignette.tres`) warms and darkens the screen edges, half intensity for one
   critical need and full for two or more, fading at 0.25/s.
@@ -540,8 +541,14 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
   | Comfort (hot, in the sun) | speed ×0.9, thirst ×1.3 | no sprint, thirst ×1.6 | pant |
   | Comfort (cold) | energy ×1.3 | energy ×1.6, jump ×0.75 | shiver |
 
-  Not wired into gameplay yet: movement, drains, sniffing and cues read it in the next steps
-  (ROADMAP "Need effects").
+  **Abilities (wired):** `NeedsComponent` sets `MovementComponent.jump_multiplier` and gates
+  `sprint_allowed` through `SprintBursts` (pure: a 4 s burst, then 3 s catching its breath;
+  not sprinting refills it). Asking to sprint while it may not emits `effect_blocked(need_id,
+  &"sprint")` once per attempt and need, relayed to `EventBus.need_effect_blocked`: the
+  `NeedMeter` of that need flashes twice (`NeedsHudSettings.flash_*`, shown even if faded) and
+  `UiSounds` plays the critical chime lower (`need_blocked`, pitch 0.6). The shade is asked
+  (`shade_source`, default the `WorldStreamer`) only while comfort is low. Drains between
+  needs, rest and sniff factors and the cues other than `tired` are not wired yet.
 - HUD (`NeedsHud`, `scenes/ui/needs_hud.tscn`, `data/ui/needs_hud.tres`): bottom left, one
   `NeedMeter` per need, an icon inside a ring that empties with the need (ring colour
   `NeedDefinition.color`). Icons are silhouettes drawn in code by `NeedIcon`: a drop (thirst), an

@@ -9,11 +9,17 @@ extends Node
 ## [code]debug_refill_needs[/code] (F5) refills everything until eating and drinking exist
 ## (Phase 7).
 ## [br][br]
-## Soft consequences (ADR-003): while needs are critical it eases
-## [member MovementComponent.speed_multiplier] down to the lowest critical speed factor and
-## eases [method tiredness] up (tired idle animation); both ease back when the needs recover.
+## Need effects (ADR-012, on top of ADR-003): every tick [member effects] ([NeedEffects], from
+## [member effect_table]) is recomputed from the needs' tiers. The component eases
+## [member MovementComponent.speed_multiplier] towards its speed factor, sets
+## [member MovementComponent.jump_multiplier], gates [member MovementComponent.sprint_allowed]
+## through [SprintBursts], and eases [method tiredness] up while the [code]&"tired"[/code] cue
+## is active (tired idle animation). Asking to sprint when it may not emits
+## [signal effect_blocked] once per need that limits it (also on
+## [code]EventBus.need_effect_blocked[/code]) so the HUD and sounds can say why.
 ## [br][br]
-## Budget: one [method NeedsModel.tick] (a few float ops per need) every 250 ms.
+## Budget: one [method NeedsModel.tick] and one [method NeedEffects.update] (O(needs + effects)
+## float ops; the shade is asked only while comfort is low) every 250 ms.
 
 ## A need's value changed.
 signal need_changed(need_id: StringName, value: float)
@@ -21,6 +27,8 @@ signal need_changed(need_id: StringName, value: float)
 signal need_critical(need_id: StringName)
 ## A critical need recovered.
 signal need_recovered(need_id: StringName)
+## The animal asked for [param ability] ([code]&"sprint"[/code]) and [param need_id] stops it.
+signal effect_blocked(need_id: StringName, ability: StringName)
 
 ## Ticks per second.
 const TICK_HZ: float = 4.0
@@ -35,9 +43,18 @@ const IDLE_SPEED: float = 0.2
 @export var movement: MovementComponent
 ## Biomes providing warmth by id ([code]GameState.current_biome[/code]).
 @export var biomes: BiomeTable
+## Effects of low and empty needs (none when unset).
+@export var effect_table: NeedEffectTable
+## Object with [code]is_shaded(global_position) -> bool[/code] (heat effects pause in shade);
+## defaults to the [WorldStreamer] in [constant WorldStreamer.GROUP].
+@export var shade_source: Node
 
 ## The pure needs state (read it for values; write through [method set_value]).
 var model: NeedsModel
+## What the needs let the animal do now (recomputed every tick).
+var effects: NeedEffects
+## How strongly need effects apply (the player's setting).
+var intensity: NeedEffects.Intensity = NeedEffects.Intensity.NORMAL
 
 var _since_tick: float = 0.0
 var _speed_multiplier: float = 1.0
@@ -46,6 +63,8 @@ var _warmth: Dictionary[StringName, float] = {}
 var _night_drop: Dictionary[StringName, float] = {}
 var _multipliers: Dictionary[StringName, Dictionary] = {}
 var _dry: Dictionary[StringName, bool] = {}
+var _bursts: SprintBursts
+var _sprint_blocked: bool = false
 
 
 func _ready() -> void:
@@ -53,6 +72,10 @@ func _ready() -> void:
 	model.value_changed.connect(func(id: StringName, v: float) -> void: need_changed.emit(id, v))
 	model.critical_entered.connect(_on_critical_entered)
 	model.critical_exited.connect(_on_critical_exited)
+	if effect_table == null:
+		effect_table = NeedEffectTable.new()
+	effects = NeedEffects.new(effect_table)
+	_bursts = SprintBursts.new(effect_table.burst_seconds, effect_table.burst_rest_seconds)
 	if biomes != null:
 		for biome in biomes.biomes:
 			_warmth[biome.id] = biome.warmth
@@ -86,6 +109,12 @@ func tick(delta: float) -> void:
 		is_raining(),
 		_multipliers.get(GameState.current_biome, {})
 	)
+	update_effects()
+
+
+## Recomputes [member effects] from the needs now (each tick does it too).
+func update_effects() -> void:
+	effects.update(model, is_cold(), is_shaded(), intensity)
 
 
 ## Current movement speed multiplier from critical needs (eased; 1 = normal).
@@ -147,6 +176,18 @@ func is_cold() -> bool:
 	return not in_water() and modifiers.is_too_cold(felt_warmth() + modifiers.heat(activity()))
 
 
+## Whether the animal is in shade or water (heat effects pause). Only asked while comfort is
+## low; otherwise [code]false[/code].
+func is_shaded() -> bool:
+	if model.tier(modifiers.warmth_need) == NeedsModel.Tier.NORMAL:
+		return false
+	if in_water():
+		return true
+	var shade := _shade()
+	var body := movement.get_parent() as Node3D if movement != null else null
+	return shade != null and body != null and bool(shade.call(&"is_shaded", body.global_position))
+
+
 ## Whether it rains (less thirst, see [member NeedModifiers.rain]).
 func is_raining() -> bool:
 	return GameState.weather == &"rain" and not _dry.get(GameState.current_biome, false)
@@ -195,12 +236,29 @@ func get_debug_lines() -> PackedStringArray:
 
 func _ease_effects(delta: float) -> void:
 	_speed_multiplier = move_toward(
-		_speed_multiplier, model.critical_speed_factor(), modifiers.speed_ease_per_second * delta
+		_speed_multiplier, effects.speed_factor, modifiers.speed_ease_per_second * delta
 	)
-	var tired_target := 1.0 if model.is_tired() else 0.0
+	var tired_target := 1.0 if effects.cues().has(&"tired") else 0.0
 	_tiredness = move_toward(_tiredness, tired_target, modifiers.tired_ease_per_second * delta)
-	if movement != null:
-		movement.speed_multiplier = _speed_multiplier
+	if movement == null:
+		return
+	movement.speed_multiplier = _speed_multiplier
+	movement.jump_multiplier = effects.jump_factor
+	var wants := movement.wants_sprint()
+	var allowed := _bursts.step(delta, effects.sprint, wants and movement.sprint_allowed)
+	movement.sprint_allowed = allowed
+	var blocked := wants and not allowed
+	if blocked and not _sprint_blocked:
+		for need_id in effects.sprint_limiters():
+			effect_blocked.emit(need_id, &"sprint")
+			EventBus.need_effect_blocked.emit(need_id, &"sprint")
+	_sprint_blocked = blocked
+
+
+func _shade() -> Node:
+	if shade_source == null and is_inside_tree():
+		shade_source = get_tree().get_first_node_in_group(WorldStreamer.GROUP)
+	return shade_source
 
 
 func _on_critical_entered(need_id: StringName) -> void:

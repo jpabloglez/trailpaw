@@ -27,6 +27,7 @@ func _ready() -> void:
 	needs.need_changed.connect(_refresh)
 	needs.need_critical.connect(_refresh_state)
 	needs.need_recovered.connect(_refresh_state)
+	needs.effect_blocked.connect(_on_effect_blocked)
 
 
 ## Meter showing [param need_id] (for tests and tools).
@@ -36,6 +37,12 @@ func meter(need_id: StringName) -> NeedMeter:
 
 func _refresh(need_id: StringName, value: float) -> void:
 	_meters[need_id].set_value(value, needs.model.is_critical(need_id))
+
+
+func _on_effect_blocked(need_id: StringName, _ability: StringName) -> void:
+	var blocked: NeedMeter = _meters.get(need_id)
+	if blocked != null:
+		blocked.flash()
 
 
 func _refresh_state(need_id: StringName) -> void:

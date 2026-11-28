@@ -73,7 +73,10 @@ func test_floats_at_the_surface_slower_than_on_land() -> void:
 		max_speed = maxf(max_speed, _animal.movement.horizontal_speed())
 	var float_height := WATER - _species.float_depth
 	assert_float(_animal.global_position.y).is_equal_approx(float_height, 0.08)
-	assert_float(max_speed).is_less_equal(_species.trot_speed * _species.swim_speed_factor + 0.05)
+	var needs := _animal.get_node("%NeedsComponent") as NeedsComponent
+	var bonus := needs.effect_table.bonus_speed_factor  # fresh needs feel well (ADR-012)
+	var swim_speed := _species.trot_speed * _species.swim_speed_factor * bonus
+	assert_float(max_speed).is_less_equal(swim_speed + 0.05)
 
 
 func test_model_is_level_and_swim_animation_plays() -> void:

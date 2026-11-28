@@ -44,17 +44,6 @@ func test_thirst_comes_before_hunger_before_energy() -> void:
 	)
 
 
-func test_only_energy_makes_the_animal_look_tired() -> void:
-	for id: StringName in PACING:
-		assert_bool(_need(id).tired_when_critical).is_equal(id == &"energy")
-
-
-func test_consequences_are_soft() -> void:
-	# ADR-003: critical needs slow the animal a little, never stop it.
-	for id: StringName in PACING:
-		assert_float(_need(id).critical_speed_factor).is_between(0.7, 1.0)
-
-
 func test_unconfigured_need_is_invalid() -> void:
 	assert_bool(NeedDefinition.new().is_valid()).is_false()
 	assert_float(NeedDefinition.new().minutes_to_critical()).is_equal(INF)
@@ -77,9 +66,3 @@ func test_empty_margin_must_sit_between_zero_and_the_threshold() -> void:
 	assert_bool(need.is_valid()).is_false()
 	need.empty_recover_margin = 8.0
 	assert_bool(need.is_valid()).is_true()
-
-
-func test_speed_factor_must_be_a_slowdown() -> void:
-	var need := _need(&"energy").duplicate() as NeedDefinition
-	need.critical_speed_factor = 0.0
-	assert_bool(need.is_valid()).is_false()

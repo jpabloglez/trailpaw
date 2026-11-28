@@ -60,7 +60,11 @@ func test_forward_input_moves_along_forward_within_speed_limit() -> void:
 	assert_str(String(_animal.state_machine.current_state_name())).is_equal("Locomotion")
 	# No camera in the test tree: forward is the body's initial -Z.
 	assert_float(_animal.global_position.z).is_less(start.z - 1.0)
-	assert_float(max_speed).is_less_equal(_animal.movement.species.run_speed + 1e-3)
+	# Fresh needs feel well: the bonus may lift the run speed a little (ADR-012).
+	var bonus: float = (
+		(_animal.get_node("%NeedsComponent") as NeedsComponent).effect_table.bonus_speed_factor
+	)
+	assert_float(max_speed).is_less_equal(_animal.movement.species.run_speed * bonus + 1e-3)
 
 
 func test_releasing_input_returns_to_idle() -> void:

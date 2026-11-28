@@ -6,6 +6,10 @@ extends Resource
 @export var prompt: AudioStream
 ## Gentle chime when a need becomes critical.
 @export var need_critical: AudioStream
+## Soft sound when a low need blocks an action (e.g. sprinting; ADR-012).
+@export var need_blocked: AudioStream
+## Pitch of [member need_blocked] (lower than the chime it may share).
+@export_range(0.25, 2.0, 0.05) var need_blocked_pitch: float = 1.0
 ## Soft whoosh when sniffing.
 @export var sniff: AudioStream
 ## Volume of every interface sound.

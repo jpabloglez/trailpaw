@@ -47,6 +47,11 @@ signal need_critical(need_id: StringName)
 @warning_ignore("unused_signal")
 signal need_recovered(need_id: StringName)
 
+## The player asked for [param ability] ([code]&"sprint"[/code]) and the low or empty need
+## [param need_id] stops it (ADR-012): its meter pulses and a soft sound plays.
+@warning_ignore("unused_signal")
+signal need_effect_blocked(need_id: StringName, ability: StringName)
+
 ## The player opened the map (Phase 12: onboarding).
 @warning_ignore("unused_signal")
 signal map_opened

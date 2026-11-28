@@ -161,6 +161,20 @@ func test_interface_sounds_for_prompt_critical_need_and_sniff() -> void:
 	assert_str(String(ui.player().bus)).is_equal("SFX")
 
 
+func test_a_blocked_action_plays_the_low_chime_once() -> void:
+	var fox := _fox()
+	var ui := _ui(fox)
+	EventBus.need_effect_blocked.emit(&"thirst", &"sprint")
+	assert_object(ui.player().stream).is_same(UI.need_blocked)
+	assert_float(ui.player().pitch_scale).is_equal_approx(UI.need_blocked_pitch, 1e-4)
+	assert_bool(ui.player().playing).is_true()
+	var position := ui.player().get_playback_position()
+	EventBus.need_effect_blocked.emit(&"energy", &"sprint")  # same moment: no restart
+	assert_float(ui.player().get_playback_position()).is_greater_equal(position)
+	(fox.get_node("%Sniffer") as Sniffer).sniffed.emit(1)
+	assert_float(ui.player().pitch_scale).is_equal(1.0)
+
+
 func test_the_prompt_pluck_plays_once_per_appearance() -> void:
 	var fox := _fox()
 	var ui := _ui(fox)

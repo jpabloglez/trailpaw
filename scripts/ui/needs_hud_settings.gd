@@ -20,3 +20,9 @@ extends Resource
 @export_range(0.0, 1.0, 0.01) var pulse_amount: float = 0.0
 ## Pulses per second of a critical meter.
 @export_range(0.05, 5.0, 0.05, "suffix:Hz") var pulse_hz: float = 0.0
+## How long a meter flashes when its need blocks an action (seconds; ADR-012).
+@export_range(0.1, 3.0, 0.05, "suffix:s") var flash_seconds: float = 0.1
+## How much a flashing meter dims at the bottom of each flash (0 = no flash).
+@export_range(0.0, 1.0, 0.01) var flash_amount: float = 0.0
+## Flashes in [member flash_seconds].
+@export_range(1, 5, 1) var flash_count: int = 1

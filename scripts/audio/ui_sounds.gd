@@ -1,7 +1,8 @@
 class_name UiSounds
 extends Node
 ## Quiet interface feedback: a pluck when an interaction prompt appears, a gentle chime when a
-## need becomes critical and a whoosh when sniffing. Non-positional, on the SFX bus.
+## need becomes critical, a lower one when a low need blocks an action and a whoosh when
+## sniffing. Non-positional, on the SFX bus.
 
 ## Sounds and volume.
 @export var settings: UiSoundSettings
@@ -24,19 +25,26 @@ func _ready() -> void:
 	if sniffer != null:
 		sniffer.sniffed.connect(func(_count: int) -> void: play(settings.sniff))
 	EventBus.need_critical.connect(func(_need: StringName) -> void: play(settings.need_critical))
+	EventBus.need_effect_blocked.connect(_on_need_effect_blocked)
 
 
-## Plays [param stream] (the last sound wins; interface sounds are short).
-func play(stream: AudioStream) -> void:
+## Plays [param stream] at [param pitch] (the last sound wins; interface sounds are short).
+func play(stream: AudioStream, pitch: float = 1.0) -> void:
 	if stream == null:
 		return
 	_player.stream = stream
+	_player.pitch_scale = pitch
 	_player.play()
 
 
 ## The player (tests and tools).
 func player() -> AudioStreamPlayer:
 	return _player
+
+
+func _on_need_effect_blocked(_need: StringName, _ability: StringName) -> void:
+	if not _player.playing or _player.stream != settings.need_blocked:
+		play(settings.need_blocked, settings.need_blocked_pitch)
 
 
 func _on_target_changed(target: InteractionTarget) -> void:

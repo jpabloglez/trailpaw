@@ -4,7 +4,8 @@ extends Control
 ##
 ## Full meters fade out after [member NeedsHudSettings.full_hold]; a meter reappears as soon as
 ## its need drops below [member NeedsHudSettings.full_fraction]. A critical meter pulses
-## gently (it dims and brightens; no red, no sound — ADR-003).
+## gently (it dims and brightens; no red, no sound — ADR-003). [method flash] blinks it more
+## strongly when its need blocks an action (ADR-012), showing it if it was faded out.
 ## [br][br]
 ## Budget: redraws only when its value, opacity or pulse changes.
 
@@ -17,6 +18,7 @@ var _fraction: float = 1.0
 var _critical: bool = false
 var _full_for: float = 0.0
 var _pulse_time: float = 0.0
+var _flash_left: float = 0.0
 
 
 func _ready() -> void:
@@ -44,12 +46,28 @@ func advance(delta: float) -> void:
 	var full := _fraction >= settings.full_fraction
 	_full_for = _full_for + delta if full else 0.0
 	var target := 0.0 if full and _full_for >= settings.full_hold else 1.0
+	if _flash_left > 0.0:
+		_flash_left = maxf(_flash_left - delta, 0.0)
+		target = 1.0
+		queue_redraw()
 	var alpha := move_toward(modulate.a, target, settings.fade_per_second * delta)
 	if alpha != modulate.a:
 		modulate.a = alpha
 	if _critical:
 		_pulse_time += delta
 		queue_redraw()
+
+
+## Blinks the meter [member NeedsHudSettings.flash_count] times (its need blocked an action).
+func flash() -> void:
+	_flash_left = settings.flash_seconds
+	modulate.a = 1.0
+	queue_redraw()
+
+
+## Whether the meter is flashing.
+func is_flashing() -> bool:
+	return _flash_left > 0.0
 
 
 ## Shown fraction of the need (0…1), i.e. how much of the ring is filled.
@@ -62,11 +80,17 @@ func opacity() -> float:
 	return modulate.a
 
 
-## Current pulse dimming (0 = none; up to [member NeedsHudSettings.pulse_amount]).
+## Current pulse dimming (0 = none; up to [member NeedsHudSettings.pulse_amount], or
+## [member NeedsHudSettings.flash_amount] while flashing).
 func pulse() -> float:
-	if not _critical:
-		return 0.0
-	return settings.pulse_amount * 0.5 * (1.0 - cos(TAU * settings.pulse_hz * _pulse_time))
+	var dim := 0.0
+	if _critical:
+		dim = settings.pulse_amount * 0.5 * (1.0 - cos(TAU * settings.pulse_hz * _pulse_time))
+	if _flash_left > 0.0:
+		var t := 1.0 - _flash_left / settings.flash_seconds
+		var blink := 0.5 * (1.0 - cos(TAU * settings.flash_count * t))
+		dim = maxf(dim, settings.flash_amount * blink)
+	return dim
 
 
 func _draw() -> void:
