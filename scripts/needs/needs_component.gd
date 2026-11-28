@@ -107,7 +107,8 @@ func tick(delta: float) -> void:
 		felt_warmth(),
 		in_water(),
 		is_raining(),
-		_multipliers.get(GameState.current_biome, {})
+		_multipliers.get(GameState.current_biome, {}),
+		effects
 	)
 	update_effects()
 

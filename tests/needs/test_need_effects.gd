@@ -151,3 +151,26 @@ func test_updating_again_resets_what_no_longer_applies() -> void:
 	assert_array(effects.cues()).is_empty()
 	assert_float(effects.rate_multiplier(&"temperature")).is_equal(1.0)
 	assert_bool(effects.feeling_well).is_true()
+
+
+func test_drains_speed_up_only_needs_that_are_dropping() -> void:
+	var model := _model()
+	model.set_value(&"hunger", 0.0)  # energy drains ×1.6
+	var effects := _effects(model)
+	var plain := _model()
+	plain.set_value(&"hunger", 0.0)
+	model.set_value(&"energy", 50.0)
+	plain.set_value(&"energy", 50.0)
+	for i in 240:  # a minute of trotting
+		model.tick(0.25, NeedsModel.Activity.TROT, 0.0, false, false, {}, effects)
+		plain.tick(0.25, NeedsModel.Activity.TROT, 0.0)
+	var decay: float = model.definition(&"energy").decay_per_minute
+	assert_float(50.0 - model.value(&"energy")).is_equal_approx(decay * 1.6, 1e-2)
+	assert_float(50.0 - plain.value(&"energy")).is_equal_approx(decay, 1e-2)
+	for i in 240:  # resting still: recovery is not slowed
+		model.tick(0.25, NeedsModel.Activity.IDLE, 0.0, false, false, {}, effects)
+		plain.tick(0.25, NeedsModel.Activity.IDLE, 0.0)
+	var model_gain := model.value(&"energy")
+	assert_float(model_gain - (50.0 - decay * 1.6)).is_equal_approx(
+		plain.value(&"energy") - (50.0 - decay), 1e-2
+	)

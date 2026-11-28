@@ -11,6 +11,9 @@ extends Node3D
 ## ([WaterScent], up to [member SniffSettings.scent_radius], on a worker thread): a trail of
 ## blue sparkles appears one after another from the animal towards it.
 ## [br][br]
+## With [member needs], low needs help the nose (ADR-012): the food and water ranges grow by
+## [method NeedEffects.sniff_factor] ([code]&"food"[/code], [code]&"water"[/code]).
+## [br][br]
 ## Budget: only on a sniff — one shape query (≤ [constant MAX_QUERY] results),
 ## directions × rings rays (96 by default) and, for a scent, one worker task plus
 ## [member SniffSettings.trail_count] rays when it completes; sparkles are pooled and just fade
@@ -42,6 +45,8 @@ const MARKER_SHADER: Shader = preload("res://shaders/sniff_marker.gdshader")
 @export var animation: AnimationController
 ## Terrain the water is scented from (optional; no long-range scent without it).
 @export var terrain: TerrainSettings
+## Needs whose effects widen the ranges (optional).
+@export var needs: NeedsComponent
 
 var _markers: Array[MeshInstance3D] = []
 var _shown: int = 0
@@ -121,9 +126,21 @@ func sniff_now() -> void:
 	sniffed.emit(food.size())
 
 
-## Available food in the animal's diet within the radius, nearest first, capped.
+## Range food is found in now (m): [member SniffSettings.radius], wider when hungry.
+func food_radius() -> float:
+	return settings.radius * _factor(&"food")
+
+
+## Range nearby water is found in now (m): [member SniffSettings.radius], wider when thirsty.
+func water_radius() -> float:
+	return settings.radius * _factor(&"water")
+
+
+## Available food in the animal's diet within [method food_radius], nearest first, capped.
 func find_food() -> Array[InteractionTarget]:
 	var origin := body.global_position
+	var radius := food_radius()
+	(_query.shape as SphereShape3D).radius = radius
 	_query.transform = Transform3D(Basis.IDENTITY, origin)
 	var hits := body.get_world_3d().direct_space_state.intersect_shape(_query, MAX_QUERY)
 	var found: Array[InteractionTarget] = []
@@ -134,7 +151,7 @@ func find_food() -> Array[InteractionTarget]:
 		var target: InteractionTarget = collider.call(&"interaction_target", hit.shape)
 		if target == null or target.definition.type != InteractionDefinition.Type.EAT:
 			continue
-		if origin.distance_to(target.position) > settings.radius:
+		if origin.distance_to(target.position) > radius:
 			continue
 		if interactor != null and not interactor.accepts(target):
 			continue
@@ -150,15 +167,16 @@ func find_food() -> Array[InteractionTarget]:
 	return found
 
 
-## Nearest point (on rings around the animal, within the radius) where the ground lies under
-## the water surface, at the surface; [constant Vector3.INF] if none.
+## Nearest point (on rings around the animal, within [method water_radius]) where the ground
+## lies under the water surface, at the surface; [constant Vector3.INF] if none.
 func find_water() -> Vector3:
 	if is_inf(GameState.water_level):
 		return Vector3.INF
 	var origin := body.global_position
 	var space := body.get_world_3d().direct_space_state
+	var radius := water_radius()
 	for ring in range(1, settings.water_rings + 1):
-		var distance := settings.radius * ring / settings.water_rings
+		var distance := radius * ring / settings.water_rings
 		for d in settings.water_directions:
 			var angle := TAU * d / settings.water_directions
 			var point := origin + Vector3(cos(angle), 0.0, sin(angle)) * distance
@@ -199,6 +217,12 @@ func water_hint() -> Vector3:
 ## Seconds until sniffing is possible again.
 func cooldown_left() -> float:
 	return _cooldown_left
+
+
+func _factor(kind: StringName) -> float:
+	if needs == null or needs.effects == null:
+		return 1.0
+	return needs.effects.sniff_factor(kind)
 
 
 func _start_scent() -> void:

@@ -89,6 +89,33 @@ func test_highlights_available_food_in_the_diet_within_the_radius_nearest_first(
 	assert_float((markers[1] as Node3D).scale.x).is_greater((markers[0] as Node3D).scale.x)
 
 
+func test_hunger_widens_the_food_range() -> void:
+	_slab(0.0, 120.0, 0.0)
+	var animal := _animal()
+	_item(BERRIES, Vector3(0, 0.3, 30))  # beyond the usual radius (25 m)
+	await _frames(10)
+	var sniffer := _sniffer(animal)
+	var needs := animal.get_node("%NeedsComponent") as NeedsComponent
+	assert_float(sniffer.food_radius()).is_equal(SETTINGS.radius)
+	sniffer.sniff_now()
+	assert_int(sniffer.highlights().size()).is_equal(0)
+	needs.set_value(&"hunger", 10.0)
+	needs.update_effects()
+	assert_float(sniffer.food_radius()).is_equal(SETTINGS.radius * 1.5)
+	assert_float(sniffer.water_radius()).is_equal(SETTINGS.radius)
+	sniffer.sniff_now()
+	assert_int(sniffer.highlights().size()).is_equal(1)
+
+
+func test_thirst_widens_the_water_range() -> void:
+	var animal := _animal()
+	await _frames(2)
+	var needs := animal.get_node("%NeedsComponent") as NeedsComponent
+	needs.set_value(&"thirst", 0.0)
+	needs.update_effects()
+	assert_float(_sniffer(animal).water_radius()).is_equal(SETTINGS.radius * 1.5)
+
+
 func test_at_most_the_configured_number() -> void:
 	_slab(0.0, 120.0, 0.0)
 	var animal := _animal()

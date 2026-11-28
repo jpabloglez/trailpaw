@@ -547,8 +547,13 @@ bound by `physical_keycode` so the layout works on non-QWERTY keyboards (e.g. AZ
   &"sprint")` once per attempt and need, relayed to `EventBus.need_effect_blocked`: the
   `NeedMeter` of that need flashes twice (`NeedsHudSettings.flash_*`, shown even if faded) and
   `UiSounds` plays the critical chime lower (`need_blocked`, pitch 0.6). The shade is asked
-  (`shade_source`, default the `WorldStreamer`) only while comfort is low. Drains between
-  needs, rest and sniff factors and the cues other than `tired` are not wired yet.
+  (`shade_source`, default the `WorldStreamer`) only while comfort is low.
+  **Drains, rest and nose (wired):** `NeedsModel.tick(…, drains)` multiplies a need's rate by
+  `NeedEffects.rate_multiplier()` only while it is dropping (recovery is never slowed); the
+  component passes its `effects`. The Rest state scales the energy it adds by `rest_factor`.
+  The `Sniffer` (`needs`) widens `food_radius()` / `water_radius()` by the `food` / `water`
+  sniff factors (the long-range water scent keeps its own range). Cues other than `tired`
+  are not wired yet.
 - HUD (`NeedsHud`, `scenes/ui/needs_hud.tscn`, `data/ui/needs_hud.tres`): bottom left, one
   `NeedMeter` per need, an icon inside a ring that empties with the need (ring colour
   `NeedDefinition.color`). Icons are silhouettes drawn in code by `NeedIcon`: a drop (thirst), an
