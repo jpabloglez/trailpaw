@@ -184,6 +184,23 @@ func test_walking_without_sprint_is_never_blocked() -> void:
 	assert_array(_blocked).is_empty()
 
 
+func test_the_setting_turns_effects_gentle_or_off() -> void:
+	var animal := _animal_on_floor()
+	var needs := _needs(animal)
+	_hold(needs, {&"energy": 0.0}, 0.5)
+	assert_int(needs.effects.sprint).is_equal(NeedEffect.Sprint.NONE)
+	Settings.set_choice(&"need_effects", &"gentle")
+	assert_int(needs.intensity).is_equal(NeedEffects.Intensity.GENTLE)
+	assert_int(needs.effects.sprint).is_equal(NeedEffect.Sprint.BURSTS)
+	Settings.set_choice(&"need_effects", &"off")
+	_hold(needs, {&"energy": 0.0}, 0.5)
+	assert_bool(animal.movement.sprint_allowed).is_true()
+	assert_float(animal.movement.jump_multiplier).is_equal(1.0)
+	assert_array(needs.effects.cues()).contains([&"tired"])  # cues stay
+	Settings.set_choice(&"need_effects", &"normal")
+	assert_int(needs.intensity).is_equal(NeedEffects.Intensity.NORMAL)
+
+
 # --- jumping ------------------------------------------------------------------------------
 
 

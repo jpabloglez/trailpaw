@@ -440,7 +440,8 @@ taking away control (ADR-012, extends ADR-003).
       pulses its meter with a soft sound (replaces `critical_speed_factor`).
 - [x] Drains between needs (capped) and the nose helping with the remedy.
 - [x] Body language and audio: pant, growl, tired, shiver; first-time hints.
-- [ ] Setting Off / Gentle / Normal, the feeling-well bonus, balancing pass.
+- [x] Setting Off / Gentle / Normal (Settings → Gameplay) and the feeling-well bonus; the
+      balancing pass waits for the playtest.
 
 **Tests:** tiers and hysteresis, effect validation, combination rules, cap, intensity modes,
 sprint bursts, blocked feedback, drains between needs.

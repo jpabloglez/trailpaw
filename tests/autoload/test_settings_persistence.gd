@@ -25,6 +25,7 @@ func after_test() -> void:
 	Settings.set_sprint_toggle(false)
 	Settings.set_rest_toggle(false)
 	Settings.set_ui_scale(1.0)
+	Settings.set_choice(&"need_effects", &"normal")
 	Settings.config_path = _saved_path
 	if FileAccess.file_exists(TEST_PATH):
 		DirAccess.remove_absolute(TEST_PATH)
@@ -159,3 +160,25 @@ func test_the_interface_tab_and_hold_or_toggle_choices() -> void:
 	sprint.item_selected.emit(1)
 	assert_bool(Settings.sprint_toggle).is_true()
 	menu.visible = false
+
+
+func test_need_effects_persist_and_bad_choices_are_ignored() -> void:
+	var heard: Array[StringName] = []
+	var listener := func(key: StringName) -> void: heard.append(key)
+	Settings.changed.connect(listener)
+	Settings.set_choice(&"need_effects", &"gentle")
+	Settings.set_choice(&"need_effects", &"brutal")  # not a choice: ignored
+	Settings.set_choice(&"weather", &"off")  # not a choice setting: ignored
+	Settings.changed.disconnect(listener)
+	assert_array(heard).is_equal([&"need_effects"])
+	assert_str(String(Settings.need_effects)).is_equal("gentle")
+	assert_int(Settings.save_settings()).is_equal(OK)
+	Settings.need_effects = &"normal"
+	Settings.load_settings()
+	assert_str(String(Settings.need_effects)).is_equal("gentle")
+	var config := ConfigFile.new()
+	config.load(TEST_PATH)
+	config.set_value("gameplay", "need_effects", "brutal")
+	config.save(TEST_PATH)
+	Settings.load_settings()
+	assert_str(String(Settings.need_effects)).is_equal("normal")

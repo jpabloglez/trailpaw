@@ -1424,8 +1424,13 @@ input already used by another action and replaces only the action's bindings of 
 (keyboard/mouse or gamepad), and a file without gamepad entries keeps the default pad bindings;
 `InputBinding` (`scripts/util/`) names inputs (`action_text(action, gamepad)`: "W", "RT");
 right-stick sensitivity (0.2–3) scales `CameraRigSettings.stick_yaw/pitch_speed` (rad/s,
-quadratic response); `restore_default_bindings()` reads the project InputMap. Window and V-Sync are skipped
-headless. The `SettingsMenu` (Graphics / Audio / Controls tabs, built in code) opens from the
+quadratic response); `restore_default_bindings()` reads the project InputMap. Choice settings go
+through `set_choice(setting, value)` with their lists in `Settings.CHOICES` (other values are
+ignored): `music_frequency` (often / sometimes / never) and `need_effects` (normal / gentle /
+off, saved under `[gameplay]`, ADR-012; `NeedsComponent.intensity` follows it through
+`NeedEffects.intensity_for()`). Window and V-Sync are skipped
+headless. The `SettingsMenu` (Graphics / Audio / Controls / Interface / Gameplay tabs, built in
+code) opens from the
 main menu and the pause menu; changes apply at once; to rebind, click the action and press a key
 or mouse button (Esc cancels).
 Controls shows two binding buttons per action, keyboard/mouse and gamepad. A pad capture takes
