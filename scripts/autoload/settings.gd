@@ -34,6 +34,10 @@ const QUALITY_PATHS: Dictionary[StringName, String] = {
 const BUSES: Array[StringName] = [&"Master", &"Music", &"SFX", &"Ambience"]
 ## How often music plays ([MusicDirector], Phase 20), in the menu's order.
 const MUSIC_FREQUENCIES: Array[StringName] = [&"often", &"sometimes", &"never"]
+## How strongly low and empty needs affect the animal (ADR-012), in the menu's order.
+const NEED_EFFECTS: Array[StringName] = [&"normal", &"gentle", &"off"]
+## Settings set with [method set_choice] → their allowed values.
+const CHOICES: Dictionary = {&"music_frequency": MUSIC_FREQUENCIES, &"need_effects": NEED_EFFECTS}
 ## Gameplay actions the player may rebind (debug keys are fixed).
 const REMAPPABLE: Array[StringName] = [
 	&"move_forward",
@@ -88,6 +92,8 @@ var invert_y: bool = false
 var camera_shake: bool = true
 ## How often music plays: one of [constant MUSIC_FREQUENCIES].
 var music_frequency: StringName = &"sometimes"
+## How strongly needs affect the animal: one of [constant NEED_EFFECTS].
+var need_effects: StringName = &"normal"
 ## Sprint: press once to run, again (or stop) to walk — instead of holding the key.
 var sprint_toggle: bool = false
 ## Rest: press once to lie down, again (or move) to get up — instead of holding the key.
@@ -209,12 +215,13 @@ func set_camera_shake(value: bool) -> void:
 	changed.emit(&"camera_shake")
 
 
-## How often music plays (one of [constant MUSIC_FREQUENCIES]; others are ignored).
-func set_music_frequency(value: StringName) -> void:
-	if value not in MUSIC_FREQUENCIES:
+## Sets the choice [param setting] (a key of [constant CHOICES], e.g. how often music plays
+## or how strongly needs affect the animal) to [param value]; values not allowed are ignored.
+func set_choice(setting: StringName, value: StringName) -> void:
+	if not CHOICES.has(setting) or value not in CHOICES[setting]:
 		return
-	music_frequency = value
-	changed.emit(&"music_frequency")
+	set(setting, value)
+	changed.emit(setting)
 
 
 ## Binds [param action] to [param event] (a key, by physical keycode, a mouse button, a gamepad
@@ -263,6 +270,7 @@ func save_settings() -> Error:
 	config.set_value("controls", "sprint_toggle", sprint_toggle)
 	config.set_value("controls", "rest_toggle", rest_toggle)
 	config.set_value("interface", "ui_scale", ui_scale)
+	config.set_value("gameplay", "need_effects", String(need_effects))
 	hints.write(config)
 	for action in REMAPPABLE:
 		config.set_value("bindings", String(action), _serialise(action))
@@ -290,6 +298,8 @@ func load_settings() -> void:
 		volumes[bus] = clampf(float(config.get_value("audio", String(bus), 1.0)), 0.0, 1.0)
 	var frequency := StringName(str(config.get_value("audio", "music_frequency", "sometimes")))
 	music_frequency = frequency if frequency in MUSIC_FREQUENCIES else &"sometimes"
+	var effects := StringName(str(config.get_value("gameplay", "need_effects", "normal")))
+	need_effects = effects if effects in NEED_EFFECTS else &"normal"
 	mouse_sensitivity = clampf(
 		float(config.get_value("controls", "mouse_sensitivity", 1.0)), 0.2, 3.0
 	)

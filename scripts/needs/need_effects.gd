@@ -41,6 +41,17 @@ func _init(table: NeedEffectTable) -> void:
 	_table = table
 
 
+## [enum Intensity] for a [code]Settings.need_effects[/code] choice ([code]&"normal"[/code],
+## [code]&"gentle"[/code], [code]&"off"[/code]; anything else is normal).
+static func intensity_for(choice: StringName) -> Intensity:
+	match choice:
+		&"gentle":
+			return Intensity.GENTLE
+		&"off":
+			return Intensity.OFF
+	return Intensity.NORMAL
+
+
 ## Recomputes the combined effects from [param model]; the animal is [param cold] (else
 ## any low comfort is heat) and [param shaded] (in shade or water).
 func update(

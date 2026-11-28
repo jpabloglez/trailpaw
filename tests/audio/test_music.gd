@@ -182,10 +182,10 @@ func test_rain_and_rest_silence_the_music_until_they_end() -> void:
 func test_never_stops_the_music_and_often_shortens_the_silences() -> void:
 	var director := _director()
 	assert_bool(_until_playing(director, MUSIC.first_spell.y + 1.0)).is_true()
-	Settings.set_music_frequency(&"never")
+	Settings.set_choice(&"music_frequency", &"never")
 	_run(director, MUSIC.fade_out + MUSIC.change_gap.y + 60.0)
 	assert_object(director.current()).is_null()
-	Settings.set_music_frequency(&"often")
+	Settings.set_choice(&"music_frequency", &"often")
 	assert_bool(_until_playing(director, 3.0)).is_true()
 	_run(director, LENGTH + MUSIC.fade_in)
 	assert_float(director.waiting()).is_less_equal(MUSIC.pauses.y * MUSIC.often_factor)
@@ -193,8 +193,8 @@ func test_never_stops_the_music_and_often_shortens_the_silences() -> void:
 
 func test_the_frequency_is_saved_and_bad_values_ignored() -> void:
 	Settings.config_path = TEST_PATH
-	Settings.set_music_frequency(&"often")
-	Settings.set_music_frequency(&"loud")  # not a frequency: ignored
+	Settings.set_choice(&"music_frequency", &"often")
+	Settings.set_choice(&"music_frequency", &"loud")  # not a frequency: ignored
 	assert_str(String(Settings.music_frequency)).is_equal("often")
 	assert_int(Settings.save_settings()).is_equal(OK)
 	Settings.music_frequency = &"sometimes"

@@ -53,7 +53,7 @@ const IDLE_SPEED: float = 0.2
 var model: NeedsModel
 ## What the needs let the animal do now (recomputed every tick).
 var effects: NeedEffects
-## How strongly need effects apply (the player's setting).
+## How strongly need effects apply (follows [code]Settings.need_effects[/code]).
 var intensity: NeedEffects.Intensity = NeedEffects.Intensity.NORMAL
 
 var _since_tick: float = 0.0
@@ -76,6 +76,8 @@ func _ready() -> void:
 		effect_table = NeedEffectTable.new()
 	effects = NeedEffects.new(effect_table)
 	_bursts = SprintBursts.new(effect_table.burst_seconds, effect_table.burst_rest_seconds)
+	intensity = NeedEffects.intensity_for(Settings.need_effects)
+	Settings.changed.connect(_on_setting_changed)
 	if biomes != null:
 		for biome in biomes.biomes:
 			_warmth[biome.id] = biome.warmth
@@ -254,6 +256,12 @@ func _ease_effects(delta: float) -> void:
 			effect_blocked.emit(need_id, &"sprint")
 			EventBus.need_effect_blocked.emit(need_id, &"sprint")
 	_sprint_blocked = blocked
+
+
+func _on_setting_changed(setting: StringName) -> void:
+	if setting == &"need_effects":
+		intensity = NeedEffects.intensity_for(Settings.need_effects)
+		update_effects()
 
 
 func _shade() -> Node:

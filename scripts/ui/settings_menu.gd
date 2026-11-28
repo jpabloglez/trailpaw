@@ -68,6 +68,7 @@ func _ready() -> void:
 	_tabs.add_child(_audio_tab())
 	_tabs.add_child(_controls_tab())
 	_tabs.add_child(_interface_tab())
+	_tabs.add_child(_gameplay_tab())
 	_status = MenuStyle.label("", 18, "Status")
 	box.add_child(_status)
 	var done := MenuStyle.button("Done", "Done")
@@ -231,6 +232,9 @@ func _refresh() -> void:
 	(control("SprintMode") as OptionButton).select(1 if Settings.sprint_toggle else 0)
 	(control("RestMode") as OptionButton).select(1 if Settings.rest_toggle else 0)
 	(control("ShowHints") as CheckBox).set_pressed_no_signal(Settings.hints.enabled)
+	(control("NeedEffects") as OptionButton).select(
+		Settings.NEED_EFFECTS.find(Settings.need_effects)
+	)
 	(control("TextSize") as OptionButton).select(
 		maxi(0, UI_SCALES.find(snappedf(Settings.ui_scale, 0.1)))
 	)
@@ -285,7 +289,7 @@ func _audio_tab() -> Control:
 	for choice in ["Often", "Sometimes", "Never"]:
 		music.add_item(choice)
 	music.item_selected.connect(
-		func(i: int) -> void: Settings.set_music_frequency(Settings.MUSIC_FREQUENCIES[i])
+		func(i: int) -> void: Settings.set_choice(&"music_frequency", Settings.MUSIC_FREQUENCIES[i])
 	)
 	_row(grid, "Music plays", music)
 	return grid.get_parent()
@@ -358,6 +362,20 @@ func _interface_tab() -> Control:
 			_status.text = "Hints will show again"
 	)
 	_row(grid, "", again)
+	return grid.get_parent()
+
+
+func _gameplay_tab() -> Control:
+	var grid := _tab("Gameplay")
+	var effects := OptionButton.new()
+	effects.name = "NeedEffects"
+	for choice in ["Normal", "Gentle", "Off"]:
+		effects.add_item(choice)
+	effects.tooltip_text = "How much thirst, hunger, heat, cold and tiredness hold your animal back"
+	effects.item_selected.connect(
+		func(i: int) -> void: Settings.set_choice(&"need_effects", Settings.NEED_EFFECTS[i])
+	)
+	_row(grid, "Need effects", effects)
 	return grid.get_parent()
 
 

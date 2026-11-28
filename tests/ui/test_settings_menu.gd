@@ -18,6 +18,7 @@ func after_test() -> void:
 	Settings.restore_default_bindings()
 	Settings.set_fov(70.0)
 	Settings.set_volume(&"SFX", 1.0)
+	Settings.set_choice(&"need_effects", &"normal")
 	Settings.config_path = _saved_path
 	if FileAccess.file_exists(TEST_PATH):
 		DirAccess.remove_absolute(TEST_PATH)
@@ -45,6 +46,10 @@ func test_controls_change_the_settings_at_once() -> void:
 	assert_float(Settings.volume(&"SFX")).is_equal_approx(0.4, 1e-4)
 	assert_bool(menu.control("Quality") is OptionButton).is_true()
 	assert_bool(menu.control("RestoreDefaults") is Button).is_true()
+	var effects := menu.control("NeedEffects") as OptionButton
+	assert_int(effects.selected).is_equal(0)  # Normal
+	effects.item_selected.emit(1)
+	assert_str(String(Settings.need_effects)).is_equal("gentle")
 
 
 func test_capturing_a_new_key_for_an_action() -> void:
