@@ -24,6 +24,8 @@
 [ext_resource type="Resource" path="res://data/needs/energy.tres" id="28_energy"]
 [ext_resource type="Resource" path="res://data/needs/need_modifiers.tres" id="29_mods"]
 [ext_resource type="Resource" path="res://data/needs/need_effects.tres" id="60_effects"]
+[ext_resource type="Script" path="res://scripts/player/need_cues.gd" id="61_cues"]
+[ext_resource type="Resource" path="res://data/needs/need_cues.tres" id="62_cueset"]
 [ext_resource type="Resource" path="res://data/biomes/biome_table.tres" id="30_biomes"]
 
 [ext_resource type="Script" path="res://scripts/interaction/interactor.gd" id="32_inter"]
@@ -240,3 +242,10 @@ movement = NodePath("../MovementComponent")
 animation = NodePath("../AnimationController")
 footsteps = NodePath("../FootstepAudio")
 biomes = ExtResource("52_biomes")
+
+[node name="NeedCues" type="Node3D" parent="." node_paths=PackedStringArray("needs", "model_root")]
+unique_name_in_owner = true
+script = ExtResource("61_cues")
+settings = ExtResource("62_cueset")
+needs = NodePath("../NeedsComponent")
+model_root = NodePath("../Model")

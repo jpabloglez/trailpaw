@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="NeedCueSettings" format=3]
+
+[ext_resource type="Script" path="res://scripts/player/need_cue_settings.gd" id="1_cues"]
+[ext_resource type="AudioStream" path="res://assets/audio/needs/pant_loop.wav" id="2_pant"]
+[ext_resource type="AudioStream" path="res://assets/audio/needs/growl.wav" id="3_growl"]
+
+[resource]
+script = ExtResource("1_cues")
+pant_stream = ExtResource("2_pant")
+pant_volume_db = -16.0
+pant_hz = 3.0
+pant_breath = 0.025
+growl_stream = ExtResource("3_growl")
+growl_volume_db = -12.0
+growl_first = 4.0
+growl_every = Vector2(25, 45)
+shiver_degrees = 1.8
+shiver_hz = 12.0
+ease_per_second = 1.5
+bus = &"SFX"
+seed_value = 12
